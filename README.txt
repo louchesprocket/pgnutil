@@ -11,9 +11,14 @@ players against a particular set of test positions were nearly
 insoluble.  After failing to find any applicable tool on the
 Internet (a fact that still astounds me), I wrote pgnutil.
 
-Pgnutil works as a Unix-style command-line filter that has four sets
-of basic function: duplicate finding, event listing, opening-
-statistics computation, and, most importantly, search and replace. 
+Pgnutil works as a Unix-style command-line filter that performs
+matching/selecting and replacing functions on PGN files in conjunction
+with various output options.  By default, pgnutil simply outputs
+selected games after performing any stipulated replacement operations,
+but it can instead output user-selected lists of fields.  In addition,
+pgnutil has three "special" output options: duplicate finding, event
+listing, and opening statistics.  Pgnutil is particularly designed to
+be used in conjunction with tools such as bayeselo or elostat.
 
 
 Requirements
@@ -27,6 +32,98 @@ Usage
 For a complete list of options:
 
 	java -jar pgnutil.jar -h
+
+Pgnutil's most basic matching option is "-m", which takes a regular
+expression as its parameter and matches against the entire text of
+each game in the file.  For example, the following search prints
+every game containing the word "forfeit" from the file mygames.pgn:
+
+	java -jar pgnutil.jar -m 'forfeit' -i mygames.pgn
+
+By default, pgnutil outputs the entire text of each matched game.
+So in the previous example, we would have to sort through the output
+to discover which players forfeited.  Much better to save ourselves
+the trouble by combining the "-s" option, and perhaps piping the
+output to another Unix command to produce a list of unique names of
+forfeiters:
+
+	java -jar pgnutil.jar -m 'forfeit' -s 'loser' -i mygames.pgn | sort -u
+
+If we only want to get a list of players that have forfeited in a
+game involving some version of Stockfish, we can combine the "-mp"
+option, which matches any player name (either black or white):
+
+	java -jar pgnutil.jar -mp 'Stockfish' -m 'forfeit' -s 'loser' -i mygames.pgn | sort -u
+
+If we don't want to see Stockfish itself in this list (which would
+happen if Stockfish forfeited any games), we can use the "-mw"
+(match winner) option to omit cases where Stockfish lost:
+
+	java -jar pgnutil.jar -m 'forfeit' -mw 'Stockfish' -s 'loser' -i mygames.pgn | sort -u
+
+To list every game that Stockfish drew, we can use the -mt ("match
+tag") option:
+
+	java -jar pgnutil.jar -mp 'Stockfish' -mt 'Result/1\/2-1\/2' -i mygames.pgn
+
+The "-r" option performs replacements on the game text.  For example,
+to replace every instance of 'Quazar' from the file mygames.pgn with
+'Quazar 0.4 x64':
+
+	java -jar pgnutil.jar -r '.*/Quazar/Quazar 0.4 x64' -i mygames.pgn
+
+The first "/"-separated component in the parameter to the "-r"
+option actually selects games upon which to perform the replace-
+ment.  So the previous example means, "for every game containing
+the regular expression '.*' (i.e., any game at all),  replace every
+occurrence of 'Quazar' with 'Quazar 0.4 x64.'"  Similarly, the command:
+
+	java -jar pgnutil.jar -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -i mygames.pgn
+
+means, "for every game containing 'Nunn 1' or 'Noomen 2012,' replace
+every occurrence of 'Quazar' with 'Quazar 0.4 x64.'"  The selec-
+tivity of the replacement can be further refined with other op-
+tions.  For example, the command:
+
+	java -jar pgnutil.jar -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -rl 'Glaurung 2.0.1' -i mygames.pgn
+
+uses the "-rl" (replace loser) option to mean, "for every game
+containing 'Nunn 1' or 'Noomen 2012' that was lost by 'Glaurung 2.0.1,'
+replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'" 
+And, of course, any of these may be combined with any of the
+various matching ond output-selection options:
+
+	java -jar pgnutil.jar -m '[Bb]litz' -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -rl 'Glaurung 2.0.1' -s 'Event' -i mygames.pgn
+
+means, "output the value of the 'Event' tag for every game
+containing 'Blitz' or 'blitz,' but of these games, for every game
+containing 'Nunn 1' or 'Noomen 2012' that was lost by 'Glaurung
+2.0.1,' replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'"
+
+By default, pgnutil will output the full text of the game in re-
+sponse to any search operation.  The "-s" option may be used to
+restrict the output to a pipe-separated list of selected fields.
+Selected fields may include any PGN tag.  There are also five
+"special" tags recognized by the "-s" option:
+
+	moves: causes pgnutil to print the game's move list
+	opponent: when the "-mp" (match player) option is used,
+		output the name of the other player
+	gameno: causes pgnutil to print the game's position within
+		the PGN file
+	oid: causes pgnutil to print the game's opening identifier
+		(see below)
+	winner: causes pgnutil to print the name of the winner
+	loser: causes pgnutil to print the name of the loser
+
+By default, fields selected by the "-s" option appear on the output
+separated by the pipe ("|") character.  If a different output-
+delimiter is desired, this may be set with the "-od" (output-
+delimiter) option.
+
+The "special" output options are "-d" (duplicates), "-e" (events),
+and "-o" (opening statistics).  Any of these may be combined with
+any matching and replacing options (see above).
 
 To find duplicate games (defined as games with the same players and
 same move list) in the file mygames.pgn:
@@ -50,92 +147,6 @@ To output games 1616-1623 and game 1710:
 
 	java -jar pgnutil.jar -gn 1616-1623,1710 -i mygames.pgn
 
-By default, pgnutil will output the full text of the game in re-
-sponse to any search operation.  The "-s" option may be used to
-restrict the output to a pipe-separated list of selected fields.
-Selected fields may include any PGN tag; the following example
-repeats the previous search, but only prints the values of the
-"Event" and "Result" tags from each game:
-	
-	java -jar pgnutil.jar -gn 1616-1623,1710 -s 'Event,Result' -i mygames.pgn
-
-There are also five "special" tags recognized by the "-s" option:
-
-	moves: causes pgnutil to print the game's move list
-	gameno: causes pgnutil to print the game's position within
-		the PGN file
-	oid: causes pgnutil to print the game's opening identifier
-		(see below)
-	winner: causes pgnutil to print the name of the winner
-	loser: causes pgnutil to print the name of the loser
-
-The main feature of pgnutil is its ability to perform search and
-replace operations.  The "-m" option performs (roughly) Perl 5-
-style regular-expression matching against the entire text of each
-game in the file.  For example, the following search prints every
-game containing the word "forfeit" from the file mygames.pgn:
-
-	java -jar pgnutil.jar -m 'forfeit' -i mygames.pgn
-
-Of course, if we want to know which players forfeited, we would
-still have to sort through the output.  Much better to save our-
-selves the trouble by combining the "-s" option, and perhaps
-piping the output to another Unix command to produce a list of
-unique names of forfeiters:
-
-	java -jar pgnutil.jar -m 'forfeit' -s 'loser' -i mygames.pgn | sort -u
-
-If we only want to get a list of players that have forfeited in a
-game involving some version of Stockfish, we can combine the "-mp"
-option, which matches any player name (either black or white):
-
-	java -jar pgnutil.jar -mp 'Stockfish' -m 'forfeit' -s 'loser' -i mygames.pgn | sort -u
-
-If we don't want to see Stockfish itself in this list (which would
-happen if Stockfish forfeited any games), we can use the "-ml"
-(match loser) option in conjunction with a fancy regular expression
-to omit cases where Stockfish lost:
-
-	java -jar pgnutil.jar -mp 'Stockfish.*' -m 'forfeit' -ml '^(?:(?!Stockfish).)*$' -s 'loser' -i mygames.pgn | sort -u
-
-Or we can achieve the same thing (without the regular expression) by
-simply matching games that Stockfish won with the "-mw" option:
-
-	java -jar pgnutil.jar -mp 'Stockfish.*' -m 'forfeit' -mw 'Stockfish' -s 'loser' -i mygames.pgn | sort -u
-
-Pgnutil can also perform replacements on the game text with the
-"-r" option.  For example, to replace every instance of 'Quazar'
-from the file mygames.pgn with 'Quazar 0.4 x64':
-
-	java -jar pgnutil.jar -r 'Quazar/Quazar/Quazar 0.4 x64' -i mygames.pgn
-
-The first "/"-separated component in the parameter to the "-r"
-option actually selects games upon which to perform the replace-
-ment.  So the previous example means, "for every game containing
-'Quazar,' replace every occurrence of 'Quazar' with 'Quazar 0.4
-x64.'"  Similarly, the command:
-
-	java -jar pgnutil.jar -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -i mygames.pgn
-
-means, "for every game containing 'Nunn 1' or 'Noomen 2012,' replace
-every occurrence of 'Quazar' with 'Quazar 0.4 x64.'"  The selec-
-tivity of the replacement can be further refined with other op-
-tions.  For example, the command:
-
-	java -jar pgnutil.jar -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -rl 'Glaurung 2.0.1' -i mygames.pgn
-
-uses the "-rl" (replace loser) option to mean, "for every game
-containing 'Nunn 1' or 'Noomen 2012' that was lost by 'Glaurung 2.0.1,'
-replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'" 
-And, of course, any of these may be combined with any of the
-various matching ond output-selection options:
-
-	java -jar pgnutil.jar -m '[Bb]litz' -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -rl 'Glaurung 2.0.1' -s 'Event' -i mygames.pgn
-
-means, "output the value of the 'Event' tag for every game
-containing 'Blitz' or 'blitz,' but of these games, for every game
-containing 'Nunn 1' or 'Noomen 2012' that was lost by 'Glaurung
-2.0.1,' replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'"
 
 To list each event from the file mygames.pgn, along with the games
 that belong to it:
@@ -192,6 +203,11 @@ We can then feed these to a matching command ("-mo"):
 	java -jar pgnutil.jar -mo 4748b62c5f943db4,58042cacbd9498f9,3ef5ae89557400b9,5e8c715de2d30397 -i mygames.pgn
 
 to output those games wherein the selected openings were played.
+If you wish to input a long list of opening identifiers, you may
+instead use the "-of" (opening-file) option, which takes as its
+parameter the file name of a file containing opening identifiers:
+
+	java -jar pgnutil.jar -of myopeningsfile -i mygames.pgn
 
 NOTE: pgnutil correctly identifies openings (to be precise, it
 correctly identifies the "out-of-book" condition) for PGN files
@@ -202,14 +218,13 @@ been tested.
 Known Issues
 
 Apart from the opening issue (see just above), pgnutil is also
-victim to the PGN specification's greatest infirmity--which, for
-some reason, is hardly ever discussed: lack of standardized move
-notation.  PGN files are allowed to list moves in any way at all.
-This means, for example, that "Bb2," "c1-b2," and "B-QN2" are all
-valid notation.  Pgnutil makes no effort to standardize moves
-(as this would entail a large performance penalty), so all move
-comparisons, such as the "-mo" and "-ro" options, as well as du-
-plicate finding and opening statistics, assume that notation
+victim to the PGN specification's greatest infirmity: lack of
+standardized move notation.  PGN files are allowed to list moves
+in any way at all.  This means, for example, that "Bb2," "c1-b2,"
+and "B-QN2" are all valid notation.  Pgnutil makes no effort to
+standardize moves (as this would entail a large performance penalty),
+so all move comparisons, such as the "-mo" and "-ro" options, as well
+as duplicate finding and opening statistics, assume that notation
 throughout the input file is consistent.
 
 Also, the PGN spec permits "%"-style comments.  I have never seen

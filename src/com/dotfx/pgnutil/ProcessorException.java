@@ -28,7 +28,7 @@ package com.dotfx.pgnutil;
  *
  * @author Mark Chen
  */
-public class PGNException extends Exception
+public class ProcessorException extends Exception
 {
-    public PGNException(String msg) { super(msg); }
+    public ProcessorException(Exception e) { super(e); }
 }

@@ -1,4 +1,25 @@
 /*
+ * The MIT License
+ *
+ * Copyright 2018 Mark Chen.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 
 package com.dotfx.pgnutil;
@@ -14,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.cedarsoftware.util.CaseInsensitiveMap;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
@@ -30,6 +52,32 @@ public class Game
     private static final HashFunction HASHFUNC;
     private static final int BUFSIZE = 1024;
     private static final int COMMENT_BUFSIZE = 1024;
+    
+    public static enum Result
+    {
+        WHITEWIN("1-0"),
+        BLACKWIN("0-1"),
+        DRAW("1/2-1/2"),
+        NORESULT("*");
+        
+        private static final Map<String,Result> sigMap = new HashMap<>();
+        private final String signifier;
+        
+        static
+        {
+            for (Result r : Result.values())
+                sigMap.put(r.toString(), r);
+        }
+        
+        private Result(String signifier) { this.signifier = signifier; }
+        @Override public String toString() { return signifier; }
+        
+        public static Result get(String signifier)
+        {
+            if (signifier == null) return null;
+            return sigMap.get(signifier);
+        }
+    }
     
     /**
      * One per ply.
@@ -111,7 +159,7 @@ public class Game
         ArrayList<String> moveComments = new ArrayList();
         char buf[] = new char[BUFSIZE];
         int next, i, j;
-        Map<String,String> tagpairs = new HashMap<>();
+        Map<String,String> tagpairs = new CaseInsensitiveMap<>();
         List<Game.Move> moves = new ArrayList();
         List<String> gameComments = new ArrayList();
         
@@ -386,26 +434,28 @@ public class Game
     public String getRound() { return getValue("Round"); }
     public String getWhite() { return getValue("White"); }
     public String getBlack() { return getValue("Black"); }
-    public String getResult() { return getValue("Result"); }
+    public Result getResult() { return Result.get(getValue("Result")); }
     
-    public boolean isDraw() { return getResult().equals("1/2-1/2"); }
-    public boolean isNoResult() { return getResult().equals("*"); }
+    public boolean isDraw() { return getResult().equals(Result.DRAW); }
+    public boolean isNoResult() { return getResult().equals(Result.NORESULT); }
+    
+    public Move getMove(int number, Color color)
+    {
+        return getMoves().get(number * 2 - (color.equals(Color.WHITE) ? 2 : 1));
+    }
+    
     
     public String getWinner()
     {
-        String result = getResult();
-        
-        if (result.equals("1-0")) return getWhite();
-        if (result.equals("0-1")) return getBlack();
+        if (getResult().equals(Result.WHITEWIN)) return getWhite();
+        if (getResult().equals(Result.BLACKWIN)) return getBlack();
         return null;
     }
     
     public String getLoser()
     {
-        String result = getResult();
-        
-        if (result.equals("1-0")) return getBlack();
-        if (result.equals("0-1")) return getWhite();
+        if (getResult().equals(Result.WHITEWIN)) return getBlack();
+        if (getResult().equals(Result.BLACKWIN)) return getWhite();
         return null;
     }
     
@@ -435,6 +485,69 @@ public class Game
     
     /**
      * 
+     * @return the value of the TimeControl tag, if present and legible;
+     *         otherwise, best guess or null
+     */
+    public TimeCtrl getTimeCtrl()
+    {
+        String timeCtrlSt = null;
+        boolean official = false;
+        
+        try { timeCtrlSt = get(OutputSelector.TIMECONTROL); }
+        catch (InvalidSelectorException e) {} // shouldn't happen
+        
+        if (timeCtrlSt == null || timeCtrlSt.equals("?")) // try to infer
+        {
+            Clock startClko = null;
+            Clock lastClko = null;
+            Game.Color color = null;
+            
+            for (Move move : getMoves())
+            {
+                if (color != null && !move.getColor().equals(color)) continue;
+                
+                AquariumVars av = new AquariumVars(move);
+                Clock thisClko = av.getClko();
+                
+                if (thisClko == null) continue;
+                
+                if (startClko == null)
+                {
+                    startClko = thisClko;
+                    color = move.getColor();
+                }
+                
+                else if (thisClko.compareTo(lastClko) > 0 &&
+                    move.getColor().equals(color))
+                {
+                    int moveNo = move.getNumber();
+                    
+                    // Correct for Aquarium weirdness.
+                    
+                    moveNo = moveNo % 10 >= 5 ? ((moveNo / 10) * 10) + 10 :
+                        (moveNo / 10) * 10;
+                    
+                    timeCtrlSt = moveNo + "/" + startClko.inSecs();
+                    
+//                    timeCtrlSt = (moveNo -
+//                        (color.equals(Color.WHITE) ? 1 : 0)) + "/" +
+//                        startClko.inSecs();
+                    
+                    break;
+                }
+                
+                lastClko = thisClko;
+            }
+        }
+        
+        else official = true;
+        
+        try { return new TimeCtrl(timeCtrlSt, official); }
+        catch (InvalidTimeCtrlException e) { return null; }
+    }
+    
+    /**
+     * 
      * @param regex the regular expression to be matched against this game
      * @return true if a match is found, false otherwise
      */
@@ -456,52 +569,78 @@ public class Game
                 replaceAll(replacement))));
     }
     
-    /**
-     * 
-     * @param spec a comma-separated list of requested fields.  The field
-     *             "moves" corresponds to the game's move list.  The field
-     *             "gameno" corresponds to the game's number (normally, the
-     *             sequence number from the parsed PGN file).  The field 'oid'
-     *             corresponds to the game's opening identifier.
-     * 
-     * @return a String containing pipe-separated values corresponding to the
-     *         requested fields
-     */
-    public String get(String spec)
+    public String get(OutputSelector selector)
+        throws InvalidSelectorException
+    {
+        return get(new OutputSelector[] {selector});
+    }
+    
+    public String get(OutputSelector selectors[])
+        throws InvalidSelectorException
     {
         StringBuilder ret = new StringBuilder();
-        String tokens[] = spec.split(",\\W*");
         
-        for (String token : tokens)
+        for (int i = 0; i < selectors.length; i++)
         {
-            if (token.equalsIgnoreCase("moves"))
+            StringBuilder moveList = new StringBuilder();
+            List<Move> moves = getMoves();
+
+            switch (selectors[i].getValue())
             {
-                StringBuilder moveList = new StringBuilder();
-                List<Move> moves = getMoves();
+                case PRETTYMOVES:
+                    for (Move move : moves)
+                    {
+                        moveList.append(move.getNumber()).
+                            append(move.getColor().equals(Color.WHITE) ?
+                                ".   " : "... ");
+
+                        moveList.append(move.getMove());
+
+                        for (String comment : move.getComments())
+                            moveList.append(" {").append(comment).append("}");
+
+                        moveList.append("\n");
+                    }
+
+                    moveList.append("\n");
+                    return moveList.toString();
                 
-                for (Move move : moves)
-                    moveList.append(move.getMove()).append(" ");
-                
-                moveList.deleteCharAt(moveList.length() - 1);
-                ret.append(moveList.toString()).append("|");
+                case MOVES:
+                    for (Move move : moves)
+                    {
+                        if (move.getColor().equals(Color.WHITE))
+                            moveList.append(move.getNumber()).append(". ");
+
+                        moveList.append(move.getMove()).append(" ");
+                    }
+
+                    moveList.deleteCharAt(moveList.length() - 1);
+                    ret.append(moveList.toString());
+                    break;
+            
+                case OPPONENT:
+                    if (PGNUtil.playerPattern == null)
+                        throw new InvalidSelectorException("'opponent' " +
+                            "selector requires option '-mp'");
+
+                    if (PGNUtil.playerPattern.matcher(getWhite()).find())
+                        ret.append(getBlack());
+
+                    else ret.append(getWhite());
+                    break;
+
+                case GAMENO: ret.append(getNumber()); break;
+                case OID: ret.append(getOpeningID()); break;
+                case WINNER: ret.append(getWinner()); break;
+                case LOSER: ret.append(getLoser()); break;
+                case TIMECTRL: ret.append(getTimeCtrl()); break;
+                    
+                default: ret.append(getValue(selectors[i].toString()));
             }
             
-            else if (token.equalsIgnoreCase("gameno"))
-                ret.append(getNumber()).append("|");
-            
-            else if (token.equalsIgnoreCase("oid"))
-                ret.append(getOpeningID()).append("|");
-            
-            else if (token.equalsIgnoreCase("winner"))
-                ret.append(getWinner()).append("|");
-            
-            else if (token.equalsIgnoreCase("loser"))
-                ret.append(getLoser()).append("|");
-            
-            else ret.append(getValue(token)).append("|");
+            if (i < selectors.length - 1) ret.append(CLOptions.outputDelim);
         }
         
-        ret.deleteCharAt(ret.length() - 1);
         return ret.toString();
     }
     

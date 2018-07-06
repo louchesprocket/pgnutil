@@ -28,7 +28,7 @@ package com.dotfx.pgnutil;
  *
  * @author Mark Chen
  */
-public class PGNException extends Exception
+public class InvalidPlayerException extends Exception
 {
-    public PGNException(String msg) { super(msg); }
+    public InvalidPlayerException(String m) { super(m); }
 }

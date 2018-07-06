@@ -24,51 +24,46 @@
 
 package com.dotfx.pgnutil;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.Reader;
-
 /**
  *
  * @author Mark Chen
  */
-public class PGNFile
+public class Clock implements Comparable<Clock>
 {
-    final CopyReader reader;
-    int gameCounter;
+    private final int seconds;
     
-    public PGNFile(String file) throws FileNotFoundException
+    public Clock(String clockSt) throws InvalidClockException
     {
-        reader = new CopyReader(new BufferedReader(new FileReader(file)));
-        gameCounter = 0;
+        String clockParts[] = clockSt.split(":");
+        int partCount = clockParts.length;
+        if (partCount > 3) throw new InvalidClockException(clockSt);
+        
+        try
+        {
+            seconds = Integer.valueOf(clockParts[partCount - 1]) +
+                (partCount >= 2 ? Integer.valueOf(clockParts[partCount - 2]) * 60 : 0) +
+                (partCount == 3 ? Integer.valueOf(clockParts[0]) * 3600 : 0);
+        }
+        
+        catch (NumberFormatException e)
+        {
+            throw new InvalidClockException(clockSt);
+        }
     }
     
-    public PGNFile(InputStream is)
-    {
-        reader = new CopyReader(new BufferedReader(new InputStreamReader(is)));
-        gameCounter = 0;
-    }
+    public int getHrs() { return seconds / 3600; }
+    public int getMins() { return (seconds % 3600) / 60; }
+    public int getSecs() { return seconds % 60; }
     
-    /**
-     * This constructor uses the exact Reader supplied by the caller (except
-     * for wrapping it in a CopyReader so that the original game text can be
-     * retrieved).
-     * 
-     * @param reader Reader containing PGN-formatted text
-     */
-    public PGNFile(Reader reader)
-    {
-        this.reader = new CopyReader(reader);
-        gameCounter = 0;
-    }
+    public int inMins() { return seconds / 60; }
+    public int inSecs() { return seconds; }
     
-    public Game nextGame() throws IOException, PGNException
+    @Override
+    public int compareTo(Clock that) { return seconds - that.seconds; }
+    
+    @Override
+    public String toString()
     {
-        reader.clear();
-        return Game.parseNext(++gameCounter, reader);
+        return String.format("%01d:%02d:%02d", getHrs(), getMins(), getSecs());
     }
 }

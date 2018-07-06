@@ -1,25 +1,46 @@
 /*
+ * The MIT License
+ *
+ * Copyright 2018 Mark Chen.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 
 package com.dotfx.pgnutil;
 
+import com.google.common.hash.HashCode;
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 //import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.Option;
 
 /**
  *
@@ -27,187 +48,7 @@ import org.kohsuke.args4j.Option;
  */
 public class PGNUtil
 {
-    public static final String VERSION = "0.1";
-    
-    public static class CLOpts
-    {
-        // matchers
-        
-        @Option(name = "-m", forbids = {"-d", "-e", "-o"}, aliases = "-matches",
-            metaVar = "<regex>",
-            usage = "output games matching the regular expression <regex>")
-        private String containsStr;
-        
-        @Option(name = "-gn", forbids = {"-d", "-e", "-o"}, aliases = "-game_number",
-            metaVar = "<range1,range2,...>",
-            usage = "output games whose ordinal position in the input source " +
-                "is contained in <range1,range2,...>")
-        private String gameNumStr;
-
-        @Option(name = "-nm", forbids = {"-d", "-e", "-o"},
-            aliases = "-not_matches", metaVar = "<regex>",
-            usage = "output games not matching the regular expression " +
-            "<regex>")
-        private String notContainsStr;
-
-        @Option(name = "-me", forbids = {"-d", "-e", "-o"},
-            aliases = "-match_event", metaVar = "<regex>",
-            usage = "output games where the event matches <regex>")
-        private String matchEventStr;
-
-        @Option(name = "-mw", forbids = {"-d", "-e", "-o"},
-            aliases = "-match_winner", metaVar = "<regex>",
-            usage = "output games won by player <regex>")
-        private String matchWinStr;
-
-        @Option(name = "-ml", forbids = {"-d", "-e", "-o"},
-            aliases = "-match_loser", metaVar = "<regex>",
-            usage = "output games lost by player <regex>")
-        private String matchLossStr;
-
-        @Option(name = "-mp", forbids = {"-d", "-e", "-o"},
-            aliases = "-match_player", metaVar = "<regex>",
-            usage = "output games where <regex> is a player")
-        private String matchPlayerStr;
-
-        @Option(name = "-mo", forbids = {"-d", "-e", "-o"},
-            aliases = "-match_opening",
-            metaVar = "<oid1,oid1,...>",
-            usage = "output games in which the opening-book moves are the " +
-            "same as any of <oid,oid2,...>")
-        private String matchOpeningStr;
-
-        @Option(name = "-nmo", forbids = {"-d", "-e", "-o"},
-            aliases = "-not_match_opening",
-            metaVar = "<oid1,oid1,...>",
-            usage = "output games in which the opening-book moves are not " +
-            "the same as any of <oid,oid2,...>")
-        private String notMatchOpeningStr;
-        
-        // replacers
-        
-        @Option(name = "-r", forbids = {"-d", "-e", "-o"}, aliases = "-replace",
-            metaVar = "<regx1>/<regx2>/<repl>",
-            usage = "output all games (or all selected games), but for each " +
-            "game matching <regx1>, replace <regx2> with <repl>")
-        private String replaceStr;
-
-        @Option(name = "-rw", depends = {"-r"}, aliases = "-replace_winner",
-            metaVar = "<regex>",
-            usage = "in combination with \"-r\" option, select games won by " +
-            "player <regex> for replacement")
-        private String replWinStr;
-
-        @Option(name = "-rl", depends = {"-r"}, aliases = "-replace_loser",
-            metaVar = "<regex>",
-            usage = "in combination with \"-r\" option, select games lost by " +
-            "player <regex> for replacement")
-        private String replLossStr;
-
-        @Option(name = "-ro", depends = {"-r"}, aliases = "-replace_opening",
-            metaVar = "<oid1,oid1,...>",
-            usage = "in combination with \"-r\" option, select games in " +
-            "which the opening-book moves are the same as any of <oid,oid2,...> " +
-            "for replacement")
-        private String replOpeningStr;
-        
-        // duplicates
-
-        @Option(name = "-d", forbids = {"-o", "-e", "-m", "-gn", "-nm", "-me",
-            "-mw", "-ml", "-mp", "-mo", "-nmo", "-r"},
-            aliases = "-duplicates",
-            usage = "list games containing identical players and move lists; " +
-                "each line of output contains one set of two or more " +
-                "duplicate games numbers")
-        private Boolean duplicates;
-        
-        // events
-        
-        @Option(name = "-e", forbids = {"-d", "-o", "-m", "-gn", "-nm", "-me",
-            "-mw", "-ml", "-mp", "-mo", "-nmo", "-r"}, aliases = "-events",
-            usage = "list one event per line, with game numbers (ordinal " +
-            "position of the game as it was read from the input source)")
-        private Boolean events;
-        
-        // opening stats
-        
-        @Option(name = "-o", forbids = {"-d", "-e", "-m", "-gn", "-nm", "-me",
-            "-mw", "-ml", "-mp", "-mo", "-nmo", "-r"},
-            aliases = "-opening_stats", usage = "print win/loss/draw " +
-            "statistics for each opening")
-        private Boolean openingStats;
-        
-        @Option(name = "-cmin", depends = {"-o"}, aliases = "-count_min",
-            metaVar = "<min>",
-            usage = "in combination with \"-o\" option, print only openings " +
-                "that appear in at least <min> games")
-        private int minGames;
-        
-        @Option(name = "-hdp", depends = {"-o"}, aliases = "-hi_diff_pct",
-            metaVar = "<max>",
-            usage = "in combination with \"-o\" option, print only openings " +
-                "for which the percentage win difference between white and " +
-                "black is at most <max> percent")
-        private Double maxDiffPct;
-        
-        @Option(name = "-ldp", depends = {"-o"}, aliases = "-lo_diff_pct",
-            metaVar = "<min>",
-            usage = "in combination with \"-o\" option, print only openings " +
-                "for which the percentage win difference between white and " +
-                "black is at least <min> percent")
-        private Double minDiffPct;
-        
-        @Option(name = "-hdraw", depends = {"-o"}, aliases = "-hi_draw_pct",
-            metaVar = "<max>",
-            usage = "in combination with \"-o\" option, print only openings " +
-                "for which the percentage of draws is at most <max> percent")
-        private Double maxDrawPct;
-        
-        @Option(name = "-ldraw", depends = {"-o"}, aliases = "-lo_draw_pct",
-            metaVar = "<min>",
-            usage = "in combination with \"-o\" option, print only openings " +
-                "for which the percentage of draws is at least <min> percent")
-        private Double minDrawPct;
-        
-        // output-field selector
-        
-        @Option(name = "-s", forbids = {"-d", "-e"}, aliases = "-select",
-            metaVar = "<field1,field2,..>",
-            usage = "select fields for output.  The field 'moves' selects " +
-            "the game's move list, the field 'gameno' selects the ordinal " +
-            "position of the game as it was read from the input source, and " +
-            "the field 'oid' selects the game's opening identifier (not " +
-            "ECO). The fields 'winner' and 'loser' select the winning and " +
-            "losing player, respectively.  Any other field will be selected " +
-            "from the game's tag list")
-        private String outputFields;
-        
-        @Option(name = "-i", aliases = "-inputfile", usage = "input PGN file; " +
-            "if this option is not present, pgnutil reads from standard input",
-            metaVar = "<filename>")
-        private String infile;
-        
-        @Option(name = "-h", forbids = {"-d", "-e", "-o", "-m", "-gn", "-nm",
-            "-me", "-mw", "-ml", "-mp", "-mo", "-nmo", "-r"}, aliases = "-help",
-            usage = "print usage information")
-        private Boolean help;
-        
-        @Option(name = "-v", forbids = {"-d", "-e", "-o", "-m", "-h", "-gn",
-            "-nm", "-me", "-mw", "-ml", "-mp", "-mo", "-nmo", "-r"},
-            aliases = "-version",
-            usage = "print version information")
-        private Boolean version;
-        
-//        @Argument(metaVar = "[target [target2 [target3] ...]]", usage = "targets")
-//        private List<String> targets = new ArrayList<String>();
-    }
-    
-    private static class ProcessorException extends Exception
-    {
-        public ProcessorException(Exception e) { super(e); }
-    }
-    
-    private static interface GameProcessor
+    public static interface GameProcessor
     {
         /**
          * 
@@ -217,31 +58,56 @@ public class PGNUtil
         public boolean processGame() throws ProcessorException;
     }
     
-    private static class ContainsProcessor implements GameProcessor
+    // match processors
+    
+    static class ContainsProcessor implements GameProcessor
     {
-        private final Pattern containsPattern;
+        private final Pattern matchPattern;
         
-        public ContainsProcessor(Pattern p) { containsPattern = p; }
+        public ContainsProcessor(Pattern p) { matchPattern = p; }
         
         @Override public boolean processGame()
         {
-            return game.matches(containsPattern);
+            return game.matches(matchPattern);
         }
     }
     
-    private static class NotContainsProcessor implements GameProcessor
+    static class NotContainsProcessor implements GameProcessor
     {
-        private final Pattern notContainsPattern;
+        private final Pattern notMatchPattern;
         
-        public NotContainsProcessor(Pattern p) { notContainsPattern = p; }
+        public NotContainsProcessor(Pattern p) { notMatchPattern = p; }
         
         @Override public boolean processGame()
         {
-            return !game.matches(notContainsPattern);
+            return !game.matches(notMatchPattern);
         }
     }
     
-    private static class MatchGameNumProcessor implements GameProcessor
+    static class MatchTagProcessor implements GameProcessor
+    {
+        private final OutputSelector tag;
+        private final Pattern tagPattern;
+        
+        public MatchTagProcessor(String tag, Pattern p)
+        {
+            this.tag = new OutputSelector(tag);
+            tagPattern = p;
+        }
+        
+        @Override public boolean processGame()
+        {
+            try
+            {
+                String value = game.get(tag);
+                return (value != null) && tagPattern.matcher(value).find();
+            }
+            
+            catch (InvalidSelectorException e) { return false; }
+        }
+    }
+    
+    static class MatchGameNumProcessor implements GameProcessor
     {
         private final List<SimpleEntry<Integer,Integer>> ranges;
         
@@ -273,43 +139,31 @@ public class PGNUtil
         }
     }
     
-    private static class MatchOpeningProcessor implements GameProcessor
+    static class MatchOpeningProcessor implements GameProcessor
     {
-        private final Set<OpeningID> openingSet;
+        private final Set<OpeningID> matchOpeningSet;
         
         public MatchOpeningProcessor(String s)
         {
-            openingSet = new HashSet();
+            matchOpeningSet = new HashSet<>();
             
             for (String token : s.split(",\\W*"))
-                openingSet.add(OpeningID.fromString(token));
+                matchOpeningSet.add(OpeningID.fromString(token));
         }
         
         @Override public boolean processGame()
         {
-            return openingSet.contains(game.getOpeningID());
+            return matchOpeningSet.contains(game.getOpeningID());
         }
     }
     
-    private static class NotMatchOpeningProcessor extends MatchOpeningProcessor
+    static class NotMatchOpeningProcessor extends MatchOpeningProcessor
     {
         public NotMatchOpeningProcessor(String s) { super(s); }
         @Override public boolean processGame() { return !super.processGame(); }
     }
     
-    private static class MatchEventProcessor implements GameProcessor
-    {
-        private final Pattern matchEventPattern;
-        
-        public MatchEventProcessor(Pattern p) { matchEventPattern = p; }
-        
-        @Override public boolean processGame()
-        {
-            return matchEventPattern.matcher(game.getEvent()).find();
-        }
-    }
-    
-    private static class MatchWinProcessor implements GameProcessor
+    static class MatchWinProcessor implements GameProcessor
     {
         private final Pattern matchWinPattern;
         
@@ -323,7 +177,7 @@ public class PGNUtil
         }
     }
     
-    private static class MatchLossProcessor implements GameProcessor
+    static class MatchLossProcessor implements GameProcessor
     {
         private final Pattern matchLossPattern;
         
@@ -337,31 +191,51 @@ public class PGNUtil
         }
     }
     
-    private static class MatchPlayerProcessor implements GameProcessor
+    static class MatchPlayerProcessor implements GameProcessor
     {
-        private final Pattern matchPlayerPattern;
+        private final Pattern playerPattern;
         
-        public MatchPlayerProcessor(Pattern p) { matchPlayerPattern = p; }
+        public MatchPlayerProcessor(Pattern p)
+        { PGNUtil.playerPattern = playerPattern = p; }
         
         @Override public boolean processGame()
         {
-            return matchPlayerPattern.matcher(game.getWhite()).find() ||
-                matchPlayerPattern.matcher(game.getBlack()).find();
+            return playerPattern.matcher(game.getWhite()).find() ||
+                playerPattern.matcher(game.getBlack()).find();
         }
     }
+    
+    static class MatchTimeCtrlProcessor implements GameProcessor
+    {
+        private final TimeCtrl matchTimeCtrl;
+        
+        public MatchTimeCtrlProcessor(String s)
+            throws InvalidTimeCtrlException
+        {
+            matchTimeCtrl = new TimeCtrl(s, false);
+        }
+        
+        @Override public boolean processGame()
+        {
+            TimeCtrl timeCtrl = game.getTimeCtrl();
+            return timeCtrl != null ? timeCtrl.equals(matchTimeCtrl) : false;
+        }
+    }
+    
+    // replacement processors
     
     /**
      * An instance of this must be the last processor in the
      * replaceProcessors list.
      */
-    private static class ReplaceProcessor implements GameProcessor
+    static class ReplaceProcessor implements GameProcessor
     {
-        private final Pattern replacePattern;
+        private final Pattern replacePattern2; // to be replaced
         private final String replacement;
         
         public ReplaceProcessor(Pattern replacePattern, String replacement)
         {
-            this.replacePattern = replacePattern;
+            replacePattern2 = replacePattern;
             this.replacement = replacement;
         }
         
@@ -369,7 +243,7 @@ public class PGNUtil
         {
             try
             {
-                game = game.replace(replacePattern, replacement);
+                game = game.replace(replacePattern2, replacement);
                 return false;
             }
             
@@ -380,27 +254,190 @@ public class PGNUtil
         }
     }
     
-    private static interface GamePrinter { public void print(); }
-    
-    private static class DefaultGamePrinter implements GamePrinter
+    static class ReplaceContainsProcessor implements GameProcessor
     {
-        @Override public void print()
+        private final Pattern replacePattern1; // eligibility pattern
+        
+        public ReplaceContainsProcessor(Pattern p) { replacePattern1 = p; }
+        
+        @Override public boolean processGame()
+        {
+            return game.matches(replacePattern1);
+        }
+    }
+    
+    static class ReplaceWinProcessor implements GameProcessor
+    {
+        private final Pattern replaceWinPattern;
+        
+        public ReplaceWinProcessor(Pattern p) { replaceWinPattern = p; }
+        
+        @Override public boolean processGame()
+        {
+            String winner = game.getWinner();
+            if (winner == null) return false;
+            return replaceWinPattern.matcher(winner).find();
+        }
+    }
+    
+    static class ReplaceLossProcessor implements GameProcessor
+    {
+        private final Pattern replaceLossPattern;
+        
+        public ReplaceLossProcessor(Pattern p) { replaceLossPattern = p; }
+        
+        @Override public boolean processGame()
+        {
+            String loser = game.getLoser();
+            if (loser == null) return false;
+            return replaceLossPattern.matcher(loser).find();
+        }
+    }
+    
+    static class ReplaceOpeningProcessor implements GameProcessor
+    {
+        private final Set<OpeningID> replaceOpeningSet;
+        
+        public ReplaceOpeningProcessor(String s)
+        {
+            replaceOpeningSet = new HashSet<>();
+            
+            for (String token : s.split(",\\W*"))
+                replaceOpeningSet.add(OpeningID.fromString(token));
+        }
+        
+        @Override public boolean processGame()
+        {
+            return replaceOpeningSet.contains(game.getOpeningID());
+        }
+    }
+    
+    // game handlers
+    
+    static interface GameHandler
+    { public void handle() throws InvalidSelectorException; }
+    
+    static class NullGameHandler implements GameHandler
+    {
+        @Override public void handle() throws InvalidSelectorException {}
+    }
+    
+    private static class DefaultGameHandler implements GameHandler
+    {
+        @Override public void handle() throws InvalidSelectorException
         {
             System.out.print(game.getOrigText());
         }
     }
     
-    private static class SelectGamePrinter implements GamePrinter
+    static class SelectGameHandler implements GameHandler
     {
-        private final String fields;
+        private final OutputSelector selectors[];
         
-        public SelectGamePrinter(String fields) { this.fields = fields; }
-        
-        @Override public void print()
+        public SelectGameHandler(OutputSelector selectors[])
         {
-            System.out.println(game.get(fields));
+            this.selectors = selectors;
+        }
+        
+        @Override public void handle() throws InvalidSelectorException
+        {
+            System.out.println(game.get(selectors));
         }
     }
+    
+    static class EventMapHandler implements GameHandler
+    {
+        private final Map<String,List<GameInfo>> eventMap;
+        
+        public EventMapHandler() { eventMap = new HashMap<>(); }
+        
+        @Override public void handle() throws InvalidSelectorException
+        {
+            String event = game.getValue("Event");
+            List<GameInfo> eventGames = eventMap.get(event);
+
+            if (eventGames == null)
+            {
+                eventGames = new ArrayList();
+                eventMap.put(event, eventGames);
+            }
+
+            eventGames.add(new GameInfo((int)game.getNumber(),
+                game.getTimeCtrl()));
+        }
+        
+        public Map<String,List<GameInfo>> getEventMap() { return eventMap; }
+    }
+    
+    static class DuplicateHandler implements GameHandler
+    {
+        private final Map<HashCode,List<Integer>> gameMap;
+        private final Set<HashCode> duplicates;
+        
+        public DuplicateHandler()
+        {
+            gameMap = new HashMap(100000);
+            duplicates = new HashSet();
+        }
+        
+        @Override public void handle() throws InvalidSelectorException
+        {
+            HashCode gameHash = game.getHash();
+            List<Integer> gameIdxes = gameMap.get(gameHash);
+
+            if (gameIdxes != null) duplicates.add(gameHash);
+
+            else
+            {
+                gameIdxes = new ArrayList<>();
+                gameMap.put(gameHash, gameIdxes);
+            }
+
+            gameIdxes.add((int)game.getNumber());
+        }
+        
+        public List<List<Integer>> getDuplicates()
+        {
+            List<List<Integer>> ret = new ArrayList<>();
+            for (HashCode duplicate : duplicates) ret.add(gameMap.get(duplicate));
+            return ret;
+        }
+    }
+    
+    static class OpeningsHandler implements GameHandler
+    {
+        private final Map<OpeningID,OpeningStats> openingsMap;
+        
+        public OpeningsHandler() {  openingsMap = new HashMap<>(10000); }
+        
+        @Override public void handle() throws InvalidSelectorException
+        {
+            if (CLOptions.maxEloDiff != null)
+            {
+                Integer whiteElo = eloMap.get(game.getWhite().trim());
+                Integer blackElo = eloMap.get(game.getBlack().trim());
+                
+                if (whiteElo == null || blackElo == null ||
+                    Math.abs(whiteElo - blackElo) > CLOptions.maxEloDiff)
+                    return;
+            }
+            
+            OpeningID openingID = game.getOpeningID();
+            OpeningStats stats = openingsMap.get(openingID);
+
+            if (stats == null)
+            {
+                stats = new OpeningStats(openingID, game.get(OutputSelector.ECO));
+                openingsMap.put(openingID, stats);
+            }
+
+            stats.count(game);
+        }
+        
+        public Map<OpeningID,OpeningStats> getMap() { return openingsMap; }
+    }
+    
+    // opening-stat processors
     
     private static interface OpeningProcessor
     {
@@ -413,7 +450,7 @@ public class PGNUtil
             throws ProcessorException;
     }
     
-    private static class MinGamesProcessor implements OpeningProcessor
+    static class MinGamesProcessor implements OpeningProcessor
     {
         private final int minGames;
         
@@ -425,7 +462,7 @@ public class PGNUtil
         }
     }
     
-    private static class MaxWinDiffProcessor implements OpeningProcessor
+    static class MaxWinDiffProcessor implements OpeningProcessor
     {
         private final double maxDiff;
         
@@ -437,7 +474,7 @@ public class PGNUtil
         }
     }
     
-    private static class MinWinDiffProcessor implements OpeningProcessor
+    static class MinWinDiffProcessor implements OpeningProcessor
     {
         private final double minDiff;
         
@@ -449,7 +486,7 @@ public class PGNUtil
         }
     }
     
-    private static class MinDrawProcessor implements OpeningProcessor
+    static class MinDrawProcessor implements OpeningProcessor
     {
         private final double minDraw;
         
@@ -461,7 +498,7 @@ public class PGNUtil
         }
     }
     
-    private static class MaxDrawProcessor implements OpeningProcessor
+    static class MaxDrawProcessor implements OpeningProcessor
     {
         private final double maxDraw;
         
@@ -473,15 +510,17 @@ public class PGNUtil
         }
     }
     
+    // opening-stat printers
+    
     private static interface OpeningStatPrinter
     {
-        public static OpeningStatPrinter get(String fields)
+        public static OpeningStatPrinter get(OutputSelector selectors[])
         {
-            return fields == null ? new DefaultOpeningStatPrinter() :
-                new CustomOpeningStatPrinter(fields);
+            return selectors == null ? new DefaultOpeningStatPrinter() :
+                new CustomOpeningStatPrinter(selectors);
         }
         
-        public void print(OpeningStats stats);
+        public void print(OpeningStats stats) throws InvalidSelectorException;
     }
     
     private static class DefaultOpeningStatPrinter implements OpeningStatPrinter
@@ -494,31 +533,165 @@ public class PGNUtil
     
     private static class CustomOpeningStatPrinter implements OpeningStatPrinter
     {
-        private final String fields;
+        private final OutputSelector selectors[];
         
-        public CustomOpeningStatPrinter(String fields) { this.fields = fields; }
+        public CustomOpeningStatPrinter(OutputSelector selectors[])
+        {
+            this.selectors = selectors;
+        }
         
         @Override public void print(OpeningStats stats)
+            throws InvalidSelectorException
         {
-            System.out.println(stats.get(fields));
+            System.out.println(stats.get(selectors));
         }
     }
     
+    // exit processors
+    
+    private static interface ExitProcessor
+    {
+        public void process();
+    }
+    
+    private static class NullExitProcessor implements ExitProcessor
+    {
+        @Override public void process() {}
+    }
+    
+    static class EventMapExitProcessor implements ExitProcessor
+    {
+        private final Map<String,List<GameInfo>> eventMap;
+        
+        public EventMapExitProcessor(Map<String,List<GameInfo>> eventMap)
+        {
+            this.eventMap = eventMap;
+        }
+        
+        @Override public void process()
+        {
+            for (String event : eventMap.keySet())
+            {
+                List<GameInfo> games = eventMap.get(event);
+                
+                System.out.print(event + CLOptions.outputDelim +
+                    guessTimeCtrl(games) + CLOptions.outputDelim);
+                
+                for (GameInfo gi : games)
+                    System.out.print(gi.getGameNum() + " ");
+                
+                System.out.print("\n");
+            }
+        }
+    
+        public static TimeCtrl guessTimeCtrl(List<GameInfo> games)
+        {
+            TimeCtrl best = null;
+
+            for (int i = 0; i < games.size(); i++)
+            {
+                TimeCtrl current = games.get(i).getTimeCtrl();
+                if (current == null) continue;
+                if (current.isOfficial()) return current;
+                if (best == null || current.compareTo(best) > 0) best = current;
+            }
+
+            return best;
+        }
+    }
+    
+    static class DuplicateExitProcessor implements ExitProcessor
+    {
+        private final DuplicateHandler printer;
+        
+        public DuplicateExitProcessor(DuplicateHandler printer)
+        {
+            this.printer = printer;
+        }
+        
+        @Override public void process()
+        {
+            for (List<Integer> list : printer.getDuplicates())
+            {
+                for (Integer idx : list) System.out.print(idx + " ");
+                System.out.print("\n");
+            }
+        }
+    }
+    
+    static class OpeningsExitProcessor implements ExitProcessor
+    {
+        private final OpeningsHandler handler;
+        
+        public OpeningsExitProcessor(OpeningsHandler handler)
+        {
+            this.handler = handler;
+        }
+        
+        @Override public void process()
+        {
+            Map<OpeningID,OpeningStats> statMap = handler.getMap();
+            
+            OpeningStatPrinter printer =
+                OpeningStatPrinter.get(outputSelectors);
+
+            nextOpening:
+            for (OpeningID id : statMap.keySet())
+            {
+                OpeningStats stats = statMap.get(id);
+                
+                try
+                {
+                    for (OpeningProcessor processor : openingProcessors)
+                        if (!processor.processOpening(stats))
+                            continue nextOpening;
+
+                    printer.print(stats);
+                }
+            
+                catch (InvalidSelectorException | ProcessorException e)
+                {
+                    System.err.println("Exception: " + e.getMessage());
+                    System.exit(-1);
+                }
+            }
+        }
+    }
+    
+    public static final String VERSION = "0.2";
+    
+    // All of these are static in order to avoid parameter-passing overhead.
+    
     private static Game game;
+    static PGNFile pgn;
+    static final List<GameProcessor> matchProcessors = new ArrayList<>();
+    static final List<GameProcessor> replaceProcessors = new ArrayList<>();
+    static final List<OpeningProcessor> openingProcessors = new ArrayList<>();
+    
+    static Pattern playerPattern;
+    static Map<String,Integer> eloMap;
+    
+    static GameHandler handler;
+    static ExitProcessor exitProcessor;
+    static OutputSelector outputSelectors[];
+    
+    static void addMatchProcessor(GameProcessor gp) { matchProcessors.add(gp); }
+    static void addOpeningProcessor(OpeningProcessor op) { openingProcessors.add(op); }
+    static void setHandler(GameHandler printer) { PGNUtil.handler = printer; }
+    static void setExitProcessor(ExitProcessor proc) { exitProcessor = proc; }
     
     public static void main(String args[]) throws Exception
     {
-        Reader reader;
-        CLOpts options = new CLOpts();
+        CLOptions options = new CLOptions();
         CmdLineParser parser = new CmdLineParser(options);
-        List<GameProcessor> matchProcessors = new ArrayList<>();
-        List<GameProcessor> replaceProcessors = new ArrayList<>();
-        List<OpeningProcessor> openingProcessors = new ArrayList<>();
+        exitProcessor = new NullExitProcessor();
         
         try
         {
+            pgn = new PGNFile(new BufferedReader(new InputStreamReader(System.in)));
             parser.parseArgument(args);
-            if (options.help != null) throw new CmdLineException("");
+            if (handler == null) handler = new DefaultGameHandler();
+            if (options.help) throw new CmdLineException("");
         }
         
         catch (CmdLineException e)
@@ -528,184 +701,35 @@ public class PGNUtil
             System.exit(-1);
         }
         
-        if (options.version != null)
+        catch (PatternSyntaxException e)
         {
-            System.out.println("pgnutil version " + VERSION);
-            System.exit(0);
+            System.err.println("Regular expression error.  " +
+                e.getLocalizedMessage());
+            
+            System.exit(-1);
         }
         
-        if (options.infile == null)
-            reader = new BufferedReader(new InputStreamReader(System.in));
-        
-        else reader = new BufferedReader(new FileReader(options.infile));
-        
-        if (options.duplicates != null)
+        try
         {
-            List<List<Integer>> dupes =
-                new PGNDuplicateFinder(reader).getDuplicates();
+            nextGame:
+            while ((game = pgn.nextGame()) != null)
+            {
+                for (GameProcessor processor : matchProcessors)
+                    if (!processor.processGame()) continue nextGame;
 
-            for (List<Integer> list : dupes)
-            {
-                for (Integer idx : list) System.out.print(idx + " ");
-                System.out.print("\n");
-            }
-            
-            return;
-        }
-        
-        if (options.events != null)
-        {
-            Map<String,List<Integer>> events =
-                new PGNEventMapper(reader).getEventMap();
+                for (GameProcessor processor : replaceProcessors)
+                    if (!processor.processGame()) break;
 
-            for (String event : events.keySet())
-            {
-                System.out.print("{" + event + "} ");
-                List<Integer> games = events.get(event);
-                for (Integer gameNo : games) System.out.print(gameNo + " " );
-                System.out.print("\n");
+                handler.handle();
             }
             
-            return;
+            exitProcessor.process();
         }
-        
-        if (options.openingStats != null)
-        {
-            Map<OpeningID,OpeningStats> statMap =
-                new PGNOpeningMapper(reader).getStats();
-            
-            if (options.minGames > 0)
-                openingProcessors.add(new MinGamesProcessor(options.minGames));
-            
-            if (options.maxDiffPct != null)
-                openingProcessors.add(new MaxWinDiffProcessor(options.maxDiffPct));
-            
-            if (options.minDiffPct != null)
-                openingProcessors.add(new MinWinDiffProcessor(options.minDiffPct));
-            
-            if (options.minDrawPct != null)
-                openingProcessors.add(new MinDrawProcessor(options.minDrawPct));
-            
-            if (options.maxDrawPct != null)
-                openingProcessors.add(new MaxDrawProcessor(options.maxDrawPct));
-            
-            OpeningStatPrinter printer = OpeningStatPrinter.get(options.outputFields);
 
-            nextOpening:
-            for (OpeningID id : statMap.keySet())
-            {
-                OpeningStats stats = statMap.get(id);
-                
-                for (OpeningProcessor processor : openingProcessors)
-                    if (!processor.processOpening(stats)) continue nextOpening;
-                
-                printer.print(stats);
-            }
-            
-            return;
-        }
-        
-        // At this point, we're not doing duplicates, events, or opening stats,
-        // so this is a match and/or replace operation.
-        
-        // Add match processors to the matchProcessors list.
-        
-        if (options.matchEventStr != null)
-            matchProcessors.add(new MatchEventProcessor(
-                Pattern.compile(options.matchEventStr, Pattern.DOTALL)));
-        
-        if (options.matchWinStr != null)
-            matchProcessors.add(new MatchWinProcessor(
-                Pattern.compile(options.matchWinStr, Pattern.DOTALL)));
-        
-        if (options.matchLossStr != null)
-            matchProcessors.add(new MatchLossProcessor(
-                Pattern.compile(options.matchLossStr, Pattern.DOTALL)));
-        
-        if (options.matchPlayerStr != null)
-            matchProcessors.add(new MatchPlayerProcessor(
-                Pattern.compile(options.matchPlayerStr, Pattern.DOTALL)));
-        
-        if (options.gameNumStr != null)
-            matchProcessors.add(new MatchGameNumProcessor(
-                options.gameNumStr));
-        
-        if (options.matchOpeningStr != null)
-            matchProcessors.add(new MatchOpeningProcessor(
-                options.matchOpeningStr));
-        
-        if (options.notMatchOpeningStr != null)
-            matchProcessors.add(new NotMatchOpeningProcessor(
-                options.notMatchOpeningStr));
-        
-        if (options.containsStr != null)
-            matchProcessors.add(new ContainsProcessor(
-                Pattern.compile(options.containsStr, Pattern.DOTALL)));
-        
-        if (options.notContainsStr != null)
-            matchProcessors.add(new NotContainsProcessor(
-                Pattern.compile(options.notContainsStr, Pattern.DOTALL)));
-        
-        // Now add replacement processors to the replaceProcessors list.
-        
-        if (options.replaceStr != null)
+        catch (InvalidSelectorException e)
         {
-            // The regex passed to split() allows escaping of the delimiter character
-            // ("/") with a backslash. See https://stackoverflow.com/questions/
-            // 18677762/handling-delimiter-with-escape-characters-in-java-string-split-method
-            // First, however, we must escape any escaped backslashes.
-            
-            String replaceTokens[] = options.replaceStr.replace("\\\\",
-                "\0").split("(?<!\\\\)/");
-            
-            if (replaceTokens.length != 3)
-            {
-                System.err.println("\nIncorrect token count in replace string.");
-                parser.printUsage(System.err);
-                System.exit(-1);
-            }
-            
-            for (int i = 0; i < 3; i++)
-                replaceTokens[i] = replaceTokens[i].replace("\0",
-                    "\\\\").replace("\\/", "/");
-        
-            if (options.replWinStr != null)
-                replaceProcessors.add(new MatchWinProcessor(
-                    Pattern.compile(options.replWinStr, Pattern.DOTALL)));
-        
-            if (options.replLossStr != null)
-                replaceProcessors.add(new MatchLossProcessor(
-                    Pattern.compile(options.replLossStr, Pattern.DOTALL)));
-        
-            if (options.replOpeningStr != null)
-                replaceProcessors.add(new MatchOpeningProcessor(
-                    options.replOpeningStr));
-            
-            replaceProcessors.add(new ContainsProcessor(
-                Pattern.compile(replaceTokens[0], Pattern.DOTALL)));
-            
-            // This must go last.
-            replaceProcessors.add(new ReplaceProcessor(
-                Pattern.compile(replaceTokens[1], Pattern.DOTALL),
-                replaceTokens[2]));
-        }
-        
-        PGNFile pgn = new PGNFile(reader);
-        
-        GamePrinter printer = options.outputFields == null ?
-            new DefaultGamePrinter() :
-            new SelectGamePrinter(options.outputFields);
-        
-        nextGame:
-        while ((game = pgn.nextGame()) != null)
-        {
-            for (GameProcessor processor : matchProcessors)
-                if (!processor.processGame()) continue nextGame;
-            
-            for (GameProcessor processor : replaceProcessors)
-                if (!processor.processGame()) break;
-            
-            printer.print();
+            System.err.println("Invalid selector: " + e.getMessage());
+            System.exit(-1);
         }
     }
 }

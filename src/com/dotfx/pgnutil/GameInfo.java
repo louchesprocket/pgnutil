@@ -28,7 +28,41 @@ package com.dotfx.pgnutil;
  *
  * @author Mark Chen
  */
-public class PGNException extends Exception
+public class GameInfo implements Comparable<GameInfo>
 {
-    public PGNException(String msg) { super(msg); }
+    private final int gameNum;
+    private final TimeCtrl timeCtrl;
+
+    public GameInfo(int gameNum, TimeCtrl timeCtrl)
+    {
+        this.gameNum = gameNum;
+        this.timeCtrl = timeCtrl;
+    }
+
+    public int getGameNum() { return gameNum; }
+    public TimeCtrl getTimeCtrl() { return timeCtrl; }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        try
+        {
+            GameInfo that = (GameInfo)other;
+            return getGameNum() == that.getGameNum();
+        }
+
+        catch (ClassCastException e) { return false; }
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return GameInfo.class.hashCode() ^ gameNum;
+    }
+
+    @Override
+    public int compareTo(GameInfo that)
+    {
+        return getGameNum() - that.getGameNum();
+    }
 }
