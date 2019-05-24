@@ -24,10 +24,10 @@
 
 package com.dotfx.pgnutil;
 
-import java.io.CharArrayWriter;
-import java.nio.CharBuffer;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.CharBuffer;
 
 /**
  *
@@ -36,71 +36,123 @@ import java.io.Reader;
 public class CopyReader extends Reader
 {
     private final Reader in;
-    private final CharArrayWriter saver;
-    private long totalBytesRead;
+    private int markLimit;
+    private long charsRead; // count since last mark
+    private long prevCharsRead; // count up to last mark
     
-    public CopyReader(Reader in)
+    /**
+     * 
+     * @param in must support mark() and reset() operations
+     * @param outBufSize
+     * @throws IOException 
+     */
+    public CopyReader(Reader in, int outBufSize) throws IOException
     {
         this.in = in;
-        saver = new CharArrayWriter();
-        totalBytesRead = 0L;
+        markLimit = outBufSize;
+        in.mark(markLimit);
     }
     
-    @Override public void close() throws IOException { in.close(); }
-    
-    @Override public void mark(int limit) throws IOException
+    /**
+     * This is only called rarely.
+     * 
+     * @param minRequired smallest required read-ahead limit
+     */
+    private void increaseMarkLimit(long minRequired) throws IOException
     {
-        throw new IOException("mark unsupported");
+        in.reset();
+        markLimit += Math.max(minRequired - markLimit, markLimit);
+        in.mark(markLimit);
+        in.skip(charsRead);
     }
     
-    @Override public boolean markSupported() { return false; }
+    @Override public boolean ready() throws IOException { return in.ready(); }
+    @Override public void close() throws IOException { in.close(); }
+    @Override public boolean markSupported() { return in.markSupported(); }
     
     @Override public int read() throws IOException
     {
+        long span = charsRead + 1;
+        if (span >= markLimit) increaseMarkLimit(span);
+
         int ret = in.read();
-        if (ret > -1) saver.write(ret);
+        if (ret > -1) charsRead++;
         return ret;
     }
     
     @Override public int read(char buf[]) throws IOException
     {
+        long span = charsRead + buf.length;
+        if (span >= markLimit) increaseMarkLimit(span);
+
         int ret = in.read(buf);
-        if (ret > 0) saver.write(buf);
+        if (ret > 0) charsRead += ret;
         return ret;
     }
     
     @Override public int read(char buf[], int off, int len) throws IOException
     {
+        long span = charsRead + len;
+        if (span >= markLimit) increaseMarkLimit(span);
+
         int ret = in.read(buf, off, len);
-        if (ret > 0) saver.write(buf, off, ret);
+        if (ret > 0) charsRead += ret;
         return ret;
     }
     
     @Override public int read(CharBuffer target)
         throws IOException
     {
-        int start = target.position();
+        long span = charsRead + target.length();
+        if (span >= markLimit) increaseMarkLimit(span);
+
         int ret = in.read(target);
-        if (ret == -1) return ret;
-        int end = target.position();
-        saver.write(target.toString().substring(start, end));
+        if (ret > 0) charsRead += ret;
         return ret;
     }
     
-    @Override public boolean ready() throws IOException { return in.ready(); }
+    @Override public void mark(int limit) throws IOException
+    {
+        prevCharsRead += charsRead;
+        charsRead = 0L;
+        markLimit = Math.max(limit, markLimit);
+        in.mark(markLimit);
+    }
     
     @Override public void reset() throws IOException
-    { throw new IOException("reset not supported"); }
-    
-    @Override public long skip(long n) throws IOException { return in.skip(n); }
-    
-    public String getCopy() { return saver.toString(); }
-    public int bytesRead() { return saver.size(); }
-    public long totalBytesRead() { return totalBytesRead + saver.size(); }
-    
-    public void clear()
     {
-        totalBytesRead += saver.size();
-        saver.reset();
+        in.reset();
+        charsRead = 0L;
     }
+    
+    @Override public long skip(long n) throws IOException
+    {
+        long ret = in.skip(n);
+        charsRead += ret;
+        return ret;
+    }
+    
+    public String getCopy() throws EOFException, IOException
+    {
+        char buf[] = new char[(int)charsRead];
+        int total = 0;
+        in.reset();
+        
+        do
+        {
+            int read = in.read(buf, total, (int)charsRead - total);
+            if (read == -1) throw new EOFException();
+            total += read;
+        }
+        while (total < charsRead);
+        
+        prevCharsRead += charsRead;
+        charsRead = 0L;
+        in.mark(markLimit);
+        
+        return new String(buf);
+    }
+    
+    public long charsRead() { return charsRead; }
+    public long totalCharsRead() { return prevCharsRead + charsRead; }
 }

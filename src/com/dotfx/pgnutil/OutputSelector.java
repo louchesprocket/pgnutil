@@ -64,21 +64,35 @@ public class OutputSelector
         LOSER("loser"),
         MOVES("moves"),
         OID("oid"),
+        OPENINGMOVES("openingmoves"),
         OPPONENT("opponent"),
+        PLIES("plies"),
         PRETTYMOVES("prettymoves"),
+        TEXTSIZE("textsize"),
         TIMECTRL("timectrl"),
         WINNER("winner"),
         
         // additional opening-stat selectors
         BWINPCT("bwinpct"),
         BWINS("bwins"),
-        COUNT("count"),
+        COUNT("count"), // also applies to player results
         DIFF("diff"),
         DIFFPCT("diffpct"),
         DRAWPCT("drawpct"),
-        DRAWS("draws"),
+        DRAWS("draws"), // also applies to player results
         WWINPCT("wwinpct"),
         WWINS("wwins"),
+        
+        // additional event selectors
+        LASTROUND("lastround"),
+        ROUNDCOUNT("roundcount"),
+        
+        // additional player-results selectors
+        PLAYER("player"),
+        WINS("wins"),
+        LOSSES("losses"),
+        NORESULTS("noresults"),
+        WINPCT("winpct"),
         
         OTHER("");
         
@@ -107,6 +121,12 @@ public class OutputSelector
     
     private final Value value;
     private final String literal;
+    
+    public OutputSelector(Value value)
+    {
+        this.value = value == null ? Value.OTHER : value;
+        literal = this.value.toString();
+    }
     
     public OutputSelector(String literal)
     {

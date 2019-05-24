@@ -104,6 +104,13 @@ public class Game
         public int getNumber() { return number; }
         public String getMove() { return move; }
         public List<String> getComments() { return comments; }
+        public AquariumVars getAquariumVars() { return new AquariumVars(this); }
+        
+        public int getPly()
+        {
+            if (color == Color.WHITE) return (number - 1) * 2 + 1;
+            return number * 2;
+        }
         
         public boolean hasComment(Pattern regex)
         {
@@ -143,19 +150,45 @@ public class Game
     
     public Game(int number, Map<String,String> tagpairs,
         List<String> gameComments, List<Move> moves, String origText)
-    {
+        throws PGNException
+    { 
         this.number = number;
         this.tagpairs = tagpairs;
         this.gameComments = gameComments;
         this.moves = moves;
         this.origText = origText;
+        
+        if (!CLOptions.validateGames) return;
+        int lastMoveNumber = 0;
+
+        for (int i = 0; i < moves.size(); i++)
+        {
+            Move move = moves.get(i);
+            Color moveColor = move.getColor();
+            int moveNumber = move.getNumber();
+            int plyParity = i % 2;
+            
+            if (plyParity == 0)
+            {
+                if (moveColor != Color.WHITE || moveNumber != lastMoveNumber + 1)
+                    throw new PGNException("move sequence error at " +
+                        "game " + number + ", ply " + (i + 1));
+            }
+            
+            else
+            {
+                if (moveColor != Color.BLACK || moveNumber != lastMoveNumber)
+                    throw new PGNException("move sequence error at " +
+                        "game " + number + ", ply " + (i + 1));
+            }
+            
+            lastMoveNumber = move.getNumber();
+        }
     }
     
     public static Game parseNext(int number, CopyReader reader)
         throws IOException, PGNException
     {
-        String result;
-        Game.Color color;
         ArrayList<String> moveComments = new ArrayList();
         char buf[] = new char[BUFSIZE];
         int next, i, j;
@@ -176,11 +209,11 @@ public class Game
 
                 catch (IndexOutOfBoundsException e)
                 {
-                    buf = Arrays.copyOf(buf, buf.length + BUFSIZE);
+                    buf = Arrays.copyOf(buf, buf.length * 2);
                     next = reader.read(buf, i, 1);
                 }
                 
-                if (next == -1) throw new PGNException("EOF while parsing");
+                if (next == -1) throw new PGNException("eof while parsing");
                 if (Character.isWhitespace(buf[i])) break;
             }
 
@@ -198,11 +231,11 @@ public class Game
 
                 catch (IndexOutOfBoundsException e)
                 {
-                    buf = Arrays.copyOf(buf, buf.length + BUFSIZE);
+                    buf = Arrays.copyOf(buf, buf.length * 2);
                     next = reader.read(buf, i, 1);
                 }
                 
-                if (next == -1) throw new PGNException("EOF while parsing.");
+                if (next == -1) throw new PGNException("eof while parsing.");
 
                 if (buf[i] == '\\') // PGN escape character
                 {
@@ -210,11 +243,11 @@ public class Game
 
                     catch (IndexOutOfBoundsException e)
                     {
-                        buf = Arrays.copyOf(buf, buf.length + BUFSIZE);
+                        buf = Arrays.copyOf(buf, buf.length * 2);
                         next = reader.read(buf, i, 1);
                     }
                     
-                    if (next == -1) throw new PGNException("EOF while parsing.");
+                    if (next == -1) throw new PGNException("eof while parsing.");
                     escaped = true;
                 }
 
@@ -231,7 +264,7 @@ public class Game
         while (next == '{' || next == ';') 
             next = processComment(reader, next, gameComments); 
         
-        if (next == -1) throw new PGNException("EOF while parsing"); // empty move list
+        if (next == -1) throw new PGNException("eof while parsing"); // empty move list
         buf[0] = (char)next;
         
         for (i = 1;; i++) // parse each ply
@@ -242,59 +275,58 @@ public class Game
 
                 catch (IndexOutOfBoundsException e)
                 {
-                    buf = Arrays.copyOf(buf, buf.length + BUFSIZE);
+                    buf = Arrays.copyOf(buf, buf.length * 2);
                     next = reader.read(buf, j, 1);
                 }
                 
-                if (next == -1) throw new PGNException("EOF while parsing");
+                if (next == -1) throw new PGNException("eof while parsing");
                 next = buf[j];
             }
             
             if (Character.isWhitespace(buf[j - 1])) next = eatWhiteSpace(reader);
-            if (next == -1) throw new PGNException("EOF while parsing game " + number);
+            if (next == -1) throw new PGNException("eof while parsing game " + number);
             
             // termination markers
-            else if
-                (buf[j - 1] == '-' || buf[j - 1] == '/' || buf[j - 1] == '*')
+            switch (buf[j - 1])
             {
-                if (buf[j - 1] == '-')
-                {
+                case '-':
                     if (j != 2)
                         throw new PGNException("invalid termination marker");
 
                     next = reader.read(buf, 2, 1);
-                    if (next == -1) throw new PGNException("EOF while parsing");
+                    if (next == -1) throw new PGNException("eof while parsing");
 
                     if ((buf[0] != '0' && buf[0] != '1') ||
-                        (buf[2] != '0' && buf[2] != '1'))
+                        (buf[2] != '0' && buf[2] != '1') ||
+                        (buf[0] == buf[2]) ||
+                        !new String(buf, 0, 3).equals(tagpairs.get("Result")))
                         throw new PGNException("invalid termination marker");
-                    
-                    result = new String(buf, 0, 3);
-                }
-                
-                else if (buf[j - 1] == '/')
-                {
+
+                    return new Game(number, tagpairs, gameComments, moves,
+                        reader.getCopy());
+
+                case '/':
                     if (j != 2)
                         throw new PGNException("invalid termination marker");
 
                     next = reader.read(buf, 2, 5);
                     if (next == -1) throw new PGNException("EOF while parsing");
 
-                    if (!new String(buf, 0, 7).equals("1/2-1/2"))
+                    String terminator = new String(buf, 0, 7);
+
+                    if (!terminator.equals("1/2-1/2") ||
+                        !terminator.equals(tagpairs.get("Result")))
                         throw new PGNException("invalid termination marker");
-                    
-                    result = new String(buf, 0, 7);
-                }
-                
-                else result = "*";
-                
-                if (!result.equals(tagpairs.get("Result")))
-                    throw new PGNException("incorrect termination marker");
-                
-                Game game = new Game(number, tagpairs, gameComments, moves,
-                    reader.getCopy());
-                
-                return game;
+
+                    return new Game(number, tagpairs, gameComments, moves,
+                        reader.getCopy());
+
+                case '*':
+                    if (!"*".equals(tagpairs.get("Result")))
+                        throw new PGNException("invalid termination marker");
+
+                    return new Game(number, tagpairs, gameComments, moves,
+                        reader.getCopy());
             }
             
 //            movenum = new Integer(new String(buf, 0, i - 1 == 0 ? 1 : i - 1));
@@ -303,7 +335,7 @@ public class Game
             {
                 do { next = reader.read(); } while (next == '.');
                 next = eatWhiteSpace(reader);
-                if (next == -1) throw new PGNException("EOF while parsing");
+                if (next == -1) throw new PGNException("eof while parsing");
             }
             
             buf[0] = (char)next;
@@ -315,7 +347,7 @@ public class Game
 
                 catch (IndexOutOfBoundsException e)
                 {
-                    buf = Arrays.copyOf(buf, buf.length + BUFSIZE);
+                    buf = Arrays.copyOf(buf, buf.length * 2);
                     next = reader.read(buf, j, 1);
                 }
                 
@@ -348,9 +380,7 @@ public class Game
             if (next == -1) throw new PGNException("unexpected eof");
             buf[0] = (char)next;
             
-            color = i % 2 == 0 ? Game.Color.BLACK : Game.Color.WHITE;
-            
-            Game.Move move = new Game.Move(color,
+            Game.Move move = new Game.Move(i % 2 == 0 ? Color.BLACK : Color.WHITE,
                 (short)Math.round((float)i / (float)2), moveStr, moveComments);
             
             moves.add(move);
@@ -423,6 +453,7 @@ public class Game
     public final String getValue(String key) { return tagpairs.get(key); }
     public List<String> getGameComments() { return gameComments; }
     public List<Move> getMoves() { return moves; }
+    public int getPlyCount() { return moves.size(); }
     public String getOrigText() { return origText; }
     public boolean contains(CharSequence s) { return origText.contains(s); }
     
@@ -431,13 +462,24 @@ public class Game
     public String getEvent() { return getValue("Event"); }
     public String getSite() { return getValue("Site"); }
     public String getDate() { return getValue("Date"); }
-    public String getRound() { return getValue("Round"); }
     public String getWhite() { return getValue("White"); }
     public String getBlack() { return getValue("Black"); }
     public Result getResult() { return Result.get(getValue("Result")); }
     
     public boolean isDraw() { return getResult().equals(Result.DRAW); }
     public boolean isNoResult() { return getResult().equals(Result.NORESULT); }
+    
+    public int getRound()
+    {
+        try
+        {
+            int ret = Integer.valueOf(getValue("Round"));
+            if (ret < 1 && CLOptions.aquarium) return ret + 128;
+            else return ret;
+        }
+        
+        catch (NumberFormatException e) { return 0; }
+    }
     
     public Move getMove(int number, Color color)
     {
@@ -459,9 +501,72 @@ public class Game
         return null;
     }
     
-    public OpeningID getOpeningID(Pattern oobMarker)
+    public Move getFirstOobMove(Pattern oobMarker)
     {
-        StringBuilder sb = new StringBuilder();
+        Move firstCommentMove = null;
+        Move oobMove = null;
+        boolean captureNext = false;
+        
+        for (Move move : moves)
+        {
+            if (captureNext)
+            {
+                oobMove = move;
+                break;
+            }
+            
+            if (move.getComments().size() > 0)
+            {
+                // Presence of oobMarker means that book moves include the
+                // present move.  Otherwise, the first move with a comment is
+                // the first out-of-book move.
+                
+                if (firstCommentMove == null) firstCommentMove = move;
+                if (move.hasComment(oobMarker)) captureNext = true;
+            }
+        }
+        
+        if (oobMove == null) return firstCommentMove;
+        return oobMove;
+    }
+    
+    public Move getFirstOobMove() { return getFirstOobMove(OUT_OF_BOOK); }
+    
+    public Move getNextMove(Move move)
+    {
+        if (move.getPly() >= moves.size()) return null;
+        return moves.get(move.getPly());
+    }
+    
+    public MoveListId getPostOpeningId() { return getPostOpeningId(OUT_OF_BOOK); }
+    
+    public MoveListId getPostOpeningId(Pattern oobMarker)
+    {
+        return new MoveListId(getPostOpeningString(oobMarker));
+    }
+    
+    public String getPostOpeningString(Pattern oobMarker)
+    {
+        StringBuilder sb = new StringBuilder(1024);
+        Move move = getFirstOobMove();
+        
+        while (move != null)
+        {
+            if (move.getColor().equals(Color.WHITE))
+                sb.append(move.getNumber()).append(". ");
+
+            sb.append(move.getMove()).append(" ");
+            move = getNextMove(move);
+        }
+        
+        return sb.toString().trim();
+    }
+    
+    public String getOpeningString(Pattern oobMarker)
+    {
+        StringBuilder sb = new StringBuilder(1024);
+        boolean hasOobMarker = false;
+        int firstCommentIdx = -1;
         
         for (Move move : moves)
         {
@@ -471,17 +576,69 @@ public class Game
                 // present move.  Otherwise, the first move with a comment is
                 // the first out-of-book move.
                 
-                if (move.hasComment(oobMarker)) sb.append(move.getMove());
-                break;
+                if (firstCommentIdx == -1) firstCommentIdx = sb.length(); 
+                
+                if (move.hasComment(oobMarker))
+                {
+                    if (move.getColor().equals(Color.WHITE))
+                        sb.append(move.getNumber()).append(". ");
+
+                    sb.append(move.getMove());
+                    hasOobMarker = true;
+                    break;
+                }
             }
             
-            sb.append(move.getMove());
+            if (move.getColor().equals(Color.WHITE))
+                sb.append(move.getNumber()).append(". ");
+
+            sb.append(move.getMove()).append(" ");
         }
         
-        return new OpeningID(sb.toString());
+        if (!hasOobMarker && firstCommentIdx > -1)
+            sb.setLength(firstCommentIdx);
+        
+        return sb.toString().trim();
     }
     
-    public OpeningID getOpeningID() { return getOpeningID(OUT_OF_BOOK); }
+    public String getOpeningString() { return getOpeningString(OUT_OF_BOOK); }
+    
+    public MoveListId getOpeningID(Pattern oobMarker)
+    {
+        return new MoveListId(getOpeningString(oobMarker));
+    }
+    
+    public MoveListId getOpeningID() { return getOpeningID(OUT_OF_BOOK); }
+    
+    public HashCode getPlayerOpeningHash(Pattern oobMarker)
+    {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append(getWhite()).append('\0').append(getBlack()).append('\0').
+            append(getOpeningString(oobMarker));
+        
+        return HASHFUNC.hashBytes(sb.toString().getBytes());
+    }
+    
+    public HashCode getPlayerOpeningHash()
+    {
+        return getPlayerOpeningHash(OUT_OF_BOOK);
+    }
+    
+    public HashCode getPlayerPostOpeningHash(Pattern oobMarker)
+    {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append(getWhite()).append('\0').append(getBlack()).append('\0').
+            append(getPostOpeningString(oobMarker));
+        
+        return HASHFUNC.hashBytes(sb.toString().getBytes());
+    }
+    
+    public HashCode getPlayerPostOpeningHash()
+    {
+        return getPlayerPostOpeningHash(OUT_OF_BOOK);
+    }
     
     /**
      * 
@@ -564,9 +721,11 @@ public class Game
     public Game replace(Pattern replacee, String replacement)
         throws PGNException, IOException
     {
-        return parseNext(getNumber(),
+        CopyReader reader =
             new CopyReader(new StringReader(replacee.matcher(origText).
-                replaceAll(replacement))));
+                replaceAll(replacement)), PGNFile.COPY_BUF_INIT_SIZE);
+        
+        return parseNext(getNumber(), reader);
     }
     
     public String get(OutputSelector selector)
@@ -582,40 +741,39 @@ public class Game
         
         for (int i = 0; i < selectors.length; i++)
         {
-            StringBuilder moveList = new StringBuilder();
-            List<Move> moves = getMoves();
+            StringBuilder moveString = new StringBuilder();
 
             switch (selectors[i].getValue())
             {
                 case PRETTYMOVES:
                     for (Move move : moves)
                     {
-                        moveList.append(move.getNumber()).
+                        moveString.append(move.getNumber()).
                             append(move.getColor().equals(Color.WHITE) ?
                                 ".   " : "... ");
 
-                        moveList.append(move.getMove());
+                        moveString.append(move.getMove());
 
                         for (String comment : move.getComments())
-                            moveList.append(" {").append(comment).append("}");
+                            moveString.append(" {").append(comment).append("}");
 
-                        moveList.append("\n");
+                        moveString.append("\n");
                     }
 
-                    moveList.append("\n");
-                    return moveList.toString();
+                    moveString.append("\n");
+                    return moveString.toString();
                 
                 case MOVES:
                     for (Move move : moves)
                     {
                         if (move.getColor().equals(Color.WHITE))
-                            moveList.append(move.getNumber()).append(". ");
+                            moveString.append(move.getNumber()).append(". ");
 
-                        moveList.append(move.getMove()).append(" ");
+                        moveString.append(move.getMove()).append(" ");
                     }
 
-                    moveList.deleteCharAt(moveList.length() - 1);
-                    ret.append(moveList.toString());
+                    moveString.deleteCharAt(moveString.length() - 1);
+                    ret.append(moveString.toString());
                     break;
             
                 case OPPONENT:
@@ -630,9 +788,12 @@ public class Game
                     break;
 
                 case GAMENO: ret.append(getNumber()); break;
+                case OPENINGMOVES: ret.append(getOpeningString()); break;
                 case OID: ret.append(getOpeningID()); break;
+                case PLIES: ret.append(moves.size()); break;
                 case WINNER: ret.append(getWinner()); break;
                 case LOSER: ret.append(getLoser()); break;
+                case TEXTSIZE: ret.append(origText.length()); break;
                 case TIMECTRL: ret.append(getTimeCtrl()); break;
                     
                 default: ret.append(getValue(selectors[i].toString()));

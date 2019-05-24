@@ -92,11 +92,12 @@ public class TimeCtrl implements Comparable<TimeCtrl>
     }
     
     private final Segment segments[];
-    private boolean official; // if this came from the "TimeControl" tag
+    private final boolean official; // if this came from the "TimeControl" tag
     
     public TimeCtrl(String ctrlString, boolean official)
         throws InvalidTimeCtrlException
     {
+        this.official = official;
         String parts[] = ctrlString.split("[: ]");
         
         if (parts.length > 3) throw new InvalidTimeCtrlException(ctrlString);

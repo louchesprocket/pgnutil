@@ -35,8 +35,10 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.regex.Pattern;
 import org.kohsuke.args4j.Option;
 
@@ -46,17 +48,26 @@ import org.kohsuke.args4j.Option;
  */
 public class CLOptions
 {
+    private static final String APF = "-apf";
+    private static final String AQ = "-aq";
     private static final String CMIN = "-cmin";
     private static final String D = "-d";
+    private static final String DO = "-do";
+    private static final String DPO = "-dpo";
     private static final String E = "-e";
+    private static final String EE = "-ee";
     private static final String ELO = "-elo";
     private static final String GN = "-gn";
     private static final String H = "-h";
     private static final String HDRAW = "-hdraw";
     private static final String HED = "-hed";
+    private static final String HOOB = "-hoob";
+    private static final String HPC = "-hpc";
     private static final String HWD = "-hwd";
     private static final String I = "-i";
     private static final String LDRAW = "-ldraw";
+    private static final String LOOB = "-loob";
+    private static final String LPC = "-lpc";
     private static final String LWD = "-lwd";
     private static final String M = "-m";
     private static final String ML = "-ml";
@@ -67,9 +78,13 @@ public class CLOptions
     private static final String NM = "-nm";
     private static final String NMO = "-nmo";
     private static final String NOF = "-nof";
+    private static final String NPF = "-npf";
     private static final String O = "-o";
     private static final String OD = "-od";
     private static final String OF = "-of";
+    private static final String P = "-p";
+    private static final String PERF = "-perf";
+    private static final String PF = "-pf";
     private static final String R = "-r";
     private static final String RL = "-rl";
     private static final String RO = "-ro";
@@ -77,16 +92,27 @@ public class CLOptions
     private static final String S = "-s";
     private static final String TC = "-tc";
     private static final String V = "-v";
+    private static final String VD = "-vd";
+    private static final String VG = "-vg";
     
     private static enum OptId
     {
+        ANYPLAYERFILE(APF),
+        AQUARIUM(AQ),
         MINGAMECOUNT(CMIN),
         DUPLICATES(D),
+        DUPLICATEOPENINGS(DO),
+        DUPLICATEPOSTOPENINGS(DPO),
         ELOFILE(ELO),
         EVENTS(E),
+        EVENTERRORS(EE),
         GAMENUM(GN),
+        HIOOBCOUNT(HOOB),
+        HIPLYCOUNT(HPC),
         HIWINDIFF(HWD),
         INPUTFILE(I),
+        LOOOBCOUNT(LOOB),
+        LOPLYCOUNT(LPC),
         LOWINDIFF(LWD),
         MATCH(M),
         MATCHLOSER(ML),
@@ -99,15 +125,20 @@ public class CLOptions
         NOTMATCH(NM),
         NOTMATCHOPENING(NMO),
         NOTOPENINGFILE(NOF),
+        NOTPLAYERFILE(NPF),
         OPENINGFILE(OF),
         OPENINGS(O),
         OUTPUTDELIM(OD),
+        PERFORMANCE(PERF),
+        PLAYERFILE(PF),
+        PLAYERRESULTS(P),
         REPLACE(R),
         REPLACELOSER(RL),
         REPLACEOPENING(RO),
         REPLACEWINNER(RW),
         SELECTORS(S),
-        TIMECONTROL(TC);
+        TIMECONTROL(TC),
+        VALUEDELIM(VD);
         
         private static final Map<String,OptId> sigMap = new HashMap<>();
         private final String signifier;
@@ -142,6 +173,34 @@ public class CLOptions
         return count == null ? 0 : count;
     }
     
+    private static Set<String> readLineFile(File file)
+    {
+        Set<String> fileLineSet = new HashSet<>();
+
+        try
+        {
+            String line;
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+
+            while ((line = reader.readLine()) != null)
+                fileLineSet.add(line.trim());
+        }
+
+        catch (FileNotFoundException e)
+        {
+            System.err.println("File '" + file + "' not found.");
+            System.exit(-1);
+        }
+
+        catch (IOException e)
+        {
+            System.err.println("Error reading file '" + file + "'");
+            System.exit(-1);
+        }
+
+        return fileLineSet;
+    }
+    
     // matchers
 
     @Option(name = GN, aliases = "-game_number",
@@ -159,7 +218,19 @@ public class CLOptions
         }
         
         countOption(OptId.GAMENUM);
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchGameNumProcessor(gameno));
+        
+        try
+        {
+            PGNUtil.addMatchProcessor(new PGNUtil.MatchGameNumProcessor(gameno));
+        }
+        
+        catch (NumberFormatException e)
+        {
+            System.err.println("exception: argument to '" + GN + "' option " +
+                "must be an integer");
+            
+            System.exit(-1);
+        }
     }
 
     @Option(name = M, aliases = "-matches", metaVar = "<regex>",
@@ -219,8 +290,8 @@ public class CLOptions
             Pattern.compile(regex, Pattern.DOTALL)));
     }
 
-    @Option(name = MP, aliases = "-match_player", metaVar = "<regex>",
-        usage = "output games where <regex> is a player")
+    @Option(name = MP, aliases = "-match_player",
+        metaVar = "<regex>", usage = "output games where <regex> is a player")
     private void setPlayer(String regex)
     {
         if (getCount(OptId.MATCHPLAYER) > 1)
@@ -238,7 +309,7 @@ public class CLOptions
                 if (selector.getValue().equals(OutputSelector.Value.OPPONENT))
                 {
                     System.err.println("The 'opponent' selector only works " +
-                        "while matching one player ('-mp')!");
+                        "while matching one player ('" + MP + "')!");
 
                     System.exit(-1);
                 }
@@ -252,7 +323,7 @@ public class CLOptions
     }
 
     @Option(name = MO, forbids = {O, OF, NMO, NOF},
-        aliases = "-match_opening", metaVar = "<oid1,oid1,...>",
+        aliases = "-match_opening", metaVar = "<oid1,oid2,...>",
         usage = "output games in which the opening-book moves are the " +
         "same as any of <oid,oid2,...>")
     private void setOpening(String opening)
@@ -272,9 +343,9 @@ public class CLOptions
     }
 
     @Option(name = OF, forbids = {O, MO, NMO, NOF},
-        aliases = "-opening_file", metaVar = "<filename>",
+        aliases = "-opening_file", metaVar = "<file>",
         usage = "output games in which the opening-book moves are any of " +
-        "those contained in <filename>")
+        "those contained in <file>")
     private void setOpeningFile(File of)
     {
         if (getCount(OptId.OPENINGFILE) > 0)
@@ -315,7 +386,7 @@ public class CLOptions
     }
 
     @Option(name = NMO, forbids = {O, MO, OF, NOF},
-        aliases = "-not_match_opening", metaVar = "<oid1,oid1,...>",
+        aliases = "-not_match_opening", metaVar = "<oid1,oid2,...>",
         usage = "output games in which the opening-book moves are not " +
         "the same as any of <oid,oid2,...>")
     private void setNotOpening(String opening)
@@ -335,9 +406,9 @@ public class CLOptions
     }
 
     @Option(name = NOF, forbids = {O, OF, NMO, MO},
-        aliases = "-not_opening_file", metaVar = "<filename>",
+        aliases = "-not_opening_file", metaVar = "<file>",
         usage = "output games in which the opening-book moves are none of " +
-        "those contained in <filename>")
+        "those contained in <file>")
     private void setNotOpeningFile(File of)
     {
         if (getCount(OptId.NOTOPENINGFILE) > 0)
@@ -375,6 +446,61 @@ public class CLOptions
             System.err.println("Error reading file '" + of + "'");
             System.exit(-1);
         }
+    }
+
+    @Option(name = APF, aliases = "-any_player_file", metaVar = "<file>",
+        usage = "output games in which either player is contained in <file>")
+    private void setAnyPlayerFile(File playerFile)
+    {
+        if (getCount(OptId.ANYPLAYERFILE) > 0)
+        {
+            System.err.println("Option '" + OptId.ANYPLAYERFILE + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.ANYPLAYERFILE);
+        
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchAnyPlayerSetProcessor(
+            readLineFile(playerFile)));
+    }
+
+    @Option(name = PF, aliases = "-player_file", metaVar = "<file>",
+        usage = "output games in which both players are contained " +
+        "in <file>")
+    private void setPlayerFile(File playerFile)
+    {
+        if (getCount(OptId.PLAYERFILE) > 0)
+        {
+            System.err.println("Option '" + OptId.PLAYERFILE + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.PLAYERFILE);
+        
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchAllPlayerSetProcessor(
+            readLineFile(playerFile)));
+    }
+
+    @Option(name = NPF, aliases = "-not_player_file", metaVar = "<file>",
+        usage = "output games in which neither player is contained in <file>")
+    private void setNotPlayerFile(File playerFile)
+    {
+        if (getCount(OptId.NOTPLAYERFILE) > 0)
+        {
+            System.err.println("Option '" + OptId.NOTPLAYERFILE + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.NOTPLAYERFILE);
+        
+        PGNUtil.addMatchProcessor(new PGNUtil.NotMatchPlayerSetProcessor(
+            readLineFile(playerFile)));
     }
 
     @Option(name = MT, aliases = "-match_tag", metaVar = "<tag>/<regex>",
@@ -428,6 +554,70 @@ public class CLOptions
             System.err.println("\nInvalid time control: '" + timectrl + "'");
             System.exit(-1);
         }
+    }
+
+    @Option(name = LPC, aliases = "-lo_ply_count", metaVar = "<min>",
+        usage = "output games containing at least <min> plies")
+    private void setLoPlies(int plies)
+    {
+        if (getCount(OptId.LOPLYCOUNT) > 0)
+        {
+            System.err.println("Option '" + OptId.LOPLYCOUNT + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.LOPLYCOUNT);
+        PGNUtil.addMatchProcessor(new PGNUtil.MinPlyCountProcessor(plies));
+    }
+
+    @Option(name = HPC, aliases = "-hi_ply_count", metaVar = "<max>",
+        usage = "output games containing at most <max> plies")
+    private void setHiPlies(int plies)
+    {
+        if (getCount(OptId.HIPLYCOUNT) > 0)
+        {
+            System.err.println("Option '" + OptId.HIPLYCOUNT + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.HIPLYCOUNT);
+        PGNUtil.addMatchProcessor(new PGNUtil.MaxPlyCountProcessor(plies));
+    }
+
+    @Option(name = LOOB, aliases = "-lo_oob", metaVar = "<min>",
+        usage = "output games containing at least <min> out-of-book plies")
+    private void setLoOob(int plies)
+    {
+        if (getCount(OptId.LOOOBCOUNT) > 0)
+        {
+            System.err.println("Option '" + OptId.LOOOBCOUNT + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.LOOOBCOUNT);
+        PGNUtil.addMatchProcessor(new PGNUtil.MinOobProcessor(plies));
+    }
+
+    @Option(name = HOOB, aliases = "-hi_oob", metaVar = "<max>",
+        usage = "output games containing at most <max> out-of-book plies")
+    private void setHiOob(int plies)
+    {
+        if (getCount(OptId.HIOOBCOUNT) > 0)
+        {
+            System.err.println("Option '" + OptId.HIOOBCOUNT + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.HIOOBCOUNT);
+        PGNUtil.addMatchProcessor(new PGNUtil.MaxOobProcessor(plies));
     }
 
     // replacers
@@ -520,7 +710,7 @@ public class CLOptions
     }
 
     @Option(name = RO, depends = {R}, aliases = "-replace_opening",
-        metaVar = "<oid1,oid1,...>",
+        metaVar = "<oid1,oid2,...>",
         usage = "in combination with '" + R + "' option, select games in " +
         "which the opening-book moves are the same as any of <oid,oid2,...> " +
         "for replacement")
@@ -543,10 +733,11 @@ public class CLOptions
 
     // duplicates
 
-    @Option(name = D, forbids = {O, E}, aliases = "-duplicates",
+    @Option(name = D, forbids = {DO, DPO, O, E, EE, P, S},
+        aliases = "-duplicates",
         usage = "list games containing identical players and move lists; " +
             "each line of output contains one set of two or more " +
-            "duplicate games numbers")
+            "game numbers in which duplicates are found")
     private void duplicates(boolean d)
     {
         if (getCount(OptId.DUPLICATES) > 0)
@@ -559,14 +750,62 @@ public class CLOptions
         
         countOption(OptId.DUPLICATES);
         
-        PGNUtil.DuplicateHandler handler = new PGNUtil.DuplicateHandler();
+        PGNUtil.DuplicateGameHandler handler = new PGNUtil.DuplicateGameHandler();
+        PGNUtil.setHandler(handler);
+        PGNUtil.setExitProcessor(new PGNUtil.DuplicateExitProcessor(handler));
+    }
+
+    @Option(name = DO, forbids = {D, DPO, O, E, EE, P, S},
+        aliases = "-duplicate_openings",
+        usage = "list games containing identical players and openings; " +
+            "each line of output contains one set of two or more " +
+            "game numbers in which duplicates are found")
+    private void duplicateOpenings(boolean d)
+    {
+        if (getCount(OptId.DUPLICATEOPENINGS) > 0)
+        {
+            System.err.println("Option '" + OptId.DUPLICATEOPENINGS +
+                "' cannot be set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.DUPLICATEOPENINGS);
+        
+        PGNUtil.DuplicateOpeningHandler handler =
+            new PGNUtil.DuplicateOpeningHandler();
+        
+        PGNUtil.setHandler(handler);
+        PGNUtil.setExitProcessor(new PGNUtil.DuplicateExitProcessor(handler));
+    }
+
+    @Option(name = DPO, forbids = {D, DO, O, E, EE, P, S},
+        aliases = "-duplicate_post_openings",
+        usage = "list games containing identical players and post-opening " +
+            "moves; each line of output contains one set of two or more " +
+            "game numbers in which duplicates are found")
+    private void duplicatePostOpenings(boolean d)
+    {
+        if (getCount(OptId.DUPLICATEPOSTOPENINGS) > 0)
+        {
+            System.err.println("Option '" + OptId.DUPLICATEPOSTOPENINGS +
+                "' cannot be set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.DUPLICATEPOSTOPENINGS);
+        
+        PGNUtil.DuplicatePostOpeningHandler handler =
+            new PGNUtil.DuplicatePostOpeningHandler();
+        
         PGNUtil.setHandler(handler);
         PGNUtil.setExitProcessor(new PGNUtil.DuplicateExitProcessor(handler));
     }
 
     // events
 
-    @Option(name = E, forbids = {D, O}, aliases = "-events",
+    @Option(name = E, forbids = {D, DO, DPO, O, EE, P}, aliases = "-events",
         usage = "list one event per line, with game numbers (ordinal " +
         "position of the game as it was read from the input source)")
     private void events(boolean e)
@@ -580,18 +819,40 @@ public class CLOptions
         }
         
         countOption(OptId.EVENTS);
-        PGNUtil.EventMapHandler handler = new PGNUtil.EventMapHandler();
-        PGNUtil.setHandler(handler);
+        Events events = new Events(false);
+        PGNUtil.setHandler(new PGNUtil.TallyHandler(events));
+        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(events));
+    }
+
+    // event errors
+
+    @Option(name = EE, forbids = {D, DO, DPO, O, E, P, S},
+        aliases = "-event_errors",
+        usage = "list each event containing errors, one event per line, with " +
+        "information about each error found")
+    private void eventErrors(boolean e)
+    {
+        if (getCount(OptId.EVENTERRORS) > 0)
+        {
+            System.err.println("Option '" + OptId.EVENTERRORS + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
         
-        PGNUtil.setExitProcessor(
-            new PGNUtil.EventMapExitProcessor(handler.getEventMap()));
+        countOption(OptId.EVENTERRORS);
+        Events events = new Events(true);
+        PGNUtil.setHandler(new PGNUtil.TallyHandler(events));
+        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(events));
     }
 
     // opening stats
 
-    @Option(name = O, forbids = {D, E},
+    @Option(name = O, forbids = {D, DO, DPO, E, EE, P},
         aliases = "-opening_stats", usage = "print win/loss/draw " +
-        "statistics for each opening")
+        "statistics for each opening.  Valid output selectors ('" + S + "') are: " +
+        "'eco,' 'oid,' 'count,' 'wwins,' 'bwins,' 'draws,' 'wwinpct,'" +
+        "'bwinpct,' 'diff,' 'diffpct,' 'drawpct'")
     private void openings(boolean o)
     {
         if (getCount(OptId.OPENINGS) > 0)
@@ -604,15 +865,15 @@ public class CLOptions
         
         countOption(OptId.OPENINGS);
         
-        PGNUtil.OpeningsHandler handler = new PGNUtil.OpeningsHandler();
-        PGNUtil.setHandler(handler);
-        PGNUtil.setExitProcessor(new PGNUtil.OpeningsExitProcessor(handler));
+        OpeningStats os = new OpeningStats();
+        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
     @Option(name = CMIN, depends = {O}, aliases = "-count_min",
         metaVar = "<min>",
         usage = "in combination with '" + O + "' option, print only openings " +
-            "that appear in at least <min> games")
+        "that appear in at least <min> games")
     private void minOpeningCount(int cmin)
     {
         if (getCount(OptId.MINGAMECOUNT) > 0)
@@ -624,14 +885,14 @@ public class CLOptions
         }
         
         countOption(OptId.MINGAMECOUNT);
-        PGNUtil.addOpeningProcessor(new PGNUtil.MinGamesProcessor(cmin));
+        OpeningStats.addOpeningProcessor(new OpeningStats.MinGamesProcessor(cmin));
     }
 
     @Option(name = HWD, depends = {O}, aliases = "-hi_win_diff",
         metaVar = "<max>",
         usage = "in combination with '" + O + "' option, print only openings " +
-            "for which the percentage win difference between white and " +
-            "black is at most <max> percent")
+        "for which the percentage win difference between white and " +
+        "black is at most <max> percent")
     private void hiWinDiff(double max)
     {
         if (getCount(OptId.HIWINDIFF) > 0)
@@ -643,14 +904,14 @@ public class CLOptions
         }
         
         countOption(OptId.HIWINDIFF);
-        PGNUtil.addOpeningProcessor(new PGNUtil.MaxWinDiffProcessor(max));
+        OpeningStats.addOpeningProcessor(new OpeningStats.MaxWinDiffProcessor(max));
     }
 
     @Option(name = LWD, depends = {O}, aliases = "-lo_win_diff",
         metaVar = "<min>",
         usage = "in combination with '" + O + "' option, print only openings " +
-            "for which the percentage win difference between white and " +
-            "black is at least <min> percent")
+        "for which the percentage win difference between white and " +
+        "black is at least <min> percent")
     private void loWinDiff(double min)
     {
         if (getCount(OptId.LOWINDIFF) > 0)
@@ -662,13 +923,13 @@ public class CLOptions
         }
         
         countOption(OptId.LOWINDIFF);
-        PGNUtil.addOpeningProcessor(new PGNUtil.MinWinDiffProcessor(min));
+        OpeningStats.addOpeningProcessor(new OpeningStats.MinWinDiffProcessor(min));
     }
 
     @Option(name = HDRAW, depends = {O}, aliases = "-hi_draw_pct",
         metaVar = "<max>",
         usage = "in combination with '" + O + "' option, print only openings " +
-            "for which the percentage of draws is at most <max> percent")
+        "for which the percentage of draws is at most <max> percent")
     private void maxDraw(double max)
     {
         if (getCount(OptId.MAXDRAW) > 0)
@@ -680,13 +941,13 @@ public class CLOptions
         }
         
         countOption(OptId.MAXDRAW);
-        PGNUtil.addOpeningProcessor(new PGNUtil.MaxDrawProcessor(max));
+        OpeningStats.addOpeningProcessor(new OpeningStats.MaxDrawProcessor(max));
     }
 
     @Option(name = LDRAW, depends = {O}, aliases = "-lo_draw_pct",
         metaVar = "<min>",
         usage = "in combination with '" + O + "' option, print only openings " +
-            "for which the percentage of draws is at least <min> percent")
+        "for which the percentage of draws is at least <min> percent")
     private void minDraw(double min)
     {
         if (getCount(OptId.MINDRAW) > 0)
@@ -698,20 +959,20 @@ public class CLOptions
         }
         
         countOption(OptId.MINDRAW);
-        PGNUtil.addOpeningProcessor(new PGNUtil.MinDrawProcessor(min));
+        OpeningStats.addOpeningProcessor(new OpeningStats.MinDrawProcessor(min));
     }
 
     @Option(name = HED, depends = {O, ELO}, aliases = "-hi_elo_diff",
         metaVar = "<diff>",
         usage = "in combination with '" + O + "' and '" + ELO + "' options, " +
-            "print only openings for which the difference in player elo " +
-            "ratings is at most <diff>")
+        "print only openings for which the difference in player elo " +
+        "ratings is at most <diff>")
     static Integer maxEloDiff;
 
     @Option(name = ELO, depends = {HED}, aliases = "-elo_file",
-        metaVar = "<filename>",
-        usage = "in combination with '" + O + "' and '" + HED + "' options, use " +
-            "elo ratings contained in the file <filename>")
+        metaVar = "<file>",
+        usage = "in combination with '" + O + "' and '" + HED + "' options, " +
+        "use elo ratings contained in the file <file>")
     private void setEloFile(File of)
     {
         if (getCount(OptId.ELOFILE) > 0)
@@ -723,17 +984,20 @@ public class CLOptions
         }
         
         countOption(OptId.ELOFILE);
+        
         PGNUtil.eloMap = new HashMap<>();
+        Pattern playerPattern = Pattern.compile("^(\\S.*\\S)\\s+-?\\d+$");
+        Pattern eloPattern = Pattern.compile("^.*\\s+(-?\\d+)$");
         
         try (Scanner fileScanner = new Scanner(of))
-        {  
+        {
             while (fileScanner.hasNextLine())
             {
                 String s = fileScanner.nextLine().trim();
                 if (s.length() == 0) continue;
                 
-                PGNUtil.eloMap.put(s.replaceAll("^(\\S.*\\S)\\s+-?\\d+$", "$1"),
-                    Integer.valueOf(s.replaceAll("^.*\\s+(-?\\d+)$", "$1")));
+                PGNUtil.eloMap.put(playerPattern.matcher(s).replaceAll("$1"),
+                    Integer.valueOf(eloPattern.matcher(s).replaceAll("$1")));
             }
         }
         
@@ -749,11 +1013,35 @@ public class CLOptions
             System.exit(-1);
         }
     }
+    
+    // player results
+
+    @Option(name = P, forbids = {D, DO, DPO, O, E, EE},
+        aliases = "-player_results",
+        usage = "list win/loss/draw statistics for each player.  Valid " +
+        "output selectors ('" + S + "') are: 'player,' 'wins,' 'losses,' 'draws,' " +
+        "'noresults,' 'count,' 'winpct'")
+    private void playerResults(boolean e)
+    {
+        if (getCount(OptId.PLAYERRESULTS) > 0)
+        {
+            System.err.println("Option '" + OptId.PLAYERRESULTS +
+                "' cannot be set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.PLAYERRESULTS);
+        
+        PlayerResults pr = new PlayerResults();
+        PGNUtil.setHandler(new PGNUtil.TallyHandler(pr));
+        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(pr));
+    }
 
     // output-field selector
 
-    @Option(name = S, forbids = {D, E}, aliases = "-select",
-        metaVar = "<field1,field2,..>",
+    @Option(name = S, forbids = {D, DO, DPO, EE}, aliases = "-select",
+        metaVar = "<field1,field2,...>",
         usage = "select fields for output.  The field 'moves' selects " +
         "the game's move list, the field 'gameno' selects the ordinal " +
         "position of the game as it was read from the input source, and " +
@@ -795,10 +1083,29 @@ public class CLOptions
             PGNUtil.handler = new PGNUtil.SelectGameHandler(PGNUtil.outputSelectors);
     }
 
-    @Option(name = OD, forbids = {D}, aliases = "-output_delim",
+    @Option(name = OD, forbids = {D, DO, DPO}, aliases = "-output_delim",
         metaVar = "<delim>",
-        usage = "set the delimiter for output types where this is sensible")
+        usage = "set the delimiter between output fields where this is sensible")
     static String outputDelim = "|";
+
+    @Option(name = VD, aliases = "-value_delim",
+        metaVar = "<delim>",
+        usage = "set the delimiter for values within a single output field, " +
+        "where this is sensible")
+    static String valueDelim = ",";
+
+    @Option(name = AQ, aliases = "-fix_aquarium",
+        usage = "compensate for  Aquarium bugs, where possible")
+    static boolean aquarium = false;
+
+    @Option(name = PERF, aliases = "-performance",
+        usage = "print performance statistics at end of output")
+    static boolean performance = false;
+
+    @Option(name = VG, aliases = "-validate_games",
+        usage = "throw an exception for any game that contains move-sequence " +
+            "errors")
+    static boolean validateGames = false;
 
     @Option(name = I, aliases = "-inputfile", usage = "input PGN file; " +
         "if this option is not present, pgnutil reads from standard input",
@@ -807,7 +1114,7 @@ public class CLOptions
     {
         if (getCount(OptId.INPUTFILE) > 0)
         {
-            System.err.println("Option '" + OptId.INPUTFILE + "' cannot be " +
+            System.err.println("option '" + OptId.INPUTFILE + "' cannot be " +
                 "set more than once!");
             
             System.exit(-1);
@@ -822,16 +1129,24 @@ public class CLOptions
         
         catch (FileNotFoundException e)
         {
-            System.err.println("File not found: " + f);
+            System.err.println("file not found: " + f);
+            System.exit(-1);
+        }
+        
+        catch (IOException e)
+        {
+            System.err.println("i/o exception: " + f);
             System.exit(-1);
         }
     }
 
-    @Option(name = H, forbids = {D, E, O, M, GN, NM, MW, ML, MP, MO, NMO, R, V},
+    @Option(name = H, forbids = {D, DO, DPO, E, EE, O, M, GN, NM, MW, ML, MP,
+        MO, NMO, R, V},
         aliases = "-help", usage = "print usage information")
-    boolean help;
+    static boolean help = false;
 
-    @Option(name = V, forbids = {D, E, O, M, GN, NM, MW, ML, MP, MO, NMO, R, H},
+    @Option(name = V, forbids = {D, DO, DPO, E, EE, O, M, GN, NM, MW, ML, MP,
+        MO, NMO, R, H},
         aliases = "-version",
         usage = "print version information")
     private void version(boolean v)

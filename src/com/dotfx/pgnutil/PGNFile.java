@@ -30,7 +30,6 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.Reader;
 
 /**
  *
@@ -38,19 +37,20 @@ import java.io.Reader;
  */
 public class PGNFile
 {
-    final CopyReader reader;
-    int gameCounter;
+    public static final int COPY_BUF_INIT_SIZE = 32768;
+    private final CopyReader reader;
+    private int gameCounter;
     
-    public PGNFile(String file) throws FileNotFoundException
+    public PGNFile(String file) throws FileNotFoundException, IOException
     {
-        reader = new CopyReader(new BufferedReader(new FileReader(file)));
-        gameCounter = 0;
+        reader = new CopyReader(new BufferedReader(new FileReader(file)),
+            COPY_BUF_INIT_SIZE);
     }
     
-    public PGNFile(InputStream is)
+    public PGNFile(InputStream is) throws IOException
     {
-        reader = new CopyReader(new BufferedReader(new InputStreamReader(is)));
-        gameCounter = 0;
+        reader = new CopyReader(new BufferedReader(new InputStreamReader(is)),
+            COPY_BUF_INIT_SIZE);
     }
     
     /**
@@ -59,16 +59,20 @@ public class PGNFile
      * retrieved).
      * 
      * @param reader Reader containing PGN-formatted text
+     * @throws IOException 
      */
-    public PGNFile(Reader reader)
+    public PGNFile(BufferedReader reader) throws IOException
     {
-        this.reader = new CopyReader(reader);
-        gameCounter = 0;
+        this.reader = new CopyReader(reader, COPY_BUF_INIT_SIZE);
     }
     
     public Game nextGame() throws IOException, PGNException
     {
-        reader.clear();
-        return Game.parseNext(++gameCounter, reader);
+        Game ret = Game.parseNext(gameCounter + 1, reader);
+        if (ret != null) gameCounter++;
+        return ret;
     }
+    
+    public int getGamesRead() { return gameCounter; }
+    public long getTotalBytesRead() { return reader.totalCharsRead(); }
 }

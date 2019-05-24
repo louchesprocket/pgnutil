@@ -16,9 +16,10 @@ matching/selecting and replacing functions on PGN files in conjunction
 with various output options.  By default, pgnutil simply outputs
 selected games after performing any stipulated replacement operations,
 but it can instead output user-selected lists of fields.  In addition,
-pgnutil has three "special" output options: duplicate finding, event
-listing, and opening statistics.  Pgnutil is particularly designed to
-be used in conjunction with tools such as bayeselo or elostat.
+pgnutil has various "special" output options: duplicate finding, event
+listing, opening statistics, and player statistics.  Pgnutil is
+particularly designed to be used in conjunction with tools such as
+bayeselo or elostat.
 
 
 Requirements
@@ -65,6 +66,17 @@ To list every game that Stockfish drew, we can use the -mt ("match
 tag") option:
 
 	java -jar pgnutil.jar -mp 'Stockfish' -mt 'Result/1\/2-1\/2' -i mygames.pgn
+
+If we want to perform any of these queries on a list of player names
+(instead of a single player name) we can use the player-file options
+"-pf" (to match both players), "-apf" (to match either player), or
+"-npf" (to match neither player).  For example, the command:
+
+	java -jar pgnutil.jar -pf myplayers.txt -mt 'Result/1\/2-1\/2' -i mygames.pgn
+
+will output every drawn game from the file mygames.pgn wherein both
+players are listed in the file myplayers.txt.  The latter is a simple
+text file listing player names, one per line.
 
 The "-r" option performs replacements on the game text.  For example,
 to replace every instance of 'Quazar' from the file mygames.pgn with
@@ -117,29 +129,34 @@ Selected fields may include any PGN tag.  There are also five
 	loser: causes pgnutil to print the name of the loser
 
 By default, fields selected by the "-s" option appear on the output
-separated by the pipe ("|") character.  If a different output-
+separated by the pipe ("|") character.  If a different output
 delimiter is desired, this may be set with the "-od" (output-
 delimiter) option.
 
-The "special" output options are "-d" (duplicates), "-e" (events),
-and "-o" (opening statistics).  Any of these may be combined with
-any matching and replacing options (see above).
+Similarly, values within a field are, by default, separated by
+commas.  If a different value delimiter is desired, it may be set
+with the "-vd" (value-delimiter) option.
+
+The "special" output options include "-d" (duplicates), "-do"
+(duplicate openings), "-e" (events), "-ee" (event errors), "-o"
+(opening statistics), and "-p" (player statistics).  Any of these
+may be combined with any matching and replacing options (see above).
 
 To find duplicate games (defined as games with the same players and
 same move list) in the file mygames.pgn:
 
 	java -jar pgnutil.jar -d -i mygames.pgn
 
-The previous command will print a space-sparated list of game
+The previous command will print a comma-sparated list of game
 numbers (indexed from the first game of the PGN file), with each set
 of duplicates on a separate line.  For example, the output:
 
-	1616 1617
-	1622 1623 1710
+	1616,1617
+	1622,1623,1710
 
 means that game 1617 is a duplicate of 1616, and games 1623 and
-1710 are duplicates of 1622.  To output games 1616 and 1617 from the
-PGN file:
+1710 are duplicates of 1622.  To output games 1616 and 1617 from
+the PGN file:
 
 	java -jar pgnutil.jar -gn 1616,1617 -i mygames.pgn
 
@@ -152,6 +169,11 @@ To list each event from the file mygames.pgn, along with the games
 that belong to it:
 
 	java -jar pgnutil.jar -e -i mygames.pgn
+
+To list each player from the file mygames.pgn, along with
+win/loss/draw statistics:
+
+	java.jar pgnutil.jar -p -i mygames.pgn
 
 To list opening statistics for all games in mygames.pgn:
 

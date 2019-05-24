@@ -33,11 +33,11 @@ import java.util.Map;
  */
 public class AquariumVars
 {
-    private Clock clk;
-    private Clock clko;
-    private String emt;
-    private String eval;
-    private String meval;
+    private Clock clk; // my time remaining until time control after this move
+    private Clock clko; // opponent's time remaining
+    private String emt; // elapsed time for this move
+    private String eval; // position evaluation
+    private String meval; // similar to emt? plus egtb hits. E.g., "15s|TB:3m"
     private final Map<String,String> otherVars;
     
     public AquariumVars(Game.Move move)
@@ -135,4 +135,12 @@ public class AquariumVars
     public String getEval() { return eval; }
     public String getMeval() { return meval; }
     public String get(String tag) { return otherVars.get(tag); }
+    
+    public String getTbHits()
+    {
+        if (meval == null) return null;
+        int tbVarStart = meval.indexOf("|TB:");
+        if (tbVarStart > -1) return meval.substring(tbVarStart + 4);
+        return null;
+    }
 }

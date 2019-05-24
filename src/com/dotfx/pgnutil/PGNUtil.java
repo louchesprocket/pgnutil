@@ -30,11 +30,15 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -116,11 +120,12 @@ public class PGNUtil
             ranges = new ArrayList();
             
             for (String token : s.split(",\\W*"))
-            {
+            { 
                 String rangeBounds[] = token.split("-");
                 Integer rangeStart = Integer.valueOf(rangeBounds[0]);
-                
-                ranges.add(new SimpleEntry(rangeStart, rangeBounds.length == 1 ?
+
+                ranges.add(new SimpleEntry(rangeStart,
+                    rangeBounds.length == 1 ?
                     rangeStart : Integer.valueOf(rangeBounds[1])));
             }
         }
@@ -139,16 +144,72 @@ public class PGNUtil
         }
     }
     
+    static class MatchAnyPlayerSetProcessor implements GameProcessor
+    {
+        private final Set<String> playerSet;
+        
+        public MatchAnyPlayerSetProcessor(Set<String> playerSet)
+        {
+            this.playerSet = playerSet;
+        }
+        
+        @Override public boolean processGame()
+        {
+            return playerSet.contains(game.getWhite()) ||
+                playerSet.contains(game.getBlack());
+        }
+    }
+    
+    static class MatchAllPlayerSetProcessor implements GameProcessor
+    {
+        private final Set<String> playerSet;
+        
+        public MatchAllPlayerSetProcessor(Set<String> playerSet)
+        {
+            this.playerSet = playerSet;
+        }
+        
+        @Override public boolean processGame()
+        {
+            return playerSet.contains(game.getWhite()) &&
+                playerSet.contains(game.getBlack());
+        }
+    }
+    
+    static class NotMatchPlayerSetProcessor implements GameProcessor
+    {
+        private final Set<String> playerSet;
+        
+        public NotMatchPlayerSetProcessor(Set<String> playerSet)
+        {
+            this.playerSet = playerSet;
+        }
+        
+        @Override public boolean processGame()
+        {
+            return !playerSet.contains(game.getWhite()) &&
+                !playerSet.contains(game.getBlack());
+        }
+    }
+    
     static class MatchOpeningProcessor implements GameProcessor
     {
-        private final Set<OpeningID> matchOpeningSet;
+        private final Set<MoveListId> matchOpeningSet;
         
-        public MatchOpeningProcessor(String s)
+        public MatchOpeningProcessor(String s) throws IllegalArgumentException
         {
             matchOpeningSet = new HashSet<>();
             
             for (String token : s.split(",\\W*"))
-                matchOpeningSet.add(OpeningID.fromString(token));
+            {
+                try { matchOpeningSet.add(MoveListId.fromString(token)); }
+                
+                catch (IllegalArgumentException e)
+                {
+                    System.err.println("invalid opening id: '" + token + "'");
+                    System.exit(-1);
+                }
+            }
         }
         
         @Override public boolean processGame()
@@ -219,6 +280,56 @@ public class PGNUtil
         {
             TimeCtrl timeCtrl = game.getTimeCtrl();
             return timeCtrl != null ? timeCtrl.equals(matchTimeCtrl) : false;
+        }
+    }
+    
+    static class MinPlyCountProcessor implements GameProcessor
+    {
+        private final int plies;
+        
+        public MinPlyCountProcessor(int plies) { this.plies = plies; }
+        
+        @Override public boolean processGame()
+        {
+            return game.getPlyCount() >= plies;
+        }
+    }
+    
+    static class MaxPlyCountProcessor implements GameProcessor
+    {
+        private final int plies;
+        
+        public MaxPlyCountProcessor(int plies) { this.plies = plies; }
+        
+        @Override public boolean processGame()
+        {
+            return game.getPlyCount() <= plies;
+        }
+    }
+    
+    static class MinOobProcessor implements GameProcessor
+    {
+        private final int plies;
+        
+        MinOobProcessor(int plies) { this.plies = plies; }
+        
+        @Override public boolean processGame()
+        {
+            return game.getPlyCount() - game.getFirstOobMove().getPly() >=
+                plies;
+        }
+    }
+    
+    static class MaxOobProcessor implements GameProcessor
+    {
+        private final int plies;
+        
+        MaxOobProcessor(int plies) { this.plies = plies; }
+        
+        @Override public boolean processGame()
+        {
+            return game.getPlyCount() - game.getFirstOobMove().getPly() <=
+                plies;
         }
     }
     
@@ -296,14 +407,22 @@ public class PGNUtil
     
     static class ReplaceOpeningProcessor implements GameProcessor
     {
-        private final Set<OpeningID> replaceOpeningSet;
+        private final Set<MoveListId> replaceOpeningSet;
         
         public ReplaceOpeningProcessor(String s)
         {
             replaceOpeningSet = new HashSet<>();
             
             for (String token : s.split(",\\W*"))
-                replaceOpeningSet.add(OpeningID.fromString(token));
+            {
+                try { replaceOpeningSet.add(MoveListId.fromString(token)); }
+                
+                catch (IllegalArgumentException e)
+                {
+                    System.err.println("invalid opening id: '" + token + "'");
+                    System.exit(-1);
+                }
+            }
         }
         
         @Override public boolean processGame()
@@ -315,7 +434,9 @@ public class PGNUtil
     // game handlers
     
     static interface GameHandler
-    { public void handle() throws InvalidSelectorException; }
+    {
+        public void handle() throws InvalidSelectorException;
+    }
     
     static class NullGameHandler implements GameHandler
     {
@@ -345,205 +466,83 @@ public class PGNUtil
         }
     }
     
-    static class EventMapHandler implements GameHandler
+    static abstract class DuplicateHandler implements GameHandler
     {
-        private final Map<String,List<GameInfo>> eventMap;
-        
-        public EventMapHandler() { eventMap = new HashMap<>(); }
-        
-        @Override public void handle() throws InvalidSelectorException
-        {
-            String event = game.getValue("Event");
-            List<GameInfo> eventGames = eventMap.get(event);
-
-            if (eventGames == null)
-            {
-                eventGames = new ArrayList();
-                eventMap.put(event, eventGames);
-            }
-
-            eventGames.add(new GameInfo((int)game.getNumber(),
-                game.getTimeCtrl()));
-        }
-        
-        public Map<String,List<GameInfo>> getEventMap() { return eventMap; }
-    }
-    
-    static class DuplicateHandler implements GameHandler
-    {
-        private final Map<HashCode,List<Integer>> gameMap;
+        private final Map<HashCode,SortedSet<Integer>> gameMap;
         private final Set<HashCode> duplicates;
         
-        public DuplicateHandler()
+        DuplicateHandler()
         {
             gameMap = new HashMap(100000);
             duplicates = new HashSet();
         }
         
-        @Override public void handle() throws InvalidSelectorException
+        final void handle(HashCode hash) throws InvalidSelectorException
         {
-            HashCode gameHash = game.getHash();
-            List<Integer> gameIdxes = gameMap.get(gameHash);
-
-            if (gameIdxes != null) duplicates.add(gameHash);
+            SortedSet<Integer> gameIdxes = gameMap.get(hash);
+            if (gameIdxes != null) duplicates.add(hash);
 
             else
             {
-                gameIdxes = new ArrayList<>();
-                gameMap.put(gameHash, gameIdxes);
+                gameIdxes = new TreeSet<>();
+                gameMap.put(hash, gameIdxes);
             }
 
             gameIdxes.add((int)game.getNumber());
         }
         
-        public List<List<Integer>> getDuplicates()
+        final SortedSet<SortedSet<Integer>> getDuplicates()
         {
-            List<List<Integer>> ret = new ArrayList<>();
+            SortedSet<SortedSet<Integer>> ret = new TreeSet<>
+            (
+                new Comparator<SortedSet<Integer>>()
+                {
+                    @Override
+                    public int compare(SortedSet<Integer> s1, SortedSet<Integer> s2)
+                    {
+                        return s1.first() - s2.first();
+                    }
+                }
+            );
+            
             for (HashCode duplicate : duplicates) ret.add(gameMap.get(duplicate));
             return ret;
         }
     }
     
-    static class OpeningsHandler implements GameHandler
+    static class DuplicateGameHandler extends DuplicateHandler
     {
-        private final Map<OpeningID,OpeningStats> openingsMap;
+        @Override public void handle() throws InvalidSelectorException
+        {
+            super.handle(game.getHash());
+        }
+    }
+    
+    static class DuplicateOpeningHandler extends DuplicateHandler
+    {
+        @Override public void handle() throws InvalidSelectorException
+        {
+            super.handle(game.getPlayerOpeningHash());
+        }
+    }
+    
+    static class DuplicatePostOpeningHandler extends DuplicateHandler
+    {
+        @Override public void handle() throws InvalidSelectorException
+        {
+            super.handle(game.getPlayerPostOpeningHash());
+        }
+    }
+    
+    static class TallyHandler implements GameHandler
+    {
+        private final Tallier tallier;
         
-        public OpeningsHandler() {  openingsMap = new HashMap<>(10000); }
+        TallyHandler(Tallier tallier) { this.tallier = tallier; }
         
         @Override public void handle() throws InvalidSelectorException
         {
-            if (CLOptions.maxEloDiff != null)
-            {
-                Integer whiteElo = eloMap.get(game.getWhite().trim());
-                Integer blackElo = eloMap.get(game.getBlack().trim());
-                
-                if (whiteElo == null || blackElo == null ||
-                    Math.abs(whiteElo - blackElo) > CLOptions.maxEloDiff)
-                    return;
-            }
-            
-            OpeningID openingID = game.getOpeningID();
-            OpeningStats stats = openingsMap.get(openingID);
-
-            if (stats == null)
-            {
-                stats = new OpeningStats(openingID, game.get(OutputSelector.ECO));
-                openingsMap.put(openingID, stats);
-            }
-
-            stats.count(game);
-        }
-        
-        public Map<OpeningID,OpeningStats> getMap() { return openingsMap; }
-    }
-    
-    // opening-stat processors
-    
-    private static interface OpeningProcessor
-    {
-        /**
-         * 
-         * @return true if we should continue processing this opening, false if
-         * we should skip it
-         */
-        public boolean processOpening(OpeningStats stats)
-            throws ProcessorException;
-    }
-    
-    static class MinGamesProcessor implements OpeningProcessor
-    {
-        private final int minGames;
-        
-        public MinGamesProcessor(int minGames) { this.minGames = minGames; }
-        
-        @Override public boolean processOpening(OpeningStats stats)
-        {
-            return stats.getGameCount() >= minGames;
-        }
-    }
-    
-    static class MaxWinDiffProcessor implements OpeningProcessor
-    {
-        private final double maxDiff;
-        
-        public MaxWinDiffProcessor(double maxDiff) { this.maxDiff = maxDiff; }
-        
-        @Override public boolean processOpening(OpeningStats stats)
-        {
-            return stats.getWhiteWinPct() - stats.getBlackWinPct() <= maxDiff;
-        }
-    }
-    
-    static class MinWinDiffProcessor implements OpeningProcessor
-    {
-        private final double minDiff;
-        
-        public MinWinDiffProcessor(double minDiff) { this.minDiff = minDiff; }
-        
-        @Override public boolean processOpening(OpeningStats stats)
-        {
-            return stats.getWhiteWinPct() - stats.getBlackWinPct() >= minDiff;
-        }
-    }
-    
-    static class MinDrawProcessor implements OpeningProcessor
-    {
-        private final double minDraw;
-        
-        public MinDrawProcessor(double minDraw) { this.minDraw = minDraw; }
-        
-        @Override public boolean processOpening(OpeningStats stats)
-        {
-            return stats.getDrawPct() >= minDraw;
-        }
-    }
-    
-    static class MaxDrawProcessor implements OpeningProcessor
-    {
-        private final double maxDraw;
-        
-        public MaxDrawProcessor(double maxDraw) { this.maxDraw = maxDraw; }
-        
-        @Override public boolean processOpening(OpeningStats stats)
-        {
-            return stats.getDrawPct() <= maxDraw;
-        }
-    }
-    
-    // opening-stat printers
-    
-    private static interface OpeningStatPrinter
-    {
-        public static OpeningStatPrinter get(OutputSelector selectors[])
-        {
-            return selectors == null ? new DefaultOpeningStatPrinter() :
-                new CustomOpeningStatPrinter(selectors);
-        }
-        
-        public void print(OpeningStats stats) throws InvalidSelectorException;
-    }
-    
-    private static class DefaultOpeningStatPrinter implements OpeningStatPrinter
-    {
-        @Override public void print(OpeningStats stats)
-        {
-            System.out.println(stats);
-        }
-    }
-    
-    private static class CustomOpeningStatPrinter implements OpeningStatPrinter
-    {
-        private final OutputSelector selectors[];
-        
-        public CustomOpeningStatPrinter(OutputSelector selectors[])
-        {
-            this.selectors = selectors;
-        }
-        
-        @Override public void print(OpeningStats stats)
-            throws InvalidSelectorException
-        {
-            System.out.println(stats.get(selectors));
+            tallier.tally(game);
         }
     }
     
@@ -559,47 +558,6 @@ public class PGNUtil
         @Override public void process() {}
     }
     
-    static class EventMapExitProcessor implements ExitProcessor
-    {
-        private final Map<String,List<GameInfo>> eventMap;
-        
-        public EventMapExitProcessor(Map<String,List<GameInfo>> eventMap)
-        {
-            this.eventMap = eventMap;
-        }
-        
-        @Override public void process()
-        {
-            for (String event : eventMap.keySet())
-            {
-                List<GameInfo> games = eventMap.get(event);
-                
-                System.out.print(event + CLOptions.outputDelim +
-                    guessTimeCtrl(games) + CLOptions.outputDelim);
-                
-                for (GameInfo gi : games)
-                    System.out.print(gi.getGameNum() + " ");
-                
-                System.out.print("\n");
-            }
-        }
-    
-        public static TimeCtrl guessTimeCtrl(List<GameInfo> games)
-        {
-            TimeCtrl best = null;
-
-            for (int i = 0; i < games.size(); i++)
-            {
-                TimeCtrl current = games.get(i).getTimeCtrl();
-                if (current == null) continue;
-                if (current.isOfficial()) return current;
-                if (best == null || current.compareTo(best) > 0) best = current;
-            }
-
-            return best;
-        }
-    }
-    
     static class DuplicateExitProcessor implements ExitProcessor
     {
         private final DuplicateHandler printer;
@@ -611,54 +569,47 @@ public class PGNUtil
         
         @Override public void process()
         {
-            for (List<Integer> list : printer.getDuplicates())
+            for (SortedSet<Integer> list : printer.getDuplicates())
             {
-                for (Integer idx : list) System.out.print(idx + " ");
+                Iterator<Integer> iter = list.iterator();
+                System.out.print(iter.next());
+                
+                while (iter.hasNext())
+                    System.out.print(CLOptions.valueDelim + iter.next());
+                
                 System.out.print("\n");
             }
         }
     }
     
-    static class OpeningsExitProcessor implements ExitProcessor
+    static class TallyExitProcessor implements ExitProcessor
     {
-        private final OpeningsHandler handler;
+        private final Tallier iteratorProvider;
         
-        public OpeningsExitProcessor(OpeningsHandler handler)
+        TallyExitProcessor(Tallier iteratorProvider)
         {
-            this.handler = handler;
+            this.iteratorProvider = iteratorProvider;
         }
         
         @Override public void process()
         {
-            Map<OpeningID,OpeningStats> statMap = handler.getMap();
-            
-            OpeningStatPrinter printer =
-                OpeningStatPrinter.get(outputSelectors);
-
-            nextOpening:
-            for (OpeningID id : statMap.keySet())
+            try
             {
-                OpeningStats stats = statMap.get(id);
+                Iterator<String> iter =
+                    iteratorProvider.getOutputIterator(outputSelectors);
                 
-                try
-                {
-                    for (OpeningProcessor processor : openingProcessors)
-                        if (!processor.processOpening(stats))
-                            continue nextOpening;
-
-                    printer.print(stats);
-                }
+                while (iter.hasNext()) System.out.println(iter.next());
+            }
             
-                catch (InvalidSelectorException | ProcessorException e)
-                {
-                    System.err.println("Exception: " + e.getMessage());
-                    System.exit(-1);
-                }
+            catch (InvalidSelectorException e)
+            {
+                System.err.println("Exception: " + e.getMessage());
+                System.exit(-1);
             }
         }
     }
     
-    public static final String VERSION = "0.2";
+    public static final String VERSION = "0.3";
     
     // All of these are static in order to avoid parameter-passing overhead.
     
@@ -666,7 +617,6 @@ public class PGNUtil
     static PGNFile pgn;
     static final List<GameProcessor> matchProcessors = new ArrayList<>();
     static final List<GameProcessor> replaceProcessors = new ArrayList<>();
-    static final List<OpeningProcessor> openingProcessors = new ArrayList<>();
     
     static Pattern playerPattern;
     static Map<String,Integer> eloMap;
@@ -676,15 +626,15 @@ public class PGNUtil
     static OutputSelector outputSelectors[];
     
     static void addMatchProcessor(GameProcessor gp) { matchProcessors.add(gp); }
-    static void addOpeningProcessor(OpeningProcessor op) { openingProcessors.add(op); }
     static void setHandler(GameHandler printer) { PGNUtil.handler = printer; }
     static void setExitProcessor(ExitProcessor proc) { exitProcessor = proc; }
     
-    public static void main(String args[]) throws Exception
+    public static void main(String args[])
     {
         CLOptions options = new CLOptions();
         CmdLineParser parser = new CmdLineParser(options);
         exitProcessor = new NullExitProcessor();
+        long startTime = 0L;
         
         try
         {
@@ -703,11 +653,21 @@ public class PGNUtil
         
         catch (PatternSyntaxException e)
         {
-            System.err.println("Regular expression error.  " +
+            System.err.println("regular expression error.  " +
                 e.getLocalizedMessage());
             
             System.exit(-1);
         }
+        
+        catch (IOException e)
+        {
+            System.err.println("i/o exception; failed to read input: " +
+                e.getLocalizedMessage());
+            
+            System.exit(-1);
+        }
+        
+        if (CLOptions.performance) startTime = System.currentTimeMillis();
         
         try
         {
@@ -728,8 +688,28 @@ public class PGNUtil
 
         catch (InvalidSelectorException e)
         {
-            System.err.println("Invalid selector: " + e.getMessage());
+            System.err.println("invalid selector: " + e.getLocalizedMessage());
             System.exit(-1);
         }
+
+        catch (PGNException e)
+        {
+            System.err.println("PGN parsing exception: " +
+                e.getLocalizedMessage());
+            
+            System.exit(-1);
+        }
+
+        catch (IOException | ProcessorException e)
+        {
+            System.err.println("exception: " + e.getLocalizedMessage());
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        
+        if (CLOptions.performance)
+            System.err.println("processed " + pgn.getGamesRead() +
+                " games (" + pgn.getTotalBytesRead() + " chars) in " +
+                (System.currentTimeMillis() - startTime) + "ms");
     }
 }

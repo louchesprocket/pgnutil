@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Mark Chen.
+ * Copyright 2019 Mark Chen <chen@dotfx.com>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,47 +24,27 @@
 
 package com.dotfx.pgnutil;
 
+import java.text.NumberFormat;
+
 /**
  *
- * @author Mark Chen
+ * @author Mark Chen <chen@dotfx.com>
  */
-public class GameInfo implements Comparable<GameInfo>
+public class Formats
 {
-    private final int gameNum, round;
-    private final TimeCtrl timeCtrl;
-
-    public GameInfo(int gameNum, int round, TimeCtrl timeCtrl)
-    {
-        this.gameNum = gameNum;
-        this.round = round;
-        this.timeCtrl = timeCtrl;
-    }
-
-    public int getGameNum() { return gameNum; }
-    public int getRound() { return round; }
-    public TimeCtrl getTimeCtrl() { return timeCtrl; }
-
-    @Override
-    public boolean equals(Object other)
-    {
-        try
-        {
-            GameInfo that = (GameInfo)other;
-            return getGameNum() == that.getGameNum();
-        }
-
-        catch (ClassCastException e) { return false; }
-    }
+    public static final NumberFormat PERCENT;
+    public static final NumberFormat DECIMAL;
     
-    @Override
-    public int hashCode()
+    static
     {
-        return GameInfo.class.hashCode() ^ gameNum;
-    }
+        PERCENT = NumberFormat.getPercentInstance();
+        PERCENT.setMinimumFractionDigits(1);
+        PERCENT.setMaximumFractionDigits(1);
 
-    @Override
-    public int compareTo(GameInfo that)
-    {
-        return getGameNum() - that.getGameNum();
+        DECIMAL = NumberFormat.getInstance();
+        DECIMAL.setMinimumIntegerDigits(0);
+        DECIMAL.setMinimumIntegerDigits(1);
+        DECIMAL.setMinimumFractionDigits(3);
+        DECIMAL.setMaximumFractionDigits(3);
     }
 }

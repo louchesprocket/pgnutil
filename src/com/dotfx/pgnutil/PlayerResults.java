@@ -24,59 +24,182 @@
 
 package com.dotfx.pgnutil;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
+
 /**
  *
  * @author Mark Chen
  */
-public class PlayerResults
+public class PlayerResults implements Tallier
 {
-    private final String player;
-    private int wins;
-    private int losses;
-    private int draws;
-    private int noResults;
-    
-    public PlayerResults(String player)
+    public static class Score
     {
-        this.player = player;
-    }
-    
-    public String getPlayer() { return player; }
-    
-    public String getResults()
-    {
-        return String.format("+%d=%d-%d", wins, draws, losses);
-    }
-        
-    public void incWins() { wins++; }
-    public void incLosses() { losses++; }
-    public void incDraws() { draws++; }
-    public void incNoResults() { noResults++; }
+        private int wins;
+        private int losses;
+        private int draws;
+        private int noResults;
 
-    public void tallyResult(Game game) throws InvalidPlayerException
+        public Score() {}
+
+        public void incWins() { wins++; }
+        public void incLosses() { losses++; }
+        public void incDraws() { draws++; }
+        public void incNoResults() { noResults++; }
+        public int getWins() { return wins; }
+        public int getLosses() { return losses; }
+        public int getDraws() { return draws; }
+        public int getNoResults() { return noResults; }
+        
+        public int getGameCount()
+        {
+            return wins + losses + draws + noResults;
+        }
+        
+        public double getWinPct()
+        {
+            return ((double)wins + ((double)draws) / 2) / getGameCount();
+        }
+
+        @Override
+        public String toString()
+        {
+            return String.format("+%d=%d-%d", wins, draws, losses);
+        }
+    }
+    
+    private class ResultsIterator implements Iterator<String>
     {
-        if (game.getWhite().equals(player))
+        private final Iterator<String> iterator;
+        private final OutputSelector selectors[];
+        
+        private ResultsIterator(Map<String,Score> resultsMap,
+            OutputSelector selectors[])
+            throws InvalidSelectorException
         {
-            switch (game.getResult())
+            iterator = resultsMap.keySet().iterator();
+            
+            if (selectors == null || selectors.length == 0)
             {
-                case WHITEWIN: incWins(); break;
-                case BLACKWIN: incLosses(); break;
-                case DRAW: incDraws(); break;
-                default: incNoResults();
+                this.selectors = null;
+                return;
             }
+            
+            for (OutputSelector selector : selectors)
+            {
+                switch (selector.getValue())
+                {
+                    case PLAYER:
+                    case WINS:
+                    case LOSSES:
+                    case DRAWS:
+                    case NORESULTS:
+                    case COUNT:
+                    case WINPCT:
+                        break;
+
+                    default:
+                        throw new InvalidSelectorException("'" + selector +
+                            "' is not a valid selector in this context");
+                }
+            }
+            
+            this.selectors = selectors;
         }
         
-        else if (game.getBlack().equals(player))
+        @Override public boolean hasNext() { return iterator.hasNext(); }
+        
+        @Override public String next()
         {
-            switch (game.getResult())
+            StringBuilder ret = new StringBuilder();
+            String player = iterator.next();
+            Score score = resultsMap.get(player);
+            
+            if (selectors == null)
+                ret.append(player).append(CLOptions.outputDelim).
+                    append(score.toString()).append(CLOptions.outputDelim).
+                    append("games: ").append(score.getGameCount()).
+                    append(CLOptions.outputDelim).append("win: " ).
+                    append(Formats.PERCENT.format(score.getWinPct()));
+
+            else for (int i = 0; i < selectors.length; i++)
             {
-                case WHITEWIN: incLosses(); break;
-                case BLACKWIN: incWins(); break;
-                case DRAW: incDraws(); break;
-                default: incNoResults();
+                switch (selectors[i].getValue())
+                {
+                    case PLAYER: ret.append(player); break;
+                    case WINS: ret.append(score.getWins()); break;
+                    case LOSSES: ret.append(score.getLosses()); break;
+                    case DRAWS: ret.append(score.getDraws()); break;
+                    case NORESULTS: ret.append(score.getNoResults()); break;
+                    case COUNT: ret.append(score.getGameCount()); break;
+                    
+                    case WINPCT:
+                        ret.append(Formats.DECIMAL.format(score.getWinPct()));
+                        break;
+                }
+
+                if (i < selectors.length - 1) ret.append(CLOptions.outputDelim);
             }
+
+            return ret.toString();
+        }
+    }
+    
+    private final Map<String,Score> resultsMap;
+    
+    public PlayerResults()
+    {
+        resultsMap = new TreeMap<>();
+    }
+    
+    @Override
+    public void tally(Game game)
+    {
+        String white = game.getWhite();
+        String black = game.getBlack();
+        Score whiteScore = resultsMap.get(white);
+        Score blackScore = resultsMap.get(black);
+        
+        if (whiteScore == null)
+        {
+            whiteScore = new Score();
+            resultsMap.put(white, whiteScore);
         }
         
-        else throw new InvalidPlayerException("'" + player + "' is not a player");
+        if (blackScore == null)
+        {
+            blackScore = new Score();
+            resultsMap.put(black, blackScore);
+        }
+        
+        switch (game.getResult())
+        {
+            case WHITEWIN:
+                whiteScore.incWins();
+                blackScore.incLosses();
+                break;
+                
+            case BLACKWIN:
+                whiteScore.incLosses();
+                blackScore.incWins();
+                break;
+                
+            case DRAW:
+                whiteScore.incDraws();
+                blackScore.incDraws();
+                break;
+                
+            default:
+                whiteScore.incNoResults();
+                blackScore.incNoResults();
+        }
+    }
+
+    @Override
+    public Iterator<String> getOutputIterator(OutputSelector selectors[])
+        throws InvalidSelectorException
+    {
+        return new ResultsIterator(resultsMap, selectors);
     }
 }
