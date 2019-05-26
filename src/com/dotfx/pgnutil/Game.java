@@ -745,7 +745,7 @@ public class Game
 
             switch (selectors[i].getValue())
             {
-                case PRETTYMOVES:
+                case FULLMOVES:
                     for (Move move : moves)
                     {
                         moveString.append(move.getNumber()).

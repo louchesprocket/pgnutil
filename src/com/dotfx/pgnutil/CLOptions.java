@@ -24,16 +24,13 @@
 
 package com.dotfx.pgnutil;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
+import java.io.CharArrayWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.InputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -173,15 +170,13 @@ public class CLOptions
         return count == null ? 0 : count;
     }
     
-    private static Set<String> readLineFile(File file)
+    private static Set<String> readLinesSet(File file)
     {
         Set<String> fileLineSet = new HashSet<>();
+        String line;
 
-        try
+        try (BufferedReader reader = new BufferedReader(new FileReader(file)))
         {
-            String line;
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-
             while ((line = reader.readLine()) != null)
                 fileLineSet.add(line.trim());
         }
@@ -199,6 +194,58 @@ public class CLOptions
         }
 
         return fileLineSet;
+    }
+    
+    private static String readFully(File file)
+    {
+        CharArrayWriter writer = new CharArrayWriter();
+        
+        try (BufferedReader reader = new BufferedReader(new FileReader(file)))
+        {
+            char buf[] = new char[1024];
+            int read;
+            
+            while ((read = reader.read(buf, 0, buf.length)) >= 0)
+                writer.write(buf, 0, read);
+        }
+        
+        catch (FileNotFoundException e)
+        {
+            System.err.println("File '" + file + "' not found.");
+            System.exit(-1);
+        }
+        
+        catch (IOException e)
+        {
+            System.err.println("Error reading file '" + file + "'");
+            System.exit(-1);
+        }
+        
+        return writer.toString();
+    }
+    
+    private static String[] splitCommaSeparated(String s)
+    {
+        return s.replaceAll("#.*", "").trim().replaceAll("\\W+", ",").
+            replaceAll(",+", ",").split(",");
+    }
+    
+    private Set<MoveListId> getOpeningsSet(String openingsSt)
+    {
+        Set<MoveListId> openingSet = new HashSet<>();
+            
+        for (String s : splitCommaSeparated(openingsSt))
+        {
+            try { openingSet.add(MoveListId.fromString(s)); }
+
+            catch (IllegalArgumentException e)
+            {
+                System.err.println("invalid opening id: '" + s + "'");
+                System.exit(-1);
+            }
+        }
+        
+        return openingSet;
     }
     
     // matchers
@@ -326,7 +373,7 @@ public class CLOptions
         aliases = "-match_opening", metaVar = "<oid1,oid2,...>",
         usage = "output games in which the opening-book moves are the " +
         "same as any of <oid,oid2,...>")
-    private void setOpening(String opening)
+    private void setOpening(String openingsSt)
     {
         if (getCount(OptId.MATCHOPENING) > 0)
         {
@@ -338,8 +385,8 @@ public class CLOptions
         
         countOption(OptId.MATCHOPENING);
         
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchOpeningProcessor(
-            opening.trim().replaceAll("\\W+", ",").replaceAll(",+", ",")));
+        PGNUtil.addMatchProcessor(
+            new PGNUtil.MatchOpeningProcessor(getOpeningsSet(openingsSt)));
     }
 
     @Option(name = OF, forbids = {O, MO, NMO, NOF},
@@ -358,38 +405,15 @@ public class CLOptions
         
         countOption(OptId.OPENINGFILE);
         
-        try
-        {
-            byte buf[] = new byte[1024];
-            int read;
-            InputStream is = new BufferedInputStream(new FileInputStream(of));
-            OutputStream os = new ByteArrayOutputStream();
-            
-            while ((read = is.read(buf)) >= 0) os.write(buf, 0, read);
-            
-            PGNUtil.addMatchProcessor(new PGNUtil.MatchOpeningProcessor(
-                os.toString().replaceAll("#.*", "").trim().
-                    replaceAll("\\W+", ",").replaceAll(",+", ",")));
-        }
-        
-        catch (FileNotFoundException e)
-        {
-            System.err.println("File '" + of + "' not found.");
-            System.exit(-1);
-        }
-        
-        catch (IOException e)
-        {
-            System.err.println("Error reading file '" + of + "'");
-            System.exit(-1);
-        }
+        PGNUtil.addMatchProcessor(
+            new PGNUtil.MatchOpeningProcessor(getOpeningsSet(readFully(of))));
     }
 
     @Option(name = NMO, forbids = {O, MO, OF, NOF},
         aliases = "-not_match_opening", metaVar = "<oid1,oid2,...>",
         usage = "output games in which the opening-book moves are not " +
         "the same as any of <oid,oid2,...>")
-    private void setNotOpening(String opening)
+    private void setNotOpening(String openingsSt)
     {
         if (getCount(OptId.NOTMATCHOPENING) > 0)
         {
@@ -401,8 +425,8 @@ public class CLOptions
         
         countOption(OptId.NOTMATCHOPENING);
         
-        PGNUtil.addMatchProcessor(new PGNUtil.NotMatchOpeningProcessor(
-            opening.trim().replaceAll("\\W+", ",").replaceAll(",+", ",")));
+        PGNUtil.addMatchProcessor(
+            new PGNUtil.NotMatchOpeningProcessor(getOpeningsSet(openingsSt)));
     }
 
     @Option(name = NOF, forbids = {O, OF, NMO, MO},
@@ -420,32 +444,9 @@ public class CLOptions
         }
         
         countOption(OptId.NOTOPENINGFILE);
-        
-        try
-        {
-            byte buf[] = new byte[1024];
-            int read;
-            InputStream is = new BufferedInputStream(new FileInputStream(of));
-            OutputStream os = new ByteArrayOutputStream();
-            
-            while ((read = is.read(buf)) >= 0) os.write(buf, 0, read);
-            
-            PGNUtil.addMatchProcessor(new PGNUtil.NotMatchOpeningProcessor(
-                os.toString().replaceAll("#.*", "").trim().
-                    replaceAll("\\W+", ",").replaceAll(",+", ",")));
-        }
-        
-        catch (FileNotFoundException e)
-        {
-            System.err.println("File '" + of + "' not found.");
-            System.exit(-1);
-        }
-        
-        catch (IOException e)
-        {
-            System.err.println("Error reading file '" + of + "'");
-            System.exit(-1);
-        }
+
+        PGNUtil.addMatchProcessor(
+            new PGNUtil.NotMatchOpeningProcessor(getOpeningsSet(readFully(of))));
     }
 
     @Option(name = APF, aliases = "-any_player_file", metaVar = "<file>",
@@ -463,7 +464,7 @@ public class CLOptions
         countOption(OptId.ANYPLAYERFILE);
         
         PGNUtil.addMatchProcessor(new PGNUtil.MatchAnyPlayerSetProcessor(
-            readLineFile(playerFile)));
+            readLinesSet(playerFile)));
     }
 
     @Option(name = PF, aliases = "-player_file", metaVar = "<file>",
@@ -482,7 +483,7 @@ public class CLOptions
         countOption(OptId.PLAYERFILE);
         
         PGNUtil.addMatchProcessor(new PGNUtil.MatchAllPlayerSetProcessor(
-            readLineFile(playerFile)));
+            readLinesSet(playerFile)));
     }
 
     @Option(name = NPF, aliases = "-not_player_file", metaVar = "<file>",
@@ -500,7 +501,7 @@ public class CLOptions
         countOption(OptId.NOTPLAYERFILE);
         
         PGNUtil.addMatchProcessor(new PGNUtil.NotMatchPlayerSetProcessor(
-            readLineFile(playerFile)));
+            readLinesSet(playerFile)));
     }
 
     @Option(name = MT, aliases = "-match_tag", metaVar = "<tag>/<regex>",
@@ -736,8 +737,8 @@ public class CLOptions
     @Option(name = D, forbids = {DO, DPO, O, E, EE, P, S},
         aliases = "-duplicates",
         usage = "list games containing identical players and move lists; " +
-            "each line of output contains one set of two or more " +
-            "game numbers in which duplicates are found")
+        "each line of output contains one set of two or more " +
+        "game numbers in which duplicates are found")
     private void duplicates(boolean d)
     {
         if (getCount(OptId.DUPLICATES) > 0)
@@ -758,8 +759,8 @@ public class CLOptions
     @Option(name = DO, forbids = {D, DPO, O, E, EE, P, S},
         aliases = "-duplicate_openings",
         usage = "list games containing identical players and openings; " +
-            "each line of output contains one set of two or more " +
-            "game numbers in which duplicates are found")
+        "each line of output contains one set of two or more " +
+        "game numbers in which duplicates are found")
     private void duplicateOpenings(boolean d)
     {
         if (getCount(OptId.DUPLICATEOPENINGS) > 0)
@@ -782,8 +783,8 @@ public class CLOptions
     @Option(name = DPO, forbids = {D, DO, O, E, EE, P, S},
         aliases = "-duplicate_post_openings",
         usage = "list games containing identical players and post-opening " +
-            "moves; each line of output contains one set of two or more " +
-            "game numbers in which duplicates are found")
+        "moves; each line of output contains one set of two or more " +
+        "game numbers in which duplicates are found")
     private void duplicatePostOpenings(boolean d)
     {
         if (getCount(OptId.DUPLICATEPOSTOPENINGS) > 0)
@@ -819,7 +820,7 @@ public class CLOptions
         }
         
         countOption(OptId.EVENTS);
-        Events events = new Events(false);
+        Tallier events = new Events(false);
         PGNUtil.setHandler(new PGNUtil.TallyHandler(events));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(events));
     }
@@ -841,7 +842,7 @@ public class CLOptions
         }
         
         countOption(OptId.EVENTERRORS);
-        Events events = new Events(true);
+        Tallier events = new Events(true);
         PGNUtil.setHandler(new PGNUtil.TallyHandler(events));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(events));
     }
@@ -865,7 +866,7 @@ public class CLOptions
         
         countOption(OptId.OPENINGS);
         
-        OpeningStats os = new OpeningStats();
+        Tallier os = new OpeningStats();
         PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
@@ -1033,7 +1034,7 @@ public class CLOptions
         
         countOption(OptId.PLAYERRESULTS);
         
-        PlayerResults pr = new PlayerResults();
+        Tallier pr = new PlayerResults();
         PGNUtil.setHandler(new PGNUtil.TallyHandler(pr));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(pr));
     }

@@ -196,20 +196,9 @@ public class PGNUtil
     {
         private final Set<MoveListId> matchOpeningSet;
         
-        public MatchOpeningProcessor(String s) throws IllegalArgumentException
+        public MatchOpeningProcessor(Set<MoveListId> openings)
         {
-            matchOpeningSet = new HashSet<>();
-            
-            for (String token : s.split(",\\W*"))
-            {
-                try { matchOpeningSet.add(MoveListId.fromString(token)); }
-                
-                catch (IllegalArgumentException e)
-                {
-                    System.err.println("invalid opening id: '" + token + "'");
-                    System.exit(-1);
-                }
-            }
+            matchOpeningSet = openings;
         }
         
         @Override public boolean processGame()
@@ -220,7 +209,11 @@ public class PGNUtil
     
     static class NotMatchOpeningProcessor extends MatchOpeningProcessor
     {
-        public NotMatchOpeningProcessor(String s) { super(s); }
+        public NotMatchOpeningProcessor(Set<MoveListId> openings)
+        {
+            super(openings);
+        }
+        
         @Override public boolean processGame() { return !super.processGame(); }
     }
     
@@ -257,7 +250,9 @@ public class PGNUtil
         private final Pattern playerPattern;
         
         public MatchPlayerProcessor(Pattern p)
-        { PGNUtil.playerPattern = playerPattern = p; }
+        {
+            PGNUtil.playerPattern = playerPattern = p;
+        }
         
         @Override public boolean processGame()
         {

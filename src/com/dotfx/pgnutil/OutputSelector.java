@@ -60,6 +60,7 @@ public class OutputSelector
         WHITETYPE("whitetype"),
         
         // special
+        FULLMOVES("fullmoves"),
         GAMENO("gameno"),
         LOSER("loser"),
         MOVES("moves"),
@@ -67,7 +68,6 @@ public class OutputSelector
         OPENINGMOVES("openingmoves"),
         OPPONENT("opponent"),
         PLIES("plies"),
-        PRETTYMOVES("prettymoves"),
         TEXTSIZE("textsize"),
         TIMECTRL("timectrl"),
         WINNER("winner"),
