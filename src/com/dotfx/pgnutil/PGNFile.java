@@ -66,13 +66,13 @@ public class PGNFile
         this.reader = new CopyReader(reader, COPY_BUF_INIT_SIZE);
     }
     
-    public Game nextGame() throws IOException, PGNException
+    public PgnGame nextGame() throws IOException, PGNException
     {
-        Game ret = Game.parseNext(gameCounter + 1, reader);
+        PgnGame ret = PgnGame.parseNext(gameCounter + 1, reader);
         if (ret != null) gameCounter++;
         return ret;
     }
     
     public int getGamesRead() { return gameCounter; }
-    public long getTotalBytesRead() { return reader.totalCharsRead(); }
+    public long getTotalCharsRead() { return reader.totalCharsRead(); }
 }

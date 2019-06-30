@@ -30,7 +30,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -45,52 +44,66 @@ import org.kohsuke.args4j.Option;
  */
 public class CLOptions
 {
-    private static final String APF = "-apf";
-    private static final String AQ = "-aq";
-    private static final String CMIN = "-cmin";
-    private static final String D = "-d";
-    private static final String DO = "-do";
-    private static final String DPO = "-dpo";
-    private static final String E = "-e";
-    private static final String EE = "-ee";
-    private static final String ELO = "-elo";
-    private static final String GN = "-gn";
-    private static final String H = "-h";
-    private static final String HDRAW = "-hdraw";
-    private static final String HED = "-hed";
-    private static final String HOOB = "-hoob";
-    private static final String HPC = "-hpc";
-    private static final String HWD = "-hwd";
-    private static final String I = "-i";
-    private static final String LDRAW = "-ldraw";
-    private static final String LOOB = "-loob";
-    private static final String LPC = "-lpc";
-    private static final String LWD = "-lwd";
-    private static final String M = "-m";
-    private static final String ML = "-ml";
-    private static final String MP = "-mp";
-    private static final String MO = "-mo";
-    private static final String MW = "-mw";
-    private static final String MT = "-mt";
-    private static final String NM = "-nm";
-    private static final String NMO = "-nmo";
-    private static final String NOF = "-nof";
-    private static final String NPF = "-npf";
-    private static final String O = "-o";
-    private static final String OD = "-od";
-    private static final String OF = "-of";
-    private static final String P = "-p";
-    private static final String PERF = "-perf";
-    private static final String PF = "-pf";
-    private static final String R = "-r";
-    private static final String RL = "-rl";
-    private static final String RO = "-ro";
-    private static final String RW = "-rw";
-    private static final String S = "-s";
-    private static final String TC = "-tc";
-    private static final String V = "-v";
-    private static final String VD = "-vd";
-    private static final String VG = "-vg";
+    public static final String APF = "-apf";
+    public static final String AQ = "-aq";
+    public static final String CMIN = "-cmin";
+    public static final String D = "-d";
+    public static final String DO = "-do";
+    public static final String DPO = "-dpo";
+    public static final String E = "-e";
+    public static final String EE = "-ee";
+    public static final String ECO = "-eco";
+    public static final String ELO = "-elo";
+    public static final String GN = "-gn";
+    public static final String H = "-h";
+    public static final String HDRAW = "-hdraw";
+    public static final String HED = "-hed";
+    public static final String HOOB = "-hoob";
+    public static final String HPC = "-hpc";
+    public static final String HWD = "-hwd";
+    public static final String I = "-i";
+    public static final String LDRAW = "-ldraw";
+    public static final String LOOB = "-loob";
+    public static final String LPC = "-lpc";
+    public static final String LWD = "-lwd";
+    public static final String M = "-m";
+    public static final String MECO = "-meco";
+    public static final String MECODESC = "-mecodesc";
+    public static final String ML = "-ml";
+    public static final String MP = "-mp";
+    public static final String MO = "-mo";
+    public static final String MPOS = "-mpos";
+    public static final String MSCIDECO = "-mscideco";
+    public static final String MSCIDECODESC = "-mscidecodesc";
+    public static final String MW = "-mw";
+    public static final String MT = "-mt";
+    public static final String MXECO = "-mxeco";
+    public static final String MXECODESC = "-mxecodesc";
+    public static final String MXSCIDECO = "-mxscideco";
+    public static final String MXSCIDECODESC = "-mxscidecodesc";
+    public static final String NM = "-nm";
+    public static final String NMO = "-nmo";
+    public static final String NMT = "-nmt";
+    public static final String NOF = "-nof";
+    public static final String NPF = "-npf";
+    public static final String O = "-o";
+    public static final String OD = "-od";
+    public static final String OF = "-of";
+    public static final String P = "-p";
+    public static final String PERF = "-perf";
+    public static final String PF = "-pf";
+    public static final String R = "-r";
+    public static final String RL = "-rl";
+    public static final String RO = "-ro";
+    public static final String RW = "-rw";
+    public static final String S = "-s";
+    public static final String SCIDECO = "-scideco";
+    public static final String TC = "-tc";
+    public static final String V = "-v";
+    public static final String VD = "-vd";
+    public static final String VG = "-vg";
+    public static final String XECO = "-xeco";
+    public static final String XSCIDECO = "-xscideco";
     
     private static enum OptId
     {
@@ -100,6 +113,7 @@ public class CLOptions
         DUPLICATES(D),
         DUPLICATEOPENINGS(DO),
         DUPLICATEPOSTOPENINGS(DPO),
+        ECOOPENINGS(ECO),
         ELOFILE(ELO),
         EVENTS(E),
         EVENTERRORS(EE),
@@ -112,15 +126,25 @@ public class CLOptions
         LOPLYCOUNT(LPC),
         LOWINDIFF(LWD),
         MATCH(M),
+        MATCHECO(MECO),
+        MATCHECODESC(MECODESC),
         MATCHLOSER(ML),
         MATCHOPENING(MO),
         MATCHPLAYER(MP),
+        MATCHPOSITION(MPOS),
+        MATCHSCIDECO(MSCIDECO),
+        MATCHSCIDECODESC(MSCIDECODESC),
         MATCHTAG(MT),
+        MATCHTRANSECO(MXECO),
+        MATCHTRANSECODESC(MXECODESC),
+        MATCHTRANSSCIDECO(MXSCIDECO),
+        MATCHTRANSSCIDECODESC(MXSCIDECODESC),
         MATCHWINNER(MW),
         MAXDRAW(HDRAW),
         MINDRAW(LDRAW),
         NOTMATCH(NM),
         NOTMATCHOPENING(NMO),
+        NOTMATCHTAG(NMT),
         NOTOPENINGFILE(NOF),
         NOTPLAYERFILE(NPF),
         OPENINGFILE(OF),
@@ -133,9 +157,12 @@ public class CLOptions
         REPLACELOSER(RL),
         REPLACEOPENING(RO),
         REPLACEWINNER(RW),
+        SCIDECOOPENINGS(SCIDECO),
         SELECTORS(S),
         TIMECONTROL(TC),
-        VALUEDELIM(VD);
+        VALUEDELIM(VD),
+        XECOOPENINGS(XECO),
+        XSCIDECOOPENINGS(XSCIDECO);
         
         private static final Map<String,OptId> sigMap = new HashMap<>();
         private final String signifier;
@@ -449,6 +476,200 @@ public class CLOptions
             new PGNUtil.NotMatchOpeningProcessor(getOpeningsSet(readFully(of))));
     }
 
+    @Option(name = MPOS, forbids = {},
+        aliases = "-match_pos", metaVar = "<move_string>",
+        usage = "output games that contain the position reached by SAN string " +
+        "<move_string>")
+    private void setPosition(String moveSt)
+    {
+        if (getCount(OptId.MATCHPOSITION) > 0)
+        {
+            System.err.println("Option '" + OptId.MATCHPOSITION + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.MATCHPOSITION);
+        
+        Board board = new Board(true);
+        
+        try { board.goTo(PgnGame.parseMoveString(moveSt)); }
+        
+        catch (IllegalMoveException e)
+        {
+            System.err.println(e.getMessage());
+            System.exit(-1);
+        }
+        
+        PGNUtil.addMatchProcessor(
+            new PGNUtil.MatchPositionProcessor(board));
+    }
+
+    @Option(name = MECO, forbids = {},
+        aliases = "-match_eco", metaVar = "<regex>",
+        usage = "output games belonging to ECO code  <regex>")
+    private void setEco(String eco)
+    {
+        if (getCount(OptId.MATCHECO) > 0)
+        {
+            System.err.println("Option '" + OptId.MATCHECO + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.MATCHECO);
+        
+        PGNUtil.addMatchProcessor(
+            new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.Type.STD));
+    }
+
+    @Option(name = MECODESC, forbids = {},
+        aliases = "-match_eco_desc", metaVar = "<regex>",
+        usage = "output games whose ECO description matches <regex>")
+    private void setEcoDesc(String eco)
+    {
+        if (getCount(OptId.MATCHECODESC) > 0)
+        {
+            System.err.println("Option '" + OptId.MATCHECODESC +
+                "' cannot be " + "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.MATCHECODESC);
+        
+        PGNUtil.addMatchProcessor(
+            new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.Type.STD));
+    }
+
+    @Option(name = MSCIDECO, forbids = {},
+        aliases = "-match_scid_eco", metaVar = "<regex>",
+        usage = "output games belonging to Scid ECO code  <regex>")
+    private void setScidEco(String eco)
+    {
+        if (getCount(OptId.MATCHSCIDECO) > 0)
+        {
+            System.err.println("Option '" + OptId.MATCHSCIDECO + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.MATCHSCIDECO);
+        
+        PGNUtil.addMatchProcessor(
+            new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.Type.SCID));
+    }
+
+    @Option(name = MSCIDECODESC, forbids = {},
+        aliases = "-match_scid_eco_desc", metaVar = "<regex>",
+        usage = "output games whose Scid ECO description matches <regex>")
+    private void setScidEcoDesc(String eco)
+    {
+        if (getCount(OptId.MATCHSCIDECODESC) > 0)
+        {
+            System.err.println("Option '" + OptId.MATCHSCIDECODESC +
+                "' cannot be " + "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.MATCHSCIDECODESC);
+        
+        PGNUtil.addMatchProcessor(
+            new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.Type.SCID));
+    }
+
+    @Option(name = MXECO, forbids = {},
+        aliases = "-match_trans_eco", metaVar = "<regex>",
+        usage = "output games belonging to ECO code <regex>, matching " +
+        "transpositionally")
+    private void setXEco(String eco)
+    {
+        if (getCount(OptId.MATCHTRANSECO) > 0)
+        {
+            System.err.println("Option '" + OptId.MATCHTRANSECO +
+                "' cannot be " + "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.MATCHTRANSECO);
+        
+        PGNUtil.addMatchProcessor(
+            new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.Type.STD));
+    }
+
+    @Option(name = MXECODESC, forbids = {},
+        aliases = "-match_trans_eco_desc", metaVar = "<regex>",
+        usage = "output games whose ECO description matches <regex>, " +
+        "matching transpositionally")
+    private void setXEcoDesc(String eco)
+    {
+        if (getCount(OptId.MATCHTRANSECODESC) > 0)
+        {
+            System.err.println("Option '" + OptId.MATCHTRANSECODESC +
+                "' cannot be " + "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.MATCHTRANSECODESC);
+        
+        PGNUtil.addMatchProcessor(
+            new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.Type.STD));
+    }
+
+    @Option(name = MXSCIDECO, forbids = {},
+        aliases = "-match_trans_scid_eco", metaVar = "<regex>",
+        usage = "output games belonging to Scid ECO code <regex>, matching " +
+        "transpositionally")
+    private void setXScidEco(String eco)
+    {
+        if (getCount(OptId.MATCHTRANSSCIDECO) > 0)
+        {
+            System.err.println("Option '" + OptId.MATCHTRANSSCIDECO +
+                "' cannot be " + "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.MATCHTRANSSCIDECO);
+        
+        PGNUtil.addMatchProcessor(
+            new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.Type.SCID));
+    }
+
+    @Option(name = MXSCIDECODESC, forbids = {},
+        aliases = "-match_trans_scid_eco_desc", metaVar = "<regex>",
+        usage = "output games whose Scid ECO description matches <regex>, " +
+        "matching transpositionally")
+    private void setXScidEcoDesc(String eco)
+    {
+        if (getCount(OptId.MATCHTRANSSCIDECODESC) > 0)
+        {
+            System.err.println("Option '" + OptId.MATCHTRANSSCIDECODESC +
+                "' cannot be " + "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.MATCHTRANSSCIDECODESC);
+        
+        PGNUtil.addMatchProcessor(
+            new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.Type.SCID));
+    }
+
     @Option(name = APF, aliases = "-any_player_file", metaVar = "<file>",
         usage = "output games in which either player is contained in <file>")
     private void setAnyPlayerFile(File playerFile)
@@ -527,6 +748,32 @@ public class CLOptions
             tagTokens[i] = tagTokens[i].replace("\0", "\\\\").replace("\\/", "/");
         
         PGNUtil.addMatchProcessor(new PGNUtil.MatchTagProcessor(tagTokens[0],
+            Pattern.compile(tagTokens[1], Pattern.DOTALL)));
+    }
+
+    @Option(name = NMT, aliases = "-not_match_tag", metaVar = "<tag>/<regex>",
+        usage = "output games in which PGN tag <tag> does not have value <regex>")
+    private void setNotTag(String tag)
+    {
+        countOption(OptId.NOTMATCHTAG);
+        
+        // The regex passed to split() allows escaping of the delimiter character
+        // ("/") with a backslash. See https://stackoverflow.com/questions/
+        // 18677762/handling-delimiter-with-escape-characters-in-java-string-split-method
+        // First, however, we must escape any escaped backslashes.
+
+        String[] tagTokens = tag.replace("\\\\", "\0").split("(?<!\\\\)/");
+
+        if (tagTokens.length != 2)
+        {
+            System.err.println("\nIncorrect token count in match-tag string.");
+            System.exit(-1);
+        }
+
+        for (int i = 0; i < 2; i++)
+            tagTokens[i] = tagTokens[i].replace("\0", "\\\\").replace("\\/", "/");
+        
+        PGNUtil.addMatchProcessor(new PGNUtil.NotMatchTagProcessor(tagTokens[0],
             Pattern.compile(tagTokens[1], Pattern.DOTALL)));
     }
 
@@ -871,6 +1118,88 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
+    @Option(name = ECO, depends = {O},
+        aliases = "-eco_stats", usage = "combined with the '" + O + "' " +
+        "option, print win/loss/draw statistics for each ECO code")
+    private void ecoOpenings(boolean o)
+    {
+        if (getCount(OptId.ECOOPENINGS) > 0)
+        {
+            System.err.println("Option '" + OptId.ECOOPENINGS + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.ECOOPENINGS);
+        
+        Tallier os = new EcoStats(EcoTree.Type.STD, false);
+        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+    }
+
+    @Option(name = SCIDECO, depends = {O},
+        aliases = "-scid_eco_stats", usage = "combined with the '" + O + "' " +
+        "option, print win/loss/draw statistics for each Scid ECO code")
+    private void ScidEcoOpenings(boolean o)
+    {
+        if (getCount(OptId.SCIDECOOPENINGS) > 0)
+        {
+            System.err.println("Option '" + OptId.SCIDECOOPENINGS + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.SCIDECOOPENINGS);
+        
+        Tallier os = new EcoStats(EcoTree.Type.SCID, false);
+        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+    }
+
+    @Option(name = XECO, depends = {O},
+        aliases = "-trans_eco_stats", usage = "combined with the '" + O + "' " +
+        "option, print win/loss/draw statistics for each ECO code, matching " +
+        "openings transpositionally")
+    private void XEcoOpenings(boolean o)
+    {
+        if (getCount(OptId.XECOOPENINGS) > 0)
+        {
+            System.err.println("Option '" + OptId.XECOOPENINGS + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.XECOOPENINGS);
+        
+        Tallier os = new EcoStats(EcoTree.Type.STD, true);
+        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+    }
+
+    @Option(name = XSCIDECO, depends = {O},
+        aliases = "-trans_scid_eco_stats", usage = "combined with the '" + O + "' " +
+        "option, print win/loss/draw statistics for each Scid ECO code, matching " +
+        "openings transpositionally")
+    private void XScidEcoOpenings(boolean o)
+    {
+        if (getCount(OptId.XSCIDECOOPENINGS) > 0)
+        {
+            System.err.println("Option '" + OptId.XSCIDECOOPENINGS + "' cannot be " +
+                "set more than once!");
+            
+            System.exit(-1);
+        }
+        
+        countOption(OptId.XSCIDECOOPENINGS);
+        
+        Tallier os = new EcoStats(EcoTree.Type.SCID, true);
+        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+    }
+
     @Option(name = CMIN, depends = {O}, aliases = "-count_min",
         metaVar = "<min>",
         usage = "in combination with '" + O + "' option, print only openings " +
@@ -886,7 +1215,7 @@ public class CLOptions
         }
         
         countOption(OptId.MINGAMECOUNT);
-        OpeningStats.addOpeningProcessor(new OpeningStats.MinGamesProcessor(cmin));
+        OpeningStats.addOpeningProcessor(new OpeningProcessors.MinGamesProcessor(cmin));
     }
 
     @Option(name = HWD, depends = {O}, aliases = "-hi_win_diff",
@@ -905,7 +1234,7 @@ public class CLOptions
         }
         
         countOption(OptId.HIWINDIFF);
-        OpeningStats.addOpeningProcessor(new OpeningStats.MaxWinDiffProcessor(max));
+        OpeningStats.addOpeningProcessor(new OpeningProcessors.MaxWinDiffProcessor(max));
     }
 
     @Option(name = LWD, depends = {O}, aliases = "-lo_win_diff",
@@ -924,7 +1253,7 @@ public class CLOptions
         }
         
         countOption(OptId.LOWINDIFF);
-        OpeningStats.addOpeningProcessor(new OpeningStats.MinWinDiffProcessor(min));
+        OpeningStats.addOpeningProcessor(new OpeningProcessors.MinWinDiffProcessor(min));
     }
 
     @Option(name = HDRAW, depends = {O}, aliases = "-hi_draw_pct",
@@ -942,7 +1271,7 @@ public class CLOptions
         }
         
         countOption(OptId.MAXDRAW);
-        OpeningStats.addOpeningProcessor(new OpeningStats.MaxDrawProcessor(max));
+        OpeningStats.addOpeningProcessor(new OpeningProcessors.MaxDrawProcessor(max));
     }
 
     @Option(name = LDRAW, depends = {O}, aliases = "-lo_draw_pct",
@@ -960,7 +1289,7 @@ public class CLOptions
         }
         
         countOption(OptId.MINDRAW);
-        OpeningStats.addOpeningProcessor(new OpeningStats.MinDrawProcessor(min));
+        OpeningStats.addOpeningProcessor(new OpeningProcessors.MinDrawProcessor(min));
     }
 
     @Option(name = HED, depends = {O, ELO}, aliases = "-hi_elo_diff",
@@ -1113,19 +1442,12 @@ public class CLOptions
         metaVar = "<filename>")
     private void setInput(File f)
     {
-        if (getCount(OptId.INPUTFILE) > 0)
-        {
-            System.err.println("option '" + OptId.INPUTFILE + "' cannot be " +
-                "set more than once!");
-            
-            System.exit(-1);
-        }
-        
         countOption(OptId.INPUTFILE);
         
         try
         {
-            PGNUtil.pgn = new PGNFile(new BufferedReader(new FileReader(f)));
+            PGNUtil.pgnFileList.add(new PGNFile(new BufferedReader(
+                new FileReader(f))));
         }
         
         catch (FileNotFoundException e)

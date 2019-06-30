@@ -52,7 +52,6 @@ public class OutputSelector
         
         // Arena extras
         BLACKTYPE("blacktype"),
-        ECO("eco"),
         PLYCOUNT("plycount"),
         TERMINATION("termination"),
         TIME("time"),
@@ -60,22 +59,41 @@ public class OutputSelector
         WHITETYPE("whitetype"),
         
         // special
+        ECO("eco"),
+        ECODESC("ecodesc"),
+        ECOMOVES("ecomoves"),
+        FENECO("feneco"),
         FULLMOVES("fullmoves"),
         GAMENO("gameno"),
         LOSER("loser"),
         MOVES("moves"),
         OID("oid"),
         OPENINGMOVES("openingmoves"),
+        OPENINGFEN("openingfen"),
+        OPID("opid"), // opening position identifier
         OPPONENT("opponent"),
+        OPPONENTELO("opponentelo"),
+        PLAYERELO("playerelo"),
         PLIES("plies"),
+        SCIDECO("scideco"),
+        SCIDECODESC("scidecodesc"),
+        SCIDECOMOVES("scidecomoves"),
         TEXTSIZE("textsize"),
         TIMECTRL("timectrl"),
+        XECO("xeco"),
+        XECODESC("xecodesc"),
+        XECOMOVES("xecomoves"),
+        XSCIDECO("xscideco"),
+        XSCIDECODESC("xscidecodesc"),
+        XSCIDECOMOVES("xscidecomoves"),
         WINNER("winner"),
         
         // additional opening-stat selectors
         BWINPCT("bwinpct"),
         BWINS("bwins"),
+        CODE("code"), // ECO code
         COUNT("count"), // also applies to player results
+        DESC("desc"),
         DIFF("diff"),
         DIFFPCT("diffpct"),
         DRAWPCT("drawpct"),

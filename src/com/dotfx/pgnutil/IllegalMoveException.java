@@ -21,19 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.dotfx.pgnutil;
 
-import java.util.Iterator;
+package com.dotfx.pgnutil;
 
 /**
  *
  * @author Mark Chen <chen@dotfx.com>
  */
-public interface Tallier
+public class IllegalMoveException extends Exception
 {
-    public void tally(PgnGame game) throws IllegalMoveException;
-    default public void init() throws InvalidSelectorException {}
-    
-    public Iterator<String> getOutputIterator(OutputSelector selectors[])
-        throws InvalidSelectorException;
+    public IllegalMoveException() { super(); }
+    public IllegalMoveException(String s) { super(s); }
+    public IllegalMoveException(Throwable t) { super(t); }
+    public IllegalMoveException(String s, Throwable t) { super(s, t); }
 }

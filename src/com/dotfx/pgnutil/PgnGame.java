@@ -24,6 +24,11 @@
 
 package com.dotfx.pgnutil;
 
+import com.cedarsoftware.util.CaseInsensitiveMap;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -35,18 +40,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.cedarsoftware.util.CaseInsensitiveMap;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
-
 /**
  *
  * @author Mark Chen
  */
-public class Game
+public class PgnGame
 {
-    public static enum Color { WHITE, BLACK; }
     public static final Pattern OUT_OF_BOOK;
     public static final int HASHSEED = 0xa348ccf1;
     private static final HashFunction HASHFUNC;
@@ -106,6 +105,26 @@ public class Game
         public List<String> getComments() { return comments; }
         public AquariumVars getAquariumVars() { return new AquariumVars(this); }
         
+        public static String getMoveText(String san)
+        {
+            int end = san.length();
+            
+            while (end > 0 && !Character.isLetterOrDigit(san.charAt(end - 1)))
+                end--;
+            
+            return san.substring(0, end);
+        }
+        
+        public String getMoveText()
+        {
+            int end = move.length();
+            
+            while (end > 0 && !Character.isLetterOrDigit(move.charAt(end - 1)))
+                end--;
+            
+            return move.substring(0, end);
+        }
+        
         public int getPly()
         {
             if (color == Color.WHITE) return (number - 1) * 2 + 1;
@@ -148,7 +167,7 @@ public class Game
     private final List<Move> moves;
     private final String origText;
     
-    public Game(int number, Map<String,String> tagpairs,
+    public PgnGame(int number, Map<String,String> tagpairs,
         List<String> gameComments, List<Move> moves, String origText)
         throws PGNException
     { 
@@ -186,14 +205,42 @@ public class Game
         }
     }
     
-    public static Game parseNext(int number, CopyReader reader)
+    /**
+     * 
+     * @param moveSt example: "1. Nf3 c5 2. g3 Nc6"
+     * @return 
+     */
+    public static List<String> parseMoveString(String moveSt)
+    {
+        List<String> moveList = new ArrayList<>();
+        String moves[] = moveSt.split("\\s+");
+
+        for (String move : moves)
+        {
+            int start = 0;
+            int end = move.length() - 1;
+
+            while (start <= end &&
+                !Character.isLetter(move.charAt(start))) start++;
+
+            while (end > 0 &&
+                !Character.isLetterOrDigit(move.charAt(end))) end--;
+
+            if (end <= start) continue;
+            moveList.add(move.substring(start, end + 1));
+        }
+        
+        return moveList;
+    }
+    
+    public static PgnGame parseNext(int number, CopyReader reader)
         throws IOException, PGNException
     {
         ArrayList<String> moveComments = new ArrayList();
         char buf[] = new char[BUFSIZE];
         int next, i, j;
         Map<String,String> tagpairs = new CaseInsensitiveMap<>();
-        List<Game.Move> moves = new ArrayList();
+        List<PgnGame.Move> moves = new ArrayList();
         List<String> gameComments = new ArrayList();
         
         while (true) // parse tag pairs
@@ -205,12 +252,12 @@ public class Game
             // tag
             for (i = 0;; i++)
             {
-                try { next = reader.read(buf, i, 1); }
+                try { next = reader.readFully(buf, i, 1); }
 
                 catch (IndexOutOfBoundsException e)
                 {
                     buf = Arrays.copyOf(buf, buf.length * 2);
-                    next = reader.read(buf, i, 1);
+                    next = reader.readFully(buf, i, 1);
                 }
                 
                 if (next == -1) throw new PGNException("eof while parsing");
@@ -227,24 +274,24 @@ public class Game
             {
                 boolean escaped = false;
                 
-                try { next = reader.read(buf, i, 1); }
+                try { next = reader.readFully(buf, i, 1); }
 
                 catch (IndexOutOfBoundsException e)
                 {
                     buf = Arrays.copyOf(buf, buf.length * 2);
-                    next = reader.read(buf, i, 1);
+                    next = reader.readFully(buf, i, 1);
                 }
                 
                 if (next == -1) throw new PGNException("eof while parsing.");
 
                 if (buf[i] == '\\') // PGN escape character
                 {
-                    try { next = reader.read(buf, i, 1); }
+                    try { next = reader.readFully(buf, i, 1); }
 
                     catch (IndexOutOfBoundsException e)
                     {
                         buf = Arrays.copyOf(buf, buf.length * 2);
-                        next = reader.read(buf, i, 1);
+                        next = reader.readFully(buf, i, 1);
                     }
                     
                     if (next == -1) throw new PGNException("eof while parsing.");
@@ -271,12 +318,12 @@ public class Game
         {
             for (j = 1; Character.isDigit(buf[j - 1]); j++) // move number
             {
-                try { next = reader.read(buf, j, 1); }
+                try { next = reader.readFully(buf, j, 1); }
 
                 catch (IndexOutOfBoundsException e)
                 {
                     buf = Arrays.copyOf(buf, buf.length * 2);
-                    next = reader.read(buf, j, 1);
+                    next = reader.readFully(buf, j, 1);
                 }
                 
                 if (next == -1) throw new PGNException("eof while parsing");
@@ -291,41 +338,46 @@ public class Game
             {
                 case '-':
                     if (j != 2)
-                        throw new PGNException("invalid termination marker");
+                        throw new PGNException("invalid termination marker " +
+                            "at game " + number);
 
-                    next = reader.read(buf, 2, 1);
+                    next = reader.readFully(buf, 2, 1);
                     if (next == -1) throw new PGNException("eof while parsing");
 
                     if ((buf[0] != '0' && buf[0] != '1') ||
                         (buf[2] != '0' && buf[2] != '1') ||
                         (buf[0] == buf[2]) ||
                         !new String(buf, 0, 3).equals(tagpairs.get("Result")))
-                        throw new PGNException("invalid termination marker");
+                        throw new PGNException("invalid termination marker " +
+                            "at game " + number);
 
-                    return new Game(number, tagpairs, gameComments, moves,
+                    return new PgnGame(number, tagpairs, gameComments, moves,
                         reader.getCopy());
 
                 case '/':
                     if (j != 2)
-                        throw new PGNException("invalid termination marker");
+                        throw new PGNException("invalid termination marker " +
+                            "at game " + number);
 
-                    next = reader.read(buf, 2, 5);
+                    next = reader.readFully(buf, 2, 5);
                     if (next == -1) throw new PGNException("EOF while parsing");
 
                     String terminator = new String(buf, 0, 7);
 
                     if (!terminator.equals("1/2-1/2") ||
                         !terminator.equals(tagpairs.get("Result")))
-                        throw new PGNException("invalid termination marker");
+                        throw new PGNException("invalid termination marker " +
+                            "at game " + number);
 
-                    return new Game(number, tagpairs, gameComments, moves,
+                    return new PgnGame(number, tagpairs, gameComments, moves,
                         reader.getCopy());
 
                 case '*':
                     if (!"*".equals(tagpairs.get("Result")))
-                        throw new PGNException("invalid termination marker");
+                        throw new PGNException("invalid termination marker " +
+                            "at game " + number);
 
-                    return new Game(number, tagpairs, gameComments, moves,
+                    return new PgnGame(number, tagpairs, gameComments, moves,
                         reader.getCopy());
             }
             
@@ -334,7 +386,7 @@ public class Game
             if (next == '.')
             {
                 do { next = reader.read(); } while (next == '.');
-                next = eatWhiteSpace(reader);
+                if (Character.isWhitespace(next)) next = eatWhiteSpace(reader);
                 if (next == -1) throw new PGNException("eof while parsing");
             }
             
@@ -343,12 +395,12 @@ public class Game
             // get the move
             for (j = 1;; j++)
             {
-                try { next = reader.read(buf, j, 1); }
+                try { next = reader.readFully(buf, j, 1); }
 
                 catch (IndexOutOfBoundsException e)
                 {
                     buf = Arrays.copyOf(buf, buf.length * 2);
-                    next = reader.read(buf, j, 1);
+                    next = reader.readFully(buf, j, 1);
                 }
                 
                 if (next == -1) throw new PGNException("empty move");
@@ -380,7 +432,7 @@ public class Game
             if (next == -1) throw new PGNException("unexpected eof");
             buf[0] = (char)next;
             
-            Game.Move move = new Game.Move(i % 2 == 0 ? Color.BLACK : Color.WHITE,
+            PgnGame.Move move = new PgnGame.Move(i % 2 == 0 ? Color.BLACK : Color.WHITE,
                 (short)Math.round((float)i / (float)2), moveStr, moveComments);
             
             moves.add(move);
@@ -397,7 +449,7 @@ public class Game
      *         -1 on eof
      * @throws IOException 
      */
-    private static int processComment(Reader reader, int commentStart,
+    private static int processComment(CopyReader reader, int commentStart,
         List<String> commentList)
         throws IOException
     {
@@ -406,12 +458,12 @@ public class Game
         
         for (i = 0;; i++) // one character per loop iteration
         {
-            try { next = reader.read(buf, i, 1); }
+            try { next = reader.readFully(buf, i, 1); }
             
             catch (IndexOutOfBoundsException e)
             {
                 buf = Arrays.copyOf(buf, buf.length + COMMENT_BUFSIZE);
-                next = reader.read(buf, i, 1);
+                next = reader.readFully(buf, i, 1);
             }
             
             if (next == -1) return -1; // eof not okay here
@@ -553,13 +605,122 @@ public class Game
         while (move != null)
         {
             if (move.getColor().equals(Color.WHITE))
-                sb.append(move.getNumber()).append(". ");
+                sb.append(move.getNumber()).append(".");
 
             sb.append(move.getMove()).append(" ");
             move = getNextMove(move);
         }
         
         return sb.toString().trim();
+    }
+    
+    public Board getOpeningPosition(Pattern oobMarker)
+        throws IllegalMoveException
+    {
+        Board board = new Board(true);
+        int plyCount = moves.size();
+        int firstComment = -1;
+        int lastBookMove = -1;
+        
+        for (int i = 0; i < plyCount; i++)
+        {
+            Move move = moves.get(i);
+            
+            if (move.getComments().size() > 0)
+            {
+                // Presence of oobMarker means that book moves include the
+                // present move.  Otherwise, the first move with a comment is
+                // the first out-of-book move.
+                
+                if (firstComment == -1) firstComment = i;
+                
+                if (move.hasComment(oobMarker))
+                {
+                    lastBookMove = i;
+                    break;
+                }
+            }
+        }
+        
+        if (lastBookMove < 0)
+        {
+            lastBookMove = firstComment - 1;
+            if (lastBookMove < 0 && firstComment < 0) lastBookMove = plyCount;
+        }
+        
+        for (int i = 0; i <= lastBookMove; i++)
+            board.move(moves.get(i).getMoveText());
+        
+        return board;
+    }
+    
+    public Board getOpeningPosition() throws IllegalMoveException
+    {
+        return getOpeningPosition(OUT_OF_BOOK);
+    }
+    
+    public PositionId getOpid(Pattern oobMarker) throws IllegalMoveException
+    {
+        return getOpeningPosition(oobMarker).positionId();
+    }
+    
+    public PositionId getOpid() throws IllegalMoveException
+    {
+        return getOpeningPosition(OUT_OF_BOOK).positionId();
+    }
+    
+    public String getOpeningFen(Pattern oobMarker) throws IllegalMoveException
+    {
+        return getOpeningPosition(oobMarker).toFen();
+    }
+    
+    public String getOpeningFen() throws IllegalMoveException
+    {
+        return getOpeningPosition(OUT_OF_BOOK).toFen();
+    }
+    
+    public String getFullOpeningString(Pattern oobMarker)
+    {
+        StringBuilder sb = new StringBuilder(1024);
+        boolean hasOobMarker = false;
+        int firstCommentIdx = -1;
+        
+        for (Move move : moves)
+        {
+            if (move.getComments().size() > 0)
+            {
+                // Presence of oobMarker means that book moves include the
+                // present move.  Otherwise, the first move with a comment is
+                // the first out-of-book move.
+                
+                if (firstCommentIdx == -1) firstCommentIdx = sb.length(); 
+                
+                if (move.hasComment(oobMarker))
+                {
+                    if (move.getColor().equals(Color.WHITE))
+                        sb.append(move.getNumber()).append(".");
+
+                    sb.append(move.getMove());
+                    hasOobMarker = true;
+                    break;
+                }
+            }
+            
+            if (move.getColor().equals(Color.WHITE))
+                sb.append(move.getNumber()).append(".");
+
+            sb.append(move.getMove()).append(" ");
+        }
+        
+        if (!hasOobMarker && firstCommentIdx > -1)
+            sb.setLength(firstCommentIdx);
+        
+        return sb.toString().trim();
+    }
+    
+    public String getDecoratedOpeningString()
+    {
+        return getFullOpeningString(OUT_OF_BOOK);
     }
     
     public String getOpeningString(Pattern oobMarker)
@@ -581,18 +742,18 @@ public class Game
                 if (move.hasComment(oobMarker))
                 {
                     if (move.getColor().equals(Color.WHITE))
-                        sb.append(move.getNumber()).append(". ");
+                        sb.append(move.getNumber()).append(".");
 
-                    sb.append(move.getMove());
+                    sb.append(move.getMoveText());
                     hasOobMarker = true;
                     break;
                 }
             }
             
             if (move.getColor().equals(Color.WHITE))
-                sb.append(move.getNumber()).append(". ");
+                sb.append(move.getNumber()).append(".");
 
-            sb.append(move.getMove()).append(" ");
+            sb.append(move.getMoveText()).append(" ");
         }
         
         if (!hasOobMarker && firstCommentIdx > -1)
@@ -603,12 +764,12 @@ public class Game
     
     public String getOpeningString() { return getOpeningString(OUT_OF_BOOK); }
     
-    public MoveListId getOpeningID(Pattern oobMarker)
+    public MoveListId openingId(Pattern oobMarker)
     {
         return new MoveListId(getOpeningString(oobMarker));
     }
     
-    public MoveListId getOpeningID() { return getOpeningID(OUT_OF_BOOK); }
+    public MoveListId openingId() { return openingId(OUT_OF_BOOK); }
     
     public HashCode getPlayerOpeningHash(Pattern oobMarker)
     {
@@ -657,7 +818,7 @@ public class Game
         {
             Clock startClko = null;
             Clock lastClko = null;
-            Game.Color color = null;
+            Color color = null;
             
             for (Move move : getMoves())
             {
@@ -718,7 +879,29 @@ public class Game
         return origText.matches(regex);
     }
     
-    public Game replace(Pattern replacee, String replacement)
+    public boolean containsPosition(PositionId pos)
+        throws IllegalMoveException
+    {
+        Board board = new Board(true);
+
+        for (Move move : moves)
+            if (board.move(move).positionId().equals(pos)) return true;
+        
+        return false;
+    }
+    
+    public boolean containsPosition(Board pos)
+        throws IllegalMoveException
+    {
+        Board board = new Board(true);
+
+        for (Move move : moves)
+            if (board.move(move).positionEquals(pos)) return true;
+        
+        return false;
+    }
+    
+    public PgnGame replace(Pattern replacee, String replacement)
         throws PGNException, IOException
     {
         CopyReader reader =
@@ -737,6 +920,8 @@ public class Game
     public String get(OutputSelector selectors[])
         throws InvalidSelectorException
     {
+        EcoTree.NodeSet stdXEcoNodeSet = null;
+        EcoTree.NodeSet scidXEcoNodeSet = null;
         StringBuilder ret = new StringBuilder();
         
         for (int i = 0; i < selectors.length; i++)
@@ -778,18 +963,221 @@ public class Game
             
                 case OPPONENT:
                     if (PGNUtil.playerPattern == null)
-                        throw new InvalidSelectorException("'opponent' " +
-                            "selector requires option '-mp'");
+                        throw new InvalidSelectorException("'" +
+                            OutputSelector.Value.OPPONENT + "' " +
+                            "selector requires option '" + CLOptions.MP + "'");
 
                     if (PGNUtil.playerPattern.matcher(getWhite()).find())
                         ret.append(getBlack());
 
                     else ret.append(getWhite());
                     break;
+            
+                case PLAYERELO:
+                    if (PGNUtil.playerPattern == null)
+                        throw new InvalidSelectorException("'" +
+                            OutputSelector.Value.OPPONENT + "' " +
+                            "selector requires option '" + CLOptions.MP + "'");
+
+                    if (PGNUtil.playerPattern.matcher(getWhite()).find())
+                        ret.append(getValue("WhiteElo"));
+
+                    else ret.append(getValue("BlackElo"));
+                    break;
+            
+                case OPPONENTELO:
+                    if (PGNUtil.playerPattern == null)
+                        throw new InvalidSelectorException("'" +
+                            OutputSelector.Value.OPPONENT + "' " +
+                            "selector requires option '" + CLOptions.MP + "'");
+
+                    if (PGNUtil.playerPattern.matcher(getWhite()).find())
+                        ret.append(getValue("BlackElo"));
+
+                    else ret.append(getValue("WhiteElo"));
+                    break;
+                    
+                case OPENINGFEN:
+                    try { ret.append(getOpeningFen()); }
+                    
+                    catch (IllegalMoveException e)
+                    {
+                        System.err.println("in game " + getNumber() + ": " +
+                            e.getMessage());
+                    }
+                    
+                    break;
+                    
+                case OPID:
+                    try { ret.append(getOpid()); }
+                    
+                    catch (IllegalMoveException e)
+                    {
+                        System.err.println("in game " + getNumber() + ": " +
+                            e.getMessage());
+                    }
+                    
+                    break;
+                    
+                case ECO:
+                    ret.append(EcoTree.getInstance().getDeepestNode(this).
+                        getCode());
+                    
+                    break;
+                    
+                case ECODESC:
+                    ret.append(EcoTree.getInstance().getDeepestNode(this).
+                        getDesc());
+                    
+                    break;
+                    
+                case ECOMOVES:
+                    ret.append(new EcoTree.NodeSet(EcoTree.getInstance().
+                        getDeepestNode(this)).getMoveString());
+                    
+                    break;
+                    
+                case SCIDECO:
+                    ret.append(EcoTree.getScidInstance().
+                        getDeepestNode(this).getCode());
+                    
+                    break;
+                    
+                case SCIDECODESC:
+                    ret.append(EcoTree.getScidInstance().
+                        getDeepestNode(this).getDesc());
+                    
+                    break;
+                    
+                case SCIDECOMOVES:
+                    ret.append(new EcoTree.NodeSet(EcoTree.getScidInstance().
+                        getDeepestNode(this)).getMoveString());
+                    
+                    break;
+
+                case XECO:
+                    try
+                    {
+                        stdXEcoNodeSet =
+                            getXEcoCode(EcoTree.getInstance(),
+                                stdXEcoNodeSet, ret);
+                    }
+                    
+                    catch (IllegalMoveException e)
+                    {
+                        System.err.println("in game " + getNumber() + ": " +
+                            e.getMessage());
+                    }
+                    
+                    break;
+
+                case XECODESC:
+                    try
+                    {
+                        stdXEcoNodeSet =
+                            getXEcoDesc(EcoTree.getInstance(),
+                                stdXEcoNodeSet, ret);
+                    }
+                    
+                    catch (IllegalMoveException e)
+                    {
+                        System.err.println("in game " + getNumber() + ": " +
+                            e.getMessage());
+                    }
+                    
+                    break;
+                    
+                case XECOMOVES:
+                    try
+                    {
+                        stdXEcoNodeSet = getXEcoMoves(EcoTree.getInstance(),
+                            stdXEcoNodeSet, ret);
+                    }
+                    
+                    catch (IllegalMoveException e)
+                    {
+                        System.err.println("in game " + getNumber() + ": " +
+                            e.getMessage());
+                    }
+                    
+                    break;
+
+                case XSCIDECO:
+                    try
+                    {
+                        scidXEcoNodeSet =
+                            getXEcoCode(EcoTree.getScidInstance(),
+                                scidXEcoNodeSet, ret);
+                    }
+                    
+                    catch (IllegalMoveException e)
+                    {
+                        System.err.println("in game " + getNumber() + ": " +
+                            e.getMessage());
+                    }
+                    
+                    break;
+
+                case XSCIDECODESC:
+                    try
+                    {
+                        stdXEcoNodeSet =
+                            getXEcoDesc(EcoTree.getScidInstance(),
+                                stdXEcoNodeSet, ret);
+                    }
+                    
+                    catch (IllegalMoveException e)
+                    {
+                        System.err.println("in game " + getNumber() + ": " +
+                            e.getMessage());
+                    }
+                    
+                    break;
+                    
+                case XSCIDECOMOVES:
+                    try
+                    {
+                        scidXEcoNodeSet = getXEcoMoves(EcoTree.getScidInstance(),
+                            scidXEcoNodeSet, ret);
+                    }
+                    
+                    catch (IllegalMoveException e)
+                    {
+                        System.err.println("in game " + getNumber() + ": " +
+                            e.getMessage());
+                    }
+                    
+                    break;
+                    
+//                case FENECO:
+//                    try
+//                    {
+//                        EcoFen ef = EcoFen.getInstance();
+//                        Board board = new Board(true);
+//                        EcoFen.Opening opening = null;
+//                        
+//                        for (Move move : moves)
+//                        {
+//                            board = board.move(move);
+//                            EcoFen.Opening o = ef.getOpening(board.toShortFen());
+//                            if (o != null) opening = o; 
+//                        }
+//                        
+//                        ret.append(opening == null ? null : opening.getCode());
+//                    }
+//                    
+//                    catch (IOException | IllegalMoveException |
+//                        NullPointerException e)
+//                    {
+//                        System.err.println("in game " + getNumber() + ": " +
+//                            e.getMessage());
+//                    }
+//                    
+//                    break;
 
                 case GAMENO: ret.append(getNumber()); break;
-                case OPENINGMOVES: ret.append(getOpeningString()); break;
-                case OID: ret.append(getOpeningID()); break;
+                case OPENINGMOVES: ret.append(getDecoratedOpeningString()); break;
+                case OID: ret.append(openingId()); break;
                 case PLIES: ret.append(moves.size()); break;
                 case WINNER: ret.append(getWinner()); break;
                 case LOSER: ret.append(getLoser()); break;
@@ -805,17 +1193,54 @@ public class Game
         return ret.toString();
     }
     
+    private EcoTree.NodeSet getXEcoCode(EcoTree ecoTree,
+        EcoTree.NodeSet set, StringBuilder appendTo)
+        throws IllegalMoveException
+    {
+        EcoTree.NodeSet ecoSet = set == null ?
+            ecoTree.getDeepestTranspositionSet(this) : set;
+
+        if (ecoSet == null) return null;
+        appendTo.append(ecoSet.toString());
+        return ecoSet;
+    }
+    
+    private EcoTree.NodeSet getXEcoDesc(EcoTree ecoTree,
+        EcoTree.NodeSet set, StringBuilder appendTo)
+        throws IllegalMoveException
+    {
+        EcoTree.NodeSet ecoSet = set == null ?
+            ecoTree.getDeepestTranspositionSet(this) : set;
+
+        if (ecoSet == null) return null;
+        appendTo.append(ecoSet.getDesc());
+        return ecoSet;
+    }
+    
+    private EcoTree.NodeSet getXEcoMoves(EcoTree ecoTree,
+        EcoTree.NodeSet set, StringBuilder appendTo)
+        throws IllegalMoveException
+    {
+        EcoTree.NodeSet ecoSet = set == null ?
+            ecoTree.getDeepestTranspositionSet(this) : set;
+
+        if (ecoSet == null) return null;
+        appendTo.append(ecoSet.getMoveString());
+        return ecoSet;
+    }
+    
     /**
      * Test for same players and same moves.
+     * 
      * @param other
      * @return true if the parameter Game has the same players, same moves, and
      *         same result as this Game, false otherwise
      */
     public boolean isDuplicateOf(Object other)
     {
-        if (other == null || !(other instanceof Game)) return false;
+        if (other == null || !(other instanceof PgnGame)) return false;
         
-        Game otherGame = (Game)other;
+        PgnGame otherGame = (PgnGame)other;
         String thisWhite = getWhite();
         String thisBlack = getBlack();
         String otherWhite = otherGame.getWhite();

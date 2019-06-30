@@ -48,21 +48,22 @@ the trouble by combining the "-s" option, and perhaps piping the
 output to another Unix command to produce a list of unique names of
 forfeiters:
 
-	java -jar pgnutil.jar -m 'forfeit' -s 'loser' -i mygames.pgn | sort -u
+	java -jar pgnutil.jar -m 'forfeit' -s loser -i mygames.pgn | sort -u
 
 If we only want to get a list of players that have forfeited in a
 game involving some version of Stockfish, we can combine the "-mp"
 option, which matches any player name (either black or white):
 
-	java -jar pgnutil.jar -mp 'Stockfish' -m 'forfeit' -s 'loser' -i mygames.pgn | sort -u
+	java -jar pgnutil.jar -mp 'Stockfish' -m 'forfeit' -s loser -i mygames.pgn | sort -u
 
 If we don't want to see Stockfish itself in this list (which would
 happen if Stockfish forfeited any games), we can use the "-mw"
-(match winner) option to omit cases where Stockfish lost:
+(match winner) option to omit cases where Stockfish lost.  We can
+also list the event and round number for every such game:
 
-	java -jar pgnutil.jar -m 'forfeit' -mw 'Stockfish' -s 'loser' -i mygames.pgn | sort -u
+	java -jar pgnutil.jar -m 'forfeit' -mw 'Stockfish' -s loser,Event,Round -i mygames.pgn
 
-To list every game that Stockfish drew, we can use the -mt ("match
+To output every game that Stockfish drew, we can use the -mt ("match
 tag") option:
 
 	java -jar pgnutil.jar -mp 'Stockfish' -mt 'Result/1\/2-1\/2' -i mygames.pgn
@@ -105,18 +106,25 @@ replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'"
 And, of course, any of these may be combined with any of the
 various matching ond output-selection options:
 
-	java -jar pgnutil.jar -m '[Bb]litz' -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -rl 'Glaurung 2.0.1' -s 'Event' -i mygames.pgn
+	java -jar pgnutil.jar -m '[Bb]litz' -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -rl 'Glaurung 2.0.1' -s Event -i mygames.pgn
 
 means, "output the value of the 'Event' tag for every game
 containing 'Blitz' or 'blitz,' but of these games, for every game
 containing 'Nunn 1' or 'Noomen 2012' that was lost by 'Glaurung
 2.0.1,' replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'"
 
+Position searches are performed with the "-mpos" (match position)
+option, where the parameter is in Standard Algebraic Notation.  For
+example:
+
+	java -jar pgnutil.jar -mpos '1.d4 Nf6 2.c4 c5' -i mygames.pgn
+
 By default, pgnutil will output the full text of the game in re-
 sponse to any search operation.  The "-s" option may be used to
 restrict the output to a pipe-separated list of selected fields.
-Selected fields may include any PGN tag.  There are also five
-"special" tags recognized by the "-s" option:
+Selected fields may include any PGN tag and should be separated on
+the command line by commas.  There are several "special" selectors
+recognized by the "-s" option.  For example:
 
 	moves: causes pgnutil to print the game's move list
 	opponent: when the "-mp" (match player) option is used,
@@ -127,6 +135,39 @@ Selected fields may include any PGN tag.  There are also five
 		(see below)
 	winner: causes pgnutil to print the name of the winner
 	loser: causes pgnutil to print the name of the loser
+
+There are also several output selectors relating to ECO codes:
+
+	eco: output the standard ECO code for the game, matching
+		move sequences
+	xeco: output the ECO code for the game, matching positions
+		transpositionally
+	scideco: output the Scid ECO code for the game, matching
+		move sequences
+	xscideco: output the Scid ECO code for the game, matching
+		positions transpositionally
+	ecodesc: output the standard description of the opening,
+		matching move sequences
+	xecodesc: output the standard description of the opening,
+		matching positions transpositionally
+	scidecodesc: output the Scid description of the opening,
+		matching move sequences
+	xscidecodesc: output the Scid description of the opening,
+		matching positions transpositionally
+	ecomoves: output the game moves that match the line
+		defining the standard ECO code
+	xecomoves: output the game moves that match the line
+		defining the standard ECO code, matching
+		positions transpositionally
+	scidecomoves: output the game moves that match the line 
+                defining the Scid ECO code
+	xscidecomoves: output the game moves that match the line
+                defining the Scid ECO code, matching positions
+		transpositionally
+
+Note that any of the transpositional selectors ("xeco," "xscideco,"
+"xecodesc," "xscidecodesc," "xecomoves," and "xscidecomoves") may
+return more than one result.
 
 By default, fields selected by the "-s" option appear on the output
 separated by the pipe ("|") character.  If a different output
@@ -175,7 +216,10 @@ win/loss/draw statistics:
 
 	java.jar pgnutil.jar -p -i mygames.pgn
 
-To list opening statistics for all games in mygames.pgn:
+Pgnutil's definition of an "opening" pertains specifically to
+chess engines; it is the list of a game's book moves that occur
+prior to the first engine-generated move.  To list opening
+statistics for all games in mygames.pgn:
 
 	java -jar pgnutil.jar -o -i mygames.pgn
 
@@ -189,7 +233,6 @@ black and white is no greater than 10% and the draw percentage is
 no greater than 50%."  The opening-statistics function has its own
 set of output selectors:
 
-	eco: the ECO code of the opening
 	oid: the opening identifier; this may be used with the
 		"match opening" ("-mo") and "replace opening"
 		("-ro") options
@@ -211,7 +254,7 @@ set of output selectors:
 So we can use the previous example to generate a list of opening
 identifers (note addition of the "-s" option):
 
-	java -jar pgnutil.jar -o -cmin 100 -ldp -.1 -hdp .1 -hdraw .5 -i -s 'oid' mygames.pgn
+	java -jar pgnutil.jar -o -cmin 100 -ldp -.1 -hdp .1 -hdraw .5 -i -s oid mygames.pgn
 
 which may produce output such as:
 
@@ -220,7 +263,7 @@ which may produce output such as:
 	3ef5ae89557400b9
 	5e8c715de2d30397
 
-We can then feed these to a matching command ("-mo"):
+These can then be fed to a matching command ("-mo"):
 
 	java -jar pgnutil.jar -mo 4748b62c5f943db4,58042cacbd9498f9,3ef5ae89557400b9,5e8c715de2d30397 -i mygames.pgn
 
@@ -236,18 +279,35 @@ correctly identifies the "out-of-book" condition) for PGN files
 produced by Arena and Aquarium.  Other types of PGN files have not
 been tested.
 
+To output opening statistics by ECO code instead of opening
+identifier, the "-o" option may be combined with any of the options
+"-eco," "-xeco," "-scideco," or "-xscideco."  These will list
+statistics by standard ECO code, standard ECO code matched
+transpositionally, Scid ECO code, or Scid ECO code matched
+transpositionally, respectively.
+
 
 Known Issues
 
-Apart from the opening issue (see just above), pgnutil is also
-victim to the PGN specification's greatest infirmity: lack of
+Apart from the opening issue (see second paragraph above), pgnutil is
+also victim to the PGN specification's greatest infirmity: lack of
 standardized move notation.  PGN files are allowed to list moves
 in any way at all.  This means, for example, that "Bb2," "c1-b2,"
 and "B-QN2" are all valid notation.  Pgnutil makes no effort to
-standardize moves (as this would entail a large performance penalty),
+normalize moves (as this would entail a large performance penalty),
 so all move comparisons, such as the "-mo" and "-ro" options, as well
 as duplicate finding and opening statistics, assume that notation
-throughout the input file is consistent.
+throughout the input file is consistent.  The various ECO-code
+and position-finding options require that the input file be in
+Standard Algebraic Notation.
+
+PGN files often violate the PGN specification.  Where it can,
+pgnutil refrains from complaining about such errors (for example, it
+does not demand a correct Seven Tag Roster).  Certain problems,
+however, will cause an error to be reported.  Kingbase, for instance,
+uses the backslash ("\") character in some event names.  Since the
+PGN specification defines this as an escape character, it may cause
+certain tag-value pairs to be unterminated, resulting in an exception.
 
 Also, the PGN spec permits "%"-style comments.  I have never seen
 these used, so they are unsupported.

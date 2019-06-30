@@ -40,7 +40,7 @@ public class AquariumVars
     private String meval; // similar to emt? plus egtb hits. E.g., "15s|TB:3m"
     private final Map<String,String> otherVars;
     
-    public AquariumVars(Game.Move move)
+    public AquariumVars(PgnGame.Move move)
     {
         otherVars = new HashMap<>();
         

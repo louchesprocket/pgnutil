@@ -154,7 +154,7 @@ public class PlayerResults implements Tallier
     }
     
     @Override
-    public void tally(Game game)
+    public void tally(PgnGame game)
     {
         String white = game.getWhite();
         String black = game.getBlack();

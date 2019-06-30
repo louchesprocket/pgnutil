@@ -111,6 +111,25 @@ public class CopyReader extends Reader
         return ret;
     }
     
+    public int readFully(char buf[], int off, int len) throws IOException
+    {
+        long span = charsRead + len;
+        if (span >= markLimit) increaseMarkLimit(span);
+        
+        int total = 0;
+        
+        do
+        {
+            int read = in.read(buf, off + total, len - total);
+            if (read == -1) return -1;
+            total += read;
+        }
+        while (total < len);
+
+        charsRead += total;
+        return total;
+    }
+    
     @Override public void mark(int limit) throws IOException
     {
         prevCharsRead += charsRead;

@@ -111,6 +111,29 @@ public class PGNUtil
         }
     }
     
+    static class NotMatchTagProcessor implements GameProcessor
+    {
+        private final OutputSelector tag;
+        private final Pattern tagPattern;
+        
+        public NotMatchTagProcessor(String tag, Pattern p)
+        {
+            this.tag = new OutputSelector(tag);
+            tagPattern = p;
+        }
+        
+        @Override public boolean processGame()
+        {
+            try
+            {
+                String value = game.get(tag);
+                return (value == null) || !tagPattern.matcher(value).find();
+            }
+            
+            catch (InvalidSelectorException e) { return false; }
+        }
+    }
+    
     static class MatchGameNumProcessor implements GameProcessor
     {
         private final List<SimpleEntry<Integer,Integer>> ranges;
@@ -203,7 +226,7 @@ public class PGNUtil
         
         @Override public boolean processGame()
         {
-            return matchOpeningSet.contains(game.getOpeningID());
+            return matchOpeningSet.contains(game.openingId());
         }
     }
     
@@ -328,6 +351,132 @@ public class PGNUtil
         }
     }
     
+    static class MatchPositionProcessor implements GameProcessor
+    {
+        private final Board pos;
+        
+        MatchPositionProcessor(Board pos) { this.pos = pos; }
+        
+        @Override public boolean processGame()
+        {
+            try { return game.containsPosition(pos); }
+            
+            catch (IllegalMoveException | StringIndexOutOfBoundsException e)
+            {
+                System.err.println("PGN error in game #" + game.getNumber() +
+                    ": " + e.getMessage());
+                
+                return false;
+            }
+        }
+    }
+    
+    static class MatchEcoProcessor implements GameProcessor
+    {
+        private final EcoTree ecoTree;
+        private final Pattern ecoMatcher;
+        
+        MatchEcoProcessor(Pattern ecoMatcher, EcoTree.Type treeType)
+        {
+            if (treeType == EcoTree.Type.SCID)
+                ecoTree = EcoTree.getScidInstance();
+            
+            else ecoTree = EcoTree.getInstance();
+            
+            this.ecoMatcher = ecoMatcher;
+        }
+        
+        @Override public boolean processGame()
+        {
+            return ecoMatcher.matcher(ecoTree.getDeepestDefined(game).
+                getCode()).find();
+        }
+    }
+    
+    static class MatchEcoDescProcessor implements GameProcessor
+    {
+        private final EcoTree ecoTree;
+        private final Pattern ecoMatcher;
+        
+        MatchEcoDescProcessor(Pattern ecoMatcher, EcoTree.Type treeType)
+        {
+            if (treeType == EcoTree.Type.SCID)
+                ecoTree = EcoTree.getScidInstance();
+            
+            else ecoTree = EcoTree.getInstance();
+            
+            this.ecoMatcher = ecoMatcher;
+        }
+        
+        @Override public boolean processGame()
+        {
+            return ecoMatcher.matcher(ecoTree.getDeepestDefined(game).
+                getDesc()).find();
+        }
+    }
+    
+    static class MatchXEcoProcessor implements GameProcessor
+    {
+        private final EcoTree ecoTree;
+        private final Pattern ecoMatcher;
+        
+        MatchXEcoProcessor(Pattern ecoMatcher, EcoTree.Type treeType)
+        {
+            if (treeType == EcoTree.Type.SCID)
+                ecoTree = EcoTree.getScidInstance();
+            
+            else ecoTree = EcoTree.getInstance();
+            
+            this.ecoMatcher = ecoMatcher;
+        }
+        
+        @Override public boolean processGame()
+        {
+            EcoTree.NodeSet nodeSet;
+            
+            try { nodeSet = ecoTree.getDeepestTranspositionSet(game); }
+            
+            catch (IllegalMoveException e)
+            {
+                System.err.println(e);
+                return false;
+            }
+            
+            return ecoMatcher.matcher(nodeSet.toString()).find();
+        }
+    }
+    
+    static class MatchXEcoDescProcessor implements GameProcessor
+    {
+        private final EcoTree ecoTree;
+        private final Pattern ecoMatcher;
+        
+        MatchXEcoDescProcessor(Pattern ecoMatcher, EcoTree.Type treeType)
+        {
+            if (treeType == EcoTree.Type.SCID)
+                ecoTree = EcoTree.getScidInstance();
+            
+            else ecoTree = EcoTree.getInstance();
+            
+            this.ecoMatcher = ecoMatcher;
+        }
+        
+        @Override public boolean processGame()
+        {
+            EcoTree.NodeSet nodeSet;
+            
+            try { nodeSet = ecoTree.getDeepestTranspositionSet(game); }
+            
+            catch (IllegalMoveException e)
+            {
+                System.err.println(e);
+                return false;
+            }
+            
+            return ecoMatcher.matcher(nodeSet.getDesc()).find();
+        }
+    }
+    
     // replacement processors
     
     /**
@@ -422,7 +571,7 @@ public class PGNUtil
         
         @Override public boolean processGame()
         {
-            return replaceOpeningSet.contains(game.getOpeningID());
+            return replaceOpeningSet.contains(game.openingId());
         }
     }
     
@@ -430,7 +579,8 @@ public class PGNUtil
     
     static interface GameHandler
     {
-        public void handle() throws InvalidSelectorException;
+        default public void init() throws InvalidSelectorException {}
+        public void handle() throws InvalidSelectorException, IllegalMoveException;
     }
     
     static class NullGameHandler implements GameHandler
@@ -534,8 +684,10 @@ public class PGNUtil
         private final Tallier tallier;
         
         TallyHandler(Tallier tallier) { this.tallier = tallier; }
+        @Override public void init() throws InvalidSelectorException { tallier.init(); }
         
-        @Override public void handle() throws InvalidSelectorException
+        @Override public void handle()
+            throws InvalidSelectorException, IllegalMoveException
         {
             tallier.tally(game);
         }
@@ -608,8 +760,8 @@ public class PGNUtil
     
     // All of these are static in order to avoid parameter-passing overhead.
     
-    private static Game game;
-    static PGNFile pgn;
+    private static PgnGame game;
+    static List<PGNFile> pgnFileList;
     static final List<GameProcessor> matchProcessors = new ArrayList<>();
     static final List<GameProcessor> replaceProcessors = new ArrayList<>();
     
@@ -620,6 +772,9 @@ public class PGNUtil
     static ExitProcessor exitProcessor;
     static OutputSelector outputSelectors[];
     
+    static long gamesRead = 0L;
+    static long charsRead = 0L;
+    
     static void addMatchProcessor(GameProcessor gp) { matchProcessors.add(gp); }
     static void setHandler(GameHandler printer) { PGNUtil.handler = printer; }
     static void setExitProcessor(ExitProcessor proc) { exitProcessor = proc; }
@@ -629,13 +784,19 @@ public class PGNUtil
         CLOptions options = new CLOptions();
         CmdLineParser parser = new CmdLineParser(options);
         exitProcessor = new NullExitProcessor();
+        pgnFileList = new ArrayList<>();
         long startTime = 0L;
         
         try
         {
-            pgn = new PGNFile(new BufferedReader(new InputStreamReader(System.in)));
             parser.parseArgument(args);
+            
+            if (pgnFileList.isEmpty())
+                pgnFileList.add(new PGNFile(new BufferedReader(
+                    new InputStreamReader(System.in))));
+            
             if (handler == null) handler = new DefaultGameHandler();
+            handler.init();
             if (options.help) throw new CmdLineException("");
         }
         
@@ -654,6 +815,12 @@ public class PGNUtil
             System.exit(-1);
         }
         
+        catch (InvalidSelectorException e)
+        {
+            System.err.println("invalid selector: " + e.getLocalizedMessage());
+            System.exit(-1);
+        }
+        
         catch (IOException e)
         {
             System.err.println("i/o exception; failed to read input: " +
@@ -666,45 +833,42 @@ public class PGNUtil
         
         try
         {
-            nextGame:
-            while ((game = pgn.nextGame()) != null)
+            for (PGNFile pgn : pgnFileList)
             {
-                for (GameProcessor processor : matchProcessors)
-                    if (!processor.processGame()) continue nextGame;
+                nextGame:
+                while ((game = pgn.nextGame()) != null)
+                {
+                    for (GameProcessor processor : matchProcessors)
+                        if (!processor.processGame()) continue nextGame;
 
-                for (GameProcessor processor : replaceProcessors)
-                    if (!processor.processGame()) break;
+                    for (GameProcessor processor : replaceProcessors)
+                        if (!processor.processGame()) break;
 
-                handler.handle();
+                    handler.handle();
+                }
+                
+                gamesRead += pgn.getGamesRead();
+                charsRead += pgn.getTotalCharsRead();
             }
             
             exitProcessor.process();
         }
 
-        catch (InvalidSelectorException e)
+        catch (InvalidSelectorException | IllegalMoveException | PGNException e)
         {
-            System.err.println("invalid selector: " + e.getLocalizedMessage());
-            System.exit(-1);
-        }
-
-        catch (PGNException e)
-        {
-            System.err.println("PGN parsing exception: " +
-                e.getLocalizedMessage());
-            
+            System.err.println(e.getLocalizedMessage());
             System.exit(-1);
         }
 
         catch (IOException | ProcessorException e)
         {
             System.err.println("exception: " + e.getLocalizedMessage());
-            e.printStackTrace();
             System.exit(-1);
         }
         
         if (CLOptions.performance)
-            System.err.println("processed " + pgn.getGamesRead() +
-                " games (" + pgn.getTotalBytesRead() + " chars) in " +
+            System.err.println("processed " + gamesRead + " games (" +
+                charsRead + " chars) in " +
                 (System.currentTimeMillis() - startTime) + "ms");
     }
 }

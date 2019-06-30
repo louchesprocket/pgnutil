@@ -228,7 +228,7 @@ public class Events implements Tallier
     }
 
     @Override
-    public void tally(Game game)
+    public void tally(PgnGame game)
     {
         String event = game.getValue("Event");
         List<GameInfo> eventGames = eventMap.get(event);

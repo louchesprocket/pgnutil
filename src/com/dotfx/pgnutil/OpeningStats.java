@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *
@@ -38,135 +37,26 @@ import java.util.Set;
  */
 public class OpeningStats implements Tallier
 {
-    private static interface OpeningProcessor
-    {
-        /**
-         * 
-         * @return true if we should continue processing this opening, false if
-         * we should skip it
-         */
-        public boolean processOpening(Opening opening);
-    }
-    
-    static class MinGamesProcessor implements OpeningProcessor
-    {
-        private final int minGames;
-        
-        public MinGamesProcessor(int minGames) { this.minGames = minGames; }
-        
-        @Override public boolean processOpening(Opening opening)
-        {
-            return opening.getGameCount() >= minGames;
-        }
-    }
-    
-    static class MaxWinDiffProcessor implements OpeningProcessor
-    {
-        private final double maxDiff;
-        
-        public MaxWinDiffProcessor(double maxDiff) { this.maxDiff = maxDiff; }
-        
-        @Override public boolean processOpening(Opening opening)
-        {
-            return opening.getWhiteWinPct() - opening.getBlackWinPct() <= maxDiff;
-        }
-    }
-    
-    static class MinWinDiffProcessor implements OpeningProcessor
-    {
-        private final double minDiff;
-        
-        public MinWinDiffProcessor(double minDiff) { this.minDiff = minDiff; }
-        
-        @Override public boolean processOpening(Opening opening)
-        {
-            return opening.getWhiteWinPct() - opening.getBlackWinPct() >= minDiff;
-        }
-    }
-    
-    static class MinDrawProcessor implements OpeningProcessor
-    {
-        private final double minDraw;
-        
-        public MinDrawProcessor(double minDraw) { this.minDraw = minDraw; }
-        
-        @Override public boolean processOpening(Opening opening)
-        {
-            return opening.getDrawPct() >= minDraw;
-        }
-    }
-    
-    static class MaxDrawProcessor implements OpeningProcessor
-    {
-        private final double maxDraw;
-        
-        public MaxDrawProcessor(double maxDraw) { this.maxDraw = maxDraw; }
-        
-        @Override public boolean processOpening(Opening opening)
-        {
-            return opening.getDrawPct() <= maxDraw;
-        }
-    }
-    
-    private static class Opening
+    private static class Opening extends OpeningScore
     {
         private final MoveListId oid;
-        private final String eco;
-        private int whiteWins;
-        private int blackWins;
-        private int draws;
-        private int noResult;
+        private final EcoTree.Node eco;
         
-        Opening(MoveListId oid, String eco)
+        Opening(MoveListId oid, EcoTree.Node eco)
         {
+            super();
             this.oid = oid;
             this.eco = eco;
-            whiteWins = blackWins = draws = noResult = 0;
         }
 
-        public void incWhiteWin() { whiteWins++; }
-        public void incBlackWin() { blackWins++; }
-        public void incDraw() { draws++; }
-        public void incNoResult() { noResult++; }
         public MoveListId getId() { return oid; }
-        public String getEco() { return eco; }
-        public int getWhiteWins() { return whiteWins; }
-        public int getBlackWins() { return blackWins; }
-        public int getDraws() { return draws; }
-        public int getNoResults() { return noResult; }
-
-        public int getGameCount()
-        {
-            return whiteWins + blackWins + draws;
-        }
-
-        public double getWhiteWinPct()
-        {
-            return (double)whiteWins / (whiteWins + blackWins + draws);
-        }
-
-        public double getBlackWinPct()
-        {
-            return (double)blackWins / (whiteWins + blackWins + draws);
-        }
-
-        public double getDrawPct()
-        {
-            return (double)draws / (whiteWins + blackWins + draws);
-        }
+        public EcoTree.Node getEco() { return eco; }
 
         @Override
         public String toString()
         {
-            double whiteWinPct = getWhiteWinPct();
-            double blackWinPct = getBlackWinPct();
-
-            return "ECO: " + eco + "; " + "opening: " + oid + "; " + 
-                "games: " + getGameCount() + "; " +
-                "white: " + Formats.PERCENT.format(whiteWinPct) + "; " +
-                "black: " + Formats.PERCENT.format(blackWinPct) + "; " +
-                "diff: " + Formats.PERCENT.format(whiteWinPct - blackWinPct) + "; " +
-                "draw: " + Formats.PERCENT.format(getDrawPct());
+            return "ECO: " + eco.getCode() + CLOptions.outputDelim +
+                "opening: " + oid + CLOptions.outputDelim + super.toString();
         }
     }
     
@@ -187,7 +77,7 @@ public class OpeningStats implements Tallier
             {
                 Opening opening = openingsMap.get(oid);
                 
-                for (OpeningProcessor processor : openingProcessors)
+                for (OpeningProcessors.Processor processor : openingProcessors)
                     if (!processor.processOpening(opening))
                         continue nextOpening;
 
@@ -207,6 +97,8 @@ public class OpeningStats implements Tallier
                 switch (selector.getValue())
                 {
                     case ECO:
+                    case ECODESC:
+                    case ECOMOVES:
                     case OID:
                     case COUNT:
                     case WWINS:
@@ -241,12 +133,27 @@ public class OpeningStats implements Tallier
             {
                 switch (selectors[i].getValue())
                 {
-                    case ECO: ret.append(opening.getEco()); break;
+                    case ECO: ret.append(opening.getEco().getCode()); break;
+                    case ECODESC: ret.append(opening.getEco().getDesc()); break;
                     case OID: ret.append(opening.getId()); break;
                     case COUNT: ret.append(opening.getGameCount()); break;
                     case WWINS: ret.append(opening.getWhiteWins()); break;
                     case BWINS: ret.append(opening.getBlackWins()); break;
                     case DRAWS: ret.append(opening.getDraws()); break;
+                    
+                    case ECOMOVES:
+                        for (EcoTree.Node node : opening.getEco().getPath())
+                        {
+                            int ply = node.getPly();
+                            if (ply != 1) ret.append(" ");
+
+                            if (ply % 2 == 1)
+                                ret.append(((ply + 1)/2)).append(".");
+
+                            ret.append(node.getMove());
+                        }
+                        
+                        break;
 
                     case WWINPCT:
                         ret.append(Formats.DECIMAL.format(opening.getWhiteWinPct()));
@@ -277,23 +184,25 @@ public class OpeningStats implements Tallier
         }
     }
     
-    private static final List<OpeningProcessor> openingProcessors =
+    private static final List<OpeningProcessors.Processor> openingProcessors =
         new ArrayList<>();
     
     private final Map<MoveListId,Opening> openingsMap;
+    private final EcoTree ecoTree;
 
     public OpeningStats()
     {
         openingsMap = new HashMap<>(10000);
+        ecoTree = EcoTree.getInstance();
     }
     
-    static void addOpeningProcessor(OpeningProcessor op)
+    static void addOpeningProcessor(OpeningProcessors.Processor op)
     {
         openingProcessors.add(op);
     }
 
     @Override
-    public void tally(Game game)
+    public void tally(PgnGame game)
     {
         if (CLOptions.maxEloDiff != null)
         {
@@ -305,20 +214,18 @@ public class OpeningStats implements Tallier
                 return;
         }
 
-        MoveListId openingID = game.getOpeningID();
-        Opening opening = openingsMap.get(openingID);
+        MoveListId openingId = game.openingId();
+        Opening opening = openingsMap.get(openingId);
 
         if (opening == null)
         {
-            try { opening = new Opening(openingID, game.get(OutputSelector.ECO)); }
+            PgnGame.Move firstOob = game.getFirstOobMove();
+            if (firstOob == null) return;
             
-            catch (InvalidSelectorException e) // can't happen
-            {
-                e.printStackTrace();
-                System.exit(-1);
-            }
+            opening = new Opening(openingId,
+                ecoTree.get(game, firstOob.getPly() - 1));
             
-            openingsMap.put(openingID, opening);
+            openingsMap.put(openingId, opening);
         }
 
         switch (game.getResult())

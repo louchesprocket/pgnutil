@@ -23,17 +23,17 @@
  */
 package com.dotfx.pgnutil;
 
-import java.util.Iterator;
-
 /**
  *
  * @author Mark Chen <chen@dotfx.com>
  */
-public interface Tallier
+public enum Color
 {
-    public void tally(PgnGame game) throws IllegalMoveException;
-    default public void init() throws InvalidSelectorException {}
+    WHITE("w"),
+    BLACK("b");
     
-    public Iterator<String> getOutputIterator(OutputSelector selectors[])
-        throws InvalidSelectorException;
+    private final String signifier;
+
+    private Color(String signifier) { this.signifier = signifier; }
+    @Override public String toString() { return signifier; }
 }

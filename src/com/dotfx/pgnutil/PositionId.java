@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Mark Chen.
+ * Copyright 2019 Mark Chen <chen@dotfx.com>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,11 +29,11 @@ import net.jpountz.xxhash.XXHashFactory;
 
 /**
  *
- * @author Mark Chen
+ * @author Mark Chen <chen@dotfx.com>
  */
-public class MoveListId implements Comparable<MoveListId>
+public class PositionId implements Comparable<PositionId>
 {
-    public static final int HASHSEED = 0x6a83fcd5;
+    public static final int HASHSEED = 0x6a830fe6;
     public static final XXHashFactory FACTORY;
     
     private final long value;
@@ -43,7 +43,7 @@ public class MoveListId implements Comparable<MoveListId>
         FACTORY = XXHashFactory.fastestInstance();
     }
     
-    public MoveListId(byte b[])
+    public PositionId(byte b[])
     {
         StreamingXXHash64 hashFunc = FACTORY.newStreamingHash64(HASHSEED);
 //        hashFunc.reset(); // does not reset the seed
@@ -51,14 +51,7 @@ public class MoveListId implements Comparable<MoveListId>
         value = hashFunc.getValue();
     }
     
-    public MoveListId(String s) { this(s.getBytes()); }
-    
-    public static MoveListId fromString(String s)
-    {
-        return new MoveListId(NumberUtils.hexToLong(s));
-    }
-    
-    public MoveListId(long value) { this.value = value; }
+    public PositionId(long value) { this.value = value; }
     
     @Override
     public String toString() { return NumberUtils.longToHex(value, false); }
@@ -66,7 +59,7 @@ public class MoveListId implements Comparable<MoveListId>
     @Override
     public boolean equals(Object other)
     {
-        try { return value == ((MoveListId)other).value; }
+        try { return value == ((PositionId)other).value; }
         catch (ClassCastException | NullPointerException e) { return false; }
     }
     
@@ -77,20 +70,11 @@ public class MoveListId implements Comparable<MoveListId>
     }
     
     @Override
-    public int compareTo(MoveListId other)
+    public int compareTo(PositionId other)
     {
         long diff = value - other.value;
         if (diff > 0) return 1;
         if (diff < 0) return -1;
         return 0;
     }
-    
-//    public static void main(String args[])
-//    {
-//        OpeningID oid1 = new OpeningID("hello world");
-//        OpeningID oid2 = OpeningID.fromString("3a4c23e3c695ef34");
-//        System.out.println(oid1);
-//        System.out.println(oid2);
-//        System.out.println(oid1.equals(oid2));
-//    }
 }
