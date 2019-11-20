@@ -496,6 +496,119 @@ public class EcoTree
         
         switch (type)
         {
+            case SCID:
+                try (BufferedReader dbReader =
+                    new BufferedReader(new InputStreamReader(
+                        new FileInputStream("/Users/chen/Documents/chess/openings/scid.eco"))))
+                {
+                    String line;
+
+                    while ((line = dbReader.readLine()) != null)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        String s;
+
+                        if (line.startsWith("#") || line.trim().length() == 0)
+                            continue;
+
+                        sb.append(line);
+
+                        while (!line.contains("*"))
+                        {
+                            line = dbReader.readLine();
+                            sb.append(line);
+                        }
+
+                        s = sb.toString();
+                        List<String> moveList = new ArrayList<>();
+                        String parts[] = s.split("\"");
+                        String rawMoves[] = parts[2].trim().split("\\s+");
+
+                        for (String move : rawMoves)
+                        {
+                            if (move.equals("*")) break;
+                            int moveStart = 0;
+                            int moveEnd = move.length() - 1;
+
+                            while (!Character.isLetterOrDigit(move.charAt(moveEnd)))
+                                moveEnd--;
+                            
+                            while (moveStart < moveEnd &&
+                                !Character.isLetter(move.charAt(moveStart)))
+                                moveStart++;
+                            
+                            if (moveStart == moveEnd) continue; // space after move #
+                            
+                            moveList.add(move.substring(moveStart,
+                                moveEnd + 1));
+                        }
+
+                        insertNodes(moveList, parts[0].trim(), parts[1].trim());
+                    }
+                }
+                
+                break;
+
+            case NIK:
+                try (BufferedReader dbReader =
+                    new BufferedReader(new InputStreamReader(
+                        new FileInputStream("/Users/chen/Documents/chess/niklasf_eco/eco.json"))))
+                {
+                    String line;
+
+                    while ((line = dbReader.readLine()) != null)
+                    {
+                        if (!line.trim().startsWith("{")) continue;
+
+                        Board board = new Board(true);
+                        List<String> moveList = new ArrayList<>();
+                        String parts[] = line.split("\"");
+                        String rawMoves[] = parts[17].trim().split("\\s+");
+
+                        for (String move : rawMoves)
+                            moveList.add(board.coordToSan(move));
+
+                        insertNodes(moveList, parts[3], parts[7]);
+                    }
+                }
+                
+                break;
+                
+            case STD:
+                try (BufferedReader dbReader =
+                    new BufferedReader(new InputStreamReader(
+                        EcoTree.class.getResource("/com/dotfx/pgnutil/std_eco").
+                            openStream())))
+                {
+                    String line;
+
+                    while ((line = dbReader.readLine()) != null)
+                    {
+                        if (line.startsWith("#")) continue;
+                        line = line.trim();
+                        if (line.length() == 0) continue;
+                        
+                        String code = line.substring(0, 3);
+                        String desc = line.substring(3).trim();
+                        
+                        line = dbReader.readLine().trim();
+
+                        Board board = new Board(true);
+                        List<String> moveList = new ArrayList<>();
+                        String rawMoves[] = line.split("\\s+");
+
+                        for (String move : rawMoves)
+                        {
+                            if (Character.isDigit(move.charAt(0))) continue;
+                            moveList.add(board.normalize(move));
+                        }
+
+                        insertNodes(moveList, code, desc);
+                    }
+                }
+                
+                break;
+                
             case ECODB: readEcoDb("/com/dotfx/pgnutil/eco_db"); break;
             case SCIDDB: readEcoDb("/com/dotfx/pgnutil/scideco_db");
         }
@@ -639,11 +752,14 @@ public class EcoTree
             
             try { nodeSet = fenMap.get(board.move(move).toShortFen()); }
             
-            catch (IllegalMoveException | NullPointerException e)
+            catch (IllegalMoveException | NullPointerException |
+                StringIndexOutOfBoundsException e)
             {
                 throw new IllegalMoveException("Illegal move: '" + move +
                     "' in game " + game.getNumber() + ".  Game text:\n" +
-                    game.getOrigText(), e);
+                    "##################################################\n" +
+                    game.getOrigText() +
+                    "\n##################################################", e);
             }
             
             if (nodeSet != null) deepest = nodeSet;

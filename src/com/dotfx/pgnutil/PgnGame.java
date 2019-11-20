@@ -894,9 +894,17 @@ public class PgnGame
         throws IllegalMoveException
     {
         Board board = new Board(true);
+        int whitePieceCount = pos.getWhitePieceCount();
+        int blackPieceCount = pos.getBlackPieceCount();
 
         for (Move move : moves)
+        {
             if (board.move(move).positionEquals(pos)) return true;
+            
+            if (board.getWhitePieceCount() < whitePieceCount ||
+                board.getBlackPieceCount() < blackPieceCount)
+                return false;
+        }
         
         return false;
     }

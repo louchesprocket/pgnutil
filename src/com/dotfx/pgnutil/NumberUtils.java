@@ -136,10 +136,4 @@ import java.util.Arrays;
         ByteBuffer bb = ByteBuffer.wrap(input);
         return bb.getInt();
     }
-
-//    public static void main(String[] args)
-//    {
-//        System.out.println((byte)0xff);
-//        System.out.println(bytesToInt(new byte[] {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff}));
-//    }
 }

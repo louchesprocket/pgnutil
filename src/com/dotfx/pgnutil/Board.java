@@ -24,7 +24,6 @@
 
 package com.dotfx.pgnutil;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -181,14 +180,14 @@ public class Board
     private static final int whiteKCastleSquares[] = new int[] {4, 5, 6};
     private static final int whiteQCastleSquares[] = new int[] {2, 3, 4};
     private static final int blackKCastleSquares[] = new int[] {60, 61, 62};
-    private static final int blackQCastleSquares[] = new int[] {58, 69, 60};
+    private static final int blackQCastleSquares[] = new int[] {58, 59, 60};
     private static final Color[] COLORS = new Color[] {Color.WHITE, Color.BLACK};
     
     private static final int[] NMOVES =
         new int[] {6, 15, 17, 10, -6, -15, -17, -10};
     
     private final Piece position[];
-    private int ply;
+    private short ply;
     private boolean whiteCanCastleQ;
     private boolean whiteCanCastleK;
     private boolean blackCanCastleQ;
@@ -196,7 +195,9 @@ public class Board
     private byte whiteKingLoc;
     private byte blackKingLoc;
     private byte epCandidate; // location of the capture square; -1 if none
-    private int halfMoveClock; // ply of last capture or pawn move
+    private short halfMoveClock; // ply of last capture or pawn move
+    private byte whitePieceCount = 16;
+    private byte blackPieceCount = 16;
     
     public Board(boolean initialPosition)
     {
@@ -237,11 +238,14 @@ public class Board
         position[63] = new Piece(Color.BLACK, PieceType.ROOK);
     }
     
-    public Board(Piece position[], int ply, byte epCandidate,
+    public Board(Piece position[], short ply, byte epCandidate,
         boolean whiteCanCastleQ, boolean whiteCanCastleK,
         boolean blackCanCastleQ, boolean blackCanCastleK, byte whiteKingLoc,
-        byte blackKingLoc, int halfMoveClock)
+        byte blackKingLoc, short halfMoveClock)
     {
+        byte whiteCount = 0;
+        byte blackCount = 0;
+        
         this.position = position;
         this.ply = ply;
         this.epCandidate = epCandidate;
@@ -252,16 +256,41 @@ public class Board
         this.whiteKingLoc = whiteKingLoc;
         this.blackKingLoc = blackKingLoc;
         this.halfMoveClock = halfMoveClock;
+        
+        for (int i = 0; i < 64; i++)
+        {
+            if (position[i] != null)
+            {
+                if (position[i].getColor() == Color.WHITE) whiteCount++;
+                else blackCount++;
+            }
+        }
+        
+        whitePieceCount = whiteCount;
+        blackPieceCount = blackCount;
+    }
+    
+    public Board(Board other)
+    {
+        position = new Piece[64];
+        System.arraycopy(other.position, 0, position, 0, 64);
+        
+        this.ply = other.ply;
+        this.epCandidate = other.epCandidate;
+        this.whiteCanCastleQ = other.whiteCanCastleQ;
+        this.whiteCanCastleK = other.whiteCanCastleK;
+        this.blackCanCastleQ = other.blackCanCastleQ;
+        this.blackCanCastleK = other.blackCanCastleK;
+        this.whiteKingLoc = other.whiteKingLoc;
+        this.blackKingLoc = other.blackKingLoc;
+        this.halfMoveClock = other.halfMoveClock;
+        this.whitePieceCount = other.whitePieceCount;
+        this.blackPieceCount = other.blackPieceCount;
     }
     
     public Board copy()
     {
-        Piece posCopy[] = new Piece[64];
-        System.arraycopy(position, 0, posCopy, 0, 64);
-        
-        return new Board(posCopy, ply, epCandidate, whiteCanCastleQ,
-            whiteCanCastleK, blackCanCastleQ, blackCanCastleK, whiteKingLoc,
-            blackKingLoc, halfMoveClock);
+        return new Board(this);
     }
     
     public boolean canMove(int start, int end)
@@ -467,74 +496,89 @@ public class Board
     }
     
     /**
-     * Checks if the mover is moving into check (and nothing else).
      * 
      * @param start
      * @param end
-     * @return 
+     * @return true if the mover is moving into check or (in case of castling)
+     * out of or through check
      */
-    private boolean canLegallyMove(int start, int end)
+    private boolean isMovingIntoCheck(int start, int end)
     {
         Piece movingPiece = position[start];
         Color color = movingPiece.getColor();
-        int span = end - start;
+        int span = end > start ? end - start : start - end;
         
-        if (movingPiece.getType() == PieceType.KING && span == 2) // castle
+        // en passant capture
+        if (end == epCandidate && movingPiece.getType() == PieceType.PAWN)
         {
-            if (color == Color.WHITE)
-            {
-                if (end - start == 2) // king side
-                    return !isInCheck(color, whiteKCastleSquares);
-
-                else // queen side
-                    return !isInCheck(color, whiteQCastleSquares);
-            }
-
-            else
-            {
-                if (end - start == 2) // king side
-                    return !isInCheck(color, blackKCastleSquares);
-
-                else // queen side
-                    return !isInCheck(color, blackQCastleSquares);
-            }
+            int savedCaptureLoc =
+                color == Color.WHITE ? epCandidate - 8 : epCandidate + 8;
+            
+            Piece savedCapture = position[savedCaptureLoc];
+            
+            position[end] = position[start];
+            position[start] = null;
+            position[savedCaptureLoc] = null;
+            
+            boolean ret = isInCheck(color,
+                new int[] {color == Color.WHITE ? whiteKingLoc : blackKingLoc});
+            
+            position[start] = movingPiece;
+            position[end] = null;
+            position[savedCaptureLoc] = savedCapture;
+            
+            return ret;
         }
         
         else
         {
             Piece savedCapture = position[end];
-            byte savedEp = epCandidate;
-            boolean savedWCastleK = whiteCanCastleK;
-            boolean savedWCastleQ = whiteCanCastleQ;
-            boolean savedBCastleK = blackCanCastleK;
-            boolean savedBCastleQ = blackCanCastleQ;
             byte savedWKingLoc = whiteKingLoc;
             byte savedBKingLoc = blackKingLoc;
-            int savedMoveClock = halfMoveClock;
             
-            move(start, end, PieceType.PAWN);
+            position[end] = position[start];
+            position[start] = null;
+        
+            try
+            {
+                if (movingPiece.getType() == PieceType.KING)
+                {
+                    if (span == 2) // castle
+                    {
+                        if (color == Color.WHITE)
+                        {
+                            if (end - start == 2) // king side
+                                return isInCheck(color, whiteKCastleSquares);
+
+                            // queen side
+                            else return isInCheck(color, whiteQCastleSquares);
+                        }
+
+                        else
+                        {
+                            if (end - start == 2) // king side
+                                return isInCheck(color, blackKCastleSquares);
+
+                            // queen side
+                            else return isInCheck(color, blackQCastleSquares);
+                        }
+                    }
+
+                    else if (color == Color.WHITE) whiteKingLoc = (byte)end;
+                    else blackKingLoc = (byte)end;
+                }
+
+                return isInCheck(color, new int[]
+                    {color == Color.WHITE ? whiteKingLoc : blackKingLoc});
+            }
             
-            boolean ret = !isInCheck(color, new int[]
-                {color == Color.WHITE ? whiteKingLoc : blackKingLoc});
-            
-            position[start] = movingPiece;
-            position[end] = savedCapture;
-            epCandidate = savedEp;
-            whiteCanCastleK = savedWCastleK;
-            whiteCanCastleQ = savedWCastleQ;
-            blackCanCastleK = savedBCastleK;
-            blackCanCastleQ = savedBCastleQ;
-            whiteKingLoc = savedWKingLoc;
-            blackKingLoc = savedBKingLoc;
-            halfMoveClock = savedMoveClock;
-            ply--;
-            
-            return ret;
-//            Board boardCopy = copyAndMove(start, end, PieceType.PAWN);
-//            
-//            return !boardCopy.isInCheck(color, new int[]
-//                {color == Color.WHITE ? boardCopy.whiteKingLoc :
-//                    boardCopy.blackKingLoc});
+            finally
+            {
+                position[start] = movingPiece;
+                position[end] = savedCapture;
+                whiteKingLoc = savedWKingLoc;
+                blackKingLoc = savedBKingLoc;
+            }
         }
     }
     
@@ -552,9 +596,7 @@ public class Board
             
             for (int i = 0; i < 64; i++)
             {
-                Piece piece = position[i];
-
-                if (piece != null && piece.getColor() != color &&
+                if (position[i] != null && position[i].getColor() != color &&
                     canMove(i, square)) return true;
             }
             
@@ -568,7 +610,7 @@ public class Board
     public boolean moveTest(int start, int end)
     {
         return end >= 0 && end < 64 && canMove(start, end) &&
-            canLegallyMove(start, end);
+            !isMovingIntoCheck(start, end);
     }
     
     /**
@@ -582,7 +624,14 @@ public class Board
     public Board move(int start, int end, PieceType promoteTo)
     {
         ply++;
-        if (position[end] != null) halfMoveClock = ply;
+        
+        if (position[end] != null)
+        {
+            halfMoveClock = ply;
+            
+            if (position[end].getColor() == Color.WHITE) whitePieceCount--;
+            else blackPieceCount--;
+        }
         
         position[end] = position[start];
         position[start] = null;
@@ -667,9 +716,16 @@ public class Board
                 else if (end == epCandidate && (span == 7 || span == 9))
                 {
                     if (piece.getColor() == Color.WHITE)
+                    {
                         position[epCandidate - 8] = null;
+                        blackPieceCount--;
+                    }
                     
-                    else position[epCandidate + 8] = null;
+                    else
+                    {
+                        position[epCandidate + 8] = null;
+                        whitePieceCount--;
+                    }
                     
                     epCandidate = -1;
                 }
@@ -686,16 +742,6 @@ public class Board
         }
         
         return this;
-    }
-    
-    public Board legallyMove(int start, int end, PieceType promoteTo)
-        throws IllegalMoveException
-    {
-        if (start >= 0 && start <= 63 && end >= 0 && end <= 63 &&
-            canLegallyMove(start, end)) return move(start, end, promoteTo);
-        
-        throw new IllegalMoveException("cannot move " + position[start] +
-            " from " + start + " to "  + end);
     }
     
     public Board copyAndMove(int start, int end, PieceType promoteTo)
@@ -721,7 +767,7 @@ public class Board
     }
     
     /**
-     * Executes move with correctness checking.
+     * Executes one move with correctness checking.
      * 
      * @param san example: "Nf6"
      * @return
@@ -746,14 +792,26 @@ public class Board
         
         if (san.equalsIgnoreCase("O-O"))
         {
-            if (color == Color.WHITE) return move(4, 6, promoteTo);
-            else return move(60, 62, null);
+            if (color == Color.WHITE && canMove(4, 6) &&
+                !isMovingIntoCheck(4, 6)) return move(4, 6, promoteTo);
+            
+            else if (color == Color.BLACK && canMove(60, 62) &&
+                !isMovingIntoCheck(60, 62)) return move(60, 62, null);
+        
+            throw new IllegalMoveException("illegal move: '" + san +
+                "' at ply " + (ply + 1));
         }
         
         if (san.equalsIgnoreCase("O-O-O"))
         {
-            if (color == Color.WHITE) return move(4, 2, promoteTo);
-            else return move(60, 58, promoteTo);
+            if (color == Color.WHITE && canMove(4, 2) &&
+                !isMovingIntoCheck(4, 2)) return move(4, 2, promoteTo);
+            
+            else if (color == Color.BLACK && canMove(60, 58) &&
+                !isMovingIntoCheck(60, 58)) return move(60, 58, promoteTo);
+        
+            throw new IllegalMoveException("illegal move: '" + san +
+                "' at ply " + (ply + 1));
         }
         
         if (Character.isUpperCase(lastChar)) // promotion
@@ -779,7 +837,7 @@ public class Board
                 
                 if (piece != null && piece.getType() == PieceType.PAWN &&
                     piece.getColor() == color && canMove(i, endSquare) &&
-                    canLegallyMove(i, endSquare))
+                    !isMovingIntoCheck(i, endSquare))
                     return move(i, endSquare, promoteTo);
             }
         
@@ -818,7 +876,7 @@ public class Board
 
                     if (piece != null && piece.getType() == pieceType &&
                         piece.getColor() == color && canMove(i, endSquare) &&
-                        canLegallyMove(i, endSquare))
+                        !isMovingIntoCheck(i, endSquare))
                         return move(i, endSquare, promoteTo);
                 }
             }
@@ -834,7 +892,7 @@ public class Board
 
                     if (piece != null && piece.getType() == pieceType &&
                         piece.getColor() == color && canMove(i, endSquare) &&
-                        canLegallyMove(i, endSquare))
+                        !isMovingIntoCheck(i, endSquare))
                         return move(i, endSquare, promoteTo);
                 }
             }
@@ -849,7 +907,7 @@ public class Board
             
             if (piece != null && piece.getType() == pieceType &&
                 piece.getColor() == color && i != endSquare &&
-                canMove(i, endSquare) && canLegallyMove(i, endSquare))
+                canMove(i, endSquare) && !isMovingIntoCheck(i, endSquare))
                 return move(i, endSquare, promoteTo);
         }
         
@@ -1375,10 +1433,19 @@ public class Board
         return Arrays.equals(position, that.position);
     }
     
+    /**
+     * 
+     * @param that
+     * @return true if all pieces are in the same places and same side to move
+     */
     public boolean positionEquals(Board that)
     {
-        return Arrays.equals(position, that.position) &&
-            ply % 2 == that.ply % 2;
+//        if (whitePieceCount != that.whitePieceCount ||
+//            blackPieceCount != that.blackPieceCount)
+//            return false;
+        
+        return ply % 2 == that.ply % 2 &&
+            Arrays.equals(position, that.position);
     }
     
     public PositionId positionId()
@@ -1395,6 +1462,9 @@ public class Board
         
         return new PositionId(buf);
     }
+    
+    public int getWhitePieceCount() { return whitePieceCount; }
+    public int getBlackPieceCount() { return blackPieceCount; }
     
     @Override
     public String toString()
@@ -1444,68 +1514,11 @@ public class Board
     public int hashCode()
     {
         return Board.class.hashCode() ^ Arrays.hashCode(position) ^
-            Integer.hashCode(ply) ^ Integer.hashCode(epCandidate) ^
+            Short.hashCode(ply) ^ Byte.hashCode(epCandidate) ^
             Boolean.hashCode(whiteCanCastleK) ^
             Boolean.hashCode(whiteCanCastleQ) ^
             Boolean.hashCode(blackCanCastleK) ^
             Boolean.hashCode(blackCanCastleQ) ^
-            Integer.hashCode(halfMoveClock);
-    }
-    
-    public static void main(String args[]) throws Exception
-    {
-        Board board = new Board(true);
-        
-        List<String> moveSt1 = PgnGame.parseMoveString("1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 " +
-            "d6 5.Nf3 O-O 6.Be2 e5 7.O-O Nc6 8.d5 Ne7 9.Ne1 Nd7 10.f3 f5 11.Nd3 Nf6 12.Bd2");
-        
-        List<String> moveSt2 = PgnGame.parseMoveString("1.Nf3 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.d4 O-O 6.Be2 e5 7.O-O Nc6 8.d5 Ne7 " +
-"9.Ne1 Nd7 10.Nd3 f5 11.Bd2 Nf6 12.f3 Kh8 13.g4 c6 14.Kg2 b5 15.b3 a5 16." +
-"Nf2 b4 17.Na4 Bb7 18.Rc1 fxe4 19.fxe4 cxd5 20.exd5 Nexd5 21.cxd5 Nxd5 22." +
-"Kg1 e4 23.Nxe4 Bd4+ 24.Rf2 Rxf2 25.Nxf2 Qh4 26.Qe1 Rf8 27.Bf3 Rxf3 28.Qe4 " +
-"Qxf2+");
-        
-        EcoTree ecoTree = EcoTree.getScidInstance();
-        
-        EcoTree.NodeSet deepest1 =
-            ecoTree.getDeepestTranspositionSet(moveSt1);
-        
-        EcoTree.NodeSet deepest2 =
-            ecoTree.getDeepestTranspositionSet(moveSt2);
-        
-        System.out.println("board 1 ECO: " +deepest1.getNodeSet().iterator().next().getCode());
-        System.out.println("board 2 ECO: " + deepest2.getNodeSet().iterator().next().getCode());
-        
-//        System.out.println(board.normalize("g4"));
-//        System.out.println(board.normalize("e5"));
-//        System.out.println(board.normalize("f4"));
-//        System.out.println(board.normalize("Qh4"));
-//        System.out.println(board.coordToSan("e2e4") + " " + board.coordToSan("e7e5"));
-//        System.out.println(board.coordToSan("f2f4") + " " + board.coordToSan("e5f4"));
-//        System.out.println(board.coordToSan("g1f3") + " " + board.coordToSan("d7d5"));
-//        System.out.println(board.coordToSan("f1e2") + " " + board.coordToSan("g8f6"));
-//        System.out.println(board.coordToSan("e1g1") + " " + board.coordToSan("d5d4"));
-//        System.out.println(board.coordToSan("c2c4") + " " + board.coordToSan("d4c3"));
-//        System.out.println(board.coordToSan("d2d4") + " " + board.coordToSan("f8e7"));
-//        System.out.println(board.coordToSan("b1d2") + " " + board.coordToSan("e8g8"));
-//        System.out.println(board.coordToSan("d4d5") + " " + board.coordToSan("c7c5"));
-//        System.out.println(board.coordToSan("d5c6") + " " + board.coordToSan("d8d6"));
-//        System.out.println(board.coordToSan("c6b7") + " " + board.coordToSan("b8a6"));
-//        System.out.println(board.coordToSan("b7c8Q") + " " + board.coordToSan("c3b2"));
-//        System.out.println(board.coordToSan("d1c2") + " " + board.coordToSan("a6c5"));
-//        System.out.println(board.normalize("Q8xc5"));
-//        board.move("d4").move("Nf6");
-//        board.move("c4").move("e6");
-//        board.move("Nf3").move("b6");
-//        board.move("g3").move("Ba6");
-//        board.move("b3").move("Bb4+");
-//        board.move("Bd2").move("Be7");
-//        board.move("Bg2").move("c6");
-//        board.move("Bc3").move("d5");
-//        board.move("Ne5").move("Nfd7");
-//        board.move("Nxd7").move("Nxd7");
-//        board.move("Nd2").move("O-O");
-//        board.move("O-O").move("Rc8");
-//        board.move("e4");
+            Short.hashCode(halfMoveClock);
     }
 }

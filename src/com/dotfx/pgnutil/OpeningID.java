@@ -86,13 +86,4 @@ public class OpeningID implements Comparable
     {
         return value.compareTo(((OpeningID)other).value);
     }
-    
-//    public static void main(String args[])
-//    {
-//        OpeningID oid1 = new OpeningID("hello world");
-//        OpeningID oid2 = OpeningID.fromString("3a4c23e3c695ef34");
-//        System.out.println(oid1);
-//        System.out.println(oid2);
-//        System.out.println(oid1.equals(oid2));
-//    }
 }

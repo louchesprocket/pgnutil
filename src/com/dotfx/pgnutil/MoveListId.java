@@ -84,13 +84,4 @@ public class MoveListId implements Comparable<MoveListId>
         if (diff < 0) return -1;
         return 0;
     }
-    
-//    public static void main(String args[])
-//    {
-//        OpeningID oid1 = new OpeningID("hello world");
-//        OpeningID oid2 = OpeningID.fromString("3a4c23e3c695ef34");
-//        System.out.println(oid1);
-//        System.out.println(oid2);
-//        System.out.println(oid1.equals(oid2));
-//    }
 }
