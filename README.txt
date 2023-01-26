@@ -138,7 +138,7 @@ recognized by the "-s" option.  For example:
 
 Thus, the command:
 
-    java -jar pgnutil.jar -mt 'Event/Nunn 1' -mp 'Glaurung 2.0.1' -s opponent,gameno -i mygames.pgn
+    java -jar pgnutil.jar -mt 'Event/Nunn 1' -mp 'Glaurung 2.0.1' -s opponent,winner -i mygames.pgn
 
 means, "for every game in which the 'Event' tag contains the
 text 'Nunn 1' and in which 'Glaurung 2.0.1' was a player,
