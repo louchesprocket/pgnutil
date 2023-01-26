@@ -499,7 +499,7 @@ public class EcoTree
             case SCID:
                 try (BufferedReader dbReader =
                     new BufferedReader(new InputStreamReader(
-                        new FileInputStream("/Users/chen/Documents/chess/openings/scid.eco"))))
+                        new FileInputStream("~/Documents/chess/openings/scid.eco"))))
                 {
                     String line;
 
@@ -552,7 +552,7 @@ public class EcoTree
             case NIK:
                 try (BufferedReader dbReader =
                     new BufferedReader(new InputStreamReader(
-                        new FileInputStream("/Users/chen/Documents/chess/niklasf_eco/eco.json"))))
+                        new FileInputStream("~/Documents/chess/niklasf_eco/eco.json"))))
                 {
                     String line;
 
@@ -1035,4 +1035,58 @@ public class EcoTree
             children.remove(node);
         }
     }
+    
+//    public static void main(String args[]) throws Exception
+//    {
+//        long start = System.currentTimeMillis();
+//        EcoTree tree1 = new EcoTree(Type.SCID);
+////        EcoTree tree1 = getScidInstance();
+//        tree1.printTranspositions();
+//
+////        EcoTree tree = new EcoTree(Type.SCID);
+////        tree.writeStdFormat(new File("~/Desktop/tree.out"));
+//        
+////        List<Node> nodeList = scid.get("1.d4 b6 2.c4 e6 3.e4 Bb7 4.Nc3 Bb4 5.Qc2 Qh4 6.Bd3 f5 7.Nf3 Bxc3+ 8.Qxc3 " +
+////"Qg4 9.O-O fxe4 10.Ne5").getPath();
+////        
+////        System.out.println("===== len: " + nodeList.size());
+////        Node bottom = nodeList.get(nodeList.size() - 1);
+////        System.out.println("===== code: " + bottom.getCode());
+////        System.out.println("===== desc: " + bottom.getDesc());
+//        
+//// tree diff
+////
+////        EcoTree tree1 = getInstance(); // second column
+////        EcoTree tree2 = getNikInstance(); // first column
+////        List<Node> treeDiff = tree1.diff(tree2, false);
+////        
+////        for (Node tree2Node : treeDiff)
+////        {
+////            List<Node> tree2Path = tree2Node.getPath();
+////            
+////            System.out.print(tree2Node.getStdCode() + " " +
+////                tree1.getTop().getBottomNode(tree2Path).getStdCode() +
+////                " ");
+////            
+////            for (Node pathNode : tree2Path)
+////            {
+////                int ply = pathNode.getPly();
+////                if (ply != 1) System.out.print(" ");
+////
+////                if (ply % 2 == 1)
+////                    System.out.print(((ply + 1)/2) + ".");
+////
+////                System.out.print(pathNode.getMove());
+////            }
+////            
+////            System.out.print("\n");
+////        }
+////        
+////        System.out.println("DIFF: " + treeDiff.size());
+//
+//// end tree diff
+//
+//        System.out.println("NODE COUNT: " + tree1.positionCount());
+//        System.out.println("ELAPSED: " + (System.currentTimeMillis() - start));
+//    }
 }

@@ -333,8 +333,9 @@ public class PGNUtil
         
         @Override public boolean processGame()
         {
-            return game.getPlyCount() - game.getFirstOobMove().getPly() >=
-                plies;
+            if (plies < 1) return true;
+            PgnGame.Move firstOobMove = game.getFirstOobMove();
+            return firstOobMove == null ? false : game.getPlyCount() - firstOobMove.getPly() >= plies;
         }
     }
     
@@ -346,8 +347,9 @@ public class PGNUtil
         
         @Override public boolean processGame()
         {
-            return game.getPlyCount() - game.getFirstOobMove().getPly() <=
-                plies;
+            PgnGame.Move firstOobMove = game.getFirstOobMove();
+            // if all book moves, return true
+            return firstOobMove == null ? true : game.getPlyCount() - firstOobMove.getPly() <= plies;
         }
     }
     
@@ -657,25 +659,25 @@ public class PGNUtil
     
     static class DuplicateGameHandler extends DuplicateHandler
     {
-        @Override public void handle() throws InvalidSelectorException
+        @Override public final void handle() throws InvalidSelectorException
         {
             super.handle(game.getHash());
+        }
+    }
+
+    static class DuplicateMoveHandler extends DuplicateHandler
+    {
+        @Override public final void handle() throws InvalidSelectorException
+        {
+            super.handle(game.getMoveHash());
         }
     }
     
     static class DuplicateOpeningHandler extends DuplicateHandler
     {
-        @Override public void handle() throws InvalidSelectorException
+        @Override public final void handle() throws InvalidSelectorException
         {
             super.handle(game.getPlayerOpeningHash());
-        }
-    }
-    
-    static class DuplicatePostOpeningHandler extends DuplicateHandler
-    {
-        @Override public void handle() throws InvalidSelectorException
-        {
-            super.handle(game.getPlayerPostOpeningHash());
         }
     }
     
@@ -756,10 +758,11 @@ public class PGNUtil
         }
     }
     
-    public static final String VERSION = "0.3";
+    public static final String VERSION = "0.5";
     
     // All of these are static in order to avoid parameter-passing overhead.
     
+    static Pattern bookMarker;
     private static PgnGame game;
     static List<PGNFile> pgnFileList;
     static final List<GameProcessor> matchProcessors = new ArrayList<>();
@@ -775,6 +778,10 @@ public class PGNUtil
     static long gamesRead = 0L;
     static long charsRead = 0L;
     
+    static void setBookMarker(String regex)
+    {
+        bookMarker = Pattern.compile(regex, Pattern.DOTALL);
+    }
     static void addMatchProcessor(GameProcessor gp) { matchProcessors.add(gp); }
     static void setHandler(GameHandler printer) { PGNUtil.handler = printer; }
     static void setExitProcessor(ExitProcessor proc) { exitProcessor = proc; }

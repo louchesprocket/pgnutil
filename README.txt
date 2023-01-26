@@ -136,6 +136,14 @@ recognized by the "-s" option.  For example:
 	winner: causes pgnutil to print the name of the winner
 	loser: causes pgnutil to print the name of the loser
 
+Thus, the command:
+
+    java -jar pgnutil.jar -mt 'Event/Nunn 1' -mp 'Glaurung 2.0.1' -s opponent,gameno -i mygames.pgn
+
+means, "for every game in which the 'Event' tag contains the
+text 'Nunn 1' and in which 'Glaurung 2.0.1' was a player,
+output the name of the opponent and the name of the winner."
+
 There are also several output selectors relating to ECO codes:
 
 	eco: output the standard ECO code for the game, matching
@@ -179,8 +187,8 @@ commas.  If a different value delimiter is desired, it may be set
 with the "-vd" (value-delimiter) option.
 
 The "special" output options include "-d" (duplicates), "-do"
-(duplicate openings), "-e" (events), "-ee" (event errors), "-o"
-(opening statistics), and "-p" (player statistics).  Any of these
+(duplicate openings), "-e" (events), "-csr" (check sequential rounds),
+"-o" (opening statistics), and "-p" (player statistics).  Any of these
 may be combined with any matching and replacing options (see above).
 
 To find duplicate games (defined as games with the same players and
@@ -225,7 +233,7 @@ statistics for all games in mygames.pgn:
 
 This query may also be paramaterized.  For example:
 
-	java -jar pgnutil.jar -o -cmin 100 -ldp -.1 -hdp .1 -hdraw .5 -i mygames.pgn
+	java -jar pgnutil.jar -o -cmin 100 -lwd -.1 -hwd .1 -hdraw .5 -i mygames.pgn
 
 means, "print opening statistics for every opening represented by
 at least 100 games where the difference in win percentage between
@@ -274,10 +282,21 @@ parameter the file name of a file containing opening identifiers:
 
 	java -jar pgnutil.jar -of myopeningsfile -i mygames.pgn
 
-NOTE: pgnutil correctly identifies openings (to be precise, it
-correctly identifies the "out-of-book" condition) for PGN files
-produced by Arena and Aquarium.  Other types of PGN files have not
-been tested.
+Pgnutil identifies the demarcation point between "opening" moves
+and engine-generated moves by searching for a specific
+regular expression. By default, this regular expression is:
+
+    "(out\s+of\s+book)|(^End\s+of\s+opening)"
+
+which matches the "out-of-book" marker for both Aquarium and
+Banksia. This regular expression may be set to any value with the
+book-marker ("-bm") option. For example,
+
+    java -jar pgnutil.jar -of myopeningsfile -bm "my book marker" -i mygames.pgn
+
+will search for games matching any of the openings from
+myopeningsfile, using "my book marker" as the demarcation
+between "book" moves and engine moves.
 
 To output opening statistics by ECO code instead of opening
 identifier, the "-o" option may be combined with any of the options

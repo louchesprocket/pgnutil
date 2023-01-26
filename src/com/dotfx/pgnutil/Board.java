@@ -187,7 +187,7 @@ public class Board
         new int[] {6, 15, 17, 10, -6, -15, -17, -10};
     
     private final Piece position[];
-    private short ply;
+    private short ply; // zero at initial position
     private boolean whiteCanCastleQ;
     private boolean whiteCanCastleK;
     private boolean blackCanCastleQ;

@@ -145,4 +145,12 @@ public class TimeCtrl implements Comparable<TimeCtrl>
         if (segments.length == 3) ret += ":" + segments[2].toString();
         return ret;
     }
+    
+//    public static void main(String args[]) throws Exception
+//    {
+//        System.out.println(new TimeCtrl("40/1200", true));
+//        System.out.println(new TimeCtrl("0/300", true));
+//        System.out.println(new TimeCtrl("0+6", true));
+//        System.out.println(new TimeCtrl("20/300+6", true));
+//    }
 }

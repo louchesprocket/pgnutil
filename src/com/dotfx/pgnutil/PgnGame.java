@@ -32,27 +32,23 @@ import com.google.common.hash.Hashing;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
  *
  * @author Mark Chen
  */
-public class PgnGame
+public final class PgnGame
 {
     public static final Pattern OUT_OF_BOOK;
+    public static final String ROUND_TAG;
     public static final int HASHSEED = 0xa348ccf1;
     private static final HashFunction HASHFUNC;
     private static final int BUFSIZE = 1024;
     private static final int COMMENT_BUFSIZE = 1024;
     
-    public static enum Result
+    public enum Result
     {
         WHITEWIN("1-0"),
         BLACKWIN("0-1"),
@@ -81,10 +77,10 @@ public class PgnGame
     /**
      * One per ply.
      */
-    public static class Move
+    public static final class Move
     {
         private final Color color;
-        private final short number;
+        private final short number; // not ply
         private final String move;
         private final List<String> comments;
         
@@ -158,21 +154,27 @@ public class PgnGame
     static
     {
         HASHFUNC = Hashing.murmur3_128(HASHSEED);
-        OUT_OF_BOOK = Pattern.compile("out\\s+of\\s+book", Pattern.DOTALL);
+        ROUND_TAG = "Round";
+
+        // Aquarium: "[Black|White] out of book"
+        // Banksia: "End of opening"
+        OUT_OF_BOOK = PGNUtil.bookMarker == null ?
+            Pattern.compile("(out\\s+of\\s+book)|(^End\\s+of\\s+opening)", Pattern.DOTALL):
+            PGNUtil.bookMarker;
     }
     
     private final int number;
-    private final Map<String,String> tagpairs;
+    private final Map<String,String> tagPairs;
     private final List<String> gameComments;
     private final List<Move> moves;
     private final String origText;
     
-    public PgnGame(int number, Map<String,String> tagpairs,
+    public PgnGame(int number, Map<String,String> tagPairs,
         List<String> gameComments, List<Move> moves, String origText)
         throws PGNException
     { 
         this.number = number;
-        this.tagpairs = tagpairs;
+        this.tagPairs = tagPairs;
         this.gameComments = gameComments;
         this.moves = moves;
         this.origText = origText;
@@ -491,7 +493,11 @@ public class PgnGame
         
         return next;
     }
-    
+
+    /**
+     *
+     * @return hash of player names and game moves
+     */
     public HashCode getHash()
     {
         StringBuilder sb = new StringBuilder();
@@ -499,10 +505,21 @@ public class PgnGame
         for (Move move : getMoves()) sb.append(move.getMove());
         return HASHFUNC.hashBytes(sb.toString().getBytes());
     }
+
+    /**
+     *
+     * @return hash of game moves
+     */
+    public HashCode getMoveHash()
+    {
+        StringBuilder sb = new StringBuilder();
+        for (Move move : getMoves()) sb.append(move.getMove());
+        return HASHFUNC.hashBytes(sb.toString().getBytes());
+    }
     
     public int getNumber() { return number; }
-    public Set<String> getKeySet() { return tagpairs.keySet(); }
-    public final String getValue(String key) { return tagpairs.get(key); }
+    public Set<String> getKeySet() { return tagPairs.keySet(); }
+    public String getValue(String key) { return tagPairs.get(key); }
     public List<String> getGameComments() { return gameComments; }
     public List<Move> getMoves() { return moves; }
     public int getPlyCount() { return moves.size(); }
@@ -525,7 +542,7 @@ public class PgnGame
     {
         try
         {
-            int ret = Integer.valueOf(getValue("Round"));
+            int ret = Integer.valueOf(getValue(ROUND_TAG));
             if (ret < 1 && CLOptions.aquarium) return ret + 128;
             else return ret;
         }
@@ -552,37 +569,61 @@ public class PgnGame
         if (getResult().equals(Result.BLACKWIN)) return getWhite();
         return null;
     }
-    
-    public Move getFirstOobMove(Pattern oobMarker)
+
+    /**
+     *
+     * @return the first out-of-book Move or null if none is found
+     */
+    public Move getFirstOobMove()
     {
+        if (moves.size() < 1) return null;
         Move firstCommentMove = null;
-        Move oobMove = null;
-        boolean captureNext = false;
         
         for (Move move : moves)
         {
-            if (captureNext)
-            {
-                oobMove = move;
-                break;
-            }
-            
             if (move.getComments().size() > 0)
             {
                 // Presence of oobMarker means that book moves include the
                 // present move.  Otherwise, the first move with a comment is
                 // the first out-of-book move.
-                
+
+                if (move.hasComment(OUT_OF_BOOK)) return moves.get(move.getPly());
                 if (firstCommentMove == null) firstCommentMove = move;
-                if (move.hasComment(oobMarker)) captureNext = true;
             }
         }
         
-        if (oobMove == null) return firstCommentMove;
-        return oobMove;
+        return firstCommentMove;
     }
-    
-    public Move getFirstOobMove() { return getFirstOobMove(OUT_OF_BOOK); }
+
+    /**
+     *
+     * @return the last book move, or null if none is found
+     */
+    public Move getLastBookMove()
+    {
+        if (moves.size() < 1) return null;
+        Move firstCommentMove = null;
+
+        for (Move move : moves)
+        {
+            if (move.getComments().size() > 0)
+            {
+                // Presence of oobMarker means that book moves include the
+                // present move.  Otherwise, the first move with a comment is
+                // the first out-of-book move.
+
+                if (move.hasComment(OUT_OF_BOOK)) return move;
+                if (firstCommentMove == null) firstCommentMove = move;
+            }
+        }
+
+        // no comments found, so assume whole game is in book
+        if (firstCommentMove == null) return moves.get(moves.size() - 1);
+
+        // comment found, but no oob marker
+        int firstCommentPly = firstCommentMove.getPly();
+        return firstCommentPly <= 1 ? null : moves.get(firstCommentPly - 2);
+    }
     
     public Move getNextMove(Move move)
     {
@@ -786,21 +827,6 @@ public class PgnGame
         return getPlayerOpeningHash(OUT_OF_BOOK);
     }
     
-    public HashCode getPlayerPostOpeningHash(Pattern oobMarker)
-    {
-        StringBuilder sb = new StringBuilder();
-        
-        sb.append(getWhite()).append('\0').append(getBlack()).append('\0').
-            append(getPostOpeningString(oobMarker));
-        
-        return HASHFUNC.hashBytes(sb.toString().getBytes());
-    }
-    
-    public HashCode getPlayerPostOpeningHash()
-    {
-        return getPlayerPostOpeningHash(OUT_OF_BOOK);
-    }
-    
     /**
      * 
      * @return the value of the TimeControl tag, if present and legible;
@@ -824,9 +850,7 @@ public class PgnGame
             {
                 if (color != null && !move.getColor().equals(color)) continue;
                 
-                AquariumVars av = new AquariumVars(move);
-                Clock thisClko = av.getClko();
-                
+                Clock thisClko = new AquariumVars(move).getClko();
                 if (thisClko == null) continue;
                 
                 if (startClko == null)

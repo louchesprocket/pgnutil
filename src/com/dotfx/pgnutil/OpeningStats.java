@@ -219,12 +219,9 @@ public class OpeningStats implements Tallier
 
         if (opening == null)
         {
-            PgnGame.Move firstOob = game.getFirstOobMove();
-            if (firstOob == null) return;
-            
-            opening = new Opening(openingId,
-                ecoTree.get(game, firstOob.getPly() - 1));
-            
+            PgnGame.Move lastBookMove = game.getLastBookMove();
+            if (lastBookMove == null) return;
+            opening = new Opening(openingId, ecoTree.get(game, lastBookMove.getPly()));
             openingsMap.put(openingId, opening);
         }
 
