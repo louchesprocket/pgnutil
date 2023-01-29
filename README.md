@@ -1,4 +1,4 @@
-**pgnutil**
+# pgnutil
 
 Pgnutil is a command-line tool for operating on Portable Game Notation (PGN) files.  I wrote the tool because I like to run computer-chess tournaments for my own amusement, and found that calculating results was a nightmare due to a lack of very basic capabilities for handling PGN files.  Common problems such as finding duplicate games, identifying time forfeitures, and even just figuring out if I had already played a particular pair of players against a particular set of test positions were nearly insoluble.  After failing to find any applicable tool on the
 Internet, I wrote pgnutil.
@@ -6,18 +6,18 @@ Internet, I wrote pgnutil.
 Pgnutil works as a Unix-style command-line filter that performs matching/selecting and replacing functions on PGN files in conjunction with various output options.  By default, pgnutil simply outputs selected games after performing any stipulated replacement operations, but it can instead output user-selected lists of fields.  In addition, pgnutil has various "special" output options: duplicate finding, event listing, opening statistics, and player statistics.  Pgnutil is particularly designed to be used in conjunction with tools such as bayeselo or elostat.
 
 
-**Requirements**
+## Requirements
 
 Pgnutil requires Java 1.8 or higher.  It theoretically runs on any platform with a command line.
 
 
-**Building**
+## Building
 
 To build, open the project in IntelliJ Idea and select
 "Build->Rebuild Project" from the menu bar. Then run script/mkdist.sh. This will create the pgnutil integrated executable in the dist directory.
 
 
-**Usage**
+## Usage
 
 For a complete list of options:
 
@@ -199,13 +199,10 @@ If pgnutil fails to find the out-of-book marker for a game, it assumes that the 
 To output opening statistics by ECO code instead of opening identifier, the "-o" option may be combined with any of the options "-eco," "-xeco," "-scideco," or "-xscideco."  These will list statistics by standard ECO code, standard ECO code matched transpositionally, Scid ECO code, or Scid ECO code matched transpositionally, respectively.
 
 
-**Known Issues**
+## Known Issues
 
-Apart from the opening issue (see second paragraph above), pgnutil is also victim to the PGN specification's greatest infirmity: lack of standardized move notation.  PGN files are allowed to list moves in any way at all.  This means, for example, that "Bb2," "c1-b2,"
-and "B-QN2" are all valid notation.  Pgnutil makes no effort to normalize moves (as this would entail a large performance penalty), so all move comparisons, such as the "-mo" and "-ro" options, as well as duplicate finding and opening statistics, assume that notation
-throughout the input file is consistent.  The various ECO-code and position-finding options require that the input file be in Standard Algebraic Notation.
+Apart from the opening issue (see second paragraph above), pgnutil is also victim to the PGN specification's greatest infirmity: lack of standardized move notation.  PGN files are allowed to list moves in any way at all.  This means, for example, that "Bb2," "c1-b2," and "B-QN2" are all valid notation.  Pgnutil makes no effort to normalize moves (as this would entail a large performance penalty), so all move comparisons, such as the "-mo" and "-ro" options, as well as duplicate finding and opening statistics, assume that notation throughout the input file is consistent.  The various ECO-code and position-finding options require that the input file be in Standard Algebraic Notation.
 
-PGN files often violate the PGN specification. Where it can, pgnutil refrains from complaining about such errors (for example, it does not demand a correct Seven Tag Roster).  Certain problems, however, will cause an error to be reported.  Kingbase, for instance,
-uses the backslash ("\") character in some event names.  Since the PGN specification defines this as an escape character, it may cause certain tag-value pairs to be unterminated, resulting in an exception.
+PGN files often violate the PGN specification. Where it can, pgnutil refrains from complaining about such errors (for example, it does not demand a correct Seven Tag Roster).  Certain problems, however, will cause an error to be reported.  Kingbase, for instance, uses the backslash ("\") character in some event names.  Since the PGN specification defines this as an escape character, it may cause certain tag-value pairs to be unterminated, resulting in an exception.
 
 Also, the PGN spec permits "%"-style comments.  I have never seen these used, so they are unsupported.
