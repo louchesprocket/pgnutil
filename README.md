@@ -186,11 +186,11 @@ to output those games wherein the selected openings were played. If you wish to 
 
 Pgnutil identifies the demarcation point between "opening" moves and engine-generated moves by searching for a specific regular expression. By default, this regular expression is:
 
-   ``"(out\s+of\s+book)|(^End\s+of\s+opening)"``
+``(out\s+of\s+book)|(^End\s+of\s+opening)``
 
 which matches the "out-of-book" marker for both Aquarium and Banksia. This regular expression may be set to any value with the book-marker ("-bm") option. For example,
 
-``pgnutil -of myopeningsfile -bm "my book marker" -i mygames.pgn`
+``pgnutil -of myopeningsfile -bm 'my book marker' -i mygames.pgn``
 
 will search for games matching any of the openings from myopeningsfile, using "my book marker" as the demarcation between "book" moves and engine moves.
 
