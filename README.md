@@ -121,7 +121,7 @@ Similarly, values within a field are, by default, separated by commas.  If a dif
 
 ### Special Output Options
 
-The "special" output options include "-d" (duplicates), "-do" (duplicate openings), "-e" (events), "-csr" (check sequential rounds), "-o" (opening statistics), and "-p" (player statistics). Any of these may be combined with any matching and replacing options (see above).
+The "special" output options include "-d" (duplicates), "-do" (duplicate openings), "-e" (events), "-csr" (check sequential rounds), "-o" ([opening](#openings) statistics), and "-p" (player statistics). Any of these may be combined with any matching and replacing options (see above).
 
 To find duplicate games (defined as games with the same players and same move list) in the file mygames.pgn:
 
