@@ -28,7 +28,7 @@ Pgnutil's most basic matching option is "-m", which takes a regular expression a
 
 ``pgnutil -m 'forfeit' -i mygames.pgn``
 
-By default, pgnutil outputs the entire text of each matched game. So in the previous example, we would have to sort through the output to discover which players forfeited.  Much better to save the trouble by combining the "-s" option, and perhaps piping the output to another Unix command to produce a list of unique names of forfeiters:
+By default, pgnutil outputs the entire text of each matched game. So in the previous example, we would have to sort through the output to discover which players forfeited.  Much better to save the trouble by combining the "-s" option (see [Output Selectors](#output-selectors) below), and perhaps piping the output to another Unix command to produce a list of unique names of forfeiters:
 
 ``pgnutil -m 'forfeit' -s loser -i mygames.pgn | sort -u``
 
