@@ -1,15 +1,14 @@
 Description
 
-Pgnutil is a command-line tool for performing various operations
-on Portable Game Notation (PGN) files.  I wrote the tool because
-I like to run computer-chess tournaments for my own amusement, and
-found that calculating results was a nightmare due to a lack of very
-basic capabilities for handling PGN files.  Common problems such
-as finding duplicate games, identifying time forfeitures, and even
-just figuring out if I had already played a particular pair of
-players against a particular set of test positions were nearly
-insoluble.  After failing to find any applicable tool on the
-Internet (a fact that still astounds me), I wrote pgnutil.
+Pgnutil is a command-line tool for operating on Portable Game Notation
+(PGN) files.  I wrote the tool because I like to run computer-chess
+tournaments for my own amusement, and found that calculating results
+was a nightmare due to a lack of very basic capabilities for handling
+PGN files.  Common problems such as finding duplicate games, identifying
+time forfeitures, and even just figuring out if I had already played a
+particular pair of players against a particular set of test positions
+were nearly insoluble.  After failing to find any applicable tool on the
+Internet, I wrote pgnutil.
 
 Pgnutil works as a Unix-style command-line filter that performs
 matching/selecting and replacing functions on PGN files in conjunction
@@ -24,7 +23,7 @@ bayeselo or elostat.
 
 Requirements
 
-pgnutil requires Java 1.8 or higher.  It theoretically runs on any
+Pgnutil requires Java 1.8 or higher.  It theoretically runs on any
 platform with a command line.
 
 
@@ -32,7 +31,8 @@ Building
 
 To build, open the project in IntelliJ Idea and select
 "Build->Rebuild Project" from the menu bar. Then run script/mkdist.sh.
-This will create the pgnutil integrated executable in the dist directory.
+This will create the pgnutil integrated executable in the dist
+directory.
 
 
 Usage
@@ -50,10 +50,9 @@ every game containing the word "forfeit" from the file mygames.pgn:
 
 By default, pgnutil outputs the entire text of each matched game.
 So in the previous example, we would have to sort through the output
-to discover which players forfeited.  Much better to save ourselves
-the trouble by combining the "-s" option, and perhaps piping the
-output to another Unix command to produce a list of unique names of
-forfeiters:
+to discover which players forfeited.  Much better to save the trouble
+by combining the "-s" option, and perhaps piping the output to another
+Unix command to produce a list of unique names of forfeiters:
 
 	pgnutil -m 'forfeit' -s loser -i mygames.pgn | sort -u
 
@@ -92,22 +91,28 @@ to replace every instance of 'Quazar' from the file mygames.pgn with
 
 	pgnutil -r '.*/Quazar/Quazar 0.4 x64' -i mygames.pgn
 
+Or, to strip comments (to be precise, all text between curly braces):
+
+    pgnutil -r '.*/\{.*?\}/' -i mygames.pgn
+
 The first "/"-separated component in the parameter to the "-r"
-option actually selects games upon which to perform the replace-
-ment.  So the previous example means, "for every game containing
-the regular expression '.*' (i.e., any game at all),  replace every
-occurrence of 'Quazar' with 'Quazar 0.4 x64.'"  Similarly, the command:
+option selects games upon which to perform the replacement.  So the
+previous example means, "For every game containing the regular
+expression '.*' (i.e., any game at all), replace every occurrence of
+the regular expression '\{.*?\}' with an empty string." Similarly, the
+command:
 
 	pgnutil -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -i mygames.pgn
 
-means, "for every game containing 'Nunn 1' or 'Noomen 2012,' replace
-every occurrence of 'Quazar' with 'Quazar 0.4 x64.'"  The selec-
-tivity of the replacement can be further refined with other op-
+means, "For every game containing 'Nunn 1' or 'Noomen 2012,' replace
+every occurrence of 'Quazar' with 'Quazar 0.4 x64.'"
+
+The selectivity of the replacement can be further refined with other op-
 tions.  For example, the command:
 
 	pgnutil -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -rl 'Glaurung 2.0.1' -i mygames.pgn
 
-uses the "-rl" (replace loser) option to mean, "for every game
+uses the "-rl" (replace loser) option to mean, "For every game
 containing 'Nunn 1' or 'Noomen 2012' that was lost by 'Glaurung 2.0.1,'
 replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'" 
 And, of course, any of these may be combined with any of the
@@ -115,7 +120,7 @@ various matching ond output-selection options:
 
 	pgnutil -m '[Bb]litz' -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -rl 'Glaurung 2.0.1' -s Event -i mygames.pgn
 
-means, "output the value of the 'Event' tag for every game
+means, "Output the value of the 'Event' tag for every game
 containing 'Blitz' or 'blitz,' but of these games, for every game
 containing 'Nunn 1' or 'Noomen 2012' that was lost by 'Glaurung
 2.0.1,' replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'"
@@ -147,7 +152,7 @@ Thus, the command:
 
     pgnutil -mt 'Event/Nunn 1' -mp 'Glaurung 2.0.1' -s opponent,winner -i mygames.pgn
 
-means, "for every game in which the 'Event' tag contains the
+means, "For every game in which the 'Event' tag contains the
 text 'Nunn 1' and in which 'Glaurung 2.0.1' was a player,
 output the name of the opponent and the name of the winner."
 
@@ -182,7 +187,7 @@ There are also several output selectors relating to ECO codes:
 
 Note that any of the transpositional selectors ("xeco," "xscideco,"
 "xecodesc," "xscidecodesc," "xecomoves," and "xscidecomoves") may
-return more than one result.
+return more than one result per game.
 
 By default, fields selected by the "-s" option appear on the output
 separated by the pipe ("|") character.  If a different output
@@ -242,7 +247,7 @@ This query may also be paramaterized.  For example:
 
 	pgnutil -o -cmin 100 -lwd -.1 -hwd .1 -hdraw .5 -i mygames.pgn
 
-means, "print opening statistics for every opening represented by
+means, "Print opening statistics for every opening represented by
 at least 100 games where the difference in win percentage between
 black and white is no greater than 10% and the draw percentage is
 no greater than 50%."  The opening-statistics function has its own
