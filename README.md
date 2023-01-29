@@ -28,7 +28,7 @@ Pgnutil's most basic matching option is "-m", which takes a regular expression a
 
 ``pgnutil -m 'forfeit' -i mygames.pgn``
 
-By default, pgnutil outputs the entire text of each matched game. So in the previous example, we would have to sort through the output to discover which players forfeited.  Much better to save the trouble by combining the "-s" option (see [Output Selectors](#output-selectors) below), and perhaps piping the output to another Unix command to produce a list of unique names of forfeiters:
+By default, pgnutil outputs the entire text of each matched game. So in the previous example, we would have to sort through the output to discover which players forfeited.  Much better to save the trouble by combining the "-s" option (see [Output Selectors](#output-selectors), below), and perhaps piping the output to another Unix command to produce a list of unique names of forfeiters:
 
 ``pgnutil -m 'forfeit' -s loser -i mygames.pgn | sort -u``
 
@@ -75,7 +75,7 @@ The selectivity of the replacement can be further refined with other options.  F
 
 ``pgnutil -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -rl 'Glaurung 2.0.1' -i mygames.pgn``
 
-uses the "-rl" (replace loser) option to mean, "For every game containing 'Nunn 1' or 'Noomen 2012' that was lost by 'Glaurung 2.0.1,' replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'" And, of course, any of these may be combined with any of the various matching and output-selection options:
+uses the "-rl" (replace loser) option to mean, "For every game containing 'Nunn 1' or 'Noomen 2012' that was lost by 'Glaurung 2.0.1,' replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'" And, of course, any of these may be combined with any of the various [matching](#matching) and [output-selection](#output-selectors) options:
 
 ``pgnutil -m '[Bb]litz' -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -rl 'Glaurung 2.0.1' -s Event -i mygames.pgn``
 
