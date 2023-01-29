@@ -56,7 +56,7 @@ The "-r" option performs replacements on the game text.  For example, to replace
 
 Or, to strip comments (to be precise, all text between curly braces):
 
-``pgnutil -r '.*/\{.*?\}/' -i mygames.pgn`
+``pgnutil -r '.*/\{.*?\}/' -i mygames.pgn``
 
 The first "/"-separated component in the parameter to the "-r" option selects games upon which to perform the replacement.  So the previous example means, "For every game containing the regular expression '.&#42;' (i.e., any game at all), replace every occurrence of the regular expression '\\{.&#42;?\\}' with an empty string." Similarly, the command:
 
