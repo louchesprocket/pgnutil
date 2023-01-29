@@ -23,6 +23,7 @@ For a complete list of options:
 
 ``pgnutil -h``
 
+### Matching
 Pgnutil's most basic matching option is "-m", which takes a regular expression as its parameter and matches against the entire text of each game in the file.  For example, the following search prints every game containing the word "forfeit" from the file mygames.pgn:
 
 ``pgnutil -m 'forfeit' -i mygames.pgn``
@@ -50,6 +51,12 @@ If we want to perform any of these queries on a list of player names (instead of
 
 will output every drawn game from the file mygames.pgn wherein both players are listed in the file myplayers.txt.  The latter is a simple text file listing player names, one per line.
 
+Position searches are performed with the "-mpos" (match position) option, where the parameter is in Standard Algebraic Notation. For example:
+
+``pgnutil -mpos '1.d4 Nf6 2.c4 c5' -i mygames.pgn``
+
+### Replacing
+
 The "-r" option performs replacements on the game text.  For example, to replace every instance of 'Quazar' from the file mygames.pgn with 'Quazar 0.4 x64':
 
 ``pgnutil -r '.*/Quazar/Quazar 0.4 x64' -i mygames.pgn``
@@ -74,9 +81,7 @@ uses the "-rl" (replace loser) option to mean, "For every game containing 'Nunn 
 
 means, "Output the value of the 'Event' tag for every game containing 'Blitz' or 'blitz,' but of these games, for every game containing 'Nunn 1' or 'Noomen 2012' that was lost by 'Glaurung 2.0.1,' replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'"
 
-Position searches are performed with the "-mpos" (match position) option, where the parameter is in Standard Algebraic Notation. For example:
-
-``pgnutil -mpos '1.d4 Nf6 2.c4 c5' -i mygames.pgn``
+### Output Selectors
 
 By default, pgnutil will output the full text of the game in response to any search operation.  The "-s" option may be used to restrict the output to a pipe-separated list of selected fields. Selected fields may include any PGN tag and should be separated on the command line by commas.  There are several "special" selectors recognized by the "-s" option.  For example:
 
@@ -114,6 +119,8 @@ By default, fields selected by the "-s" option appear on the output separated by
 
 Similarly, values within a field are, by default, separated by commas.  If a different value delimiter is desired, it may be set with the "-vd" (value-delimiter) option.
 
+### Special Output Options
+
 The "special" output options include "-d" (duplicates), "-do" (duplicate openings), "-e" (events), "-csr" (check sequential rounds), "-o" (opening statistics), and "-p" (player statistics). Any of these may be combined with any matching and replacing options (see above).
 
 To find duplicate games (defined as games with the same players and same move list) in the file mygames.pgn:
@@ -141,6 +148,8 @@ To list each event from the file mygames.pgn, along with the games that belong t
 To list each player from the file mygames.pgn, along with win/loss/draw statistics:
 
 ``pgnutil -p -i mygames.pgn``
+
+### Openings
 
 Pgnutil's definition of an "opening" pertains specifically to chess engines; it is the list of a game's book moves that occur prior to the first engine-generated move.  To list opening
 statistics for all games in mygames.pgn:
