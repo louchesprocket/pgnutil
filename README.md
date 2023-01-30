@@ -57,13 +57,13 @@ Position searches are performed with the "-mpos" (match position) option, where 
 
 ### Replacing
 
-The "-r" option performs replacements on the game text.  For example, to replace every instance of 'Quazar' from the file mygames.pgn with 'Quazar 0.4 x64':
-
-``pgnutil -r '.*/Quazar/Quazar 0.4 x64' -i mygames.pgn``
-
-Or, to strip comments (to be precise, all text between curly braces):
+The "-r" option performs replacements on the game text.  For example, to strip comments (or, to be precise, all text between curly braces):
 
 ``pgnutil -r '.*/\{.*?\}/' -i mygames.pgn``
+
+To replace every instance of 'Quazar' from the file mygames.pgn with 'Quazar 0.4 x64':
+
+``pgnutil -r '.*/Quazar/Quazar 0.4 x64' -i mygames.pgn``
 
 The first "/"-separated component in the parameter to the "-r" option selects games upon which to perform the replacement.  So the previous example means, "For every game containing the regular expression '.&#42;' (i.e., any game at all), replace every occurrence of the regular expression '\\{.&#42;?\\}' with an empty string." Similarly, the command:
 
@@ -121,7 +121,7 @@ Similarly, values within a field are, by default, separated by commas.  If a dif
 
 ### Special Output Options
 
-The "special" output options include "-d" (duplicates), "-do" (duplicate openings), "-e" (events), "-csr" (check sequential rounds), "-o" ([opening](#openings) statistics), and "-p" (player statistics). Any of these may be combined with any matching and replacing options (see above).
+The "special" output options include "-d" (duplicates), "-dm" (duplicate moves), "-do" (duplicate [openings](#openings)), "-e" (events), "-csr" (check sequential rounds), "-o" ([opening](#openings) statistics), and "-p" (player statistics). Any of these may be combined with any matching and replacing options (see above).
 
 To find duplicate games (defined as games with the same players and same move list) in the file mygames.pgn:
 
@@ -156,12 +156,13 @@ statistics for all games in mygames.pgn:
 
 ``pgnutil -o -i mygames.pgn``
 
-This query may also be paramaterized. For example:
+This query may also be paramaterized and run on a [selection of games](#matching). For example:
 
-``pgnutil -o -cmin 100 -lwd -.1 -hwd .1 -hdraw .5 -i mygames.pgn``
+``pgnutil -mt 'Event/Nunn 1' -o -cmin 100 -lwd -.1 -hwd .1 -hdraw .5 -i mygames.pgn``
 
-means, "Print opening statistics for every opening represented by at least 100 games where the difference in win percentage between black and white is no greater than 10% and the draw percentage is no greater than 50%."  The opening-statistics function has its own
-set of output selectors:
+means, "Print opening statistics for every opening represented by at least 100 games where the 'Event' tag contains the text 'Nunn 1,' the difference in win percentage between black and white is no greater than 10%, and the draw percentage is no greater than 50%."
+
+The opening-statistics function has its own set of output selectors:
 
 * 	oid: the opening identifier; this may be used with the "match opening" ("-mo") and "replace opening" ("-ro") options
 * 	count: the count of games represented by this opening
@@ -176,7 +177,7 @@ set of output selectors:
 
 So we can use the previous example to generate a list of opening identifers (note addition of the "-s" option):
 
-``pgnutil -o -cmin 100 -ldp -.1 -hdp .1 -hdraw .5 -i -s oid mygames.pgn``
+``pgnutil -mt 'Event/Nunn 1' -o -cmin 100 -ldp -.1 -hdp .1 -hdraw .5 -i -s oid mygames.pgn``
 
 which may produce output such as:
 
