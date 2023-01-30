@@ -123,7 +123,7 @@ Similarly, values within a field are, by default, separated by commas.  If a dif
 
 ### Special Output Options
 
-The "special" output options include "-d" (duplicates), "-dm" (duplicate moves), "-do" (duplicate [openings](#openings)), "-e" (events), "-csr" (check sequential rounds), "-o" ([opening](#openings) statistics), and "-p" (player statistics). Any of these may be combined with any matching and replacing options (see above).
+The "special" output options include "-d" (duplicates), "-dm" (duplicate moves), "-do" (duplicate openings), "-e" (events), "-csr" (check sequential rounds), "-o" ([opening statistics](#openings)), and "-p" (player statistics). Any of these may be combined with any matching and replacing options (see above).
 
 To find duplicate games (defined as games with the same players and same move list) in the file mygames.pgn:
 
@@ -192,7 +192,7 @@ These can then be fed to a matching command ("-mo"):
 
 ``pgnutil -mo 4748b62c5f943db4,58042cacbd9498f9,3ef5ae89557400b9,5e8c715de2d30397 -i mygames.pgn``
 
-to output those games wherein the selected openings were played. If you wish to input a long list of opening identifiers, you may instead use the "-of" (opening-file) option, which takes as its parameter the file name of a file containing opening identifiers:
+to output those games wherein the selected openings were played. If you wish to input a long list of opening identifiers, you may instead use the "-of" (opening-file) option, which takes as its parameter the name of a file containing opening identifiers:
 
 ``pgnutil -of myopeningsfile -i mygames.pgn``
 
