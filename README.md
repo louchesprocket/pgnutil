@@ -57,15 +57,17 @@ Position searches are performed with the "-mpos" (match position) option, where 
 
 ### Replacing
 
-The "-r" option performs replacements on the game text.  For example, to strip comments (or, to be precise, all text between curly braces):
+The "-r" option performs replacements on the game text.  For example, to strip comments (or, to be precise, all text between curly braces) from mygames.pgn:
 
 ``pgnutil -r '.*/\{.*?\}/' -i mygames.pgn``
+
+The first "/"-separated component in the parameter to the "-r" option selects games upon which to perform the replacement.  So the previous example means, "For every game containing the regular expression '.&#42;' (i.e., any game at all), replace every occurrence of the regular expression '\\{.&#42;?\\}' with an empty string."
 
 To replace every instance of 'Quazar' from the file mygames.pgn with 'Quazar 0.4 x64':
 
 ``pgnutil -r '.*/Quazar/Quazar 0.4 x64' -i mygames.pgn``
 
-The first "/"-separated component in the parameter to the "-r" option selects games upon which to perform the replacement.  So the previous example means, "For every game containing the regular expression '.&#42;' (i.e., any game at all), replace every occurrence of the regular expression '\\{.&#42;?\\}' with an empty string." Similarly, the command:
+Similarly, the command:
 
 ``pgnutil -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -i mygames.pgn``
 
