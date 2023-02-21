@@ -24,6 +24,8 @@
 
 package com.dotfx.pgnutil;
 
+import com.dotfx.pgnutil.eco.EcoTree;
+import com.dotfx.pgnutil.eco.TreeNodeSet;
 import com.google.common.hash.HashCode;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -52,7 +54,7 @@ import org.kohsuke.args4j.CmdLineParser;
  */
 public class PGNUtil
 {
-    public static interface GameProcessor
+    public interface GameProcessor
     {
         /**
          * 
@@ -64,7 +66,7 @@ public class PGNUtil
     
     // match processors
     
-    static class ContainsProcessor implements GameProcessor
+    static final class ContainsProcessor implements GameProcessor
     {
         private final Pattern matchPattern;
         
@@ -76,7 +78,7 @@ public class PGNUtil
         }
     }
     
-    static class NotContainsProcessor implements GameProcessor
+    static final class NotContainsProcessor implements GameProcessor
     {
         private final Pattern notMatchPattern;
         
@@ -88,7 +90,7 @@ public class PGNUtil
         }
     }
     
-    static class MatchTagProcessor implements GameProcessor
+    static final class MatchTagProcessor implements GameProcessor
     {
         private final OutputSelector tag;
         private final Pattern tagPattern;
@@ -111,7 +113,7 @@ public class PGNUtil
         }
     }
     
-    static class NotMatchTagProcessor implements GameProcessor
+    static final class NotMatchTagProcessor implements GameProcessor
     {
         private final OutputSelector tag;
         private final Pattern tagPattern;
@@ -134,7 +136,7 @@ public class PGNUtil
         }
     }
     
-    static class MatchGameNumProcessor implements GameProcessor
+    static final class MatchGameNumProcessor implements GameProcessor
     {
         private final List<SimpleEntry<Integer,Integer>> ranges;
         
@@ -147,9 +149,8 @@ public class PGNUtil
                 String rangeBounds[] = token.split("-");
                 Integer rangeStart = Integer.valueOf(rangeBounds[0]);
 
-                ranges.add(new SimpleEntry(rangeStart,
-                    rangeBounds.length == 1 ?
-                    rangeStart : Integer.valueOf(rangeBounds[1])));
+                ranges.add(new SimpleEntry(rangeStart, rangeBounds.length == 1 ?
+                        rangeStart : Integer.valueOf(rangeBounds[1])));
             }
         }
         
@@ -159,15 +160,14 @@ public class PGNUtil
             
             for (SimpleEntry<Integer,Integer> range : ranges)
             {
-                if (gameno >= range.getKey() && gameno <= range.getValue())
-                    return true;
+                if (gameno >= range.getKey() && gameno <= range.getValue()) return true;
             }
             
             return false;
         }
     }
     
-    static class MatchAnyPlayerSetProcessor implements GameProcessor
+    static final class MatchAnyPlayerSetProcessor implements GameProcessor
     {
         private final Set<String> playerSet;
         
@@ -178,12 +178,11 @@ public class PGNUtil
         
         @Override public boolean processGame()
         {
-            return playerSet.contains(game.getWhite()) ||
-                playerSet.contains(game.getBlack());
+            return playerSet.contains(game.getWhite()) || playerSet.contains(game.getBlack());
         }
     }
     
-    static class MatchAllPlayerSetProcessor implements GameProcessor
+    static final class MatchAllPlayerSetProcessor implements GameProcessor
     {
         private final Set<String> playerSet;
         
@@ -194,12 +193,11 @@ public class PGNUtil
         
         @Override public boolean processGame()
         {
-            return playerSet.contains(game.getWhite()) &&
-                playerSet.contains(game.getBlack());
+            return playerSet.contains(game.getWhite()) && playerSet.contains(game.getBlack());
         }
     }
     
-    static class NotMatchPlayerSetProcessor implements GameProcessor
+    static final class NotMatchPlayerSetProcessor implements GameProcessor
     {
         private final Set<String> playerSet;
         
@@ -210,12 +208,11 @@ public class PGNUtil
         
         @Override public boolean processGame()
         {
-            return !playerSet.contains(game.getWhite()) &&
-                !playerSet.contains(game.getBlack());
+            return !playerSet.contains(game.getWhite()) && !playerSet.contains(game.getBlack());
         }
     }
     
-    static class MatchOpeningProcessor implements GameProcessor
+    static final class MatchOpeningProcessor implements GameProcessor
     {
         private final Set<MoveListId> matchOpeningSet;
         
@@ -223,24 +220,24 @@ public class PGNUtil
         {
             matchOpeningSet = openings;
         }
-        
         @Override public boolean processGame()
         {
             return matchOpeningSet.contains(game.openingId());
         }
     }
     
-    static class NotMatchOpeningProcessor extends MatchOpeningProcessor
+    static final class NotMatchOpeningProcessor implements GameProcessor
     {
+        private final Set<MoveListId> notMatchOpeningSet;
+
         public NotMatchOpeningProcessor(Set<MoveListId> openings)
         {
-            super(openings);
+            notMatchOpeningSet = openings;
         }
-        
-        @Override public boolean processGame() { return !super.processGame(); }
+        @Override public boolean processGame() { return !notMatchOpeningSet.contains(game.openingId()); }
     }
     
-    static class MatchWinProcessor implements GameProcessor
+    static final class MatchWinProcessor implements GameProcessor
     {
         private final Pattern matchWinPattern;
         
@@ -254,7 +251,7 @@ public class PGNUtil
         }
     }
     
-    static class MatchLossProcessor implements GameProcessor
+    static final class MatchLossProcessor implements GameProcessor
     {
         private final Pattern matchLossPattern;
         
@@ -268,7 +265,7 @@ public class PGNUtil
         }
     }
     
-    static class MatchPlayerProcessor implements GameProcessor
+    static final class MatchPlayerProcessor implements GameProcessor
     {
         private final Pattern playerPattern;
         
@@ -279,17 +276,15 @@ public class PGNUtil
         
         @Override public boolean processGame()
         {
-            return playerPattern.matcher(game.getWhite()).find() ||
-                playerPattern.matcher(game.getBlack()).find();
+            return playerPattern.matcher(game.getWhite()).find() || playerPattern.matcher(game.getBlack()).find();
         }
     }
     
-    static class MatchTimeCtrlProcessor implements GameProcessor
+    static final class MatchTimeCtrlProcessor implements GameProcessor
     {
         private final TimeCtrl matchTimeCtrl;
         
-        public MatchTimeCtrlProcessor(String s)
-            throws InvalidTimeCtrlException
+        public MatchTimeCtrlProcessor(String s) throws InvalidTimeCtrlException
         {
             matchTimeCtrl = new TimeCtrl(s, false);
         }
@@ -301,7 +296,7 @@ public class PGNUtil
         }
     }
     
-    static class MinPlyCountProcessor implements GameProcessor
+    static final class MinPlyCountProcessor implements GameProcessor
     {
         private final int plies;
         
@@ -313,7 +308,7 @@ public class PGNUtil
         }
     }
     
-    static class MaxPlyCountProcessor implements GameProcessor
+    static final class MaxPlyCountProcessor implements GameProcessor
     {
         private final int plies;
         
@@ -325,7 +320,7 @@ public class PGNUtil
         }
     }
     
-    static class MinOobProcessor implements GameProcessor
+    static final class MinOobProcessor implements GameProcessor
     {
         private final int plies;
         
@@ -339,7 +334,7 @@ public class PGNUtil
         }
     }
     
-    static class MaxOobProcessor implements GameProcessor
+    static final class MaxOobProcessor implements GameProcessor
     {
         private final int plies;
         
@@ -353,7 +348,7 @@ public class PGNUtil
         }
     }
     
-    static class MatchPositionProcessor implements GameProcessor
+    static final class MatchPositionProcessor implements GameProcessor
     {
         private final Board pos;
         
@@ -363,80 +358,64 @@ public class PGNUtil
         {
             try { return game.containsPosition(pos); }
             
-            catch (IllegalMoveException | StringIndexOutOfBoundsException e)
+            catch (IllegalMoveException | StringIndexOutOfBoundsException | NullPointerException e)
             {
-                System.err.println("PGN error in game #" + game.getNumber() +
-                    ": " + e.getMessage());
-                
+                System.err.println("PGN error in game #" + game.getNumber() + ": " + e.getMessage());
                 return false;
             }
         }
     }
     
-    static class MatchEcoProcessor implements GameProcessor
+    static final class MatchEcoProcessor implements GameProcessor
     {
         private final EcoTree ecoTree;
         private final Pattern ecoMatcher;
         
-        MatchEcoProcessor(Pattern ecoMatcher, EcoTree.Type treeType)
+        MatchEcoProcessor(Pattern ecoMatcher, EcoTree.FileType treeType)
         {
-            if (treeType == EcoTree.Type.SCID)
-                ecoTree = EcoTree.getScidInstance();
-            
-            else ecoTree = EcoTree.getInstance();
-            
+            ecoTree = treeType.getEcoTree();
             this.ecoMatcher = ecoMatcher;
         }
         
         @Override public boolean processGame()
         {
-            return ecoMatcher.matcher(ecoTree.getDeepestDefined(game).
-                getCode()).find();
+            return ecoMatcher.matcher(ecoTree.getDeepestDefined(game).getCode()).find();
         }
     }
     
-    static class MatchEcoDescProcessor implements GameProcessor
+    static final class MatchEcoDescProcessor implements GameProcessor
     {
         private final EcoTree ecoTree;
         private final Pattern ecoMatcher;
         
-        MatchEcoDescProcessor(Pattern ecoMatcher, EcoTree.Type treeType)
+        MatchEcoDescProcessor(Pattern ecoMatcher, EcoTree.FileType treeType)
         {
-            if (treeType == EcoTree.Type.SCID)
-                ecoTree = EcoTree.getScidInstance();
-            
-            else ecoTree = EcoTree.getInstance();
-            
+            ecoTree = treeType.getEcoTree();
             this.ecoMatcher = ecoMatcher;
         }
         
         @Override public boolean processGame()
         {
-            return ecoMatcher.matcher(ecoTree.getDeepestDefined(game).
-                getDesc()).find();
+            return ecoMatcher.matcher(ecoTree.getDeepestDefined(game).getDesc()).find();
         }
     }
     
-    static class MatchXEcoProcessor implements GameProcessor
+    static final class MatchXEcoProcessor implements GameProcessor
     {
         private final EcoTree ecoTree;
         private final Pattern ecoMatcher;
         
-        MatchXEcoProcessor(Pattern ecoMatcher, EcoTree.Type treeType)
+        MatchXEcoProcessor(Pattern ecoMatcher, EcoTree.FileType treeType)
         {
-            if (treeType == EcoTree.Type.SCID)
-                ecoTree = EcoTree.getScidInstance();
-            
-            else ecoTree = EcoTree.getInstance();
-            
+            ecoTree = treeType.getEcoTree();
             this.ecoMatcher = ecoMatcher;
         }
         
         @Override public boolean processGame()
         {
-            EcoTree.NodeSet nodeSet;
+            TreeNodeSet treeNodeSet;
             
-            try { nodeSet = ecoTree.getDeepestTranspositionSet(game); }
+            try { treeNodeSet = ecoTree.getDeepestTranspositionSet(game); }
             
             catch (IllegalMoveException e)
             {
@@ -444,30 +423,26 @@ public class PGNUtil
                 return false;
             }
             
-            return ecoMatcher.matcher(nodeSet.toString()).find();
+            return ecoMatcher.matcher(treeNodeSet.toString()).find();
         }
     }
     
-    static class MatchXEcoDescProcessor implements GameProcessor
+    static final class MatchXEcoDescProcessor implements GameProcessor
     {
         private final EcoTree ecoTree;
         private final Pattern ecoMatcher;
         
-        MatchXEcoDescProcessor(Pattern ecoMatcher, EcoTree.Type treeType)
+        MatchXEcoDescProcessor(Pattern ecoMatcher, EcoTree.FileType treeType)
         {
-            if (treeType == EcoTree.Type.SCID)
-                ecoTree = EcoTree.getScidInstance();
-            
-            else ecoTree = EcoTree.getInstance();
-            
+            ecoTree = treeType.getEcoTree();
             this.ecoMatcher = ecoMatcher;
         }
         
         @Override public boolean processGame()
         {
-            EcoTree.NodeSet nodeSet;
+            TreeNodeSet treeNodeSet;
             
-            try { nodeSet = ecoTree.getDeepestTranspositionSet(game); }
+            try { treeNodeSet = ecoTree.getDeepestTranspositionSet(game); }
             
             catch (IllegalMoveException e)
             {
@@ -475,7 +450,7 @@ public class PGNUtil
                 return false;
             }
             
-            return ecoMatcher.matcher(nodeSet.getDesc()).find();
+            return ecoMatcher.matcher(treeNodeSet.getDesc()).find();
         }
     }
     
@@ -485,7 +460,7 @@ public class PGNUtil
      * An instance of this must be the last processor in the
      * replaceProcessors list.
      */
-    static class ReplaceProcessor implements GameProcessor
+    static final class ReplaceProcessor implements GameProcessor
     {
         private final Pattern replacePattern2; // to be replaced
         private final String replacement;
@@ -511,7 +486,7 @@ public class PGNUtil
         }
     }
     
-    static class ReplaceContainsProcessor implements GameProcessor
+    static final class ReplaceContainsProcessor implements GameProcessor
     {
         private final Pattern replacePattern1; // eligibility pattern
         
@@ -523,7 +498,7 @@ public class PGNUtil
         }
     }
     
-    static class ReplaceWinProcessor implements GameProcessor
+    static final class ReplaceWinProcessor implements GameProcessor
     {
         private final Pattern replaceWinPattern;
         
@@ -537,7 +512,7 @@ public class PGNUtil
         }
     }
     
-    static class ReplaceLossProcessor implements GameProcessor
+    static final class ReplaceLossProcessor implements GameProcessor
     {
         private final Pattern replaceLossPattern;
         
@@ -551,7 +526,7 @@ public class PGNUtil
         }
     }
     
-    static class ReplaceOpeningProcessor implements GameProcessor
+    static final class ReplaceOpeningProcessor implements GameProcessor
     {
         private final Set<MoveListId> replaceOpeningSet;
         
@@ -579,10 +554,10 @@ public class PGNUtil
     
     // game handlers
     
-    static interface GameHandler
+    interface GameHandler
     {
-        default public void init() throws InvalidSelectorException {}
-        public void handle() throws InvalidSelectorException, IllegalMoveException;
+        default void init() throws InvalidSelectorException {}
+        void handle() throws InvalidSelectorException, IllegalMoveException;
     }
     
     static class NullGameHandler implements GameHandler
@@ -590,7 +565,7 @@ public class PGNUtil
         @Override public void handle() throws InvalidSelectorException {}
     }
     
-    private static class DefaultGameHandler implements GameHandler
+    private static final class DefaultGameHandler implements GameHandler
     {
         @Override public void handle() throws InvalidSelectorException
         {
@@ -598,7 +573,7 @@ public class PGNUtil
         }
     }
     
-    static class SelectGameHandler implements GameHandler
+    static final class SelectGameHandler implements GameHandler
     {
         private final OutputSelector selectors[];
         
@@ -657,7 +632,7 @@ public class PGNUtil
         }
     }
     
-    static class DuplicateGameHandler extends DuplicateHandler
+    static final class DuplicateGameHandler extends DuplicateHandler
     {
         @Override public final void handle() throws InvalidSelectorException
         {
@@ -665,15 +640,15 @@ public class PGNUtil
         }
     }
 
-    static class DuplicateMoveHandler extends DuplicateHandler
+    static final class DuplicateMoveHandler extends DuplicateHandler
     {
-        @Override public final void handle() throws InvalidSelectorException
+        @Override public void handle() throws InvalidSelectorException
         {
             super.handle(game.getMoveHash());
         }
     }
     
-    static class DuplicateOpeningHandler extends DuplicateHandler
+    static final class DuplicateOpeningHandler extends DuplicateHandler
     {
         @Override public final void handle() throws InvalidSelectorException
         {
@@ -681,15 +656,14 @@ public class PGNUtil
         }
     }
     
-    static class TallyHandler implements GameHandler
+    static final class TallyHandler implements GameHandler
     {
         private final Tallier tallier;
         
         TallyHandler(Tallier tallier) { this.tallier = tallier; }
         @Override public void init() throws InvalidSelectorException { tallier.init(); }
         
-        @Override public void handle()
-            throws InvalidSelectorException, IllegalMoveException
+        @Override public void handle() throws IllegalMoveException
         {
             tallier.tally(game);
         }
@@ -697,17 +671,14 @@ public class PGNUtil
     
     // exit processors
     
-    private static interface ExitProcessor
-    {
-        public void process();
-    }
+    private interface ExitProcessor { void process(); }
     
-    private static class NullExitProcessor implements ExitProcessor
+    private static final class NullExitProcessor implements ExitProcessor
     {
         @Override public void process() {}
     }
     
-    static class DuplicateExitProcessor implements ExitProcessor
+    static final class DuplicateExitProcessor implements ExitProcessor
     {
         private final DuplicateHandler printer;
         
@@ -722,16 +693,13 @@ public class PGNUtil
             {
                 Iterator<Integer> iter = list.iterator();
                 System.out.print(iter.next());
-                
-                while (iter.hasNext())
-                    System.out.print(CLOptions.valueDelim + iter.next());
-                
+                while (iter.hasNext()) System.out.print(CLOptions.valueDelim + iter.next());
                 System.out.print("\n");
             }
         }
     }
     
-    static class TallyExitProcessor implements ExitProcessor
+    static final class TallyExitProcessor implements ExitProcessor
     {
         private final Tallier iteratorProvider;
         
@@ -744,9 +712,7 @@ public class PGNUtil
         {
             try
             {
-                Iterator<String> iter =
-                    iteratorProvider.getOutputIterator(outputSelectors);
-                
+                Iterator<String> iter = iteratorProvider.getOutputIterator(outputSelectors);
                 while (iter.hasNext()) System.out.println(iter.next());
             }
             
@@ -758,7 +724,7 @@ public class PGNUtil
         }
     }
     
-    public static final String VERSION = "0.5";
+    public static final String VERSION = "0.6";
     
     // All of these are static in order to avoid parameter-passing overhead.
     
@@ -799,8 +765,7 @@ public class PGNUtil
             parser.parseArgument(args);
             
             if (pgnFileList.isEmpty())
-                pgnFileList.add(new PGNFile(new BufferedReader(
-                    new InputStreamReader(System.in))));
+                pgnFileList.add(new PGNFile(new BufferedReader(new InputStreamReader(System.in))));
             
             if (handler == null) handler = new DefaultGameHandler();
             handler.init();
@@ -816,9 +781,7 @@ public class PGNUtil
         
         catch (PatternSyntaxException e)
         {
-            System.err.println("regular expression error.  " +
-                e.getLocalizedMessage());
-            
+            System.err.println("regular expression error.  " + e.getLocalizedMessage());
             System.exit(-1);
         }
         
@@ -830,9 +793,7 @@ public class PGNUtil
         
         catch (IOException e)
         {
-            System.err.println("i/o exception; failed to read input: " +
-                e.getLocalizedMessage());
-            
+            System.err.println("i/o exception; failed to read input: " + e.getLocalizedMessage());
             System.exit(-1);
         }
         
@@ -874,8 +835,7 @@ public class PGNUtil
         }
         
         if (CLOptions.performance)
-            System.err.println("processed " + gamesRead + " games (" +
-                charsRead + " chars) in " +
+            System.err.println("processed " + gamesRead + " games (" + charsRead + " chars) in " +
                 (System.currentTimeMillis() - startTime) + "ms");
     }
 }

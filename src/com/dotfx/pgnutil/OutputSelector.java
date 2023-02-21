@@ -24,6 +24,9 @@
 
 package com.dotfx.pgnutil;
 
+import com.dotfx.pgnutil.eco.EcoTree;
+import com.dotfx.pgnutil.eco.TreeNodeSet;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,98 +34,403 @@ import java.util.Map;
  *
  * @author Mark Chen
  */
-public class OutputSelector
+public final class OutputSelector
 {
+    public interface OutputHandler
+    {
+        void appendOutput(PgnGame game, StringBuilder sb) throws InvalidSelectorException;
+    }
+
+    private final class DefaultOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getValue(literal));
+        }
+    }
+
+    private static final class TagsOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getTags());
+        }
+    }
+
+    private static final class RoundOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getRound());
+        }
+    }
+
+    private static final class MoveListOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            for (PgnGame.Move move : game.getMoves())
+            {
+                if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
+                sb.append(move.getMove()).append(" ");
+            }
+
+            sb.deleteCharAt(sb.length() - 1);
+        }
+    }
+
+    private static final class DecoratedMovesOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            for (PgnGame.Move move : game.getMoves())
+            {
+                if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
+                sb.append(move.getMove());
+                for (String comment : move.getComments()) sb.append(" {").append(comment).append("}");
+                sb.append(" ");
+            }
+
+            sb.deleteCharAt(sb.length() - 1);
+        }
+    }
+
+    private static final class OpponentOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb) throws InvalidSelectorException
+        {
+            if (PGNUtil.playerPattern == null)
+                throw new InvalidSelectorException("'" + OutputSelector.Value.OPPONENT + "' " +
+                        "selector requires option '" + CLOptions.MP + "'");
+
+            if (PGNUtil.playerPattern.matcher(game.getWhite()).find()) sb.append(game.getBlack());
+            else sb.append(game.getWhite());
+        }
+    }
+
+    private static final class PlayerEloOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb) throws InvalidSelectorException
+        {
+            if (PGNUtil.playerPattern == null)
+                throw new InvalidSelectorException("'" + OutputSelector.Value.OPPONENT + "' " +
+                        "selector requires option '" + CLOptions.MP + "'");
+
+            if (PGNUtil.playerPattern.matcher(game.getWhite()).find()) sb.append(game.getValue("WhiteElo"));
+            else sb.append(game.getValue("BlackElo"));
+        }
+    }
+
+    private static final class OpponentEloOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb) throws InvalidSelectorException
+        {
+            if (PGNUtil.playerPattern == null)
+                throw new InvalidSelectorException("'" + OutputSelector.Value.OPPONENT + "' " +
+                        "selector requires option '" + CLOptions.MP + "'");
+
+            if (PGNUtil.playerPattern.matcher(game.getWhite()).find()) sb.append(game.getValue("BlackElo"));
+            else sb.append(game.getValue("WhiteElo"));
+        }
+    }
+
+    private static final class OpeningFenOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            try { sb.append(game.getOpeningFen()); }
+
+            catch (IllegalMoveException e)
+            {
+                System.err.println("in game " + game.getNumber() + ": " + e.getMessage());
+            }
+        }
+    }
+
+    private static final class OpeningIdOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            try { sb.append(game.getOpid()); }
+
+            catch (IllegalMoveException e)
+            {
+                System.err.println("in game " + game.getNumber() + ": " + e.getMessage());
+            }
+        }
+    }
+
+    private static final class EcoOutputHandler implements OutputHandler
+    {
+        private final EcoTree.FileType type;
+
+        private EcoOutputHandler(EcoTree.FileType type) { this.type = type; }
+
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(type.getEcoTree().getDeepestNode(game).getCode());
+        }
+    }
+
+    private static final class EcoDescOutputHandler implements OutputHandler
+    {
+        private final EcoTree.FileType type;
+
+        private EcoDescOutputHandler(EcoTree.FileType type) { this.type = type; }
+
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(type.getEcoTree().getDeepestNode(game).getDesc());
+        }
+    }
+
+    private static final class EcoMovesOutputHandler implements OutputHandler
+    {
+        private final EcoTree.FileType type;
+
+        private EcoMovesOutputHandler(EcoTree.FileType type) { this.type = type; }
+
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(new TreeNodeSet(type.getEcoTree().getDeepestNode(game)).getMoveString());
+        }
+    }
+
+    private static final class XEcoOutputHandler implements OutputHandler
+    {
+        private final EcoTree.FileType type;
+
+        private XEcoOutputHandler(EcoTree.FileType type) { this.type = type; }
+
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            try { sb.append(game.getXEcoNodeSet(type)); }
+
+            catch (IllegalMoveException e)
+            {
+                System.err.println("in game " + game.getNumber() + ": " + e.getMessage());
+            }
+        }
+    }
+
+    private static final class XEcoDescOutputHandler implements OutputHandler
+    {
+        private final EcoTree.FileType type;
+
+        private XEcoDescOutputHandler(EcoTree.FileType type) { this.type = type; }
+
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            try { sb.append(game.getXEcoNodeSet(type).getDesc()); }
+
+            catch (IllegalMoveException e)
+            {
+                System.err.println("in game " + game.getNumber() + ": " + e.getMessage());
+            }
+        }
+    }
+
+    private static final class XEcoMovesOutputHandler implements OutputHandler
+    {
+        private final EcoTree.FileType type;
+
+        private XEcoMovesOutputHandler(EcoTree.FileType type) { this.type = type; }
+
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            try { sb.append(game.getXEcoNodeSet(type).getMoveString()); }
+
+            catch (IllegalMoveException e)
+            {
+                System.err.println("in game " + game.getNumber() + ": " + e.getMessage());
+            }
+        }
+    }
+
+    private static final class GameNumOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getNumber());
+        }
+    }
+
+    private static final class OpeningMovesOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getDecoratedOpeningString());
+        }
+    }
+
+    private static final class OidOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.openingId());
+        }
+    }
+
+    private static final class PliesOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getMoves().size());
+        }
+    }
+
+    private static final class WinnerOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getWinner());
+        }
+    }
+
+    private static final class LoserOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getLoser());
+        }
+    }
+
+    private static final class TextSizeOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getOrigText().length());
+        }
+    }
+
+    private static final class TimeCtrlOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getTimeCtrl());
+        }
+    }
+
     public static enum Value
     {
         // standard seven tags
-        BLACK("black"),
-        DATE("date"),
-        EVENT("event"),
-        RESULT("result"),
-        ROUND("round"),
-        SITE("site"),
-        WHITE("white"),
+        BLACK("black", null),
+        DATE("date", null),
+        EVENT("event", null),
+        RESULT("result", null),
+        ROUND("round", new RoundOutputHandler()), // to handle Aquarium bugs, if needed
+        SITE("site", null),
+        WHITE("white", null),
         
         // Aquarium
-        BLACKELO("blackelo"),
-        CLASSES("classes"),
-        TIMECONTROL("timecontrol"),
-        WHITEELO("whiteelo"),
+        BLACKELO("blackelo", null),
+        CLASSES("classes", null),
+        TIMECONTROL("timecontrol", null),
+        WHITEELO("whiteelo", null),
         
         // Arena extras
-        BLACKTYPE("blacktype"),
-        PLYCOUNT("plycount"),
-        TERMINATION("termination"),
-        TIME("time"),
-        VARIATION("variation"),
-        WHITETYPE("whitetype"),
+        BLACKTYPE("blacktype", null),
+        PLYCOUNT("plycount", null),
+        TERMINATION("termination", null),
+        TIME("time", null),
+        VARIATION("variation", null),
+        WHITETYPE("whitetype", null),
         
         // special
-        ECO("eco"),
-        ECODESC("ecodesc"),
-        ECOMOVES("ecomoves"),
-        FENECO("feneco"),
-        FULLMOVES("fullmoves"),
-        GAMENO("gameno"),
-        LOSER("loser"),
-        MOVES("moves"),
-        OID("oid"),
-        OPENINGMOVES("openingmoves"),
-        OPENINGFEN("openingfen"),
-        OPID("opid"), // opening position identifier
-        OPPONENT("opponent"),
-        OPPONENTELO("opponentelo"),
-        PLAYERELO("playerelo"),
-        PLIES("plies"),
-        SCIDECO("scideco"),
-        SCIDECODESC("scidecodesc"),
-        SCIDECOMOVES("scidecomoves"),
-        TEXTSIZE("textsize"),
-        TIMECTRL("timectrl"),
-        XECO("xeco"),
-        XECODESC("xecodesc"),
-        XECOMOVES("xecomoves"),
-        XSCIDECO("xscideco"),
-        XSCIDECODESC("xscidecodesc"),
-        XSCIDECOMOVES("xscidecomoves"),
-        WINNER("winner"),
+        GAMENO("gameno", new GameNumOutputHandler()),
+        TAGS("tags", new TagsOutputHandler()),
+        TEXTSIZE("textsize", new TextSizeOutputHandler()),
+        TIMECTRL("timectrl", new TimeCtrlOutputHandler()), // infers time control, if tag not present
+        WINNER("winner", new WinnerOutputHandler()),
+        LOSER("loser", new LoserOutputHandler()),
+        MOVES("moves", new MoveListOutputHandler()),
+        DECORATEDMOVES("decoratedmoves", new DecoratedMovesOutputHandler()),
+        OID("oid", new OidOutputHandler()), // opening move list identifier
+        OPENINGMOVES("openingmoves", new OpeningMovesOutputHandler()),
+        OPENINGFEN("openingfen", new OpeningFenOutputHandler()),
+        OPID("opid", new OpeningIdOutputHandler()), // opening position identifier
+        OPPONENT("opponent", new OpponentOutputHandler()),
+        OPPONENTELO("opponentelo", new OpponentEloOutputHandler()),
+        PLAYERELO("playerelo", new PlayerEloOutputHandler()),
+        PLIES("plies", new PliesOutputHandler()),
+        STDECO("stdeco", new EcoOutputHandler(EcoTree.FileType.STD)),
+        STDECODESC("stdecodesc", new EcoDescOutputHandler(EcoTree.FileType.STD)),
+        STDECOMOVES("stdecomoves", new EcoMovesOutputHandler(EcoTree.FileType.STD)),
+        SCIDECO("scideco", new EcoOutputHandler(EcoTree.FileType.SCIDDB)),
+        SCIDECODESC("scidecodesc", new EcoDescOutputHandler(EcoTree.FileType.SCIDDB)),
+        SCIDECOMOVES("scidecomoves", new EcoMovesOutputHandler(EcoTree.FileType.SCIDDB)),
+        XSTDECO("xstdeco", new XEcoOutputHandler(EcoTree.FileType.STD)),
+        XSTDECODESC("xstdecodesc", new XEcoDescOutputHandler(EcoTree.FileType.STD)),
+        XSTDECOMOVES("xstdecomoves", new XEcoMovesOutputHandler(EcoTree.FileType.STD)),
+        XSCIDECO("xscideco", new XEcoOutputHandler(EcoTree.FileType.SCIDDB)),
+        XSCIDECODESC("xscidecodesc", new XEcoDescOutputHandler(EcoTree.FileType.SCIDDB)),
+        XSCIDECOMOVES("xscidecomoves", new XEcoMovesOutputHandler(EcoTree.FileType.SCIDDB)),
         
         // additional opening-stat selectors
-        BWINPCT("bwinpct"),
-        BWINS("bwins"),
-        CODE("code"), // ECO code
-        COUNT("count"), // also applies to player results
-        DESC("desc"),
-        DIFF("diff"),
-        DIFFPCT("diffpct"),
-        DRAWPCT("drawpct"),
-        DRAWS("draws"), // also applies to player results
-        WWINPCT("wwinpct"),
-        WWINS("wwins"),
+        BWINPCT("bwinpct", null),
+        BWINS("bwins", null),
+        CODE("code", null), // ECO code
+        COUNT("count", null), // also applies to player results
+        DESC("desc", null),
+        DIFF("diff", null),
+        DIFFPCT("diffpct", null),
+        DRAWPCT("drawpct", null),
+        DRAWS("draws", null), // also applies to player results
+        WWINPCT("wwinpct", null),
+        WWINS("wwins", null),
         
         // additional event selectors
-        LASTROUND("lastround"),
-        ROUNDCOUNT("roundcount"),
+        LASTROUND("lastround", null),
+        ROUNDCOUNT("roundcount", null),
         
         // additional player-results selectors
-        PLAYER("player"),
-        WINS("wins"),
-        LOSSES("losses"),
-        NORESULTS("noresults"),
-        WINPCT("winpct"),
-        
-        OTHER("");
+        PLAYER("player", null),
+        WINS("wins", null),
+        LOSSES("losses", null),
+        NORESULTS("noresults", null),
+        WINPCT("winpct", null),
+
+        OTHER(null, null);
         
         private static final Map<String,Value> sigMap = new HashMap<>();
         private final String signifier;
+        private final OutputHandler outputHandler;
         
         static
         {
             for (Value v : Value.values()) sigMap.put(v.toString(), v);
         }
         
-        private Value(String signifier) { this.signifier = signifier; }
+        Value(String signifier, OutputHandler outputHandler)
+        {
+            this.signifier = signifier;
+            this.outputHandler = outputHandler;
+        }
+
         @Override public String toString() { return signifier; }
         
         public static Value get(String signifier)
@@ -130,30 +438,31 @@ public class OutputSelector
             if (signifier == null) return null;
             return sigMap.get(signifier.toLowerCase());
         }
+
+        public OutputHandler getOutputHandler() { return outputHandler; }
     }
-    
-    public static final OutputSelector ECO = new OutputSelector("ECO");
-    
-    public static final OutputSelector TIMECONTROL =
-        new OutputSelector("TimeControl");
+
+    public static final OutputSelector TIMECONTROL = new OutputSelector("TimeControl");
     
     private final Value value;
     private final String literal;
-    
-    public OutputSelector(Value value)
-    {
-        this.value = value == null ? Value.OTHER : value;
-        literal = this.value.toString();
-    }
+    private final OutputHandler handler;
     
     public OutputSelector(String literal)
     {
-        Value v = Value.get(literal);
-        value = v == null ? Value.OTHER : v;
+        value = (Value.get(literal) != null ? Value.get(literal) : Value.OTHER);
+
+        // If the selector is not on the "special" list, then assume that it is a literal tag.
+        handler = (value.getOutputHandler() == null ? new DefaultOutputHandler() : value.getOutputHandler());
         this.literal = literal;
     }
     
     public Value getValue() { return value; }
+
+    public void appendOutput(PgnGame game, StringBuilder sb) throws InvalidSelectorException
+    {
+        handler.appendOutput(game, sb);
+    }
     
     @Override
     public String toString() { return literal; }

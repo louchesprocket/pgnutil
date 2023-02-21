@@ -25,6 +25,8 @@
 package com.dotfx.pgnutil;
 
 import com.cedarsoftware.util.CaseInsensitiveMap;
+import com.dotfx.pgnutil.eco.EcoTree;
+import com.dotfx.pgnutil.eco.TreeNodeSet;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
@@ -60,8 +62,7 @@ public final class PgnGame
         
         static
         {
-            for (Result r : Result.values())
-                sigMap.put(r.toString(), r);
+            for (Result r : Result.values()) sigMap.put(r.toString(), r);
         }
         
         private Result(String signifier) { this.signifier = signifier; }
@@ -104,20 +105,14 @@ public final class PgnGame
         public static String getMoveText(String san)
         {
             int end = san.length();
-            
-            while (end > 0 && !Character.isLetterOrDigit(san.charAt(end - 1)))
-                end--;
-            
+            while (end > 0 && !Character.isLetterOrDigit(san.charAt(end - 1))) end--;
             return san.substring(0, end);
         }
         
         public String getMoveText()
         {
             int end = move.length();
-            
-            while (end > 0 && !Character.isLetterOrDigit(move.charAt(end - 1)))
-                end--;
-            
+            while (end > 0 && !Character.isLetterOrDigit(move.charAt(end - 1))) end--;
             return move.substring(0, end);
         }
         
@@ -164,13 +159,16 @@ public final class PgnGame
     }
     
     private final int number;
-    private final Map<String,String> tagPairs;
+    private final CaseInsensitiveMap<String,String> tagPairs;
     private final List<String> gameComments;
     private final List<Move> moves;
     private final String origText;
+
+    // cached transposed ECO TreeNodeSets
+    private final Map<EcoTree.FileType,TreeNodeSet> xEcoCacheMap;
     
-    public PgnGame(int number, Map<String,String> tagPairs,
-        List<String> gameComments, List<Move> moves, String origText)
+    public PgnGame(int number, CaseInsensitiveMap<String,String> tagPairs, List<String> gameComments, List<Move> moves,
+                   String origText)
         throws PGNException
     { 
         this.number = number;
@@ -178,6 +176,7 @@ public final class PgnGame
         this.gameComments = gameComments;
         this.moves = moves;
         this.origText = origText;
+        xEcoCacheMap = new HashMap<>();
         
         if (!CLOptions.validateGames) return;
         int lastMoveNumber = 0;
@@ -192,15 +191,13 @@ public final class PgnGame
             if (plyParity == 0)
             {
                 if (moveColor != Color.WHITE || moveNumber != lastMoveNumber + 1)
-                    throw new PGNException("move sequence error at " +
-                        "game " + number + ", ply " + (i + 1));
+                    throw new PGNException("move sequence error at game " + number + ", ply " + (i + 1));
             }
             
             else
             {
                 if (moveColor != Color.BLACK || moveNumber != lastMoveNumber)
-                    throw new PGNException("move sequence error at " +
-                        "game " + number + ", ply " + (i + 1));
+                    throw new PGNException("move sequence error at game " + number + ", ply " + (i + 1));
             }
             
             lastMoveNumber = move.getNumber();
@@ -222,11 +219,8 @@ public final class PgnGame
             int start = 0;
             int end = move.length() - 1;
 
-            while (start <= end &&
-                !Character.isLetter(move.charAt(start))) start++;
-
-            while (end > 0 &&
-                !Character.isLetterOrDigit(move.charAt(end))) end--;
+            while (start <= end && !Character.isLetter(move.charAt(start))) start++;
+            while (end > 0 && !Character.isLetterOrDigit(move.charAt(end))) end--;
 
             if (end <= start) continue;
             moveList.add(move.substring(start, end + 1));
@@ -241,7 +235,7 @@ public final class PgnGame
         ArrayList<String> moveComments = new ArrayList();
         char buf[] = new char[BUFSIZE];
         int next, i, j;
-        Map<String,String> tagpairs = new CaseInsensitiveMap<>();
+        CaseInsensitiveMap<String,String> tagpairs = new CaseInsensitiveMap<>();
         List<PgnGame.Move> moves = new ArrayList();
         List<String> gameComments = new ArrayList();
         
@@ -353,8 +347,7 @@ public final class PgnGame
                         throw new PGNException("invalid termination marker " +
                             "at game " + number);
 
-                    return new PgnGame(number, tagpairs, gameComments, moves,
-                        reader.getCopy());
+                    return new PgnGame(number, tagpairs, gameComments, moves, reader.getCopy());
 
                 case '/':
                     if (j != 2)
@@ -534,21 +527,47 @@ public final class PgnGame
     public String getWhite() { return getValue("White"); }
     public String getBlack() { return getValue("Black"); }
     public Result getResult() { return Result.get(getValue("Result")); }
+
+    public String getRound()
+    {
+        if (CLOptions.aquarium)
+        {
+            String roundSt = getValue("Round");
+
+            try
+            {
+                int roundNum = Integer.parseInt(roundSt);
+                return String.valueOf(roundNum <= 0 ? roundNum + 128 : roundNum);
+            }
+
+            catch (NumberFormatException e) { return roundSt; }
+        }
+
+        else return getValue("Round");
+    }
+
+    public NormalizedRound getNormalizedRound()
+    {
+        try { return new NormalizedRound(getValue("Round")); }
+
+        catch (IllegalArgumentException e)
+        {
+            System.err.println("Exception in game " + getNumber() + ": " + e.getMessage());
+            System.exit(-1);
+        }
+
+        return null;
+    }
+
+    public String getTags()
+    {
+        StringJoiner sj = new StringJoiner(CLOptions.valueDelim);
+        for (String key : new TreeSet<>(tagPairs.keySet())) sj.add(key); // alphabetize for consistency
+        return sj.toString();
+    }
     
     public boolean isDraw() { return getResult().equals(Result.DRAW); }
     public boolean isNoResult() { return getResult().equals(Result.NORESULT); }
-    
-    public int getRound()
-    {
-        try
-        {
-            int ret = Integer.valueOf(getValue(ROUND_TAG));
-            if (ret < 1 && CLOptions.aquarium) return ret + 128;
-            else return ret;
-        }
-        
-        catch (NumberFormatException e) { return 0; }
-    }
     
     public Move getMove(int number, Color color)
     {
@@ -629,13 +648,6 @@ public final class PgnGame
     {
         if (move.getPly() >= moves.size()) return null;
         return moves.get(move.getPly());
-    }
-    
-    public MoveListId getPostOpeningId() { return getPostOpeningId(OUT_OF_BOOK); }
-    
-    public MoveListId getPostOpeningId(Pattern oobMarker)
-    {
-        return new MoveListId(getPostOpeningString(oobMarker));
     }
     
     public String getPostOpeningString(Pattern oobMarker)
@@ -759,11 +771,6 @@ public final class PgnGame
         return sb.toString().trim();
     }
     
-    public String getDecoratedOpeningString()
-    {
-        return getFullOpeningString(OUT_OF_BOOK);
-    }
-    
     public String getOpeningString(Pattern oobMarker)
     {
         StringBuilder sb = new StringBuilder(1024);
@@ -782,43 +789,33 @@ public final class PgnGame
                 
                 if (move.hasComment(oobMarker))
                 {
-                    if (move.getColor().equals(Color.WHITE))
-                        sb.append(move.getNumber()).append(".");
-
+                    if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
                     sb.append(move.getMoveText());
                     hasOobMarker = true;
                     break;
                 }
             }
             
-            if (move.getColor().equals(Color.WHITE))
-                sb.append(move.getNumber()).append(".");
-
+            if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
             sb.append(move.getMoveText()).append(" ");
         }
         
-        if (!hasOobMarker && firstCommentIdx > -1)
-            sb.setLength(firstCommentIdx);
-        
+        if (!hasOobMarker && firstCommentIdx > -1) sb.setLength(firstCommentIdx);
         return sb.toString().trim();
     }
-    
-    public String getOpeningString() { return getOpeningString(OUT_OF_BOOK); }
-    
-    public MoveListId openingId(Pattern oobMarker)
+
+    public String getDecoratedOpeningString()
     {
-        return new MoveListId(getOpeningString(oobMarker));
+        return getFullOpeningString(OUT_OF_BOOK);
     }
-    
+    public String getOpeningString() { return getOpeningString(OUT_OF_BOOK); }
+    public MoveListId openingId(Pattern oobMarker) { return new MoveListId(getOpeningString(oobMarker)); }
     public MoveListId openingId() { return openingId(OUT_OF_BOOK); }
     
     public HashCode getPlayerOpeningHash(Pattern oobMarker)
     {
         StringBuilder sb = new StringBuilder();
-        
-        sb.append(getWhite()).append('\0').append(getBlack()).append('\0').
-            append(getOpeningString(oobMarker));
-        
+        sb.append(getWhite()).append('\0').append(getBlack()).append('\0').append(getOpeningString(oobMarker));
         return HASHFUNC.hashBytes(sb.toString().getBytes());
     }
     
@@ -829,8 +826,7 @@ public final class PgnGame
     
     /**
      * 
-     * @return the value of the TimeControl tag, if present and legible;
-     *         otherwise, best guess or null
+     * @return the value of the TimeControl tag, if present and legible; otherwise, best guess or null
      */
     public TimeCtrl getTimeCtrl()
     {
@@ -859,16 +855,13 @@ public final class PgnGame
                     color = move.getColor();
                 }
                 
-                else if (thisClko.compareTo(lastClko) > 0 &&
-                    move.getColor().equals(color))
+                else if (thisClko.compareTo(lastClko) > 0 && move.getColor().equals(color))
                 {
                     int moveNo = move.getNumber();
                     
                     // Correct for Aquarium weirdness.
                     
-                    moveNo = moveNo % 10 >= 5 ? ((moveNo / 10) * 10) + 10 :
-                        (moveNo / 10) * 10;
-                    
+                    moveNo = moveNo % 10 >= 5 ? ((moveNo / 10) * 10) + 10 : (moveNo / 10) * 10;
                     timeCtrlSt = moveNo + "/" + startClko.inSecs();
                     
 //                    timeCtrlSt = (moveNo -
@@ -942,323 +935,37 @@ public final class PgnGame
         
         return parseNext(getNumber(), reader);
     }
+
+    TreeNodeSet getXEcoNodeSet(EcoTree.FileType type) throws IllegalMoveException
+    {
+        TreeNodeSet nodeSet = xEcoCacheMap.get(type);
+
+        if (nodeSet == null)
+        {
+            nodeSet = type.getEcoTree().getDeepestTranspositionSet(this);
+            xEcoCacheMap.put(type, nodeSet);
+        }
+
+        return nodeSet;
+    }
     
-    public String get(OutputSelector selector)
-        throws InvalidSelectorException
+    public String get(OutputSelector selector) throws InvalidSelectorException
     {
         return get(new OutputSelector[] {selector});
     }
-    
-    public String get(OutputSelector selectors[])
-        throws InvalidSelectorException
+
+    public String get(OutputSelector selectors[]) throws InvalidSelectorException
     {
-        EcoTree.NodeSet stdXEcoNodeSet = null;
-        EcoTree.NodeSet scidXEcoNodeSet = null;
         StringBuilder ret = new StringBuilder();
-        
-        for (int i = 0; i < selectors.length; i++)
+
+        for (OutputSelector selector : selectors)
         {
-            StringBuilder moveString = new StringBuilder();
-
-            switch (selectors[i].getValue())
-            {
-                case FULLMOVES:
-                    for (Move move : moves)
-                    {
-                        moveString.append(move.getNumber()).
-                            append(move.getColor().equals(Color.WHITE) ?
-                                ".   " : "... ");
-
-                        moveString.append(move.getMove());
-
-                        for (String comment : move.getComments())
-                            moveString.append(" {").append(comment).append("}");
-
-                        moveString.append("\n");
-                    }
-
-                    moveString.append("\n");
-                    return moveString.toString();
-                
-                case MOVES:
-                    for (Move move : moves)
-                    {
-                        if (move.getColor().equals(Color.WHITE))
-                            moveString.append(move.getNumber()).append(". ");
-
-                        moveString.append(move.getMove()).append(" ");
-                    }
-
-                    moveString.deleteCharAt(moveString.length() - 1);
-                    ret.append(moveString.toString());
-                    break;
-            
-                case OPPONENT:
-                    if (PGNUtil.playerPattern == null)
-                        throw new InvalidSelectorException("'" +
-                            OutputSelector.Value.OPPONENT + "' " +
-                            "selector requires option '" + CLOptions.MP + "'");
-
-                    if (PGNUtil.playerPattern.matcher(getWhite()).find())
-                        ret.append(getBlack());
-
-                    else ret.append(getWhite());
-                    break;
-            
-                case PLAYERELO:
-                    if (PGNUtil.playerPattern == null)
-                        throw new InvalidSelectorException("'" +
-                            OutputSelector.Value.OPPONENT + "' " +
-                            "selector requires option '" + CLOptions.MP + "'");
-
-                    if (PGNUtil.playerPattern.matcher(getWhite()).find())
-                        ret.append(getValue("WhiteElo"));
-
-                    else ret.append(getValue("BlackElo"));
-                    break;
-            
-                case OPPONENTELO:
-                    if (PGNUtil.playerPattern == null)
-                        throw new InvalidSelectorException("'" +
-                            OutputSelector.Value.OPPONENT + "' " +
-                            "selector requires option '" + CLOptions.MP + "'");
-
-                    if (PGNUtil.playerPattern.matcher(getWhite()).find())
-                        ret.append(getValue("BlackElo"));
-
-                    else ret.append(getValue("WhiteElo"));
-                    break;
-                    
-                case OPENINGFEN:
-                    try { ret.append(getOpeningFen()); }
-                    
-                    catch (IllegalMoveException e)
-                    {
-                        System.err.println("in game " + getNumber() + ": " +
-                            e.getMessage());
-                    }
-                    
-                    break;
-                    
-                case OPID:
-                    try { ret.append(getOpid()); }
-                    
-                    catch (IllegalMoveException e)
-                    {
-                        System.err.println("in game " + getNumber() + ": " +
-                            e.getMessage());
-                    }
-                    
-                    break;
-                    
-                case ECO:
-                    ret.append(EcoTree.getInstance().getDeepestNode(this).
-                        getCode());
-                    
-                    break;
-                    
-                case ECODESC:
-                    ret.append(EcoTree.getInstance().getDeepestNode(this).
-                        getDesc());
-                    
-                    break;
-                    
-                case ECOMOVES:
-                    ret.append(new EcoTree.NodeSet(EcoTree.getInstance().
-                        getDeepestNode(this)).getMoveString());
-                    
-                    break;
-                    
-                case SCIDECO:
-                    ret.append(EcoTree.getScidInstance().
-                        getDeepestNode(this).getCode());
-                    
-                    break;
-                    
-                case SCIDECODESC:
-                    ret.append(EcoTree.getScidInstance().
-                        getDeepestNode(this).getDesc());
-                    
-                    break;
-                    
-                case SCIDECOMOVES:
-                    ret.append(new EcoTree.NodeSet(EcoTree.getScidInstance().
-                        getDeepestNode(this)).getMoveString());
-                    
-                    break;
-
-                case XECO:
-                    try
-                    {
-                        stdXEcoNodeSet =
-                            getXEcoCode(EcoTree.getInstance(),
-                                stdXEcoNodeSet, ret);
-                    }
-                    
-                    catch (IllegalMoveException e)
-                    {
-                        System.err.println("in game " + getNumber() + ": " +
-                            e.getMessage());
-                    }
-                    
-                    break;
-
-                case XECODESC:
-                    try
-                    {
-                        stdXEcoNodeSet =
-                            getXEcoDesc(EcoTree.getInstance(),
-                                stdXEcoNodeSet, ret);
-                    }
-                    
-                    catch (IllegalMoveException e)
-                    {
-                        System.err.println("in game " + getNumber() + ": " +
-                            e.getMessage());
-                    }
-                    
-                    break;
-                    
-                case XECOMOVES:
-                    try
-                    {
-                        stdXEcoNodeSet = getXEcoMoves(EcoTree.getInstance(),
-                            stdXEcoNodeSet, ret);
-                    }
-                    
-                    catch (IllegalMoveException e)
-                    {
-                        System.err.println("in game " + getNumber() + ": " +
-                            e.getMessage());
-                    }
-                    
-                    break;
-
-                case XSCIDECO:
-                    try
-                    {
-                        scidXEcoNodeSet =
-                            getXEcoCode(EcoTree.getScidInstance(),
-                                scidXEcoNodeSet, ret);
-                    }
-                    
-                    catch (IllegalMoveException e)
-                    {
-                        System.err.println("in game " + getNumber() + ": " +
-                            e.getMessage());
-                    }
-                    
-                    break;
-
-                case XSCIDECODESC:
-                    try
-                    {
-                        stdXEcoNodeSet =
-                            getXEcoDesc(EcoTree.getScidInstance(),
-                                stdXEcoNodeSet, ret);
-                    }
-                    
-                    catch (IllegalMoveException e)
-                    {
-                        System.err.println("in game " + getNumber() + ": " +
-                            e.getMessage());
-                    }
-                    
-                    break;
-                    
-                case XSCIDECOMOVES:
-                    try
-                    {
-                        scidXEcoNodeSet = getXEcoMoves(EcoTree.getScidInstance(),
-                            scidXEcoNodeSet, ret);
-                    }
-                    
-                    catch (IllegalMoveException e)
-                    {
-                        System.err.println("in game " + getNumber() + ": " +
-                            e.getMessage());
-                    }
-                    
-                    break;
-                    
-//                case FENECO:
-//                    try
-//                    {
-//                        EcoFen ef = EcoFen.getInstance();
-//                        Board board = new Board(true);
-//                        EcoFen.Opening opening = null;
-//                        
-//                        for (Move move : moves)
-//                        {
-//                            board = board.move(move);
-//                            EcoFen.Opening o = ef.getOpening(board.toShortFen());
-//                            if (o != null) opening = o; 
-//                        }
-//                        
-//                        ret.append(opening == null ? null : opening.getCode());
-//                    }
-//                    
-//                    catch (IOException | IllegalMoveException |
-//                        NullPointerException e)
-//                    {
-//                        System.err.println("in game " + getNumber() + ": " +
-//                            e.getMessage());
-//                    }
-//                    
-//                    break;
-
-                case GAMENO: ret.append(getNumber()); break;
-                case OPENINGMOVES: ret.append(getDecoratedOpeningString()); break;
-                case OID: ret.append(openingId()); break;
-                case PLIES: ret.append(moves.size()); break;
-                case WINNER: ret.append(getWinner()); break;
-                case LOSER: ret.append(getLoser()); break;
-                case TEXTSIZE: ret.append(origText.length()); break;
-                case TIMECTRL: ret.append(getTimeCtrl()); break;
-                    
-                default: ret.append(getValue(selectors[i].toString()));
-            }
-            
-            if (i < selectors.length - 1) ret.append(CLOptions.outputDelim);
+            ret.append(CLOptions.outputDelim);
+            selector.appendOutput(this, ret);
         }
-        
+
+        ret.deleteCharAt(0);
         return ret.toString();
-    }
-    
-    private EcoTree.NodeSet getXEcoCode(EcoTree ecoTree,
-        EcoTree.NodeSet set, StringBuilder appendTo)
-        throws IllegalMoveException
-    {
-        EcoTree.NodeSet ecoSet = set == null ?
-            ecoTree.getDeepestTranspositionSet(this) : set;
-
-        if (ecoSet == null) return null;
-        appendTo.append(ecoSet.toString());
-        return ecoSet;
-    }
-    
-    private EcoTree.NodeSet getXEcoDesc(EcoTree ecoTree,
-        EcoTree.NodeSet set, StringBuilder appendTo)
-        throws IllegalMoveException
-    {
-        EcoTree.NodeSet ecoSet = set == null ?
-            ecoTree.getDeepestTranspositionSet(this) : set;
-
-        if (ecoSet == null) return null;
-        appendTo.append(ecoSet.getDesc());
-        return ecoSet;
-    }
-    
-    private EcoTree.NodeSet getXEcoMoves(EcoTree ecoTree,
-        EcoTree.NodeSet set, StringBuilder appendTo)
-        throws IllegalMoveException
-    {
-        EcoTree.NodeSet ecoSet = set == null ?
-            ecoTree.getDeepestTranspositionSet(this) : set;
-
-        if (ecoSet == null) return null;
-        appendTo.append(ecoSet.getMoveString());
-        return ecoSet;
     }
     
     /**

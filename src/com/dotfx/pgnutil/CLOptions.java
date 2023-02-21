@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import com.dotfx.pgnutil.eco.EcoTree;
 import org.kohsuke.args4j.Option;
 
 /**
@@ -174,7 +176,7 @@ public class CLOptions
             for (OptId v : OptId.values()) sigMap.put(v.toString(), v);
         }
         
-        private OptId(String signifier) { this.signifier = signifier; }
+        OptId(String signifier) { this.signifier = signifier; }
         @Override public String toString() { return signifier; }
         
         public static OptId get(String signifier)
@@ -447,8 +449,7 @@ public class CLOptions
 
     @Option(name = MPOS, forbids = {},
         aliases = "-match_pos", metaVar = "<move_string>",
-        usage = "output games that contain the position reached by SAN string " +
-        "<move_string>")
+        usage = "output games that contain the position reached by SAN string <move_string>")
     private void setPosition(String moveSt)
     {
         if (getCount(OptId.MATCHPOSITION) > 0)
@@ -463,14 +464,13 @@ public class CLOptions
         
         try { board.goTo(PgnGame.parseMoveString(moveSt)); }
         
-        catch (IllegalMoveException e)
+        catch (IllegalMoveException | NullPointerException e)
         {
-            System.err.println(e.getMessage());
+            System.err.println("illegal move in parameter: '" + moveSt + "'");
             System.exit(-1);
         }
         
-        PGNUtil.addMatchProcessor(
-            new PGNUtil.MatchPositionProcessor(board));
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionProcessor(board));
     }
 
     @Option(name = MECO, forbids = {},
@@ -486,9 +486,8 @@ public class CLOptions
         
         countOption(OptId.MATCHECO);
         
-        PGNUtil.addMatchProcessor(
-            new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.Type.STD));
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.FileType.STD));
     }
 
     @Option(name = MECODESC, forbids = {},
@@ -498,17 +497,14 @@ public class CLOptions
     {
         if (getCount(OptId.MATCHECODESC) > 0)
         {
-            System.err.println("Option '" + OptId.MATCHECODESC +
-                "' cannot be " + "set more than once!");
-            
+            System.err.println("Option '" + OptId.MATCHECODESC + "' cannot be " + "set more than once!");
             System.exit(-1);
         }
         
         countOption(OptId.MATCHECODESC);
         
-        PGNUtil.addMatchProcessor(
-            new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.Type.STD));
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.FileType.STD));
     }
 
     @Option(name = MSCIDECO, forbids = {},
@@ -518,17 +514,14 @@ public class CLOptions
     {
         if (getCount(OptId.MATCHSCIDECO) > 0)
         {
-            System.err.println("Option '" + OptId.MATCHSCIDECO + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.MATCHSCIDECO + "' cannot be " + "set more than once!");
             System.exit(-1);
         }
         
         countOption(OptId.MATCHSCIDECO);
         
-        PGNUtil.addMatchProcessor(
-            new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.Type.SCID));
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.FileType.SCIDDB));
     }
 
     @Option(name = MSCIDECODESC, forbids = {},
@@ -538,38 +531,31 @@ public class CLOptions
     {
         if (getCount(OptId.MATCHSCIDECODESC) > 0)
         {
-            System.err.println("Option '" + OptId.MATCHSCIDECODESC +
-                "' cannot be " + "set more than once!");
-            
+            System.err.println("Option '" + OptId.MATCHSCIDECODESC + "' cannot be " + "set more than once!");
             System.exit(-1);
         }
         
         countOption(OptId.MATCHSCIDECODESC);
         
-        PGNUtil.addMatchProcessor(
-            new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.Type.SCID));
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.FileType.SCIDDB));
     }
 
     @Option(name = MXECO, forbids = {},
         aliases = "-match_trans_eco", metaVar = "<regex>",
-        usage = "output games belonging to ECO code <regex>, matching " +
-        "transpositionally")
+        usage = "output games belonging to ECO code <regex>, matching transpositionally")
     private void setXEco(String eco)
     {
         if (getCount(OptId.MATCHTRANSECO) > 0)
         {
-            System.err.println("Option '" + OptId.MATCHTRANSECO +
-                "' cannot be " + "set more than once!");
-            
+            System.err.println("Option '" + OptId.MATCHTRANSECO + "' cannot be " + "set more than once!");
             System.exit(-1);
         }
         
         countOption(OptId.MATCHTRANSECO);
         
-        PGNUtil.addMatchProcessor(
-            new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.Type.STD));
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.FileType.STD));
     }
 
     @Option(name = MXECODESC, forbids = {},
@@ -580,59 +566,48 @@ public class CLOptions
     {
         if (getCount(OptId.MATCHTRANSECODESC) > 0)
         {
-            System.err.println("Option '" + OptId.MATCHTRANSECODESC +
-                "' cannot be " + "set more than once!");
-            
+            System.err.println("Option '" + OptId.MATCHTRANSECODESC + "' cannot be " + "set more than once!");
             System.exit(-1);
         }
         
         countOption(OptId.MATCHTRANSECODESC);
         
-        PGNUtil.addMatchProcessor(
-            new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.Type.STD));
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.FileType.STD));
     }
 
     @Option(name = MXSCIDECO, forbids = {},
         aliases = "-match_trans_scid_eco", metaVar = "<regex>",
-        usage = "output games belonging to Scid ECO code <regex>, matching " +
-        "transpositionally")
+        usage = "output games belonging to Scid ECO code <regex>, matching transpositionally")
     private void setXScidEco(String eco)
     {
         if (getCount(OptId.MATCHTRANSSCIDECO) > 0)
         {
-            System.err.println("Option '" + OptId.MATCHTRANSSCIDECO +
-                "' cannot be " + "set more than once!");
-            
+            System.err.println("Option '" + OptId.MATCHTRANSSCIDECO + "' cannot be " + "set more than once!");
             System.exit(-1);
         }
         
         countOption(OptId.MATCHTRANSSCIDECO);
         
-        PGNUtil.addMatchProcessor(
-            new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.Type.SCID));
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.FileType.SCIDDB));
     }
 
     @Option(name = MXSCIDECODESC, forbids = {},
         aliases = "-match_trans_scid_eco_desc", metaVar = "<regex>",
-        usage = "output games whose Scid ECO description matches <regex>, " +
-        "matching transpositionally")
+        usage = "output games whose Scid ECO description matches <regex>, matching transpositionally")
     private void setXScidEcoDesc(String eco)
     {
         if (getCount(OptId.MATCHTRANSSCIDECODESC) > 0)
         {
-            System.err.println("Option '" + OptId.MATCHTRANSSCIDECODESC +
-                "' cannot be " + "set more than once!");
-            
+            System.err.println("Option '" + OptId.MATCHTRANSSCIDECODESC + "' cannot be " + "set more than once!");
             System.exit(-1);
         }
         
         countOption(OptId.MATCHTRANSSCIDECODESC);
         
-        PGNUtil.addMatchProcessor(
-            new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.Type.SCID));
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
+            EcoTree.FileType.SCIDDB));
     }
 
     @Option(name = APF, aliases = "-any_player_file", metaVar = "<file>",
@@ -641,35 +616,27 @@ public class CLOptions
     {
         if (getCount(OptId.ANYPLAYERFILE) > 0)
         {
-            System.err.println("Option '" + OptId.ANYPLAYERFILE + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.ANYPLAYERFILE + "' cannot be set more than once!");
             System.exit(-1);
         }
         
         countOption(OptId.ANYPLAYERFILE);
-        
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchAnyPlayerSetProcessor(
-            readLinesSet(playerFile)));
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchAnyPlayerSetProcessor(readLinesSet(playerFile)));
     }
 
     @Option(name = PF, aliases = "-player_file", metaVar = "<file>",
-        usage = "output games in which both players are contained " +
-        "in <file>")
+        usage = "output games in which both players are contained in <file>")
     private void setPlayerFile(File playerFile)
     {
         if (getCount(OptId.PLAYERFILE) > 0)
         {
-            System.err.println("Option '" + OptId.PLAYERFILE + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.PLAYERFILE + "' cannot be set more than once!");
             System.exit(-1);
         }
         
         countOption(OptId.PLAYERFILE);
         
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchAllPlayerSetProcessor(
-            readLinesSet(playerFile)));
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchAllPlayerSetProcessor(readLinesSet(playerFile)));
     }
 
     @Option(name = NPF, aliases = "-not_player_file", metaVar = "<file>",
@@ -678,16 +645,12 @@ public class CLOptions
     {
         if (getCount(OptId.NOTPLAYERFILE) > 0)
         {
-            System.err.println("Option '" + OptId.NOTPLAYERFILE + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.NOTPLAYERFILE + "' cannot be set more than once!");
             System.exit(-1);
         }
         
         countOption(OptId.NOTPLAYERFILE);
-        
-        PGNUtil.addMatchProcessor(new PGNUtil.NotMatchPlayerSetProcessor(
-            readLinesSet(playerFile)));
+        PGNUtil.addMatchProcessor(new PGNUtil.NotMatchPlayerSetProcessor(readLinesSet(playerFile)));
     }
 
     @Option(name = MT, aliases = "-match_tag", metaVar = "<tag>/<regex>",
@@ -791,9 +754,7 @@ public class CLOptions
     {
         if (getCount(OptId.HIPLYCOUNT) > 0)
         {
-            System.err.println("Option '" + OptId.HIPLYCOUNT + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.HIPLYCOUNT + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -807,9 +768,7 @@ public class CLOptions
     {
         if (getCount(OptId.BOOKMARKER) > 0)
         {
-            System.err.println("Option '" + OptId.BOOKMARKER + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.BOOKMARKER + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -823,9 +782,7 @@ public class CLOptions
     {
         if (getCount(OptId.LOOOBCOUNT) > 0)
         {
-            System.err.println("Option '" + OptId.LOOOBCOUNT + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.LOOOBCOUNT + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -839,9 +796,7 @@ public class CLOptions
     {
         if (getCount(OptId.HIOOBCOUNT) > 0)
         {
-            System.err.println("Option '" + OptId.HIOOBCOUNT + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.HIOOBCOUNT + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -858,9 +813,7 @@ public class CLOptions
     {
         if (getCount(OptId.REPLACE) > 0)
         {
-            System.err.println("Option '" + OptId.REPLACE + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.REPLACE + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -896,15 +849,12 @@ public class CLOptions
 
     @Option(name = RW, depends = {R}, aliases = "-replace_winner",
         metaVar = "<regex>",
-        usage = "in combination with '" + R + "' option, select games won by " +
-        "player <regex> for replacement")
+        usage = "in combination with '" + R + "' option, select games won by player <regex> for replacement")
     private void replaceWinner(String regex)
     {
         if (getCount(OptId.REPLACEWINNER) > 0)
         {
-            System.err.println("Option '" + OptId.REPLACEWINNER + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.REPLACEWINNER + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -918,15 +868,12 @@ public class CLOptions
 
     @Option(name = RL, depends = {R}, aliases = "-replace_loser",
         metaVar = "<regex>",
-        usage = "in combination with '" + R + "' option, select games lost by " +
-        "player <regex> for replacement")
+        usage = "in combination with '" + R + "' option, select games lost by player <regex> for replacement")
     private void replaceLoser(String regex)
     {
         if (getCount(OptId.REPLACELOSER) > 0)
         {
-            System.err.println("Option '" + OptId.REPLACELOSER + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.REPLACELOSER + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -947,9 +894,7 @@ public class CLOptions
     {
         if (getCount(OptId.REPLACEOPENING) > 0)
         {
-            System.err.println("Option '" + OptId.REPLACEOPENING + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.REPLACEOPENING + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -971,9 +916,7 @@ public class CLOptions
     {
         if (getCount(OptId.DUPLICATES) > 0)
         {
-            System.err.println("Option '" + OptId.DUPLICATES + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.DUPLICATES + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -986,16 +929,13 @@ public class CLOptions
 
     @Option(name = DO, forbids = {D, DM, O, E, CSR, P, S},
         aliases = "-duplicate_openings",
-        usage = "list games containing identical players and openings; " +
-        "each line of output contains one set of two or more " +
-        "game numbers in which duplicates are found")
+        usage = "list games containing identical players and openings; each line of output contains one set of two " +
+                "or more game numbers in which duplicates are found")
     private void duplicateOpenings(boolean d)
     {
         if (getCount(OptId.DUPLICATEOPENINGS) > 0)
         {
-            System.err.println("Option '" + OptId.DUPLICATEOPENINGS +
-                "' cannot be set more than once!");
-            
+            System.err.println("Option '" + OptId.DUPLICATEOPENINGS + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -1009,14 +949,12 @@ public class CLOptions
     @Option(name = DM, forbids = {D, DO, O, E, CSR, P, S},
         aliases = "-duplicate_moves",
         usage = "list games containing identical moves; each line of output contains one set of two or more " +
-        "game numbers in which duplicates are found")
+                "game numbers in which duplicates are found")
     private void duplicatePostOpenings(boolean d)
     {
         if (getCount(OptId.DUPLICATEMOVES) > 0)
         {
-            System.err.println("Option '" + OptId.DUPLICATEMOVES +
-                "' cannot be set more than once!");
-            
+            System.err.println("Option '" + OptId.DUPLICATEMOVES + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -1036,9 +974,7 @@ public class CLOptions
     {
         if (getCount(OptId.EVENTS) > 0)
         {
-            System.err.println("Option '" + OptId.EVENTS + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.EVENTS + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -1058,9 +994,7 @@ public class CLOptions
     {
         if (getCount(OptId.CHECKSEQUENTIALROUNDS) > 0)
         {
-            System.err.println("Option '" + OptId.CHECKSEQUENTIALROUNDS + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.CHECKSEQUENTIALROUNDS + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -1081,9 +1015,7 @@ public class CLOptions
     {
         if (getCount(OptId.OPENINGS) > 0)
         {
-            System.err.println("Option '" + OptId.OPENINGS + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.OPENINGS + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -1101,15 +1033,13 @@ public class CLOptions
     {
         if (getCount(OptId.ECOOPENINGS) > 0)
         {
-            System.err.println("Option '" + OptId.ECOOPENINGS + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.ECOOPENINGS + "' cannot be set more than once!");
             System.exit(-1);
         }
         
         countOption(OptId.ECOOPENINGS);
         
-        Tallier os = new EcoStats(EcoTree.Type.STD, false);
+        Tallier os = new EcoStats(EcoTree.FileType.STD, false);
         PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
@@ -1121,15 +1051,13 @@ public class CLOptions
     {
         if (getCount(OptId.SCIDECOOPENINGS) > 0)
         {
-            System.err.println("Option '" + OptId.SCIDECOOPENINGS + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.SCIDECOOPENINGS + "' cannot be set more than once!");
             System.exit(-1);
         }
         
         countOption(OptId.SCIDECOOPENINGS);
         
-        Tallier os = new EcoStats(EcoTree.Type.SCID, false);
+        Tallier os = new EcoStats(EcoTree.FileType.SCIDDB, false);
         PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
@@ -1142,15 +1070,13 @@ public class CLOptions
     {
         if (getCount(OptId.XECOOPENINGS) > 0)
         {
-            System.err.println("Option '" + OptId.XECOOPENINGS + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.XECOOPENINGS + "' cannot be set more than once!");
             System.exit(-1);
         }
         
         countOption(OptId.XECOOPENINGS);
         
-        Tallier os = new EcoStats(EcoTree.Type.STD, true);
+        Tallier os = new EcoStats(EcoTree.FileType.STD, true);
         PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
@@ -1163,30 +1089,25 @@ public class CLOptions
     {
         if (getCount(OptId.XSCIDECOOPENINGS) > 0)
         {
-            System.err.println("Option '" + OptId.XSCIDECOOPENINGS + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.XSCIDECOOPENINGS + "' cannot be set more than once!");
             System.exit(-1);
         }
         
         countOption(OptId.XSCIDECOOPENINGS);
         
-        Tallier os = new EcoStats(EcoTree.Type.SCID, true);
+        Tallier os = new EcoStats(EcoTree.FileType.SCIDDB, true);
         PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
     @Option(name = CMIN, depends = {O}, aliases = "-count_min",
         metaVar = "<min>",
-        usage = "in combination with '" + O + "' option, print only openings " +
-        "that appear in at least <min> games")
+        usage = "in combination with '" + O + "' option, print only openings that appear in at least <min> games")
     private void minOpeningCount(int cmin)
     {
         if (getCount(OptId.MINGAMECOUNT) > 0)
         {
-            System.err.println("Option '" + OptId.MINGAMECOUNT + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.MINGAMECOUNT + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -1203,9 +1124,7 @@ public class CLOptions
     {
         if (getCount(OptId.HIWINDIFF) > 0)
         {
-            System.err.println("Option '" + OptId.HIWINDIFF + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.HIWINDIFF + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -1222,9 +1141,7 @@ public class CLOptions
     {
         if (getCount(OptId.LOWINDIFF) > 0)
         {
-            System.err.println("Option '" + OptId.LOWINDIFF + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.LOWINDIFF + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -1240,9 +1157,7 @@ public class CLOptions
     {
         if (getCount(OptId.MAXDRAW) > 0)
         {
-            System.err.println("Option '" + OptId.MAXDRAW + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.MAXDRAW + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -1258,9 +1173,7 @@ public class CLOptions
     {
         if (getCount(OptId.MINDRAW) > 0)
         {
-            System.err.println("Option '" + OptId.MINDRAW + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.MINDRAW + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -1283,9 +1196,7 @@ public class CLOptions
     {
         if (getCount(OptId.ELOFILE) > 0)
         {
-            System.err.println("Option '" + OptId.ELOFILE + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.ELOFILE + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -1331,9 +1242,7 @@ public class CLOptions
     {
         if (getCount(OptId.PLAYERRESULTS) > 0)
         {
-            System.err.println("Option '" + OptId.PLAYERRESULTS +
-                "' cannot be set more than once!");
-            
+            System.err.println("Option '" + OptId.PLAYERRESULTS + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -1347,22 +1256,19 @@ public class CLOptions
     // output-field selector
 
     @Option(name = S, forbids = {D, DO, DM, CSR}, aliases = "-select",
-        metaVar = "<field1,field2,...>",
-        usage = "select fields for output.  The field 'moves' selects " +
-        "the game's move list, the field 'gameno' selects the ordinal " +
-        "position of the game as it was read from the input source, and " +
-        "the field 'oid' selects the game's opening identifier (not " +
-        "ECO). The fields 'winner' and 'loser' select the winning and " +
-        "losing player, respectively.  When the '" + MP + "' option is used, " +
-        "the field 'opponent' selects the other player.  Any other field " +
-        "will be selected from the game's tag list")
+        metaVar = "<selector1,selector2,...>",
+        usage = "select values for output. By default, these are simply tags from the game's header (e.g., 'Event'), " +
+                "though a number of special selectors are also available. For example, 'moves' selects the game's " +
+                "move list, 'gameno' selects the ordinal position of the game as it was read from the input source, " +
+                "'oid' selects the game's opening identifier (not the ECO code), 'stdeco' selects the ECO code, and " +
+                "'scideco' selects the Scid ECO code. The selectors 'winner' and 'loser' select the winning and " +
+                "losing player, respectively.  When the '" + MP + "' option is used, 'opponent' selects the other " +
+                "player. For other available selectors, please see the README file.")
     private void selectors(String spec)
     {
         if (getCount(OptId.SELECTORS) > 0)
         {
-            System.err.println("Option '" + OptId.SELECTORS + "' cannot be " +
-                "set more than once!");
-            
+            System.err.println("Option '" + OptId.SELECTORS + "' cannot be set more than once!");
             System.exit(-1);
         }
         
@@ -1378,15 +1284,12 @@ public class CLOptions
             if (getCount(OptId.MATCHPLAYER) > 1 &&
                 PGNUtil.outputSelectors[i].getValue().equals(OutputSelector.Value.OPPONENT))
             {
-                System.err.println("The 'opponent' selector only works " +
-                    "while matching one player ('" + MP + "')!");
-
+                System.err.println("The 'opponent' selector only works while matching one player ('" + MP + "')!");
                 System.exit(-1);
             }
         }
         
-        if (PGNUtil.handler == null)
-            PGNUtil.handler = new PGNUtil.SelectGameHandler(PGNUtil.outputSelectors);
+        if (PGNUtil.handler == null) PGNUtil.handler = new PGNUtil.SelectGameHandler(PGNUtil.outputSelectors);
     }
 
     @Option(name = OD, forbids = {D, DO, DM}, aliases = "-output_delim",
@@ -1396,12 +1299,11 @@ public class CLOptions
 
     @Option(name = VD, aliases = "-value_delim",
         metaVar = "<delim>",
-        usage = "set the delimiter for values within a single output field, " +
-        "where this is sensible")
-    static String valueDelim = ",";
+        usage = "set the delimiter for values within a single output field, where this is sensible")
+    public static String valueDelim = ",";
 
     @Option(name = AQ, aliases = "-fix_aquarium",
-        usage = "compensate for  Aquarium bugs, where possible")
+        usage = "compensate for Aquarium bugs, where possible")
     static boolean aquarium = false;
 
     @Option(name = PERF, aliases = "-performance",
@@ -1409,22 +1311,17 @@ public class CLOptions
     static boolean performance = false;
 
     @Option(name = VG, aliases = "-validate_games",
-        usage = "throw an exception for any game that contains move-sequence " +
-            "errors")
+        usage = "throw an exception for any game that contains move-sequence errors")
     static boolean validateGames = false;
 
-    @Option(name = I, aliases = "-inputfile", usage = "input PGN file; " +
+    @Option(name = I, aliases = "-inputfile", usage = "input PGN file (may be specified more than once); " +
         "if this option is not present, pgnutil reads from standard input",
         metaVar = "<filename>")
     private void setInput(File f)
     {
         countOption(OptId.INPUTFILE);
         
-        try
-        {
-            PGNUtil.pgnFileList.add(new PGNFile(new BufferedReader(
-                new FileReader(f))));
-        }
+        try { PGNUtil.pgnFileList.add(new PGNFile(new BufferedReader(new FileReader(f)))); }
         
         catch (FileNotFoundException e)
         {
@@ -1439,13 +1336,11 @@ public class CLOptions
         }
     }
 
-    @Option(name = H, forbids = {D, DO, DM, E, CSR, O, M, GN, NM, MW, ML, MP,
-        MO, NMO, R, V},
+    @Option(name = H, forbids = {D, DO, DM, E, CSR, O, M, GN, NM, MW, ML, MP, MO, NMO, R, V},
         aliases = "-help", usage = "print usage information")
     static boolean help = false;
 
-    @Option(name = V, forbids = {D, DO, DM, E, CSR, O, M, GN, NM, MW, ML, MP,
-        MO, NMO, R, H},
+    @Option(name = V, forbids = {D, DO, DM, E, CSR, O, M, GN, NM, MW, ML, MP, MO, NMO, R, H},
         aliases = "-version",
         usage = "print version information")
     private void version(boolean v)

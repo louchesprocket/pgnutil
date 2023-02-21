@@ -24,6 +24,9 @@
 
 package com.dotfx.pgnutil;
 
+import com.dotfx.pgnutil.eco.EcoTree;
+import com.dotfx.pgnutil.eco.TreeNode;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,9 +43,9 @@ public class OpeningStats implements Tallier
     private static class Opening extends OpeningScore
     {
         private final MoveListId oid;
-        private final EcoTree.Node eco;
+        private final TreeNode eco;
         
-        Opening(MoveListId oid, EcoTree.Node eco)
+        Opening(MoveListId oid, TreeNode eco)
         {
             super();
             this.oid = oid;
@@ -50,7 +53,7 @@ public class OpeningStats implements Tallier
         }
 
         public MoveListId getId() { return oid; }
-        public EcoTree.Node getEco() { return eco; }
+        public TreeNode getEco() { return eco; }
 
         @Override
         public String toString()
@@ -96,9 +99,9 @@ public class OpeningStats implements Tallier
             {
                 switch (selector.getValue())
                 {
-                    case ECO:
-                    case ECODESC:
-                    case ECOMOVES:
+                    case STDECO:
+                    case STDECODESC:
+                    case STDECOMOVES:
                     case OID:
                     case COUNT:
                     case WWINS:
@@ -133,16 +136,16 @@ public class OpeningStats implements Tallier
             {
                 switch (selectors[i].getValue())
                 {
-                    case ECO: ret.append(opening.getEco().getCode()); break;
-                    case ECODESC: ret.append(opening.getEco().getDesc()); break;
+                    case STDECO: ret.append(opening.getEco().getCode()); break;
+                    case STDECODESC: ret.append(opening.getEco().getDesc()); break;
                     case OID: ret.append(opening.getId()); break;
                     case COUNT: ret.append(opening.getGameCount()); break;
                     case WWINS: ret.append(opening.getWhiteWins()); break;
                     case BWINS: ret.append(opening.getBlackWins()); break;
                     case DRAWS: ret.append(opening.getDraws()); break;
                     
-                    case ECOMOVES:
-                        for (EcoTree.Node node : opening.getEco().getPath())
+                    case STDECOMOVES:
+                        for (TreeNode node : opening.getEco().getPath())
                         {
                             int ply = node.getPly();
                             if (ply != 1) ret.append(" ");
@@ -193,7 +196,7 @@ public class OpeningStats implements Tallier
     public OpeningStats()
     {
         openingsMap = new HashMap<>(10000);
-        ecoTree = EcoTree.getInstance();
+        ecoTree = EcoTree.FileType.STD.getEcoTree();
     }
     
     static void addOpeningProcessor(OpeningProcessors.Processor op)

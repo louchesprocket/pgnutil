@@ -352,7 +352,7 @@ public class CaseInsensitiveMap<K, V> implements Map<K, V>
         {
             if (a.length < size())
             {
-                // Make a new array of a's runtime type, but my contents:
+                // Make a new array of a's runtime fileType, but my contents:
                 return (T[]) Arrays.copyOf(toArray(), size(), a.getClass());
             }
             System.arraycopy(toArray(), 0, a, 0, size());

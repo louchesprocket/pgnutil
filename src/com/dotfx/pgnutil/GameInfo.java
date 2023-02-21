@@ -30,10 +30,11 @@ package com.dotfx.pgnutil;
  */
 public class GameInfo implements Comparable<GameInfo>
 {
-    private final int gameNum, round;
+    private final int gameNum;
+    private final NormalizedRound round;
     private final TimeCtrl timeCtrl;
 
-    public GameInfo(int gameNum, int round, TimeCtrl timeCtrl)
+    public GameInfo(int gameNum, NormalizedRound round, TimeCtrl timeCtrl)
     {
         this.gameNum = gameNum;
         this.round = round;
@@ -41,7 +42,7 @@ public class GameInfo implements Comparable<GameInfo>
     }
 
     public int getGameNum() { return gameNum; }
-    public int getRound() { return round; }
+    public NormalizedRound getRound() { return round; }
     public TimeCtrl getTimeCtrl() { return timeCtrl; }
 
     @Override

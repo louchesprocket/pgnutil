@@ -24,6 +24,9 @@
 
 package com.dotfx.pgnutil;
 
+import com.dotfx.pgnutil.eco.EcoTree;
+import com.dotfx.pgnutil.eco.TreeNodeSet;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -36,23 +39,22 @@ public class EcoStats implements Tallier
 {
     private class Iterator implements java.util.Iterator<String>
     {
-        private final List<EcoTree.NodeSet> selectedOpenings;
-        private final java.util.Iterator<EcoTree.NodeSet> iterator;
+        private final List<TreeNodeSet> selectedOpenings;
+        private final java.util.Iterator<TreeNodeSet> iterator;
         private final OutputSelector selectors[];
         
         private Iterator(OutputSelector selectors[])
-            throws InvalidSelectorException
         {
             selectedOpenings = new ArrayList<>();
             
             nextOpening:
-            for (EcoTree.NodeSet nodeSet : openingsMap.keySet())
+            for (TreeNodeSet treeNodeSet : openingsMap.keySet())
             { 
                 for (OpeningProcessors.Processor processor : openingProcessors)
-                    if (!processor.processOpening(openingsMap.get(nodeSet)))
+                    if (!processor.processOpening(openingsMap.get(treeNodeSet)))
                         continue nextOpening;
 
-                selectedOpenings.add(nodeSet);
+                selectedOpenings.add(treeNodeSet);
             }
             
             iterator = selectedOpenings.iterator();
@@ -66,7 +68,7 @@ public class EcoStats implements Tallier
         @Override public String next()
         {
             StringBuilder ret = new StringBuilder();
-            EcoTree.NodeSet opening = iterator.next();
+            TreeNodeSet opening = iterator.next();
             OpeningScore score = openingsMap.get(opening);
             
             if (selectors == null)
@@ -99,9 +101,7 @@ public class EcoStats implements Tallier
                         break;
 
                     case DIFFPCT:
-                        ret.append(Formats.DECIMAL.format(score.getWhiteWinPct() -
-                            score.getBlackWinPct()));
-
+                        ret.append(Formats.DECIMAL.format(score.getWhiteWinPct() - score.getBlackWinPct()));
                         break;
 
                     case DRAWPCT:
@@ -115,20 +115,17 @@ public class EcoStats implements Tallier
         }
     }
     
-    private static final List<OpeningProcessors.Processor> openingProcessors =
-        new ArrayList<>();
+    private static final List<OpeningProcessors.Processor> openingProcessors = new ArrayList<>();
     
-    private final TreeMap<EcoTree.NodeSet,OpeningScore> openingsMap;
+    private final TreeMap<TreeNodeSet,OpeningScore> openingsMap;
     private final EcoTree ecoTree;
     private final boolean transpose;
 
-    public EcoStats(EcoTree.Type type, boolean transpose)
+    public EcoStats(EcoTree.FileType fileType, boolean transpose)
     {
         openingsMap = new TreeMap<>();
         this.transpose = transpose;
-        
-        if (type == EcoTree.Type.SCID) ecoTree = EcoTree.getScidInstance();
-        else ecoTree = EcoTree.getInstance();
+        ecoTree = fileType.getEcoTree();
     }
     
     @Override
@@ -141,8 +138,8 @@ public class EcoStats implements Tallier
             switch (selector.getValue())
             {
                 case CODE:
-                case ECODESC:
-                case ECOMOVES:
+                case STDECODESC:
+                case STDECOMOVES:
                 case OID:
                 case COUNT:
                 case WWINS:
@@ -156,8 +153,7 @@ public class EcoStats implements Tallier
                     break;
 
                 default:
-                    throw new InvalidSelectorException("'" + selector +
-                        "' is not a valid selector in this context");
+                    throw new InvalidSelectorException("'" + selector + "' is not a valid selector in this context");
             }
         }
     }
@@ -175,21 +171,20 @@ public class EcoStats implements Tallier
             Integer whiteElo = PGNUtil.eloMap.get(game.getWhite().trim());
             Integer blackElo = PGNUtil.eloMap.get(game.getBlack().trim());
 
-            if (whiteElo == null || blackElo == null ||
-                Math.abs(whiteElo - blackElo) > CLOptions.maxEloDiff)
+            if (whiteElo == null || blackElo == null || Math.abs(whiteElo - blackElo) > CLOptions.maxEloDiff)
                 return;
         }
 
-        EcoTree.NodeSet nodeSet = transpose ?
+        TreeNodeSet treeNodeSet = transpose ?
             ecoTree.getDeepestTranspositionSet(game) :
-            new EcoTree.NodeSet(ecoTree.getDeepestDefined(game));
+            new TreeNodeSet(ecoTree.getDeepestDefined(game));
         
-        OpeningScore os = openingsMap.get(nodeSet);
+        OpeningScore os = openingsMap.get(treeNodeSet);
 
         if (os == null)
         {
             os = new OpeningScore();
-            openingsMap.put(nodeSet, os);
+            openingsMap.put(treeNodeSet, os);
         }
 
         switch (game.getResult())
@@ -203,7 +198,6 @@ public class EcoStats implements Tallier
 
     @Override
     public java.util.Iterator<String> getOutputIterator(OutputSelector selectors[])
-        throws InvalidSelectorException
     {
         return new Iterator(selectors);
     }

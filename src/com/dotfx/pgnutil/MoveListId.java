@@ -25,24 +25,17 @@
 package com.dotfx.pgnutil;
 
 import net.jpountz.xxhash.StreamingXXHash64;
-import net.jpountz.xxhash.XXHashFactory;
 
 /**
+ * Represents a unique list of moves (implies unique position).
  *
  * @author Mark Chen
  */
-public class MoveListId implements Comparable<MoveListId>
+public final class MoveListId extends UniqueIdentifier implements Comparable<MoveListId>
 {
     public static final int HASHSEED = 0x6a83fcd5;
-    public static final XXHashFactory FACTORY;
-    
-    private final long value;
-    
-    static
-    {
-        FACTORY = XXHashFactory.fastestInstance();
-    }
-    
+    protected final long value;
+
     public MoveListId(byte b[])
     {
         StreamingXXHash64 hashFunc = FACTORY.newStreamingHash64(HASHSEED);
@@ -50,16 +43,15 @@ public class MoveListId implements Comparable<MoveListId>
         hashFunc.update(b, 0, b.length);
         value = hashFunc.getValue();
     }
-    
+
+    public MoveListId(long value) { this.value = value; }
     public MoveListId(String s) { this(s.getBytes()); }
     
     public static MoveListId fromString(String s)
     {
         return new MoveListId(NumberUtils.hexToLong(s));
     }
-    
-    public MoveListId(long value) { this.value = value; }
-    
+
     @Override
     public String toString() { return NumberUtils.longToHex(value, false); }
     
@@ -73,7 +65,7 @@ public class MoveListId implements Comparable<MoveListId>
     @Override
     public int hashCode()
     {
-        return HASHSEED ^ Long.hashCode(value);
+        return MoveListId.class.hashCode() ^ HASHSEED ^ Long.hashCode(value);
     }
     
     @Override

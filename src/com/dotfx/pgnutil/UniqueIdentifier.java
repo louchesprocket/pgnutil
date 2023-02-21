@@ -25,47 +25,9 @@
 package com.dotfx.pgnutil;
 
 import net.jpountz.xxhash.StreamingXXHash64;
+import net.jpountz.xxhash.XXHashFactory;
 
-/**
- * Represents a unique board position (not necessarily a unique move list).
- *
- * @author Mark Chen <chen@dotfx.com>
- */
-public final class PositionId extends UniqueIdentifier implements Comparable<PositionId>
+public abstract class UniqueIdentifier
 {
-    public static final int HASHSEED = 0x6a830fe6;
-    private final long value;
-
-    public PositionId(byte b[])
-    {
-        StreamingXXHash64 hashFunc = FACTORY.newStreamingHash64(HASHSEED);
-//        hashFunc.reset(); // does not reset the seed
-        hashFunc.update(b, 0, b.length);
-        value = hashFunc.getValue();
-    }
-
-    @Override
-    public String toString() { return NumberUtils.longToHex(value, false); }
-    
-    @Override
-    public boolean equals(Object other)
-    {
-        try { return value == ((PositionId)other).value; }
-        catch (ClassCastException | NullPointerException e) { return false; }
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        return PositionId.class.hashCode() ^ HASHSEED ^ Long.hashCode(value);
-    }
-    
-    @Override
-    public int compareTo(PositionId other)
-    {
-        long diff = value - other.value;
-        if (diff > 0) return 1;
-        if (diff < 0) return -1;
-        return 0;
-    }
+    protected static final XXHashFactory FACTORY = XXHashFactory.fastestInstance();
 }

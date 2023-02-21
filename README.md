@@ -3,7 +3,7 @@
 Pgnutil is a command-line tool for operating on Portable Game Notation (PGN) files.  I wrote the tool because I like to run computer-chess tournaments for my own amusement, and found that calculating results was a nightmare due to a lack of very basic capabilities for handling PGN files.  Common problems such as finding duplicate games, identifying time forfeitures, and even just figuring out if I had already played a particular pair of players against a particular set of test positions were nearly insoluble.  After failing to find any applicable tool on the
 Internet, I wrote pgnutil.
 
-Pgnutil works as a Unix-style command-line filter that performs [matching/selecting](#matching) and [replacing](#replacing) functions on PGN files in conjunction with various [output options](#output-selectors). By default, pgnutil simply outputs selected games after performing any stipulated replacement operations, but it can instead output user-selected lists of fields.  In addition, pgnutil has various ["special" output options](#special-output-options): duplicate finding, event listing, [opening](#openings) statistics, and player statistics.  Pgnutil is particularly designed to be used in conjunction with tools such as bayeselo or elostat.
+Pgnutil works as a Unix-style command-line filter that performs [matching/selecting](#matching) and [replacing](#replacing) functions on PGN files in conjunction with various [output options](#output-selectors). By default, pgnutil simply outputs selected games after performing any stipulated replacement operations, but it can instead output user-selected lists of fields.  In addition, pgnutil has various ["special" output options](#special-output-options): duplicate finding, event listing, [opening statistics](#openings), and player statistics.  Pgnutil is particularly designed to be used in conjunction with tools such as bayeselo or elostat.
 
 
 ## Requirements
@@ -14,7 +14,7 @@ Pgnutil requires Java 1.8 or higher.  It theoretically runs on any platform with
 ## Building
 
 To build, open the project in IntelliJ Idea and select
-"Build->Rebuild Project" from the menu bar. Then run script/mkdist.sh. This will create the pgnutil integrated executable in the dist directory.
+"Build->Build Artifacts->pgnutil:jar->Rebuild" from the menu bar. Then run script/mkdist.sh. This will create the pgnutil integrated executable in the dist directory.
 
 
 ## Usage
@@ -87,12 +87,19 @@ means, "Output the value of the 'Event' tag for every game containing 'Blitz' or
 
 By default, pgnutil will output the full text of the game in response to any search operation.  The "-s" option may be used to restrict the output to a pipe-separated list of selected fields. Selected fields may include any PGN tag and should be separated on the command line by commas.  There are several "special" selectors recognized by the "-s" option.  For example:
 
-* 	moves: causes pgnutil to print the game's move list
+* 	moves: causes pgnutil to output the game's move list
+* 	tags: causes pgnutil to output an alphabetized list of the game's header tags
+* 	decoratedmoves: causes pgnutil to output the game's move list and move comments
+* 	openingmoves: causes pgnutil to output the opening move list (see [Openings](#openings), below)
+* 	oid: causes pgnutil to output the game's opening identifier (see [Openings](#openings), below)
+* 	winner: causes pgnutil to output the name of the winner
+* 	loser: causes pgnutil to output the name of the loser
 * 	opponent: when the "-mp" (match player) option is used, output the name of the other player
-* 	gameno: causes pgnutil to print the game's position within the PGN file
-* 	oid: causes pgnutil to print the game's opening identifier (see below)
-* 	winner: causes pgnutil to print the name of the winner
-* 	loser: causes pgnutil to print the name of the loser
+* 	playerelo: when the "-mp" (match player) option is used, output the value of the "Elo" header for the specified player
+* 	opponentelo: when the "-mp" (match player) option is used, output the value of the "Elo" header for the opposing player
+* 	gameno: causes pgnutil to output the game's ordinal position within the PGN file
+* 	plies: causes pgnutil to output the number of half-moves present in the game
+* 	textsize: causes pgnutil to output the size (in characters) of the original game text
 
 Thus, the command:
 
@@ -102,20 +109,20 @@ means, "For every game in which the 'Event' tag contains the text 'Nunn 1' and i
 
 There are also several output selectors relating to ECO codes:
 
-* 	eco: output the standard ECO code for the game, matching move sequences
-* 	xeco: output the ECO code for the game, matching positions transpositionally
+* 	stdeco: output the standard ECO code for the game, matching move sequences
+* 	xstdeco: output the ECO code for the game, matching positions transpositionally
 * 	scideco: output the Scid ECO code for the game, matching move sequences
 * 	xscideco: output the Scid ECO code for the game, matching positions transpositionally
-* 	ecodesc: output the standard description of the opening, matching move sequences
-* 	xecodesc: output the standard description of the opening, matching positions transpositionally
+* 	stdecodesc: output the standard description of the opening, matching move sequences
+* 	xstdecodesc: output the standard description of the opening, matching positions transpositionally
 * 	scidecodesc: output the Scid description of the opening, matching move sequences
 * 	xscidecodesc: output the Scid description of the opening, matching positions transpositionally
-* 	ecomoves: output the game moves that match the line defining the standard ECO code
-* 	xecomoves: output the game moves that match the line defining the standard ECO code, matching positions transpositionally
+* 	stdecomoves: output the game moves that match the line defining the standard ECO code
+* 	xstdecomoves: output the game moves that match the line defining the standard ECO code, matching positions transpositionally
 * 	scidecomoves: output the game moves that match the line defining the Scid ECO code
 * 	xscidecomoves: output the game moves that match the line defining the Scid ECO code, matching positions transpositionally
 
-Note that any of the transpositional selectors ("xeco," "xscideco," "xecodesc," "xscidecodesc," "xecomoves," and "xscidecomoves") may return more than one result per game.
+Note that any of the transpositional selectors ("xstdeco," "xscideco," "xstdecodesc," "xscidecodesc," "xstdecomoves," and "xscidecomoves") may return more than one result per game.
 
 By default, fields selected by the "-s" option appear on the output separated by the pipe ("|") character.  If a different output delimiter is desired, this may be set with the "-od" (output-delimiter) option.
 
@@ -208,7 +215,7 @@ will search for games matching any of the openings from myopeningsfile, using "m
 
 If pgnutil fails to find the out-of-book marker for a game, it assumes that the first commented move is the first non-book move. This corresponds to Arena's behavior. Therefore, pgnutil's default behavior (without the "-bm" option) will correctly identify the out-of-book condition for Aquarium, Banksia, and Arena.
 
-To output opening statistics by ECO code instead of opening identifier, the "-o" option may be combined with any of the options "-eco," "-xeco," "-scideco," or "-xscideco."  These will list statistics by standard ECO code, standard ECO code matched transpositionally, Scid ECO code, or Scid ECO code matched transpositionally, respectively.
+To output opening statistics by ECO code instead of opening identifier, the "-o" option may be combined with any of the options "-stdeco," "-xstdeco," "-scideco," or "-xscideco."  These will list statistics by standard ECO code, standard ECO code matched transpositionally, Scid ECO code, or Scid ECO code matched transpositionally, respectively.
 
 
 ## Known Issues

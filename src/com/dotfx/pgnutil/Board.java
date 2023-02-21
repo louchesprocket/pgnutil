@@ -24,6 +24,8 @@
 
 package com.dotfx.pgnutil;
 
+import com.dotfx.pgnutil.eco.TreeNode;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -66,11 +68,7 @@ public class Board
         
         public int getLocation() { return location; }
         public static Square get(int square) { return squares[square]; }
-        
-        public static Square get(String s)
-        {
-            return nameMap.get(s.toLowerCase());
-        }
+        public static Square get(String s) { return nameMap.get(s.toLowerCase());}
         
         @Override
         public String toString() { return name().toLowerCase(); }
@@ -109,23 +107,23 @@ public class Board
     
     public static class Piece
     {
-        private final PieceType type;
+        private final PieceType fileType;
         private final Color color;
         
-        public Piece(Color color, PieceType type)
+        public Piece(Color color, PieceType fileType)
         {
-            this.type = type;
+            this.fileType = fileType;
             this.color = color;
         }
         
-        public PieceType getType() { return type; }
+        public PieceType getType() { return fileType; }
         public Color getColor() { return color; }
         
         public byte toByte()
         {
             if (color == Color.WHITE)
             {
-                switch (type)
+                switch (fileType)
                 {
                     case PAWN: return (byte)0;
                     case ROOK: return (byte)1;
@@ -138,7 +136,7 @@ public class Board
             
             else
             {
-                switch (type)
+                switch (fileType)
                 {
                     case PAWN: return (byte)6;
                     case ROOK: return (byte)7;
@@ -163,7 +161,7 @@ public class Board
             try
             {
                 Piece that = (Piece)other;
-                if (that.type != type) return false;
+                if (that.fileType != fileType) return false;
                 return that.color == color;
             }
             
@@ -173,7 +171,7 @@ public class Board
         @Override
         public int hashCode()
         {
-            return Piece.class.hashCode() ^ type.hashCode() ^ color.hashCode();
+            return Piece.class.hashCode() ^ fileType.hashCode() ^ color.hashCode();
         }
     }
     
@@ -621,7 +619,7 @@ public class Board
      * @param promoteTo
      * @return 
      */
-    public Board move(int start, int end, PieceType promoteTo)
+    public Board move(int start, int end, PieceType promoteTo) throws IllegalMoveException
     {
         ply++;
         
@@ -636,115 +634,122 @@ public class Board
         position[end] = position[start];
         position[start] = null;
         Piece piece = position[end];
-        
-        switch (piece.getType())
+
+        try
         {
-            case KING:
-                epCandidate = -1;
-                int diff = end - start;
-                
-                if (piece.getColor() == Color.WHITE)
-                {
-                    whiteKingLoc = (byte)end;
-                    whiteCanCastleK = false;
-                    whiteCanCastleQ = false;
-                    
-                    if (diff == -2)
-                    {
-                        position[3] = position[0];
-                        position[0] = null;
-                    }
-                    
-                    else if (diff == 2)
-                    {
-                        position[5] = position[7];
-                        position[7] = null;
-                    }
-                }
+            switch (piece.getType())
+            {
+                case KING:
+                    epCandidate = -1;
+                    int diff = end - start;
 
-                else
-                {
-                    blackKingLoc = (byte)end;
-                    blackCanCastleK = false;
-                    blackCanCastleQ = false;
-                    
-                    if (diff == -2)
-                    {
-                        position[59] = position[56];
-                        position[56] = null;
-                    }
-                    
-                    else if (diff == 2)
-                    {
-                        position[61] = position[63];
-                        position[63] = null;
-                    }
-                }
-                
-                break;
-
-            case ROOK:
-                epCandidate = -1;
-                
-                if (piece.getColor() == Color.WHITE)
-                {
-                    if (start == 7) whiteCanCastleK = false;
-                    else if (start == 0) whiteCanCastleQ = false;
-                }
-
-                else
-                {
-                    if (start == 63) blackCanCastleK = false;
-                    else if (start == 56) blackCanCastleQ = false;
-                }
-                
-                break;
-
-            case PAWN:
-                halfMoveClock = ply;
-                int endRank = end / 8;
-                int span = end > start ? end - start : start - end;
-
-                if (span == 16)
-                {
-                    if (piece.getColor() == Color.WHITE)
-                        epCandidate = (byte)(start + 8);
-
-                    else epCandidate = (byte)(start - 8);
-                }
-                
-                else if (end == epCandidate && (span == 7 || span == 9))
-                {
                     if (piece.getColor() == Color.WHITE)
                     {
-                        position[epCandidate - 8] = null;
-                        blackPieceCount--;
+                        whiteKingLoc = (byte) end;
+                        whiteCanCastleK = false;
+                        whiteCanCastleQ = false;
+
+                        if (diff == -2)
+                        {
+                            position[3] = position[0];
+                            position[0] = null;
+                        }
+
+                        else if (diff == 2)
+                        {
+                            position[5] = position[7];
+                            position[7] = null;
+                        }
                     }
-                    
+
                     else
                     {
-                        position[epCandidate + 8] = null;
-                        whitePieceCount--;
-                    }
-                    
-                    epCandidate = -1;
-                }
+                        blackKingLoc = (byte) end;
+                        blackCanCastleK = false;
+                        blackCanCastleQ = false;
 
-                else if (endRank == 0 || endRank == 7)
-                {
-                    position[end] = new Piece(piece.getColor(), promoteTo);
+                        if (diff == -2)
+                        {
+                            position[59] = position[56];
+                            position[56] = null;
+                        }
+
+                        else if (diff == 2)
+                        {
+                            position[61] = position[63];
+                            position[63] = null;
+                        }
+                    }
+
+                    break;
+
+                case ROOK:
                     epCandidate = -1;
-                }
-                
-                break;
-                
-            default: epCandidate = -1;
+
+                    if (piece.getColor() == Color.WHITE)
+                    {
+                        if (start == 7) whiteCanCastleK = false;
+                        else if (start == 0) whiteCanCastleQ = false;
+                    }
+
+                    else
+                    {
+                        if (start == 63) blackCanCastleK = false;
+                        else if (start == 56) blackCanCastleQ = false;
+                    }
+
+                    break;
+
+                case PAWN:
+                    halfMoveClock = ply;
+                    int endRank = end / 8;
+                    int span = end > start ? end - start : start - end;
+
+                    if (span == 16)
+                    {
+                        if (piece.getColor() == Color.WHITE) epCandidate = (byte)(start + 8);
+                        else epCandidate = (byte)(start - 8);
+                    }
+
+                    else if (end == epCandidate && (span == 7 || span == 9))
+                    {
+                        if (piece.getColor() == Color.WHITE)
+                        {
+                            position[epCandidate - 8] = null;
+                            blackPieceCount--;
+                        }
+
+                        else
+                        {
+                            position[epCandidate + 8] = null;
+                            whitePieceCount--;
+                        }
+
+                        epCandidate = -1;
+                    }
+
+                    else if (endRank == 0 || endRank == 7)
+                    {
+                        position[end] = new Piece(piece.getColor(), promoteTo);
+                        epCandidate = -1;
+                    }
+
+                    break;
+
+                default:
+                    epCandidate = -1;
+            }
+        }
+
+        catch (NullPointerException e)
+        {
+            throw new IllegalMoveException("illegal move: " + piece + " from " + start + " to " + end);
         }
         
         return this;
     }
     
-    public Board copyAndMove(int start, int end, PieceType promoteTo)
+    public Board copyAndMove(int start, int end, PieceType promoteTo) throws IllegalMoveException
     {
         return copy().move(start, end, promoteTo);
     }
@@ -754,9 +759,9 @@ public class Board
         return move(move.getMoveText());
     }
     
-    public Board move(List<EcoTree.Node> moveList) throws IllegalMoveException
+    public Board move(List<TreeNode> moveList) throws IllegalMoveException
     {
-        for (EcoTree.Node node : moveList) move(node.getMoveText());
+        for (TreeNode node : moveList) move(node.getMoveText());
         return this;
     }
     
@@ -792,14 +797,13 @@ public class Board
         
         if (san.equalsIgnoreCase("O-O"))
         {
-            if (color == Color.WHITE && canMove(4, 6) &&
-                !isMovingIntoCheck(4, 6)) return move(4, 6, promoteTo);
+            if (color == Color.WHITE && canMove(4, 6) && !isMovingIntoCheck(4, 6))
+                return move(4, 6, promoteTo);
             
-            else if (color == Color.BLACK && canMove(60, 62) &&
-                !isMovingIntoCheck(60, 62)) return move(60, 62, null);
+            else if (color == Color.BLACK && canMove(60, 62) && !isMovingIntoCheck(60, 62))
+                return move(60, 62, null);
         
-            throw new IllegalMoveException("illegal move: '" + san +
-                "' at ply " + (ply + 1));
+            throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
         }
         
         if (san.equalsIgnoreCase("O-O-O"))
@@ -810,16 +814,13 @@ public class Board
             else if (color == Color.BLACK && canMove(60, 58) &&
                 !isMovingIntoCheck(60, 58)) return move(60, 58, promoteTo);
         
-            throw new IllegalMoveException("illegal move: '" + san +
-                "' at ply " + (ply + 1));
+            throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
         }
         
         if (Character.isUpperCase(lastChar)) // promotion
         {
             promoteTo = PieceType.get(lastChar);
-            
-            while (!Character.isDigit(san.charAt(san.length() - 1)))
-                san = san.substring(0, --len);
+            while (!Character.isDigit(san.charAt(san.length() - 1))) san = san.substring(0, --len);
         }
         
         int firstSquare;
@@ -828,8 +829,7 @@ public class Board
         
         if (Character.isLowerCase(sanFirstChar)) // pawn move
         {
-            firstSquare =
-                Square.get(new String(new char[] {sanFirstChar, '2'})).getLocation();
+            firstSquare = Square.get(new String(new char[] {sanFirstChar, '2'})).getLocation();
             
             for (int i = firstSquare; i < 56; i += 8)
             {
@@ -841,8 +841,7 @@ public class Board
                     return move(i, endSquare, promoteTo);
             }
         
-            throw new IllegalMoveException("illegal move: '" + san +
-                "' at ply " + (ply + 1));
+            throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
         }
         
         String sanStart = san.substring(0, len - 2); // destination chopped off
@@ -858,17 +857,12 @@ public class Board
         if (disambig != null)
         {
             int disambigLen = disambig.length();
-            
-            if (disambigLen == 2)
-                return move(Square.get(disambig).getLocation(), endSquare,
-                    promoteTo);
-            
+            if (disambigLen == 2) return move(Square.get(disambig).getLocation(), endSquare, promoteTo);
             char disambigChar = disambig.charAt(0);
             
             if (Character.isLetter(disambigChar)) // file
             {
-                firstSquare =
-                    Square.get(new String(new char[] {disambigChar, '1'})).getLocation();
+                firstSquare = Square.get(new String(new char[] {disambigChar, '1'})).getLocation();
             
                 for (int i = firstSquare; i < 64; i += 8)
                 {
@@ -883,8 +877,7 @@ public class Board
             
             else // rank
             {
-                firstSquare =
-                    Square.get(new String(new char[] {'a', disambigChar})).getLocation();
+                firstSquare = Square.get(new String(new char[] {'a', disambigChar})).getLocation();
                 
                 for (int i = firstSquare; i < firstSquare + 8; i++)
                 {
@@ -897,8 +890,7 @@ public class Board
                 }
             }
         
-            throw new IllegalMoveException("illegal move: '" + san +
-                "' at ply " + (ply + 1));
+            throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
         }
         
         for (int i = 0; i < 64; i++)
@@ -911,13 +903,12 @@ public class Board
                 return move(i, endSquare, promoteTo);
         }
         
-        throw new IllegalMoveException("illegal move: '" + san + "' at ply " +
-            (ply + 1));
+        throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
     }
     
     /**
      * 
-     * @param san example: "N1f6"
+     * @param san example: "N8f6"
      * @return example: "Ngf6+"
      * @throws IllegalMoveException 
      */
@@ -953,9 +944,7 @@ public class Board
         if (Character.isUpperCase(lastChar)) // promotion
         {
             promoteTo = PieceType.get(lastChar);
-            
-            while (!Character.isDigit(san.charAt(san.length() - 1)))
-                san = san.substring(0, --len);
+            while (!Character.isDigit(san.charAt(san.length() - 1))) san = san.substring(0, --len);
         }
         
         int firstSquare;
@@ -964,8 +953,7 @@ public class Board
         
         if (Character.isLowerCase(sanFirstChar)) // pawn move
         {
-            firstSquare =
-                Square.get(new String(new char[] {sanFirstChar, '2'})).getLocation();
+            firstSquare = Square.get(new String(new char[] {sanFirstChar, '2'})).getLocation();
             
             for (int i = firstSquare; i < 56; i += 8)
             {
@@ -1002,23 +990,21 @@ public class Board
             
             if (Character.isLetter(disambigChar)) // file
             {
-                firstSquare =
-                    Square.get(new String(new char[] {disambigChar, '1'})).getLocation();
+                firstSquare = Square.get(new String(new char[] {disambigChar, '1'})).getLocation();
             
                 for (int i = firstSquare; i < 64; i += 8)
                 {
                     Piece piece = position[i];
 
-                    if (piece != null && piece.getType() == pieceType &&
-                        piece.getColor() == color && moveTest(i, endSquare))
+                    if (piece != null && piece.getType() == pieceType && piece.getColor() == color &&
+                            moveTest(i, endSquare))
                         return coordToSan(i, endSquare, promoteTo);
                 }
             }
             
             else // rank
             {
-                firstSquare =
-                    Square.get(new String(new char[] {'a', disambigChar})).getLocation();
+                firstSquare = Square.get(new String(new char[] {'a', disambigChar})).getLocation();
                 
                 for (int i = firstSquare; i < firstSquare + 8; i++)
                 {
@@ -1030,8 +1016,7 @@ public class Board
                 }
             }
         
-            throw new IllegalMoveException("illegal move: '" + san +
-                "' at ply " + (ply + 1));
+            throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
         }
         
         for (int i = 0; i < 64; i++)
@@ -1043,8 +1028,7 @@ public class Board
                 return coordToSan(i, endSquare, promoteTo);
         }
         
-        throw new IllegalMoveException("illegal move: '" + san + "' at ply " +
-            (ply + 1));
+        throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
     }
     
     public String coordToSan(int start, int end, PieceType promoteTo)
@@ -1189,8 +1173,7 @@ public class Board
         int start = Square.get(move.substring(0, 2)).getLocation();
         int end = Square.get(move.substring(2, 4)).getLocation();
         
-        PieceType promoteTo = move.length() > 4 ?
-            PieceType.get(move.substring(4,5)) : null; // ?
+        PieceType promoteTo = move.length() > 4 ? PieceType.get(move.substring(4,5)) : null; // ?
         
         return coordToSan(start, end, promoteTo);
     }

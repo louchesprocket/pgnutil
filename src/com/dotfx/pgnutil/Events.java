@@ -43,8 +43,7 @@ public class Events implements Tallier
         private final OutputSelector selectors[];
         private final java.util.Iterator<String> iterator;
         
-        private Iterator(Map<String,List<GameInfo>> eventMap,
-            OutputSelector selectors[])
+        private Iterator(Map<String,List<GameInfo>> eventMap, OutputSelector selectors[])
             throws InvalidSelectorException
         {
             this.eventMap = eventMap;
@@ -82,7 +81,7 @@ public class Events implements Tallier
             String eventName = iterator.next();
             List<GameInfo> gameList = eventMap.get(eventName);
             StringBuilder ret = new StringBuilder();
-            int thisRound;
+            NormalizedRound thisRound;
             
             if (selectors == null)
             {
@@ -100,17 +99,19 @@ public class Events implements Tallier
             {
                 switch (selectors[i].getValue())
                 {
-                    case COUNT: ret.append(gameList.size()); break;
+                    case COUNT:
+                    case ROUNDCOUNT:
+                        ret.append(gameList.size()); break;
+
                     case EVENT: ret.append(eventName); break;
-                    case ROUNDCOUNT: ret.append(gameList.size()); break;
 
                     case LASTROUND:
-                        int lastRound = 0;
+                        NormalizedRound lastRound = new NormalizedRound("-");
 
                         for (GameInfo gi : gameList)
                         {
                             thisRound = gi.getRound();
-                            if (thisRound > lastRound) lastRound = thisRound;
+                            if (thisRound.compareTo(lastRound) > 0) lastRound = thisRound;
                         }
 
                         ret.append(lastRound);
@@ -125,22 +126,19 @@ public class Events implements Tallier
     
     private class RoundErrorIterator implements java.util.Iterator<String>
     {
+        private final NormalizedRound FIRST_ROUND = new NormalizedRound("1");
         private final Map<String,List<GameInfo>> eventMap;
         private final java.util.Iterator<String> iterator;
         private String next;
         
-        private RoundErrorIterator(Map<String,List<GameInfo>> eventMap,
-            OutputSelector selectors[])
+        private RoundErrorIterator(Map<String,List<GameInfo>> eventMap, OutputSelector selectors[])
             throws InvalidSelectorException
         {
             this.eventMap = eventMap;
             iterator = eventMap.keySet().iterator();
             
             if (selectors != null && selectors.length > 0)
-            {
-                throw new InvalidSelectorException("output selectors are not " +
-                    "allowed for this function");
-            }
+                throw new InvalidSelectorException("output selectors are not allowed for this function");
         }
         
         private void genNext()
@@ -150,29 +148,25 @@ public class Events implements Tallier
             List<GameInfo> gameList = eventMap.get(eventName);
             
             gameList.sort(Comparator.comparing(GameInfo::getRound));
-            int thisRound = gameList.get(0).getRound();
-            if (thisRound != 1) ret.append(thisRound);
+            NormalizedRound thisRound = gameList.get(0).getRound();
+            if (!FIRST_ROUND.equals(thisRound)) ret.append(thisRound);
 
             for (int j = 1; j < gameList.size(); j++)
             {
-                int prevRound = thisRound;
+                NormalizedRound prevRound = thisRound;
                 thisRound = gameList.get(j).getRound();
 
-                if (thisRound - prevRound != 1)
+                if (!thisRound.canFollow(prevRound))
                 {
-                    if (ret.length() > 0)
-                        ret.append(CLOptions.valueDelim);
-
+                    if (ret.length() > 0) ret.append(CLOptions.valueDelim);
                     ret.append(prevRound).append("-").append(thisRound);
                 }
             }
 
-            if (thisRound != gameList.size())
+            if (thisRound.ordinalValue() != gameList.size())
             {
                 if (ret.length() > 0) ret.append(CLOptions.valueDelim);
-
-                ret.append(thisRound).append("(").
-                    append(gameList.size()).append(")");
+                ret.append(thisRound).append("(").append(gameList.size()).append(")");
             }
 
             if (ret.length() > 0)
@@ -239,8 +233,7 @@ public class Events implements Tallier
             eventMap.put(event, eventGames);
         }
 
-        eventGames.add(new GameInfo((int)game.getNumber(), game.getRound(),
-            game.getTimeCtrl()));
+        eventGames.add(new GameInfo((int)game.getNumber(), game.getNormalizedRound(), game.getTimeCtrl()));
     }
 
     @Override
