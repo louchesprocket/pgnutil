@@ -61,7 +61,8 @@ public final class EcoTree
         STD("/com/dotfx/pgnutil/eco/lichesseco_db", true, new StdReader.Factory());
 
         private final String path;
-        private final boolean isResource;
+        private final
+        boolean isResource;
         private final TreeReaderFactory readerFactory;
         private EcoTree treeInstance;
 
@@ -124,51 +125,49 @@ public final class EcoTree
      * @return 
      */
     public TreeNode get(String moveSt) { return topNode.getBottomNode(moveSt); }
+
+    public TreeNodeSet getTranspositions(TreeNode node)
+    {
+        return new TreeNodeSet(reader.getPositionMap().get(node.getPositionId()));
+    }
     
     public TreeNodeSet getDeepestTranspositionSet(PgnGame game) throws IllegalMoveException
     {
+        try { return getDeepestTranspositionSet(game.getOpeningMoveList()); }
+
+        catch (IllegalMoveException | NullPointerException | StringIndexOutOfBoundsException e)
+        {
+            throw new IllegalMoveException("in game " + game.getNumber() +
+                    ". Game text:\n##################################################\n" + game.getOrigText() +
+                    "\n##################################################", e);
+        }
+    }
+
+    public TreeNodeSet getDeepestTranspositionSet(List<PgnGame.Move> moveList) throws IllegalMoveException
+    {
         Set<TreeNode> deepest = new HashSet<>();
-        Map<String, Set<TreeNode>> posMap = reader.getPositionMap();
+        Map<String,Set<TreeNode>> posMap = reader.getPositionMap();
         int ply = 0;
         Board board = new Board(true);
-        
-        for (PgnGame.Move move : game.getMoves())
+
+        for (PgnGame.Move move : moveList)
         {
             if (++ply > reader.getDeepestPly()) break;
             Set<TreeNode> nodeSet;
-            
+
             try { nodeSet = posMap.get(board.move(move).positionId().toString()); }
-            
+
             catch (IllegalMoveException | NullPointerException | StringIndexOutOfBoundsException e)
             {
-                throw new IllegalMoveException("Illegal move: '" + move + "' in game " + game.getNumber() +
-                        ".  Game text:\n##################################################\n" + game.getOrigText() +
-                        "\n##################################################", e);
+                throw new IllegalMoveException("Illegal move: '" + move + "'", e);
             }
-            
+
             if (nodeSet != null) deepest = nodeSet;
         }
 
         return new TreeNodeSet(deepest);
-//        return new NodeSet(deepest).getDefinedNodeSet();
     }
-    
-    public TreeNodeSet getDeepestTranspositionSet(List<String> moveList) throws IllegalMoveException
-    {
-        Set<TreeNode> deepest = null;
-        Map<String, Set<TreeNode>> fenMap = reader.getPositionMap();
-        int ply = 0;
-        Board board = new Board(true);
-        
-        for (String move : moveList)
-        {
-            if (++ply > reader.getDeepestPly()) break;
-            Set<TreeNode> nodeSet = fenMap.get(board.move(move).positionId().toString());
-            if (nodeSet != null) deepest = nodeSet;
-        }
-        
-        return new TreeNodeSet(deepest).getDefinedNodeSet();
-    }
+
     
     public TreeNode getTop() { return topNode; }
     public int positionCount() { return topNode.deepCount(); }

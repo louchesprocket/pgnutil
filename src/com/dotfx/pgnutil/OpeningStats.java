@@ -1,24 +1,20 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Mark Chen.
+ * Copyright (c) 2023 Mark Chen <chen@dotfx.com>.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to the following
+ * conditions: The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED
+ * "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+ * TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 
@@ -26,6 +22,7 @@ package com.dotfx.pgnutil;
 
 import com.dotfx.pgnutil.eco.EcoTree;
 import com.dotfx.pgnutil.eco.TreeNode;
+import com.dotfx.pgnutil.eco.TreeNodeSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,26 +37,45 @@ import java.util.Map;
  */
 public class OpeningStats implements Tallier
 {
-    private static class Opening extends OpeningScore
+    public static class Opening extends OpeningScore
     {
         private final MoveListId oid;
         private final TreeNode eco;
+        private final TreeNode scidEco;
+        private final TreeNodeSet xEcoSet;
+        private final TreeNodeSet xScidEcoSet;
         
-        Opening(MoveListId oid, TreeNode eco)
+        Opening(MoveListId oid, TreeNode eco, TreeNode scidEco, TreeNodeSet xEcoSet, TreeNodeSet xScidEcoSet)
         {
             super();
             this.oid = oid;
             this.eco = eco;
+            this.scidEco = scidEco;
+            this.xEcoSet = xEcoSet;
+            this.xScidEcoSet = xScidEcoSet;
         }
 
         public MoveListId getId() { return oid; }
-        public TreeNode getEco() { return eco; }
+
+        public TreeNode getEco(EcoTree.FileType type)
+        {
+            if (type == EcoTree.FileType.STD) return eco;
+            if (type == EcoTree.FileType.SCIDDB) return scidEco;
+            return null;
+        }
+
+        public TreeNodeSet getXEcoSet(EcoTree.FileType type)
+        {
+            if (type == EcoTree.FileType.STD) return xEcoSet;
+            if (type == EcoTree.FileType.SCIDDB) return xScidEcoSet;
+            return null;
+        }
 
         @Override
         public String toString()
         {
-            return "ECO: " + eco.getCode() + CLOptions.outputDelim +
-                "opening: " + oid + CLOptions.outputDelim + super.toString();
+            return "ECO: " + eco.getCode() + CLOptions.outputDelim + "opening: " + oid + CLOptions.outputDelim +
+                    super.toString();
         }
     }
     
@@ -67,11 +83,8 @@ public class OpeningStats implements Tallier
     {
         private final List<Opening> selectedOpenings;
         private final java.util.Iterator<Opening> iterator;
-        private final OutputSelector selectors[];
         
-        private Iterator(Map<MoveListId,Opening> openingsMap,
-            OutputSelector selectors[])
-            throws InvalidSelectorException
+        private Iterator(Map<MoveListId,Opening> openingsMap)
         {
             selectedOpenings = new ArrayList<>();
             
@@ -81,46 +94,12 @@ public class OpeningStats implements Tallier
                 Opening opening = openingsMap.get(oid);
                 
                 for (OpeningProcessors.Processor processor : openingProcessors)
-                    if (!processor.processOpening(opening))
-                        continue nextOpening;
+                    if (!processor.processOpening(opening)) continue nextOpening;
 
                 selectedOpenings.add(opening);
             }
             
             iterator = selectedOpenings.iterator();
-            
-            if (selectors == null || selectors.length == 0)
-            {
-                this.selectors = null;
-                return;
-            }
-            
-            for (OutputSelector selector : selectors)
-            {
-                switch (selector.getValue())
-                {
-                    case STDECO:
-                    case STDECODESC:
-                    case STDECOMOVES:
-                    case OID:
-                    case COUNT:
-                    case WWINS:
-                    case BWINS:
-                    case DRAWS:
-                    case WWINPCT:
-                    case BWINPCT:
-                    case DIFF:
-                    case DIFFPCT:
-                    case DRAWPCT:
-                        break;
-
-                    default:
-                        throw new InvalidSelectorException("'" + selector +
-                            "' is not a valid selector in this context");
-                }
-            }
-            
-            this.selectors = selectors;
         }
         
         @Override public boolean hasNext() { return iterator.hasNext(); }
@@ -134,86 +113,83 @@ public class OpeningStats implements Tallier
 
             else for (int i = 0; i < selectors.length; i++)
             {
-                switch (selectors[i].getValue())
-                {
-                    case STDECO: ret.append(opening.getEco().getCode()); break;
-                    case STDECODESC: ret.append(opening.getEco().getDesc()); break;
-                    case OID: ret.append(opening.getId()); break;
-                    case COUNT: ret.append(opening.getGameCount()); break;
-                    case WWINS: ret.append(opening.getWhiteWins()); break;
-                    case BWINS: ret.append(opening.getBlackWins()); break;
-                    case DRAWS: ret.append(opening.getDraws()); break;
-                    
-                    case STDECOMOVES:
-                        for (TreeNode node : opening.getEco().getPath())
-                        {
-                            int ply = node.getPly();
-                            if (ply != 1) ret.append(" ");
-
-                            if (ply % 2 == 1)
-                                ret.append(((ply + 1)/2)).append(".");
-
-                            ret.append(node.getMove());
-                        }
-                        
-                        break;
-
-                    case WWINPCT:
-                        ret.append(Formats.DECIMAL.format(opening.getWhiteWinPct()));
-                        break;
-
-                    case BWINPCT:
-                        ret.append(Formats.DECIMAL.format(opening.getBlackWinPct()));
-                        break;
-
-                    case DIFF:
-                        ret.append(opening.getWhiteWins() - opening.getBlackWins());
-                        break;
-
-                    case DIFFPCT:
-                        ret.append(Formats.DECIMAL.format(opening.getWhiteWinPct() -
-                            opening.getBlackWinPct()));
-
-                        break;
-
-                    case DRAWPCT:
-                        ret.append(Formats.DECIMAL.format(opening.getDrawPct()));
-                }
-
-                if (i < selectors.length - 1) ret.append(CLOptions.outputDelim);
+                ret.append(CLOptions.outputDelim);
+                selectors[i].appendOutput(opening, ret);
             }
 
+            ret.delete(0, CLOptions.outputDelim.length());
             return ret.toString();
         }
     }
     
-    private static final List<OpeningProcessors.Processor> openingProcessors =
-        new ArrayList<>();
+    private static final List<OpeningProcessors.Processor> openingProcessors = new ArrayList<>();
+    private static OpeningStatsOutputSelector selectors[];
+    private static OpeningStats instance;
     
     private final Map<MoveListId,Opening> openingsMap;
-    private final EcoTree ecoTree;
+    private EcoTree ecoTree;
+    private EcoTree scidEcoTree;
+    private boolean useXStdEco;
+    private boolean useXScidEco;
 
-    public OpeningStats()
+    private OpeningStats() { openingsMap = new HashMap<>(10000); }
+
+    public static OpeningStats getInstance()
     {
-        openingsMap = new HashMap<>(10000);
-        ecoTree = EcoTree.FileType.STD.getEcoTree();
+        if (instance == null) instance = new OpeningStats();
+        return instance;
     }
-    
+
+    @Override
+    public void init() throws InvalidSelectorException
+    {
+        if (PGNUtil.outputSelectors == null || PGNUtil.outputSelectors.length == 0)
+            ecoTree = EcoTree.FileType.STD.getEcoTree();
+
+        else
+        {
+            selectors = new OpeningStatsOutputSelector[PGNUtil.outputSelectors.length];
+
+            for (int i = 0; i < PGNUtil.outputSelectors.length; i++)
+                selectors[i] = new OpeningStatsOutputSelector(PGNUtil.outputSelectors[i], this);
+        }
+    }
+
+    public void setUseEco(EcoTree.FileType type)
+    {
+        if (type == EcoTree.FileType.STD) ecoTree = type.getEcoTree();
+        else if (type == EcoTree.FileType.SCIDDB) scidEcoTree = type.getEcoTree();
+    }
+
+    public void setUseXEco(EcoTree.FileType type)
+    {
+        if (type == EcoTree.FileType.STD)
+        {
+            useXStdEco = true;
+            ecoTree = type.getEcoTree();
+        }
+
+        else if (type == EcoTree.FileType.SCIDDB)
+        {
+            useXScidEco = true;
+            scidEcoTree = type.getEcoTree();
+        }
+    }
+
     static void addOpeningProcessor(OpeningProcessors.Processor op)
     {
         openingProcessors.add(op);
     }
 
     @Override
-    public void tally(PgnGame game)
+    public void tally(PgnGame game) throws IllegalMoveException
     {
         if (CLOptions.maxEloDiff != null)
         {
             Integer whiteElo = PGNUtil.eloMap.get(game.getWhite().trim());
             Integer blackElo = PGNUtil.eloMap.get(game.getBlack().trim());
 
-            if (whiteElo == null || blackElo == null ||
-                Math.abs(whiteElo - blackElo) > CLOptions.maxEloDiff)
+            if (whiteElo == null || blackElo == null || Math.abs(whiteElo - blackElo) > CLOptions.maxEloDiff)
                 return;
         }
 
@@ -222,9 +198,15 @@ public class OpeningStats implements Tallier
 
         if (opening == null)
         {
-            PgnGame.Move lastBookMove = game.getLastBookMove();
-            if (lastBookMove == null) return;
-            opening = new Opening(openingId, ecoTree.get(game, lastBookMove.getPly()));
+            List<PgnGame.Move> openingMoveList = game.getOpeningMoveList();
+            if (openingMoveList.size() == 0) return; // no book moves
+
+            opening = new Opening(openingId,
+                    ecoTree != null ? ecoTree.get(game, openingMoveList.size()) : null,
+                    scidEcoTree != null ? scidEcoTree.get(game, openingMoveList.size()) : null,
+                    useXStdEco ? ecoTree.getDeepestTranspositionSet(game) : null,
+                    useXScidEco ? scidEcoTree.getDeepestTranspositionSet(game) : null);
+
             openingsMap.put(openingId, opening);
         }
 
@@ -239,8 +221,7 @@ public class OpeningStats implements Tallier
 
     @Override
     public java.util.Iterator<String> getOutputIterator(OutputSelector selectors[])
-        throws InvalidSelectorException
     {
-        return new Iterator(openingsMap, selectors);
+        return new Iterator(openingsMap);
     }
 }

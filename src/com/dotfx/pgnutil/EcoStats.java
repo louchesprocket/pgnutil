@@ -59,8 +59,7 @@ public class EcoStats implements Tallier
             
             iterator = selectedOpenings.iterator();
             
-            this.selectors = (selectors == null || selectors.length == 0) ?
-                null : selectors;
+            this.selectors = (selectors == null || selectors.length == 0) ? null : selectors;
         }
         
         @Override public boolean hasNext() { return iterator.hasNext(); }
@@ -80,8 +79,8 @@ public class EcoStats implements Tallier
             {
                 switch (selectors[i].getValue())
                 {
-                    case CODE: ret.append(opening.toString()); break;
-                    case DESC: ret.append(opening.getDesc()); break;
+                    case STDECO: ret.append(opening.toString()); break;
+                    case STDECODESC: ret.append(opening.getDesc()); break;
                     case MOVES: ret.append(opening.getMoveString()); break;
                     case COUNT: ret.append(score.getGameCount()); break;
                     case WWINS: ret.append(score.getWhiteWins()); break;
@@ -137,7 +136,7 @@ public class EcoStats implements Tallier
         {
             switch (selector.getValue())
             {
-                case CODE:
+                case STDECO:
                 case STDECODESC:
                 case STDECOMOVES:
                 case OID:
@@ -176,8 +175,7 @@ public class EcoStats implements Tallier
         }
 
         TreeNodeSet treeNodeSet = transpose ?
-            ecoTree.getDeepestTranspositionSet(game) :
-            new TreeNodeSet(ecoTree.getDeepestDefined(game));
+            ecoTree.getDeepestTranspositionSet(game) : new TreeNodeSet(ecoTree.getDeepestDefined(game));
         
         OpeningScore os = openingsMap.get(treeNodeSet);
 

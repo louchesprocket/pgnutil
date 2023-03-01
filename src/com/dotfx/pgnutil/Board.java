@@ -756,7 +756,7 @@ public class Board
     
     public Board move(PgnGame.Move move) throws IllegalMoveException
     {
-        return move(move.getMoveText());
+        return move(move.getMoveOnly());
     }
     
     public Board move(List<TreeNode> moveList) throws IllegalMoveException

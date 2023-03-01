@@ -130,13 +130,13 @@ Similarly, values within a field are, by default, separated by commas.  If a dif
 
 ### Special Output Options
 
-The "special" output options include "-d" (duplicates), "-dm" (duplicate moves), "-do" (duplicate openings), "-e" (events), "-csr" (check sequential rounds), "-o" ([opening statistics](#openings)), and "-p" (player statistics). Any of these may be combined with any matching and replacing options (see above).
+The "special" output options include "-d" (duplicates), "-dm" (duplicate moves), "-do" (duplicate [openings](#openings)), "-e" (events), "-csr" (check sequential rounds), "-o" ([opening](#openings) statistics), and "-p" (player statistics). Any of these may be combined with any matching and replacing options (see above).
 
 To find duplicate games (defined as games with the same players and same move list) in the file mygames.pgn:
 
 ``pgnutil -d -i mygames.pgn``
 
-The previous command will print a comma-sparated list of game numbers (indexed from the first game of the PGN file), with each set of duplicates on a separate line.  For example, the output:
+The previous command will print a comma-separated list of game numbers (indexed from the first game of the PGN file), with each set of duplicates on a separate line.  For example, the output:
 
 > 1616,1617<br>
 > 1622,1623,1710
@@ -158,10 +158,15 @@ To list each player from the file mygames.pgn, along with win/loss/draw statisti
 
 ``pgnutil -p -i mygames.pgn``
 
+The "-do" option is for engine tournaments. It works analogously to the "-d" option, and outputs games that contain the same [opening](#openings) and same players.
+
+The "-csr" option checks for non-sequential round numbers within events. Note that assignment of round numbers is dependent on the tournament format, so this option is only useful with respect to tournaments where each game is assigned a unique round number (e.g., Aquarium matches, but not Banksia matches).
+
 ### Openings
 
-Pgnutil's definition of an "opening" pertains specifically to chess engines; it is the list of a game's book moves that occur prior to the first engine-generated move.  To list opening
-statistics for all games in mygames.pgn:
+Pgnutil's definition of an "opening" pertains specifically to chess engines; it is the list of a game's book moves that occur prior to the first engine-generated move.
+
+To list opening statistics for all games in mygames.pgn:
 
 ``pgnutil -o -i mygames.pgn``
 

@@ -1,3 +1,23 @@
+/*
+ * The MIT License
+ *
+ * Copyright (c) 2023 Mark Chen <chen@dotfx.com>.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to the following
+ * conditions: The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED
+ * "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+ * TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package com.dotfx.pgnutil.eco;
 
 import com.dotfx.pgnutil.IllegalMoveException;
@@ -5,17 +25,15 @@ import com.dotfx.pgnutil.PgnGame;
 
 import java.util.*;
 
-/**
- * The entire tree of these things must be immutable (hash codes depend on it).
- */
 public final class TreeNode implements Comparable<TreeNode>
 {
     private final int ply;
     private final String moveSt;
     private String code;
     private String desc;
+    private String positionIdSt;
     private final TreeNode parent;
-    private final Map<String, TreeNode> branchMap; // children indexed by move text
+    private final Map<String,TreeNode> branchMap; // children indexed by move text
 
     /**
      * @param parent null for top tier nodes
@@ -43,15 +61,15 @@ public final class TreeNode implements Comparable<TreeNode>
     public String getSpecCode() {
         return code;
     }
-    public void setSpecCode(String code) {
-        this.code = code == null ? "" : code;
-    }
+    private void setSpecCode(String code) { this.code = code == null ? "" : code; }
     public String getSpecDesc() {
         return desc;
     }
     private void setSpecDesc(String desc) {
         this.desc = desc == null ? "" : desc;
     }
+    public String getPositionId() { return positionIdSt; }
+    void setPositionId(String st) { positionIdSt = st; }
     private TreeNode branchTo(String moveTxt) {
         return branchMap.get(moveTxt);
     }
@@ -59,13 +77,13 @@ public final class TreeNode implements Comparable<TreeNode>
         return parent;
     }
     public String getMoveText() {
-        return PgnGame.Move.getMoveText(moveSt);
+        return PgnGame.Move.getMoveOnly(moveSt);
     }
     public TreeNode branchTo(TreeNode node) {
         return branchTo(node.getMove());
     }
     public TreeNode branchTo(PgnGame.Move move) {
-        return branchTo(move.getMoveText());
+        return branchTo(move.getMoveOnly());
     }
 
     public List<TreeNode> getChildren()
@@ -108,7 +126,7 @@ public final class TreeNode implements Comparable<TreeNode>
 
         for (int i = 0; i < moveList.size(); i++)
         {
-            next = next.branchTo(moveList.get(i).getMoveText());
+            next = next.branchTo(moveList.get(i).getMoveOnly());
             if (next == null) break;
             ret = next;
         }
@@ -124,7 +142,7 @@ public final class TreeNode implements Comparable<TreeNode>
 
         for (int i = 0; i < moveList.size() && i < maxDepth; i++)
         {
-            next = next.branchTo(moveList.get(i).getMoveText());
+            next = next.branchTo(moveList.get(i).getMoveOnly());
             if (next == null) break;
             ret = next;
         }
@@ -147,7 +165,7 @@ public final class TreeNode implements Comparable<TreeNode>
 
         for (int i = 0; i < moveList.size(); i++)
         {
-            next = next.branchTo(moveList.get(i).getMoveText());
+            next = next.branchTo(moveList.get(i).getMoveOnly());
             if (next == null) break;
             ret = next;
         }
@@ -223,7 +241,7 @@ public final class TreeNode implements Comparable<TreeNode>
     }
 
     /**
-     * Adds a path below this node. Assumes no stored FEN.
+     * Adds a path below this node.
      *
      * @param moveList
      * @param code
@@ -245,7 +263,7 @@ public final class TreeNode implements Comparable<TreeNode>
     }
 
     /**
-     * Adds a node if it does not already exist. Assumes no stored FEN.
+     * Adds a node if it does not already exist.
      *
      * @param moveSt a single move in SAN
      * @param code
@@ -254,7 +272,7 @@ public final class TreeNode implements Comparable<TreeNode>
      */
     TreeNode addNode(String moveSt, String code, String desc, TreeReader handler) throws IllegalMoveException
     {
-        String moveOnly = PgnGame.Move.getMoveText(moveSt);
+        String moveOnly = PgnGame.Move.getMoveOnly(moveSt);
         TreeNode branch = branchTo(moveOnly);
 
         if (branch == null)
@@ -286,7 +304,7 @@ public final class TreeNode implements Comparable<TreeNode>
     }
 
     /**
-     * code and desc are not included in comparison because they may change.
+     * Compares paths (not codes or descriptions).
      *
      * @param that
      * @return 0 if same path
@@ -306,7 +324,7 @@ public final class TreeNode implements Comparable<TreeNode>
     @Override
     public boolean equals(Object other)
     {
-        try {return hashCode() == ((TreeNode) other).hashCode(); }
+        try { return getPathString() == ((TreeNode)other).getPathString(); }
         catch (ClassCastException | NullPointerException e) { return false; }
     }
 

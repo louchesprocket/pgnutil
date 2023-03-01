@@ -34,6 +34,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+/**
+ * Reads from standard database without computing position hashes (because hashes are stored).
+ *
+ */
 final class StdReader extends TreeReader
 {
     static class Factory implements TreeReaderFactory
@@ -47,7 +51,7 @@ final class StdReader extends TreeReader
     public static final String FIELD_DELIM = ",";
 
     /**
-     * Reads processed files with stored FEN strings.
+     * Reads processed files with stored position hashes.
      *
      * @param in
      * @param topNode
@@ -70,7 +74,7 @@ final class StdReader extends TreeReader
                 String parts[] = line.split(lineDelim);
                 String tuples[] = parts[2].split(tupleDelim);
 
-                for (int i = 0; i < tuples.length; i++) // for each move+position hash
+                for (int i = 0; i < tuples.length; i++) // for each move + position hash
                 {
                     // field[0] is the move; field[1] is the position hash
                     String fields[] = tuples[i].split(fieldDelim);
@@ -89,6 +93,7 @@ final class StdReader extends TreeReader
                         }
 
                         nodeSet.add(node);
+                        node.setPositionId(fields[1]);
                     }
                 }
             }
