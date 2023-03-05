@@ -51,12 +51,10 @@ public class PlayerResults implements Tallier
         public int getLosses() { return losses; }
         public int getDraws() { return draws; }
         public int getNoResults() { return noResults; }
-        
         public int getGameCount()
         {
             return wins + losses + draws + noResults;
         }
-        
         public double getWinPct()
         {
             return ((double)wins + ((double)draws) / 2) / getGameCount();
@@ -72,40 +70,10 @@ public class PlayerResults implements Tallier
     private class ResultsIterator implements Iterator<String>
     {
         private final Iterator<String> iterator;
-        private final OutputSelector selectors[];
         
-        private ResultsIterator(Map<String,Score> resultsMap,
-            OutputSelector selectors[])
-            throws InvalidSelectorException
+        private ResultsIterator(Map<String,Score> resultsMap)
         {
             iterator = resultsMap.keySet().iterator();
-            
-            if (selectors == null || selectors.length == 0)
-            {
-                this.selectors = null;
-                return;
-            }
-            
-            for (OutputSelector selector : selectors)
-            {
-                switch (selector.getValue())
-                {
-                    case PLAYER:
-                    case WINS:
-                    case LOSSES:
-                    case DRAWS:
-                    case NORESULTS:
-                    case COUNT:
-                    case WINPCT:
-                        break;
-
-                    default:
-                        throw new InvalidSelectorException("'" + selector +
-                            "' is not a valid selector in this context");
-                }
-            }
-            
-            this.selectors = selectors;
         }
         
         @Override public boolean hasNext() { return iterator.hasNext(); }
@@ -123,34 +91,53 @@ public class PlayerResults implements Tallier
                     append(CLOptions.outputDelim).append("win: " ).
                     append(Formats.PERCENT.format(score.getWinPct()));
 
-            else for (int i = 0; i < selectors.length; i++)
+            else
             {
-                switch (selectors[i].getValue())
+                for (PlayerResultsOutputSelector selector : selectors)
                 {
-                    case PLAYER: ret.append(player); break;
-                    case WINS: ret.append(score.getWins()); break;
-                    case LOSSES: ret.append(score.getLosses()); break;
-                    case DRAWS: ret.append(score.getDraws()); break;
-                    case NORESULTS: ret.append(score.getNoResults()); break;
-                    case COUNT: ret.append(score.getGameCount()); break;
-                    
-                    case WINPCT:
-                        ret.append(Formats.DECIMAL.format(score.getWinPct()));
-                        break;
+                    ret.append(CLOptions.outputDelim);
+                    selector.appendOutput(player, score, ret);
                 }
 
-                if (i < selectors.length - 1) ret.append(CLOptions.outputDelim);
+                ret.delete(0, CLOptions.outputDelim.length());
             }
 
             return ret.toString();
         }
     }
-    
+
+    private static PlayerResults instance;
+    private static PlayerResultsOutputSelector selectors[];
+
     private final Map<String,Score> resultsMap;
     
-    public PlayerResults()
+    private PlayerResults()
     {
         resultsMap = new TreeMap<>();
+    }
+
+    public static PlayerResults getInstance()
+    {
+        if (instance == null) instance = new PlayerResults();
+        return instance;
+    }
+
+    @Override
+    public void init() throws InvalidSelectorException
+    {
+        if (PGNUtil.outputSelectors == null || PGNUtil.outputSelectors.length == 0) return;
+        selectors = new PlayerResultsOutputSelector[PGNUtil.outputSelectors.length];
+
+        for (int i = 0; i < PGNUtil.outputSelectors.length; i++)
+        {
+            try { selectors[i] = new PlayerResultsOutputSelector(PGNUtil.outputSelectors[i].getValue()); }
+
+            catch (InvalidSelectorException e)
+            {
+                throw new InvalidSelectorException("output selector '" + PGNUtil.outputSelectors[i].toString() +
+                        "' is invalid in this context");
+            }
+        }
     }
     
     @Override
@@ -198,8 +185,7 @@ public class PlayerResults implements Tallier
 
     @Override
     public Iterator<String> getOutputIterator(OutputSelector selectors[])
-        throws InvalidSelectorException
     {
-        return new ResultsIterator(resultsMap, selectors);
+        return new ResultsIterator(resultsMap);
     }
 }

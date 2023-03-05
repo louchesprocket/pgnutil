@@ -982,8 +982,7 @@ public class CLOptions
 
     // event errors
 
-    @Option(name = CSR, forbids = {D, DO, DM, O, E, P, S},
-        aliases = "-check_sequential_rounds",
+    @Option(name = CSR, forbids = {D, DO, DM, O, E, P, S}, aliases = "-check_sequential_rounds",
         usage = "list each event containing non-sequential rounds, one event per line, with " +
         "information about each non-sequential round found")
     private void eventErrors(boolean e)
@@ -1002,11 +1001,9 @@ public class CLOptions
 
     // opening stats
 
-    @Option(name = O, forbids = {D, DO, DM, E, CSR, P},
-        aliases = "-opening_stats", usage = "print win/loss/draw " +
-        "statistics for each opening.  Valid output selectors ('" + S + "') are: " +
-        "'eco,' 'oid,' 'count,' 'wwins,' 'bwins,' 'draws,' 'wwinpct,'" +
-        "'bwinpct,' 'diff,' 'diffpct,' 'drawpct'")
+    @Option(name = O, forbids = {D, DO, DM, E, CSR, P}, aliases = "-opening_stats",
+            usage = "print win/loss/draw statistics for each opening.  Valid output selectors ('" + S + "') are: " +
+            "'eco,' 'oid,' 'count,' 'wwins,' 'bwins,' 'draws,' 'wwinpct,' 'bwinpct,' 'diff,' 'diffpct,' 'drawpct'")
     private void openings(boolean o)
     {
         if (getCount(OptId.OPENINGS) > 0)
@@ -1022,9 +1019,9 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
-    @Option(name = ECO, depends = {O},
-        aliases = "-eco_stats", usage = "combined with the '" + O + "' " +
-        "option, print win/loss/draw statistics for each ECO code")
+    /*
+    @Option(name = ECO, depends = {O}, aliases = "-eco_stats",
+            usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each ECO code")
     private void ecoOpenings(boolean o)
     {
         if (getCount(OptId.ECOOPENINGS) > 0)
@@ -1040,9 +1037,8 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
-    @Option(name = SCIDECO, depends = {O},
-        aliases = "-scid_eco_stats", usage = "combined with the '" + O + "' " +
-        "option, print win/loss/draw statistics for each Scid ECO code")
+    @Option(name = SCIDECO, depends = {O}, aliases = "-scid_eco_stats",
+            usage = "combined with the '" + O + "' " + "option, print win/loss/draw statistics for each Scid ECO code")
     private void ScidEcoOpenings(boolean o)
     {
         if (getCount(OptId.SCIDECOOPENINGS) > 0)
@@ -1058,10 +1054,9 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
-    @Option(name = XECO, depends = {O},
-        aliases = "-trans_eco_stats", usage = "combined with the '" + O + "' " +
-        "option, print win/loss/draw statistics for each ECO code, matching " +
-        "openings transpositionally")
+    @Option(name = XECO, depends = {O}, aliases = "-trans_eco_stats",
+            usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each ECO code, " +
+                    "matching openings transpositionally")
     private void XEcoOpenings(boolean o)
     {
         if (getCount(OptId.XECOOPENINGS) > 0)
@@ -1077,10 +1072,9 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
-    @Option(name = XSCIDECO, depends = {O},
-        aliases = "-trans_scid_eco_stats", usage = "combined with the '" + O + "' " +
-        "option, print win/loss/draw statistics for each Scid ECO code, matching " +
-        "openings transpositionally")
+    @Option(name = XSCIDECO, depends = {O}, aliases = "-trans_scid_eco_stats",
+            usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each Scid ECO code, " +
+                    "matching openings transpositionally")
     private void XScidEcoOpenings(boolean o)
     {
         if (getCount(OptId.XSCIDECOOPENINGS) > 0)
@@ -1095,6 +1089,7 @@ public class CLOptions
         PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
+     */
 
     @Option(name = CMIN, depends = {O}, aliases = "-count_min",
         metaVar = "<min>",
@@ -1244,7 +1239,7 @@ public class CLOptions
         
         countOption(OptId.PLAYERRESULTS);
         
-        Tallier pr = new PlayerResults();
+        Tallier pr = PlayerResults.getInstance();
         PGNUtil.setHandler(new PGNUtil.TallyHandler(pr));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(pr));
     }

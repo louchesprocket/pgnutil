@@ -34,6 +34,18 @@ public class OpeningStatsOutputSelector
         void configTallier(OpeningStats os);
     }
 
+    private static final class OidOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        {
+            sb.append(opening.getId());
+        }
+
+        @Override
+        public void configTallier(OpeningStats os) {}
+    }
+
     private static final class BlackWinPctOutputHandler implements OutputHandler
     {
         @Override
@@ -240,50 +252,51 @@ public class OpeningStatsOutputSelector
 
     public enum Value
     {
-        BWINPCT("bwinpct", new BlackWinPctOutputHandler()),
-        BWINS("bwins", new BlackWinsOutputHandler()),
-        COUNT("count", new CountOutputHandler()), // also applies to player results
-        DIFF("diff", new DiffOutputHandler()),
-        DIFFPCT("diffpct", new DiffPctOutputHandler()),
-        DRAWPCT("drawpct", new DrawPctOutputHandler()),
-        DRAWS("draws", new DrawsOutputHandler()), // also applies to player results
-        WWINPCT("wwinpct", new WhiteWinPctOutputHandler()),
-        WWINS("wwins", new WhiteWinsOutputHandler()),
+        OID(OutputSelector.Value.OID, new OidOutputHandler()),
+        BWINPCT(OutputSelector.Value.BWINPCT, new BlackWinPctOutputHandler()),
+        BWINS(OutputSelector.Value.BWINS, new BlackWinsOutputHandler()),
+        COUNT(OutputSelector.Value.COUNT, new CountOutputHandler()), // also applies to player results
+        DIFF(OutputSelector.Value.DIFF, new DiffOutputHandler()),
+        DIFFPCT(OutputSelector.Value.DIFFPCT, new DiffPctOutputHandler()),
+        DRAWPCT(OutputSelector.Value.DRAWPCT, new DrawPctOutputHandler()),
+        DRAWS(OutputSelector.Value.DRAWS, new DrawsOutputHandler()), // also applies to player results
+        WWINPCT(OutputSelector.Value.WWINPCT, new WhiteWinPctOutputHandler()),
+        WWINS(OutputSelector.Value.WWINS, new WhiteWinsOutputHandler()),
 
-        STDECO("stdeco", new EcoOutputHandler(EcoTree.FileType.STD)),
-        STDECODESC("stdecodesc", new EcoDescOutputHandler(EcoTree.FileType.STD)),
-        STDECOMOVES("stdecomoves", new EcoMovesOutputHandler(EcoTree.FileType.STD)),
+        STDECO(OutputSelector.Value.STDECO, new EcoOutputHandler(EcoTree.FileType.STD)),
+        STDECODESC(OutputSelector.Value.STDECODESC, new EcoDescOutputHandler(EcoTree.FileType.STD)),
+        STDECOMOVES(OutputSelector.Value.STDECOMOVES, new EcoMovesOutputHandler(EcoTree.FileType.STD)),
 
-        SCIDECO("scideco", new EcoOutputHandler(EcoTree.FileType.SCIDDB)),
-        SCIDECODESC("scidecodesc", new EcoDescOutputHandler(EcoTree.FileType.SCIDDB)),
-        SCIDECOMOVES("scidecomoves", new EcoMovesOutputHandler(EcoTree.FileType.SCIDDB)),
+        SCIDECO(OutputSelector.Value.SCIDECO, new EcoOutputHandler(EcoTree.FileType.SCIDDB)),
+        SCIDECODESC(OutputSelector.Value.SCIDECODESC, new EcoDescOutputHandler(EcoTree.FileType.SCIDDB)),
+        SCIDECOMOVES(OutputSelector.Value.SCIDECOMOVES, new EcoMovesOutputHandler(EcoTree.FileType.SCIDDB)),
 
-        XSTDECO("xstdeco", new XEcoOutputHandler(EcoTree.FileType.STD)),
-        XSTDECODESC("xstdecodesc", new XEcoDescOutputHandler(EcoTree.FileType.STD)),
-        XSTDECOMOVES("xstdecomoves", new XEcoMovesOutputHandler(EcoTree.FileType.STD)),
+        XSTDECO(OutputSelector.Value.XSTDECO, new XEcoOutputHandler(EcoTree.FileType.STD)),
+        XSTDECODESC(OutputSelector.Value.XSTDECODESC, new XEcoDescOutputHandler(EcoTree.FileType.STD)),
+        XSTDECOMOVES(OutputSelector.Value.XSTDECOMOVES, new XEcoMovesOutputHandler(EcoTree.FileType.STD)),
 
-        XSCIDECO("xscideco", new XEcoOutputHandler(EcoTree.FileType.SCIDDB)),
-        XSCIDECODESC("xscidecodesc", new XEcoDescOutputHandler(EcoTree.FileType.SCIDDB)),
-        XSCIDECOMOVES("xscidecomoves", new XEcoMovesOutputHandler(EcoTree.FileType.SCIDDB));
+        XSCIDECO(OutputSelector.Value.XSCIDECO, new XEcoOutputHandler(EcoTree.FileType.SCIDDB)),
+        XSCIDECODESC(OutputSelector.Value.XSCIDECODESC, new XEcoDescOutputHandler(EcoTree.FileType.SCIDDB)),
+        XSCIDECOMOVES(OutputSelector.Value.XSCIDECOMOVES, new XEcoMovesOutputHandler(EcoTree.FileType.SCIDDB));
 
-        private static final Map<String,Value> sigMap = new HashMap<>();
-        private final String signifier;
+        private static final Map<OutputSelector.Value,Value> sigMap = new HashMap<>();
+        private final OutputSelector.Value signifier;
         private final OutputHandler outputHandler;
 
-        static { for (Value v : Value.values()) sigMap.put(v.toString(), v); }
+        static { for (Value v : Value.values()) sigMap.put(v.signifier, v); }
 
-        Value(String signifier, OutputHandler outputHandler)
+        Value(OutputSelector.Value signifier, OutputHandler outputHandler)
         {
             this.signifier = signifier;
             this.outputHandler = outputHandler;
         }
 
-        @Override public String toString() { return signifier; }
+        @Override public String toString() { return signifier.toString(); }
 
-        public static Value get(String signifier)
+        public static Value get(OutputSelector.Value signifier)
         {
             if (signifier == null) return null;
-            return sigMap.get(signifier.toLowerCase());
+            return sigMap.get(signifier);
         }
 
         public OutputHandler getOutputHandler() { return outputHandler; }
@@ -292,9 +305,9 @@ public class OpeningStatsOutputSelector
     private final Value value;
     private final OutputHandler handler;
 
-    public OpeningStatsOutputSelector(OutputSelector selector, OpeningStats os) throws InvalidSelectorException
+    public OpeningStatsOutputSelector(OutputSelector.Value selector, OpeningStats os) throws InvalidSelectorException
     {
-        Value v = Value.get(selector.toString());
+        Value v = Value.get(selector);
 
         if (v != null)
         {
@@ -303,8 +316,7 @@ public class OpeningStatsOutputSelector
             handler.configTallier(os);
         }
 
-        else throw new InvalidSelectorException("output selector '" + selector.getValue() +
-                "' is invalid in this context");
+        else throw new InvalidSelectorException("output selector '" + selector + "' is invalid in this context");
     }
 
     public Value getValue() { return value; }

@@ -111,10 +111,10 @@ public class OpeningStats implements Tallier
             
             if (selectors == null) ret.append(opening.toString());
 
-            else for (int i = 0; i < selectors.length; i++)
+            else for (OpeningStatsOutputSelector selector : selectors)
             {
                 ret.append(CLOptions.outputDelim);
-                selectors[i].appendOutput(opening, ret);
+                selector.appendOutput(opening, ret);
             }
 
             ret.delete(0, CLOptions.outputDelim.length());
@@ -151,7 +151,15 @@ public class OpeningStats implements Tallier
             selectors = new OpeningStatsOutputSelector[PGNUtil.outputSelectors.length];
 
             for (int i = 0; i < PGNUtil.outputSelectors.length; i++)
-                selectors[i] = new OpeningStatsOutputSelector(PGNUtil.outputSelectors[i], this);
+            {
+                try { selectors[i] = new OpeningStatsOutputSelector(PGNUtil.outputSelectors[i].getValue(), this); }
+
+                catch (InvalidSelectorException e)
+                {
+                    throw new InvalidSelectorException("output selector '" + PGNUtil.outputSelectors[i].toString() +
+                            "' is invalid in this context");
+                }
+            }
         }
     }
 
@@ -200,12 +208,15 @@ public class OpeningStats implements Tallier
         {
             List<PgnGame.Move> openingMoveList = game.getOpeningMoveList();
             if (openingMoveList.size() == 0) return; // no book moves
+            TreeNode ecoNode = ecoTree != null ? ecoTree.get(game, openingMoveList.size()) : null;
+            TreeNode scidNode = scidEcoTree != null ? scidEcoTree.get(game, openingMoveList.size()) : null;
 
-            opening = new Opening(openingId,
-                    ecoTree != null ? ecoTree.get(game, openingMoveList.size()) : null,
-                    scidEcoTree != null ? scidEcoTree.get(game, openingMoveList.size()) : null,
-                    useXStdEco ? ecoTree.getDeepestTranspositionSet(game) : null,
-                    useXScidEco ? scidEcoTree.getDeepestTranspositionSet(game) : null);
+            opening = new Opening(openingId, ecoNode, scidNode,
+                useXStdEco ?
+                    ecoTree.getDeepestTranspositionSet(openingMoveList, ecoNode != null ? ecoNode.getPly() : 0) : null,
+                useXScidEco ?
+                    scidEcoTree.getDeepestTranspositionSet(openingMoveList, scidNode != null ? scidNode.getPly() : 0) :
+                        null);
 
             openingsMap.put(openingId, opening);
         }

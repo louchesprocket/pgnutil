@@ -133,7 +133,7 @@ public final class EcoTree
     
     public TreeNodeSet getDeepestTranspositionSet(PgnGame game) throws IllegalMoveException
     {
-        try { return getDeepestTranspositionSet(game.getOpeningMoveList()); }
+        try { return getDeepestTranspositionSet(game.getOpeningMoveList(), 0); }
 
         catch (IllegalMoveException | NullPointerException | StringIndexOutOfBoundsException e)
         {
@@ -143,26 +143,33 @@ public final class EcoTree
         }
     }
 
-    public TreeNodeSet getDeepestTranspositionSet(List<PgnGame.Move> moveList) throws IllegalMoveException
+    /**
+     *
+     * @param moveList
+     * @param startAt in plies, with starting position as 0
+     * @return
+     * @throws IllegalMoveException
+     */
+    public TreeNodeSet getDeepestTranspositionSet(List<PgnGame.Move> moveList, int startAt) throws IllegalMoveException
     {
-        Set<TreeNode> deepest = new HashSet<>();
         Map<String,Set<TreeNode>> posMap = reader.getPositionMap();
-        int ply = 0;
-        Board board = new Board(true);
+        Board board = new Board(true).goToMove(moveList.subList(0, startAt));
+        Set<TreeNode> deepest = board.getPly() > 0 ? posMap.get(board.positionId().toString()) : null;
 
-        for (PgnGame.Move move : moveList)
+        for (int i = board.getPly(); i < moveList.size() && i <= reader.getDeepestPly(); i++)
         {
-            if (++ply > reader.getDeepestPly()) break;
-            Set<TreeNode> nodeSet;
+            PgnGame.Move move = moveList.get(i);
 
-            try { nodeSet = posMap.get(board.move(move).positionId().toString()); }
+            try
+            {
+                Set<TreeNode> nodeSet = posMap.get(board.move(move).positionId().toString());
+                if (nodeSet != null) deepest = nodeSet;
+            }
 
             catch (IllegalMoveException | NullPointerException | StringIndexOutOfBoundsException e)
             {
                 throw new IllegalMoveException("Illegal move: '" + move + "'", e);
             }
-
-            if (nodeSet != null) deepest = nodeSet;
         }
 
         return new TreeNodeSet(deepest);

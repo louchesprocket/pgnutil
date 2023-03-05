@@ -285,7 +285,8 @@ public class Board
         this.whitePieceCount = other.whitePieceCount;
         this.blackPieceCount = other.blackPieceCount;
     }
-    
+
+    public int getPly() { return ply; }
     public Board copy()
     {
         return new Board(this);
@@ -768,6 +769,12 @@ public class Board
     public Board goTo(List<String> moveList) throws IllegalMoveException
     {
         for (String moveSt : moveList) move(moveSt);
+        return this;
+    }
+
+    public Board goToMove(List<PgnGame.Move> moveList) throws IllegalMoveException
+    {
+        for (PgnGame.Move move : moveList) move(move);
         return this;
     }
     
