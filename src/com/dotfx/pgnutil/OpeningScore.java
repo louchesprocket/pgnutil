@@ -45,22 +45,15 @@ public class OpeningScore
     public int getBlackWins() { return blackWins; }
     public int getDraws() { return draws; }
     public int getNoResults() { return noResult; }
-
-    public int getGameCount()
-    {
-        return whiteWins + blackWins + draws;
-    }
-
+    public int getGameCount() { return whiteWins + blackWins + draws; }
     public double getWhiteWinPct()
     {
         return (double)whiteWins / (whiteWins + blackWins + draws);
     }
-
     public double getBlackWinPct()
     {
         return (double)blackWins / (whiteWins + blackWins + draws);
     }
-
     public double getDrawPct()
     {
         return (double)draws / (whiteWins + blackWins + draws);

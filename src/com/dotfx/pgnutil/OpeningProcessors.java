@@ -24,6 +24,9 @@
 
 package com.dotfx.pgnutil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Mark Chen <chen@dotfx.com>
@@ -45,7 +48,8 @@ public class OpeningProcessors
     {
         private final int minGames;
         
-        public MinGamesProcessor(int minGames) { this.minGames = minGames; }
+        public
+        MinGamesProcessor(int minGames) { this.minGames = minGames; }
         
         @Override public boolean processOpening(OpeningScore opening)
         {
@@ -100,4 +104,13 @@ public class OpeningProcessors
             return opening.getDrawPct() <= maxDraw;
         }
     }
+
+    private static final List<Processor> openingProcessors = new ArrayList<>();
+
+    static void addOpeningProcessor(OpeningProcessors.Processor op)
+    {
+        openingProcessors.add(op);
+    }
+
+    public static List<Processor> getOpeningProcessors() { return openingProcessors; }
 }

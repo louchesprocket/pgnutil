@@ -36,12 +36,7 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  *
@@ -133,7 +128,7 @@ public final class EcoTree
     
     public TreeNodeSet getDeepestTranspositionSet(PgnGame game) throws IllegalMoveException
     {
-        try { return getDeepestTranspositionSet(game.getOpeningMoveList(), 0); }
+        try { return getDeepestTranspositionSet(game.getMoves(), 0); }
 
         catch (IllegalMoveException | NullPointerException | StringIndexOutOfBoundsException e)
         {
@@ -172,9 +167,8 @@ public final class EcoTree
             }
         }
 
-        return new TreeNodeSet(deepest);
+        return deepest == null ? new TreeNodeSet(new TreeSet<>()) : new TreeNodeSet(deepest);
     }
-
     
     public TreeNode getTop() { return topNode; }
     public int positionCount() { return topNode.deepCount(); }

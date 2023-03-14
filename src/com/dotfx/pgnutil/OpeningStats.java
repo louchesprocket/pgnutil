@@ -93,7 +93,7 @@ public class OpeningStats implements Tallier
             {
                 Opening opening = openingsMap.get(oid);
                 
-                for (OpeningProcessors.Processor processor : openingProcessors)
+                for (OpeningProcessors.Processor processor : OpeningProcessors.getOpeningProcessors())
                     if (!processor.processOpening(opening)) continue nextOpening;
 
                 selectedOpenings.add(opening);
@@ -111,18 +111,21 @@ public class OpeningStats implements Tallier
             
             if (selectors == null) ret.append(opening.toString());
 
-            else for (OpeningStatsOutputSelector selector : selectors)
+            else
             {
-                ret.append(CLOptions.outputDelim);
-                selector.appendOutput(opening, ret);
+                for (OpeningStatsOutputSelector selector : selectors)
+                {
+                    ret.append(CLOptions.outputDelim);
+                    selector.appendOutput(opening, ret);
+                }
+
+                ret.delete(0, CLOptions.outputDelim.length());
             }
 
-            ret.delete(0, CLOptions.outputDelim.length());
             return ret.toString();
         }
     }
-    
-    private static final List<OpeningProcessors.Processor> openingProcessors = new ArrayList<>();
+
     private static OpeningStatsOutputSelector selectors[];
     private static OpeningStats instance;
     
@@ -140,26 +143,22 @@ public class OpeningStats implements Tallier
         return instance;
     }
 
+    /**
+     * Output selectors must be initialized here so that the tallier knows what to do.
+     *
+     * @throws InvalidSelectorException
+     */
     @Override
-    public void init() throws InvalidSelectorException
+    public void init(OutputSelector selectors[]) throws InvalidSelectorException
     {
-        if (PGNUtil.outputSelectors == null || PGNUtil.outputSelectors.length == 0)
-            ecoTree = EcoTree.FileType.STD.getEcoTree();
+        if (selectors == null || selectors.length == 0) ecoTree = EcoTree.FileType.STD.getEcoTree();
 
         else
         {
-            selectors = new OpeningStatsOutputSelector[PGNUtil.outputSelectors.length];
+            this.selectors = new OpeningStatsOutputSelector[selectors.length];
 
-            for (int i = 0; i < PGNUtil.outputSelectors.length; i++)
-            {
-                try { selectors[i] = new OpeningStatsOutputSelector(PGNUtil.outputSelectors[i].getValue(), this); }
-
-                catch (InvalidSelectorException e)
-                {
-                    throw new InvalidSelectorException("output selector '" + PGNUtil.outputSelectors[i].toString() +
-                            "' is invalid in this context");
-                }
-            }
+            for (int i = 0; i < selectors.length; i++)
+                this.selectors[i] = new OpeningStatsOutputSelector(selectors[i], this);
         }
     }
 
@@ -182,11 +181,6 @@ public class OpeningStats implements Tallier
             useXScidEco = true;
             scidEcoTree = type.getEcoTree();
         }
-    }
-
-    static void addOpeningProcessor(OpeningProcessors.Processor op)
-    {
-        openingProcessors.add(op);
     }
 
     @Override

@@ -305,13 +305,12 @@ public class OpeningStatsOutputSelector
     private final Value value;
     private final OutputHandler handler;
 
-    public OpeningStatsOutputSelector(OutputSelector.Value selector, OpeningStats os) throws InvalidSelectorException
+    public OpeningStatsOutputSelector(OutputSelector selector, OpeningStats os) throws InvalidSelectorException
     {
-        Value v = Value.get(selector);
+        value = Value.get(selector.getValue());
 
-        if (v != null)
+        if (value != null)
         {
-            value = v;
             handler = value.getOutputHandler();
             handler.configTallier(os);
         }

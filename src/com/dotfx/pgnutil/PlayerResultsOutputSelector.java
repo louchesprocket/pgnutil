@@ -129,9 +129,9 @@ public class PlayerResultsOutputSelector
     private final PlayerResultsOutputSelector.Value value;
     private final PlayerResultsOutputSelector.OutputHandler handler;
 
-    public PlayerResultsOutputSelector(OutputSelector.Value selector) throws InvalidSelectorException
+    public PlayerResultsOutputSelector(OutputSelector selector) throws InvalidSelectorException
     {
-        Value v = Value.get(selector);
+        Value v = Value.get(selector.getValue());
 
         if (v != null)
         {

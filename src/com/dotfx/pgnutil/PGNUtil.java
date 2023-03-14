@@ -661,7 +661,7 @@ public class PGNUtil
         private final Tallier tallier;
         
         TallyHandler(Tallier tallier) { this.tallier = tallier; }
-        @Override public void init() throws InvalidSelectorException { tallier.init(); }
+        @Override public void init() throws InvalidSelectorException { tallier.init(outputSelectors); }
         
         @Override public void handle() throws IllegalMoveException
         {
@@ -763,13 +763,14 @@ public class PGNUtil
         try
         {
             parser.parseArgument(args);
+            if (options.help) throw new CmdLineException("");
+            CLOptionResolver.resolveOpts(CLOptions.getSetOpts());
             
             if (pgnFileList.isEmpty())
                 pgnFileList.add(new PGNFile(new BufferedReader(new InputStreamReader(System.in))));
             
             if (handler == null) handler = new DefaultGameHandler();
             handler.init();
-            if (options.help) throw new CmdLineException("");
         }
         
         catch (CmdLineException e)

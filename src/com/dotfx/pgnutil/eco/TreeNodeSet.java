@@ -25,6 +25,20 @@ public class TreeNodeSet implements Comparable<TreeNodeSet>
         return nodeSet;
     }
 
+    public String getCode()
+    {
+        StringBuilder sb = new StringBuilder();
+        Iterator<TreeNode> iter = nodeSet.iterator();
+
+        while (iter.hasNext())
+        {
+            sb.append(iter.next().getCode());
+            if (iter.hasNext()) sb.append(CLOptions.valueDelim);
+        }
+
+        return sb.toString();
+    }
+
     public String getDesc()
     {
         StringBuilder sb = new StringBuilder();
@@ -51,10 +65,12 @@ public class TreeNodeSet implements Comparable<TreeNodeSet>
         StringBuilder sb = new StringBuilder();
         Iterator<TreeNode> iter = nodeSet.iterator();
 
-        while (iter.hasNext()) {
+        while (iter.hasNext())
+        {
             TreeNode endNode = iter.next();
 
-            for (TreeNode pathNode : endNode.getPath()) {
+            for (TreeNode pathNode : endNode.getPath())
+            {
                 int ply = pathNode.getPly();
                 if (ply != 1) sb.append(" ");
                 if (ply % 2 == 1) sb.append(((ply + 1) / 2)).append(".");

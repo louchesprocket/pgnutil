@@ -396,6 +396,11 @@ public final class OutputSelector
         DRAWS("draws", null), // also applies to player results
         WWINPCT("wwinpct", null),
         WWINS("wwins", null),
+
+        // additional ECO-stat selectors
+        ECO("eco", null),
+        ECODESC("ecodesc", null),
+        ECOMOVES("ecomoves", null),
         
         // additional event selectors
         LASTROUND("lastround", null),

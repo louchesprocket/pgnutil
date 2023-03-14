@@ -41,16 +41,15 @@ public class EcoStats implements Tallier
     {
         private final List<TreeNodeSet> selectedOpenings;
         private final java.util.Iterator<TreeNodeSet> iterator;
-        private final OutputSelector selectors[];
         
-        private Iterator(OutputSelector selectors[])
+        private Iterator()
         {
             selectedOpenings = new ArrayList<>();
             
             nextOpening:
             for (TreeNodeSet treeNodeSet : openingsMap.keySet())
             { 
-                for (OpeningProcessors.Processor processor : openingProcessors)
+                for (OpeningProcessors.Processor processor : OpeningProcessors.getOpeningProcessors())
                     if (!processor.processOpening(openingsMap.get(treeNodeSet)))
                         continue nextOpening;
 
@@ -58,8 +57,6 @@ public class EcoStats implements Tallier
             }
             
             iterator = selectedOpenings.iterator();
-            
-            this.selectors = (selectors == null || selectors.length == 0) ? null : selectors;
         }
         
         @Override public boolean hasNext() { return iterator.hasNext(); }
@@ -75,92 +72,43 @@ public class EcoStats implements Tallier
                     append(opening.getDesc()).append(CLOptions.outputDelim).
                     append(score.toString());
 
-            else for (int i = 0; i < selectors.length; i++)
+            else
             {
-                switch (selectors[i].getValue())
+                for (EcoStatsOutputSelector selector : selectors)
                 {
-                    case STDECO: ret.append(opening.toString()); break;
-                    case STDECODESC: ret.append(opening.getDesc()); break;
-                    case MOVES: ret.append(opening.getMoveString()); break;
-                    case COUNT: ret.append(score.getGameCount()); break;
-                    case WWINS: ret.append(score.getWhiteWins()); break;
-                    case BWINS: ret.append(score.getBlackWins()); break;
-                    case DRAWS: ret.append(score.getDraws()); break;
-
-                    case WWINPCT:
-                        ret.append(Formats.DECIMAL.format(score.getWhiteWinPct()));
-                        break;
-
-                    case BWINPCT:
-                        ret.append(Formats.DECIMAL.format(score.getBlackWinPct()));
-                        break;
-
-                    case DIFF:
-                        ret.append(score.getWhiteWins() - score.getBlackWins());
-                        break;
-
-                    case DIFFPCT:
-                        ret.append(Formats.DECIMAL.format(score.getWhiteWinPct() - score.getBlackWinPct()));
-                        break;
-
-                    case DRAWPCT:
-                        ret.append(Formats.DECIMAL.format(score.getDrawPct()));
+                    ret.append(CLOptions.outputDelim);
+                    selector.appendOutput(opening, score, ret);
                 }
 
-                if (i < selectors.length - 1) ret.append(CLOptions.outputDelim);
+                ret.delete(0, CLOptions.outputDelim.length());
             }
 
             return ret.toString();
         }
     }
-    
-    private static final List<OpeningProcessors.Processor> openingProcessors = new ArrayList<>();
+
+    private static EcoStatsOutputSelector selectors[];
+    private static EcoStats instance;
     
     private final TreeMap<TreeNodeSet,OpeningScore> openingsMap;
-    private final EcoTree ecoTree;
-    private final boolean transpose;
+    private EcoTree ecoTree;
+    private boolean transpose;
 
-    public EcoStats(EcoTree.FileType fileType, boolean transpose)
+    private EcoStats(EcoTree.FileType type, boolean transpose)
     {
         openingsMap = new TreeMap<>();
+        ecoTree = type.getEcoTree();
         this.transpose = transpose;
-        ecoTree = fileType.getEcoTree();
+    }
+
+    public static EcoStats getInstance(EcoTree.FileType type, boolean transpose)
+    {
+        if (instance == null) instance = new EcoStats(type, transpose);
+        return instance;
     }
     
     @Override
-    public void init() throws InvalidSelectorException
-    {
-        if (PGNUtil.outputSelectors == null) return;
-        
-        for (OutputSelector selector : PGNUtil.outputSelectors)
-        {
-            switch (selector.getValue())
-            {
-                case STDECO:
-                case STDECODESC:
-                case STDECOMOVES:
-                case OID:
-                case COUNT:
-                case WWINS:
-                case BWINS:
-                case DRAWS:
-                case WWINPCT:
-                case BWINPCT:
-                case DIFF:
-                case DIFFPCT:
-                case DRAWPCT:
-                    break;
-
-                default:
-                    throw new InvalidSelectorException("'" + selector + "' is not a valid selector in this context");
-            }
-        }
-    }
-    
-    static void addOpeningProcessor(OpeningProcessors.Processor op)
-    {
-        openingProcessors.add(op);
-    }
+    public void init(OutputSelector selectors[]) {}
 
     @Override
     public void tally(PgnGame game) throws IllegalMoveException
@@ -176,7 +124,7 @@ public class EcoStats implements Tallier
 
         TreeNodeSet treeNodeSet = transpose ?
             ecoTree.getDeepestTranspositionSet(game) : new TreeNodeSet(ecoTree.getDeepestDefined(game));
-        
+
         OpeningScore os = openingsMap.get(treeNodeSet);
 
         if (os == null)
@@ -196,7 +144,16 @@ public class EcoStats implements Tallier
 
     @Override
     public java.util.Iterator<String> getOutputIterator(OutputSelector selectors[])
+            throws InvalidSelectorException
     {
-        return new Iterator(selectors);
+        if (selectors != null && selectors.length > 0)
+        {
+            this.selectors = new EcoStatsOutputSelector[selectors.length];
+
+            for (int i = 0; i < selectors.length; i++)
+                this.selectors[i] = new EcoStatsOutputSelector(selectors[i], this);
+        }
+
+        return new Iterator();
     }
 }

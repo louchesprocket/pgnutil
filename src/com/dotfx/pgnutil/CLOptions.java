@@ -96,15 +96,15 @@ public class CLOptions
     public static final String RO = "-ro";
     public static final String RW = "-rw";
     public static final String S = "-s";
-    public static final String SCIDECO = "-scideco";
+    public static final String SE = "-scideco";
     public static final String TC = "-tc";
     public static final String V = "-v";
     public static final String VD = "-vd";
     public static final String VG = "-vg";
-    public static final String XECO = "-xeco";
-    public static final String XSCIDECO = "-xscideco";
+    public static final String XE = "-xeco";
+    public static final String XSE = "-xscideco";
     
-    private static enum OptId
+    public static enum OptId
     {
         ANYPLAYERFILE(APF),
         AQUARIUM(AQ),
@@ -114,7 +114,7 @@ public class CLOptions
         DUPLICATES(D),
         DUPLICATEMOVES(DM),
         DUPLICATEOPENINGS(DO),
-        ECOOPENINGS(ECO),
+        STDECO(ECO),
         ELOFILE(ELO),
         EVENTS(E),
         GAMENUM(GN),
@@ -157,12 +157,12 @@ public class CLOptions
         REPLACELOSER(RL),
         REPLACEOPENING(RO),
         REPLACEWINNER(RW),
-        SCIDECOOPENINGS(SCIDECO),
+        SCIDECO(SE),
         SELECTORS(S),
         TIMECONTROL(TC),
         VALUEDELIM(VD),
-        XECOOPENINGS(XECO),
-        XSCIDECOOPENINGS(XSCIDECO);
+        XSTDECO(XE),
+        XSCIDECO(XSE);
         
         private static final Map<String,OptId> sigMap = new HashMap<>();
         private final String signifier;
@@ -196,6 +196,10 @@ public class CLOptions
         Integer count = OPTMAP.get(opt);
         return count == null ? 0 : count;
     }
+
+    public static boolean isSet(OptId opt) { return getCount(opt) > 0; }
+    public static Set<OptId> getSetOpts() { return OPTMAP.keySet(); }
+    public static Map<OptId,Integer> getOptMap() { return OPTMAP; }
     
     private static Set<String> readLinesSet(File file)
     {
@@ -1002,7 +1006,7 @@ public class CLOptions
     // opening stats
 
     @Option(name = O, forbids = {D, DO, DM, E, CSR, P}, aliases = "-opening_stats",
-            usage = "print win/loss/draw statistics for each opening.  Valid output selectors ('" + S + "') are: " +
+            usage = "print win/loss/draw statistics for each opening.  Valid output selectors ('" + S + "') include: " +
             "'eco,' 'oid,' 'count,' 'wwins,' 'bwins,' 'draws,' 'wwinpct,' 'bwinpct,' 'diff,' 'diffpct,' 'drawpct'")
     private void openings(boolean o)
     {
@@ -1019,80 +1023,79 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
-    /*
+    // ECO stats
+
     @Option(name = ECO, depends = {O}, aliases = "-eco_stats",
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each ECO code")
     private void ecoOpenings(boolean o)
     {
-        if (getCount(OptId.ECOOPENINGS) > 0)
+        if (getCount(OptId.STDECO) > 0)
         {
-            System.err.println("Option '" + OptId.ECOOPENINGS + "' cannot be set more than once!");
+            System.err.println("Option '" + OptId.STDECO + "' cannot be set more than once!");
             System.exit(-1);
         }
         
-        countOption(OptId.ECOOPENINGS);
+        countOption(OptId.STDECO);
         
-        Tallier os = new EcoStats(EcoTree.FileType.STD, false);
+        Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, false);
         PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
-    @Option(name = SCIDECO, depends = {O}, aliases = "-scid_eco_stats",
-            usage = "combined with the '" + O + "' " + "option, print win/loss/draw statistics for each Scid ECO code")
+    @Option(name = SE, depends = {O}, aliases = "-scid_eco_stats",
+            usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each Scid ECO code")
     private void ScidEcoOpenings(boolean o)
     {
-        if (getCount(OptId.SCIDECOOPENINGS) > 0)
+        if (getCount(OptId.SCIDECO) > 0)
         {
-            System.err.println("Option '" + OptId.SCIDECOOPENINGS + "' cannot be set more than once!");
+            System.err.println("Option '" + OptId.SCIDECO + "' cannot be set more than once!");
             System.exit(-1);
         }
         
-        countOption(OptId.SCIDECOOPENINGS);
+        countOption(OptId.SCIDECO);
         
-        Tallier os = new EcoStats(EcoTree.FileType.SCIDDB, false);
+        Tallier os = EcoStats.getInstance(EcoTree.FileType.SCIDDB, false);
         PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
-    @Option(name = XECO, depends = {O}, aliases = "-trans_eco_stats",
+    @Option(name = XE, depends = {O}, aliases = "-trans_eco_stats",
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each ECO code, " +
                     "matching openings transpositionally")
     private void XEcoOpenings(boolean o)
     {
-        if (getCount(OptId.XECOOPENINGS) > 0)
+        if (getCount(OptId.XSTDECO) > 0)
         {
-            System.err.println("Option '" + OptId.XECOOPENINGS + "' cannot be set more than once!");
+            System.err.println("Option '" + OptId.XSTDECO + "' cannot be set more than once!");
             System.exit(-1);
         }
         
-        countOption(OptId.XECOOPENINGS);
+        countOption(OptId.XSTDECO);
         
-        Tallier os = new EcoStats(EcoTree.FileType.STD, true);
+        Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, true);
         PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
-    @Option(name = XSCIDECO, depends = {O}, aliases = "-trans_scid_eco_stats",
+    @Option(name = XSE, depends = {O}, aliases = "-trans_scid_eco_stats",
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each Scid ECO code, " +
                     "matching openings transpositionally")
     private void XScidEcoOpenings(boolean o)
     {
-        if (getCount(OptId.XSCIDECOOPENINGS) > 0)
+        if (getCount(OptId.XSCIDECO) > 0)
         {
-            System.err.println("Option '" + OptId.XSCIDECOOPENINGS + "' cannot be set more than once!");
+            System.err.println("Option '" + OptId.XSCIDECO + "' cannot be set more than once!");
             System.exit(-1);
         }
         
-        countOption(OptId.XSCIDECOOPENINGS);
+        countOption(OptId.XSCIDECO);
         
-        Tallier os = new EcoStats(EcoTree.FileType.SCIDDB, true);
+        Tallier os = EcoStats.getInstance(EcoTree.FileType.SCIDDB, true);
         PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
-     */
 
-    @Option(name = CMIN, depends = {O}, aliases = "-count_min",
-        metaVar = "<min>",
+    @Option(name = CMIN, depends = {O}, aliases = "-count_min", metaVar = "<min>",
         usage = "in combination with '" + O + "' option, print only openings that appear in at least <min> games")
     private void minOpeningCount(int cmin)
     {
@@ -1103,14 +1106,13 @@ public class CLOptions
         }
         
         countOption(OptId.MINGAMECOUNT);
-        OpeningStats.addOpeningProcessor(new OpeningProcessors.MinGamesProcessor(cmin));
+        OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MinGamesProcessor(cmin));
+//        CLOptionResolver.setCmin(cmin); // for testing
     }
 
-    @Option(name = HWD, depends = {O}, aliases = "-hi_win_diff",
-        metaVar = "<max>",
-        usage = "in combination with '" + O + "' option, print only openings " +
-        "for which the percentage win difference between white and " +
-        "black is at most <max> percent")
+    @Option(name = HWD, depends = {O}, aliases = "-hi_win_diff", metaVar = "<max>",
+        usage = "in combination with '" + O + "' option, print only openings for which the percentage win difference " +
+                "between white and black is at most <max> percent")
     private void hiWinDiff(double max)
     {
         if (getCount(OptId.HIWINDIFF) > 0)
@@ -1120,14 +1122,12 @@ public class CLOptions
         }
         
         countOption(OptId.HIWINDIFF);
-        OpeningStats.addOpeningProcessor(new OpeningProcessors.MaxWinDiffProcessor(max));
+        OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MaxWinDiffProcessor(max));
     }
 
-    @Option(name = LWD, depends = {O}, aliases = "-lo_win_diff",
-        metaVar = "<min>",
-        usage = "in combination with '" + O + "' option, print only openings " +
-        "for which the percentage win difference between white and " +
-        "black is at least <min> percent")
+    @Option(name = LWD, depends = {O}, aliases = "-lo_win_diff", metaVar = "<min>",
+        usage = "in combination with '" + O + "' option, print only openings for which the percentage win difference " +
+                "between white and black is at least <min> percent")
     private void loWinDiff(double min)
     {
         if (getCount(OptId.LOWINDIFF) > 0)
@@ -1137,13 +1137,12 @@ public class CLOptions
         }
         
         countOption(OptId.LOWINDIFF);
-        OpeningStats.addOpeningProcessor(new OpeningProcessors.MinWinDiffProcessor(min));
+        OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MinWinDiffProcessor(min));
     }
 
-    @Option(name = HDRAW, depends = {O}, aliases = "-hi_draw_pct",
-        metaVar = "<max>",
-        usage = "in combination with '" + O + "' option, print only openings " +
-        "for which the percentage of draws is at most <max> percent")
+    @Option(name = HDRAW, depends = {O}, aliases = "-hi_draw_pct", metaVar = "<max>",
+        usage = "in combination with '" + O + "' option, print only openings for which the percentage of draws is " +
+                "at most <max> percent")
     private void maxDraw(double max)
     {
         if (getCount(OptId.MAXDRAW) > 0)
@@ -1153,13 +1152,12 @@ public class CLOptions
         }
         
         countOption(OptId.MAXDRAW);
-        OpeningStats.addOpeningProcessor(new OpeningProcessors.MaxDrawProcessor(max));
+        OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MaxDrawProcessor(max));
     }
 
-    @Option(name = LDRAW, depends = {O}, aliases = "-lo_draw_pct",
-        metaVar = "<min>",
-        usage = "in combination with '" + O + "' option, print only openings " +
-        "for which the percentage of draws is at least <min> percent")
+    @Option(name = LDRAW, depends = {O}, aliases = "-lo_draw_pct", metaVar = "<min>",
+        usage = "in combination with '" + O + "' option, print only openings for which the percentage of draws is " +
+                "at least <min> percent")
     private void minDraw(double min)
     {
         if (getCount(OptId.MINDRAW) > 0)
@@ -1169,20 +1167,17 @@ public class CLOptions
         }
         
         countOption(OptId.MINDRAW);
-        OpeningStats.addOpeningProcessor(new OpeningProcessors.MinDrawProcessor(min));
+        OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MinDrawProcessor(min));
     }
 
-    @Option(name = HED, depends = {O, ELO}, aliases = "-hi_elo_diff",
-        metaVar = "<diff>",
-        usage = "in combination with '" + O + "' and '" + ELO + "' options, " +
-        "print only openings for which the difference in player elo " +
-        "ratings is at most <diff>")
+    @Option(name = HED, depends = {O, ELO}, aliases = "-hi_elo_diff", metaVar = "<diff>",
+        usage = "in combination with '" + O + "' and '" + ELO + "' options, print only openings for which the " +
+                "difference in player elo ratings is at most <diff>")
     static Integer maxEloDiff;
 
-    @Option(name = ELO, depends = {HED}, aliases = "-elo_file",
-        metaVar = "<file>",
-        usage = "in combination with '" + O + "' and '" + HED + "' options, " +
-        "use elo ratings contained in the file <file>")
+    @Option(name = ELO, depends = {HED}, aliases = "-elo_file", metaVar = "<file>",
+        usage = "in combination with '" + O + "' and '" + HED + "' options, use elo ratings contained in the " +
+                "file <file>")
     private void setEloFile(File of)
     {
         if (getCount(OptId.ELOFILE) > 0)
