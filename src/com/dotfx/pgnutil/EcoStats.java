@@ -108,7 +108,16 @@ public class EcoStats implements Tallier
     }
     
     @Override
-    public void init(OutputSelector selectors[]) {}
+    public void init(OutputSelector selectors[]) throws InvalidSelectorException
+    {
+        if (selectors != null && selectors.length > 0)
+        {
+            this.selectors = new EcoStatsOutputSelector[selectors.length];
+
+            for (int i = 0; i < selectors.length; i++)
+                this.selectors[i] = new EcoStatsOutputSelector(selectors[i], this);
+        }
+    }
 
     @Override
     public void tally(PgnGame game) throws IllegalMoveException
@@ -143,17 +152,8 @@ public class EcoStats implements Tallier
     }
 
     @Override
-    public java.util.Iterator<String> getOutputIterator(OutputSelector selectors[])
-            throws InvalidSelectorException
+    public java.util.Iterator<String> getOutputIterator()
     {
-        if (selectors != null && selectors.length > 0)
-        {
-            this.selectors = new EcoStatsOutputSelector[selectors.length];
-
-            for (int i = 0; i < selectors.length; i++)
-                this.selectors[i] = new EcoStatsOutputSelector(selectors[i], this);
-        }
-
         return new Iterator();
     }
 }

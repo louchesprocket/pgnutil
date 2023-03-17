@@ -31,7 +31,7 @@ import java.util.Iterator;
  */
 public interface Tallier
 {
-    public void tally(PgnGame game) throws IllegalMoveException;
-    default public void init(OutputSelector selectors[]) throws InvalidSelectorException {}
-    public Iterator<String> getOutputIterator(OutputSelector selectors[]) throws InvalidSelectorException;
+    void tally(PgnGame game) throws IllegalMoveException;
+    void init(OutputSelector selectors[]) throws InvalidSelectorException;
+    Iterator<String> getOutputIterator() throws InvalidSelectorException;
 }

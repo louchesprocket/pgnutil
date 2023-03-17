@@ -712,7 +712,7 @@ public class PGNUtil
         {
             try
             {
-                Iterator<String> iter = iteratorProvider.getOutputIterator(outputSelectors);
+                Iterator<String> iter = iteratorProvider.getOutputIterator();
                 while (iter.hasNext()) System.out.println(iter.next());
             }
             

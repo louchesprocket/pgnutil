@@ -121,6 +121,18 @@ public class PlayerResults implements Tallier
         if (instance == null) instance = new PlayerResults();
         return instance;
     }
+
+    @Override
+    public void init(OutputSelector selectors[]) throws InvalidSelectorException
+    {
+        if (selectors != null && selectors.length > 0)
+        {
+            this.selectors = new PlayerResultsOutputSelector[selectors.length];
+
+            for (int i = 0; i < selectors.length; i++)
+                this.selectors[i] = new PlayerResultsOutputSelector(selectors[i]);
+        }
+    }
     
     @Override
     public void tally(PgnGame game)
@@ -166,16 +178,8 @@ public class PlayerResults implements Tallier
     }
 
     @Override
-    public Iterator<String> getOutputIterator(OutputSelector selectors[]) throws InvalidSelectorException
+    public Iterator<String> getOutputIterator()
     {
-        if (selectors != null && selectors.length > 0)
-        {
-            this.selectors = new PlayerResultsOutputSelector[selectors.length];
-
-            for (int i = 0; i < selectors.length; i++)
-                this.selectors[i] = new PlayerResultsOutputSelector(selectors[i]);
-        }
-
         return new ResultsIterator(resultsMap);
     }
 }

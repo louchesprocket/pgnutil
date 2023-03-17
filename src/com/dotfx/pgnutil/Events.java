@@ -37,116 +37,104 @@ import java.util.NoSuchElementException;
  */
 public class Events implements Tallier
 {
-    private class Iterator implements java.util.Iterator<String>
+    private interface IteratorFactory
+    {
+        java.util.Iterator getIterator(Map<String,List<GameInfo>> eventMap, EventsOutputSelector selectors[])
+                throws InvalidSelectorException;
+    }
+
+    private static class EventIteratorFactory implements IteratorFactory
+    {
+        @Override
+        public java.util.Iterator getIterator(Map<String,List<GameInfo>> eventMap, EventsOutputSelector selectors[])
+        {
+            return new Iterator(eventMap, selectors);
+        }
+    }
+
+    private static class ErrorCheckIteratorFactory implements IteratorFactory
+    {
+        @Override
+        public java.util.Iterator getIterator(Map<String,List<GameInfo>> eventMap, EventsOutputSelector selectors[])
+                throws InvalidSelectorException
+        {
+            return new RoundErrorIterator(eventMap, selectors);
+        }
+    }
+
+    private static class Iterator implements java.util.Iterator<String>
     {
         private final Map<String,List<GameInfo>> eventMap;
-        private final OutputSelector selectors[];
-        private final java.util.Iterator<String> iterator;
-        
-        private Iterator(Map<String,List<GameInfo>> eventMap, OutputSelector selectors[])
-            throws InvalidSelectorException
+        private final EventsOutputSelector selectors[];
+        private final java.util.Iterator<String> eventNameIterator;
+
+        private Iterator(Map<String,List<GameInfo>> eventMap, EventsOutputSelector selectors[])
         {
             this.eventMap = eventMap;
-            iterator = eventMap.keySet().iterator();
-            
-            if (selectors == null || selectors.length == 0)
-            {
-                this.selectors = null;
-                return;
-            }
-            
-            for (OutputSelector selector : selectors)
-            {
-                switch (selector.getValue())
-                {
-                    case COUNT:
-                    case EVENT:
-                    case LASTROUND:
-                    case ROUNDCOUNT:
-                        break;
-
-                    default:
-                        throw new InvalidSelectorException("'" + selector +
-                            "' is not a valid selector in this context");
-                }
-            }
-            
+            eventNameIterator = eventMap.keySet().iterator();
             this.selectors = selectors;
         }
-        
-        @Override public boolean hasNext() { return iterator.hasNext(); }
-        
-        @Override public String next()
+
+        @Override
+        public boolean hasNext() { return eventNameIterator.hasNext(); }
+
+        @Override
+        public String next()
         {
-            String eventName = iterator.next();
+            String eventName = eventNameIterator.next();
             List<GameInfo> gameList = eventMap.get(eventName);
             StringBuilder ret = new StringBuilder();
-            NormalizedRound thisRound;
-            
-            if (selectors == null)
+
+            if (selectors == null || selectors.length == 0)
             {
                 ret.append(eventName).append(CLOptions.outputDelim).
-                    append(guessTimeCtrl(gameList)).append(CLOptions.outputDelim);
-                
+                        append(guessTimeCtrl(gameList)).append(CLOptions.outputDelim);
+
                 int size = gameList.size();
                 if (size > 0) ret.append(gameList.get(0).getGameNum());
-                
+
                 for (int i = 1; i < size; i++)
                     ret.append(CLOptions.valueDelim).append(gameList.get(i).getGameNum());
             }
 
-            else for (int i = 0; i < selectors.length; i++)
+            else
             {
-                switch (selectors[i].getValue())
+                for (EventsOutputSelector selector : selectors)
                 {
-                    case COUNT:
-                    case ROUNDCOUNT:
-                        ret.append(gameList.size()); break;
-
-                    case EVENT: ret.append(eventName); break;
-
-                    case LASTROUND:
-                        NormalizedRound lastRound = new NormalizedRound("-");
-
-                        for (GameInfo gi : gameList)
-                        {
-                            thisRound = gi.getRound();
-                            if (thisRound.compareTo(lastRound) > 0) lastRound = thisRound;
-                        }
-
-                        ret.append(lastRound);
+                    ret.append(CLOptions.outputDelim);
+                    selector.appendOutput(eventName, gameList, ret);
                 }
 
-                if (i < selectors.length - 1) ret.append(CLOptions.outputDelim);
+                ret.delete(0, CLOptions.outputDelim.length());
             }
-            
+
             return ret.toString();
         }
     }
-    
-    private class RoundErrorIterator implements java.util.Iterator<String>
+
+    private static class RoundErrorIterator implements java.util.Iterator<String>
     {
         private final NormalizedRound FIRST_ROUND = new NormalizedRound("1");
         private final Map<String,List<GameInfo>> eventMap;
-        private final java.util.Iterator<String> iterator;
+        private final java.util.Iterator<String> eventNameIterator;
         private String next;
-        
-        private RoundErrorIterator(Map<String,List<GameInfo>> eventMap, OutputSelector selectors[])
-            throws InvalidSelectorException
+
+        private RoundErrorIterator(Map<String,List<GameInfo>> eventMap, EventsOutputSelector selectors[])
+                throws InvalidSelectorException
         {
             this.eventMap = eventMap;
-            iterator = eventMap.keySet().iterator();
-            
+            eventNameIterator = eventMap.keySet().iterator();
+
             if (selectors != null && selectors.length > 0)
                 throw new InvalidSelectorException("output selectors are not allowed for this function");
         }
-        
+
         private void genNext()
         {
             StringBuilder ret = new StringBuilder();
-            String eventName = iterator.next();
+            String eventName = eventNameIterator.next();
             List<GameInfo> gameList = eventMap.get(eventName);
-            
+
             gameList.sort(Comparator.comparing(GameInfo::getRound));
             NormalizedRound thisRound = gameList.get(0).getRound();
             if (!FIRST_ROUND.equals(thisRound)) ret.append(thisRound);
@@ -174,36 +162,62 @@ public class Events implements Tallier
                 ret.insert(0, eventName + CLOptions.outputDelim);
                 next = ret.toString();
             }
-            
+
             else next = null;
         }
-        
-        @Override public boolean hasNext()
+
+        @Override
+        public boolean hasNext()
         {
-            while (next == null && iterator.hasNext()) genNext();
+            while (next == null && eventNameIterator.hasNext()) genNext();
             return next != null;
         }
-        
-        @Override public String next()
-        { 
+
+        @Override
+        public String next()
+        {
             if (hasNext())
             {
                 String ret = next;
                 next = null;
                 return ret;
             }
-            
+
             throw new NoSuchElementException();
         }
     }
-    
+
+    private static Events instance;
     private final Map<String,List<GameInfo>> eventMap;
-    private final boolean roundErrors;
-    
-    public Events(boolean roundErrors)
+    private final IteratorFactory iteratorFactory;
+    private EventsOutputSelector selectors[];
+
+    private Events(IteratorFactory iteratorFactory)
     {
         eventMap = new HashMap<>();
-        this.roundErrors = roundErrors;
+        this.iteratorFactory = iteratorFactory;
+    }
+
+    public static Events getInstance()
+    {
+        if (instance == null) instance = new Events(new EventIteratorFactory());
+        return instance;
+    }
+
+    public static Events getEventErrorInstance()
+    {
+        if (instance == null) instance = new Events(new ErrorCheckIteratorFactory());
+        return instance;
+    }
+
+    @Override
+    public void init(OutputSelector selectors[]) throws InvalidSelectorException
+    {
+        if (selectors != null && selectors.length > 0)
+        {
+            this.selectors = new EventsOutputSelector[selectors.length];
+            for (int i = 0; i < selectors.length; i++) this.selectors[i] = new EventsOutputSelector(selectors[i]);
+        }
     }
 
     public static TimeCtrl guessTimeCtrl(List<GameInfo> games)
@@ -233,14 +247,12 @@ public class Events implements Tallier
             eventMap.put(event, eventGames);
         }
 
-        eventGames.add(new GameInfo((int)game.getNumber(), game.getNormalizedRound(), game.getTimeCtrl()));
+        eventGames.add(new GameInfo(game.getNumber(), game.getNormalizedRound(), game.getTimeCtrl()));
     }
 
     @Override
-    public java.util.Iterator<String> getOutputIterator(OutputSelector selectors[])
-        throws InvalidSelectorException
+    public java.util.Iterator<String> getOutputIterator() throws InvalidSelectorException
     {
-        if (roundErrors) return new RoundErrorIterator(eventMap, selectors);
-        return new Iterator(eventMap, selectors);
+        return iteratorFactory.getIterator(eventMap, selectors);
     }
 }

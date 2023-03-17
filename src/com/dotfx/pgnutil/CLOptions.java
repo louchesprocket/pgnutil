@@ -51,7 +51,7 @@ public class CLOptions
     public static final String DM = "-dm";
     public static final String DO = "-do";
     public static final String E = "-e";
-    public static final String ECO = "-eco";
+    public static final String ECO = "-eco"; // ECO output for "-o"
     public static final String ELO = "-elo";
     public static final String GN = "-gn";
     public static final String H = "-h";
@@ -66,20 +66,20 @@ public class CLOptions
     public static final String LPC = "-lpc";
     public static final String LWD = "-lwd";
     public static final String M = "-m";
-    public static final String MECO = "-meco";
-    public static final String MECODESC = "-mecodesc";
+    public static final String ME = "-me"; // match ECO
+    public static final String MED = "-med"; // match ECO desription
     public static final String ML = "-ml";
     public static final String MP = "-mp";
     public static final String MO = "-mo";
     public static final String MPOS = "-mpos";
-    public static final String MSCIDECO = "-mscideco";
-    public static final String MSCIDECODESC = "-mscidecodesc";
+    public static final String MSE = "-mse"; // match SCID ECO
+    public static final String MSED = "-msed"; // match SCID ECO description
     public static final String MW = "-mw";
     public static final String MT = "-mt";
-    public static final String MXECO = "-mxeco";
-    public static final String MXECODESC = "-mxecodesc";
-    public static final String MXSCIDECO = "-mxscideco";
-    public static final String MXSCIDECODESC = "-mxscidecodesc";
+    public static final String MXE = "-mxe"; // match ECO transpositionally
+    public static final String MXED = "-mxed"; // match ECO description transpositionally
+    public static final String MXSE = "-mxse"; // match SCID ECO transpositionally
+    public static final String MXSED = "-mxsed"; // match SCID ECO description transpositionally
     public static final String NM = "-nm";
     public static final String NMO = "-nmo";
     public static final String NMT = "-nmt";
@@ -96,13 +96,13 @@ public class CLOptions
     public static final String RO = "-ro";
     public static final String RW = "-rw";
     public static final String S = "-s";
-    public static final String SE = "-scideco";
+    public static final String SECO = "-seco"; // SCID ECO output for "-o"
     public static final String TC = "-tc";
     public static final String V = "-v";
     public static final String VD = "-vd";
     public static final String VG = "-vg";
-    public static final String XE = "-xeco";
-    public static final String XSE = "-xscideco";
+    public static final String XE = "-xeco"; // transpositional ECO output for "-o"
+    public static final String XSECO = "-xseco"; // transpositional SCID ECO output for "-o"
     
     public static enum OptId
     {
@@ -126,19 +126,19 @@ public class CLOptions
         LOPLYCOUNT(LPC),
         LOWINDIFF(LWD),
         MATCH(M),
-        MATCHECO(MECO),
-        MATCHECODESC(MECODESC),
+        MATCHECO(ME),
+        MATCHECODESC(MED),
         MATCHLOSER(ML),
         MATCHOPENING(MO),
         MATCHPLAYER(MP),
         MATCHPOSITION(MPOS),
-        MATCHSCIDECO(MSCIDECO),
-        MATCHSCIDECODESC(MSCIDECODESC),
+        MATCHSCIDECO(MSE),
+        MATCHSCIDECODESC(MSED),
         MATCHTAG(MT),
-        MATCHTRANSECO(MXECO),
-        MATCHTRANSECODESC(MXECODESC),
-        MATCHTRANSSCIDECO(MXSCIDECO),
-        MATCHTRANSSCIDECODESC(MXSCIDECODESC),
+        MATCHTRANSECO(MXE),
+        MATCHTRANSECODESC(MXED),
+        MATCHTRANSSCIDECO(MXSE),
+        MATCHTRANSSCIDECODESC(MXSED),
         MATCHWINNER(MW),
         MAXDRAW(HDRAW),
         MINDRAW(LDRAW),
@@ -157,12 +157,12 @@ public class CLOptions
         REPLACELOSER(RL),
         REPLACEOPENING(RO),
         REPLACEWINNER(RW),
-        SCIDECO(SE),
+        SCIDECO(SECO),
         SELECTORS(S),
         TIMECONTROL(TC),
         VALUEDELIM(VD),
         XSTDECO(XE),
-        XSCIDECO(XSE);
+        XSCIDECO(XSECO);
         
         private static final Map<String,OptId> sigMap = new HashMap<>();
         private final String signifier;
@@ -473,8 +473,7 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionProcessor(board));
     }
 
-    @Option(name = MECO, forbids = {},
-        aliases = "-match_eco", metaVar = "<regex>",
+    @Option(name = ME, forbids = {}, aliases = "-match_eco", metaVar = "<regex>",
         usage = "output games belonging to ECO code <regex>")
     private void setEco(String eco)
     {
@@ -490,8 +489,7 @@ public class CLOptions
             EcoTree.FileType.STD));
     }
 
-    @Option(name = MECODESC, forbids = {},
-        aliases = "-match_eco_desc", metaVar = "<regex>",
+    @Option(name = MED, forbids = {}, aliases = "-match_eco_desc", metaVar = "<regex>",
         usage = "output games whose ECO description matches <regex>")
     private void setEcoDesc(String eco)
     {
@@ -507,9 +505,8 @@ public class CLOptions
             EcoTree.FileType.STD));
     }
 
-    @Option(name = MSCIDECO, forbids = {},
-        aliases = "-match_scid_eco", metaVar = "<regex>",
-        usage = "output games belonging to Scid ECO code  <regex>")
+    @Option(name = MSE, forbids = {}, aliases = "-match_scid_eco", metaVar = "<regex>",
+        usage = "output games belonging to Scid ECO code <regex>")
     private void setScidEco(String eco)
     {
         if (getCount(OptId.MATCHSCIDECO) > 0)
@@ -524,8 +521,7 @@ public class CLOptions
             EcoTree.FileType.SCIDDB));
     }
 
-    @Option(name = MSCIDECODESC, forbids = {},
-        aliases = "-match_scid_eco_desc", metaVar = "<regex>",
+    @Option(name = MSED, forbids = {}, aliases = "-match_scid_eco_desc", metaVar = "<regex>",
         usage = "output games whose Scid ECO description matches <regex>")
     private void setScidEcoDesc(String eco)
     {
@@ -541,8 +537,7 @@ public class CLOptions
             EcoTree.FileType.SCIDDB));
     }
 
-    @Option(name = MXECO, forbids = {},
-        aliases = "-match_trans_eco", metaVar = "<regex>",
+    @Option(name = MXE, forbids = {}, aliases = "-match_trans_eco", metaVar = "<regex>",
         usage = "output games belonging to ECO code <regex>, matching transpositionally")
     private void setXEco(String eco)
     {
@@ -558,10 +553,8 @@ public class CLOptions
             EcoTree.FileType.STD));
     }
 
-    @Option(name = MXECODESC, forbids = {},
-        aliases = "-match_trans_eco_desc", metaVar = "<regex>",
-        usage = "output games whose ECO description matches <regex>, " +
-        "matching transpositionally")
+    @Option(name = MXED, forbids = {}, aliases = "-match_trans_eco_desc", metaVar = "<regex>",
+        usage = "output games whose ECO description matches <regex>, matching transpositionally")
     private void setXEcoDesc(String eco)
     {
         if (getCount(OptId.MATCHTRANSECODESC) > 0)
@@ -576,8 +569,7 @@ public class CLOptions
             EcoTree.FileType.STD));
     }
 
-    @Option(name = MXSCIDECO, forbids = {},
-        aliases = "-match_trans_scid_eco", metaVar = "<regex>",
+    @Option(name = MXSE, forbids = {}, aliases = "-match_trans_scid_eco", metaVar = "<regex>",
         usage = "output games belonging to Scid ECO code <regex>, matching transpositionally")
     private void setXScidEco(String eco)
     {
@@ -593,8 +585,7 @@ public class CLOptions
             EcoTree.FileType.SCIDDB));
     }
 
-    @Option(name = MXSCIDECODESC, forbids = {},
-        aliases = "-match_trans_scid_eco_desc", metaVar = "<regex>",
+    @Option(name = MXSED, forbids = {}, aliases = "-match_trans_scid_eco_desc", metaVar = "<regex>",
         usage = "output games whose Scid ECO description matches <regex>, matching transpositionally")
     private void setXScidEcoDesc(String eco)
     {
@@ -979,7 +970,7 @@ public class CLOptions
         }
         
         countOption(OptId.EVENTS);
-        Tallier events = new Events(false);
+        Tallier events = Events.getInstance();
         PGNUtil.setHandler(new PGNUtil.TallyHandler(events));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(events));
     }
@@ -998,7 +989,7 @@ public class CLOptions
         }
         
         countOption(OptId.CHECKSEQUENTIALROUNDS);
-        Tallier events = new Events(true);
+        Tallier events = Events.getEventErrorInstance();
         PGNUtil.setHandler(new PGNUtil.TallyHandler(events));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(events));
     }
@@ -1042,7 +1033,7 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
-    @Option(name = SE, depends = {O}, aliases = "-scid_eco_stats",
+    @Option(name = SECO, depends = {O}, aliases = "-scid_eco_stats",
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each Scid ECO code")
     private void ScidEcoOpenings(boolean o)
     {
@@ -1077,7 +1068,7 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
-    @Option(name = XSE, depends = {O}, aliases = "-trans_scid_eco_stats",
+    @Option(name = XSECO, depends = {O}, aliases = "-trans_scid_eco_stats",
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each Scid ECO code, " +
                     "matching openings transpositionally")
     private void XScidEcoOpenings(boolean o)

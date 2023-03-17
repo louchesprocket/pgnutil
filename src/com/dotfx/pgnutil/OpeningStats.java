@@ -84,7 +84,7 @@ public class OpeningStats implements Tallier
         private final List<Opening> selectedOpenings;
         private final java.util.Iterator<Opening> iterator;
         
-        private Iterator(Map<MoveListId,Opening> openingsMap)
+        private Iterator()
         {
             selectedOpenings = new ArrayList<>();
             
@@ -225,8 +225,8 @@ public class OpeningStats implements Tallier
     }
 
     @Override
-    public java.util.Iterator<String> getOutputIterator(OutputSelector selectors[])
+    public java.util.Iterator<String> getOutputIterator()
     {
-        return new Iterator(openingsMap);
+        return new Iterator();
     }
 }
