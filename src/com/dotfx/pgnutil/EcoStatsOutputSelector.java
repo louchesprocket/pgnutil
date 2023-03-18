@@ -37,7 +37,7 @@ public class EcoStatsOutputSelector
         @Override
         public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
         {
-            sb.append(Formats.DECIMAL.format(os.getBlackWinPct()));
+            sb.append(Formats.PERCENT.format(os.getBlackWinPct()));
         }
     }
 
@@ -73,7 +73,7 @@ public class EcoStatsOutputSelector
         @Override
         public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
         {
-            sb.append(Formats.DECIMAL.format(os.getWhiteWinPct() - os.getBlackWinPct()));
+            sb.append(Formats.PERCENT.format(os.getWhiteWinPct() - os.getBlackWinPct()));
         }
     }
 
@@ -82,7 +82,7 @@ public class EcoStatsOutputSelector
         @Override
         public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
         {
-            sb.append(Formats.DECIMAL.format(os.getDrawPct()));
+            sb.append(Formats.PERCENT.format(os.getDrawPct()));
         }
     }
 
@@ -109,7 +109,7 @@ public class EcoStatsOutputSelector
         @Override
         public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
         {
-            sb.append(Formats.DECIMAL.format(os.getWhiteWinPct()));
+            sb.append(Formats.PERCENT.format(os.getWhiteWinPct()));
         }
     }
 
@@ -197,23 +197,18 @@ public class EcoStatsOutputSelector
 
     public EcoStatsOutputSelector(OutputSelector selector, EcoStats es) throws InvalidSelectorException
     {
-        Value v = Value.get(selector.getValue());
+        value = Value.get(selector.getValue());
 
-        if (v != null)
+        if (value == null)
+            throw new InvalidSelectorException("output selector '" + selector + "' is invalid in this context");
+
+        for (OptId opt : value.getConflicting())
         {
-            value = v;
-
-            for (OptId opt : value.getConflicting())
-            {
-                if (CLOptions.isSet(opt))
-                    throw new InvalidSelectorException("output selector '" + selector + "' is" +
-                            "invalid in this context");
-            }
-
-            handler = value.getOutputHandler();
+            if (CLOptions.isSet(opt))
+                throw new InvalidSelectorException("output selector '" + selector + "' is invalid in this context");
         }
 
-        else throw new InvalidSelectorException("output selector '" + selector + "' is invalid in this context");
+        handler = value.getOutputHandler();
     }
 
     public Value getValue() { return value; }

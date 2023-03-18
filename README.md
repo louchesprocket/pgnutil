@@ -55,6 +55,20 @@ Position searches are performed with the "-mpos" (match position) option, where 
 
 ``pgnutil -mpos '1.d4 Nf6 2.c4 c5' -i mygames.pgn``
 
+Searches for ECO codes may, of course, be performed with the <nobr>"-mt"</nobr> option if the games in question have that tag. A more general way to perform ECO searches is with the <nobr>"-me"</nobr> (match ECO) option. For example:
+
+``pgnutil -me 'A42' -i mygames.pgn``
+
+will return every game in which the ECO opening A42 was played, ignoring any "ECO" tags. Note that ECO codes for this option are matched for the entire game, not just the "opening" as defined under [Openings](#openings), below. Other ECO-related matching commands are:
+
+* -med: match ECO description
+* -mxe: match ECO code, searching positions transpositionally
+* -mxed: ECO description, searching positions transpositionally
+* -mse: match Scid ECO code
+* -msed: match Scid ECO description
+* -mxse: match Scid ECO code, searching positions transpositionally
+* -mxsed: match Scid ECO description, searching positions transpositionally
+
 ### Replacing
 
 The "-r" option performs replacements on the game text.  For example, to strip comments (or, to be precise, all text between curly braces) from mygames.pgn:
@@ -85,7 +99,15 @@ means, "Output the value of the 'Event' tag for every game containing 'Blitz' or
 
 ### Output Selectors
 
-By default, pgnutil will output the full text of the game in response to any search operation.  The "-s" option may be used to restrict the output to a pipe-separated list of selected fields. Selected fields may include any PGN tag and should be separated on the command line by commas.  There are several "special" selectors recognized by the "-s" option.  For example:
+By default, pgnutil will output the full text of the game in response to any search operation.  The "-s" option may be used to restrict the output to a list of selected fields. Selected fields may include any PGN tag and should be separated on the command line by commas.
+
+By default, fields selected by the "-s" option appear on the output separated by the pipe ("|") character.  If a different output delimiter is desired, this may be set with the "-od" (output-delimiter) option.
+
+Similarly, values within a field are, by default, separated by commas.  If a different value delimiter is desired, it may be set with the "-vd" (value-delimiter) option.
+
+#### Special Output Selectors
+
+There are several "special" selectors recognized by the "-s" option.  For example:
 
 * 	moves: causes pgnutil to output the game's move list
 * 	tags: causes pgnutil to output an alphabetized list of the game's header tags
@@ -107,6 +129,8 @@ Thus, the command:
 
 means, "For every game in which the 'Event' tag contains the text 'Nunn 1' and in which 'Glaurung 2.0.1' was a player, output the name of the opponent and the name of the winner."
 
+#### ECO-Related Output Selectors
+
 There are also several output selectors relating to ECO codes:
 
 * 	stdeco: output the standard ECO code for the game, matching move sequences
@@ -124,9 +148,7 @@ There are also several output selectors relating to ECO codes:
 
 Note that any of the transpositional selectors ("xstdeco," "xscideco," "xstdecodesc," "xscidecodesc," "xstdecomoves," and "xscidecomoves") may return more than one result per game.
 
-By default, fields selected by the "-s" option appear on the output separated by the pipe ("|") character.  If a different output delimiter is desired, this may be set with the "-od" (output-delimiter) option.
-
-Similarly, values within a field are, by default, separated by commas.  If a different value delimiter is desired, it may be set with the "-vd" (value-delimiter) option.
+Pgnutil's ECO codes are the same as those used by lichess.org.
 
 ### Special Output Options
 
@@ -184,10 +206,12 @@ The opening-statistics function has its own set of output selectors:
 * 	wwinpct: white wins, expressed as a percentage of all games having a result
 * 	bwins: the number of black wins for this opening
 * 	bwinpct: black wins, expressed as a percentage of all games having a result
-* 	diff: the difference in wins between white and black
+* 	diff: the ference in wins between white and black
 * 	diffpct: the different in wins between white and black, expressed as a percentage of all games having a result
 * 	draws: the number of draws for this opening
 * 	drawpct: the number of draws for this opening expressed as a percentage of all games having a result
+
+In addition, any of the [ECO-related output selectors](#eco-related_output_selectors) may be used in this context, but will be applied only to the opening moves of the game.
 
 So we can use the previous example to generate a list of opening identifers (note addition of the "-s" option):
 
@@ -208,6 +232,12 @@ to output those games wherein the selected openings were played. If you wish to 
 
 ``pgnutil -of myopeningsfile -i mygames.pgn``
 
+To output opening statistics by ECO code instead of opening identifier (based on "opening" moves only, as defined in this section), use the <nobr>"-eco"</nobr> option in conjuction with <nobr>"-o"</nobr>:
+
+``pgnutil -o -eco -i mygames.pgn``
+
+Similarly, the options <nobr>"-xeco"</nobr>, <nobr>"-seco"</nobr>, and <nobr>"-xseco"</nobr> collate the output by ECO code matched transpositionally, Scid ECO code, and Scid ECO code matched transpositionally, respectively.
+
 Pgnutil identifies the demarcation point between "opening" moves and engine-generated moves by searching for a specific regular expression. By default, this regular expression is:
 
 ``(out\s+of\s+book)|(^End\s+of\s+opening)``
@@ -219,8 +249,6 @@ which matches the "out-of-book" marker for both Aquarium and Banksia. This regul
 will search for games matching any of the openings from myopeningsfile, using "my book marker" as the demarcation between "book" moves and engine moves.
 
 If pgnutil fails to find the out-of-book marker for a game, it assumes that the first commented move is the first non-book move. This corresponds to Arena's behavior. Therefore, pgnutil's default behavior (without the "-bm" option) will correctly identify the out-of-book condition for Aquarium, Banksia, and Arena.
-
-To output opening statistics by ECO code instead of opening identifier, the "-o" option may be combined with any of the options "-stdeco," "-xstdeco," "-scideco," or "-xscideco."  These will list statistics by standard ECO code, standard ECO code matched transpositionally, Scid ECO code, or Scid ECO code matched transpositionally, respectively.
 
 
 ## Known Issues

@@ -69,7 +69,7 @@ public class EventsOutputSelector
         @Override
         public void appendOutput(String eventName, List<GameInfo> gameList, StringBuilder sb)
         {
-            Set<NormalizedRound> rounds = new HashSet<>();
+            Set<NormalizedRound> rounds = new HashSet<>(30000);
             for (GameInfo gi : gameList) rounds.add(gi.getRound());
             sb.append(rounds.size());
         }
@@ -110,15 +110,12 @@ public class EventsOutputSelector
 
     public EventsOutputSelector(OutputSelector selector) throws InvalidSelectorException
     {
-        Value v = Value.get(selector.getValue());
+        value = Value.get(selector.getValue());
 
-        if (v != null)
-        {
-            value = v;
-            handler = value.getOutputHandler();
-        }
+        if (value == null)
+            throw new InvalidSelectorException("output selector '" + selector + "' is invalid in this context");
 
-        else throw new InvalidSelectorException("output selector '" + selector + "' is invalid in this context");
+        handler = value.getOutputHandler();
     }
 
     public Value getValue() { return value; }

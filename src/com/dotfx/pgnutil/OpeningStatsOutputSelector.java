@@ -51,7 +51,7 @@ public class OpeningStatsOutputSelector
         @Override
         public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
         {
-            sb.append(Formats.DECIMAL.format(opening.getBlackWinPct()));
+            sb.append(Formats.PERCENT.format(opening.getBlackWinPct()));
         }
 
         @Override
@@ -99,7 +99,7 @@ public class OpeningStatsOutputSelector
         @Override
         public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
         {
-            sb.append(Formats.DECIMAL.format(opening.getWhiteWinPct() - opening.getBlackWinPct()));
+            sb.append(Formats.PERCENT.format(opening.getWhiteWinPct() - opening.getBlackWinPct()));
         }
 
         @Override
@@ -111,7 +111,7 @@ public class OpeningStatsOutputSelector
         @Override
         public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
         {
-            sb.append(Formats.DECIMAL.format(opening.getDrawPct()));
+            sb.append(Formats.PERCENT.format(opening.getDrawPct()));
         }
 
         @Override
@@ -135,7 +135,7 @@ public class OpeningStatsOutputSelector
         @Override
         public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
         {
-            sb.append(Formats.DECIMAL.format(opening.getWhiteWinPct()));
+            sb.append(Formats.PERCENT.format(opening.getWhiteWinPct()));
         }
 
         @Override
@@ -309,13 +309,11 @@ public class OpeningStatsOutputSelector
     {
         value = Value.get(selector.getValue());
 
-        if (value != null)
-        {
-            handler = value.getOutputHandler();
-            handler.configTallier(os);
-        }
+        if (value == null)
+            throw new InvalidSelectorException("output selector '" + selector + "' is invalid in this context");
 
-        else throw new InvalidSelectorException("output selector '" + selector + "' is invalid in this context");
+        handler = value.getOutputHandler();
+        handler.configTallier(os);
     }
 
     public Value getValue() { return value; }

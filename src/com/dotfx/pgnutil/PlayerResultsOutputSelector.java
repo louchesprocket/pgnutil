@@ -131,15 +131,12 @@ public class PlayerResultsOutputSelector
 
     public PlayerResultsOutputSelector(OutputSelector selector) throws InvalidSelectorException
     {
-        Value v = Value.get(selector.getValue());
+        value = Value.get(selector.getValue());
 
-        if (v != null)
-        {
-            value = v;
-            handler = value.getOutputHandler();
-        }
+        if (value == null)
+            throw new InvalidSelectorException("output selector '" + selector + "' is invalid in this context");
 
-        else throw new InvalidSelectorException("output selector '" + selector + "' is invalid in this context");
+        handler = value.getOutputHandler();
     }
 
     public Value getValue() { return value; }
