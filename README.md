@@ -148,8 +148,6 @@ There are also several output selectors relating to ECO codes:
 
 Note that any of the transpositional selectors ("xstdeco," "xscideco," "xstdecodesc," "xscidecodesc," "xstdecomoves," and "xscidecomoves") may return more than one result per game.
 
-Pgnutil's ECO codes are the same as those used by lichess.org.
-
 ### Special Output Options
 
 The "special" output options include "-d" (duplicates), "-dm" (duplicate moves), "-do" (duplicate [openings](#openings)), "-e" (events), "-csr" (check sequential rounds), "-o" ([opening](#openings) statistics), and "-p" (player statistics). Any of these may be combined with any matching and replacing options (see above).

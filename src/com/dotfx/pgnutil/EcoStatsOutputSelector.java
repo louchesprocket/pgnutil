@@ -95,15 +95,6 @@ public class EcoStatsOutputSelector
         }
     }
 
-    private static final class MovesOutputHandler implements OutputHandler
-    {
-        @Override
-        public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
-        {
-            sb.append(opening.getMoveString());
-        }
-    }
-
     private static final class WhiteWinPctOutputHandler implements OutputHandler
     {
         @Override
@@ -158,7 +149,6 @@ public class EcoStatsOutputSelector
         DIFFPCT(OutputSelector.Value.DIFFPCT, new DiffPctOutputHandler(), new OptId[] {}),
         DRAWPCT(OutputSelector.Value.DRAWPCT, new DrawPctOutputHandler(), new OptId[] {}),
         DRAWS(OutputSelector.Value.DRAWS, new DrawsOutputHandler(), new OptId[] {}), // also applies to player results
-        MOVES(OutputSelector.Value.MOVES, new MovesOutputHandler(), new OptId[] {}),
         WWINPCT(OutputSelector.Value.WWINPCT, new WhiteWinPctOutputHandler(), new OptId[] {}),
         WWINS(OutputSelector.Value.WWINS, new WhiteWinsOutputHandler(), new OptId[] {}),
 

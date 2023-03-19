@@ -43,7 +43,8 @@ public class AquariumVars
     public AquariumVars(PgnGame.Move move)
     {
         otherVars = new HashMap<>();
-        
+
+        nextComment:
         for (String comment : move.getComments())
         {
             int varNameStartIdx, pos = 0, varNameEndIdx;
@@ -81,47 +82,35 @@ public class AquariumVars
                 }
                 
                 varValEndIdx = i;
+                pos = varValEndIdx + 1;
                 
                 try
                 {
                     switch (oneVarName)
                     {
                         case "clk":
-                            clk = new Clock(comment.substring(varValStartIdx,
-                                varValEndIdx));
-                            
+                            clk = new Clock(comment.substring(varValStartIdx, varValEndIdx));
                             break;
 
                         case "clko":
-                            clko = new Clock(comment.substring(varValStartIdx,
-                                varValEndIdx));
-                            
+                            clko = new Clock(comment.substring(varValStartIdx, varValEndIdx));
                             break;
 
                         case "emt":
-                            emt = comment.substring(varValStartIdx,
-                                varValEndIdx);
-                            
+                            emt = comment.substring(varValStartIdx, varValEndIdx);
                             break;
 
                         case "eval":
-                            eval = comment.substring(varValStartIdx,
-                                varValEndIdx);
-                            
+                            eval = comment.substring(varValStartIdx, varValEndIdx);
                             break;
 
                         case "meval":
-                            meval = comment.substring(varValStartIdx,
-                                varValEndIdx);
-                            
+                            meval = comment.substring(varValStartIdx, varValEndIdx);
                             break;
 
                         default:
-                            otherVars.put(oneVarName,
-                                comment.substring(varValStartIdx, varValEndIdx));
+                            otherVars.put(oneVarName, comment.substring(varValStartIdx, varValEndIdx));
                     }
-
-                    pos = varValEndIdx + 1;
                 }
                 
                 catch (InvalidClockException e) {} // best effort
