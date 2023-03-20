@@ -44,7 +44,6 @@ public class AquariumVars
     {
         otherVars = new HashMap<>();
 
-        nextComment:
         for (String comment : move.getComments())
         {
             int varNameStartIdx, pos = 0, varNameEndIdx;

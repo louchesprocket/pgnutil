@@ -324,7 +324,7 @@ public final class TreeNode implements Comparable<TreeNode>
     @Override
     public boolean equals(Object other)
     {
-        try { return getPathString() == ((TreeNode)other).getPathString(); }
+        try { return getPathString().equals(((TreeNode)other).getPathString()); }
         catch (ClassCastException | NullPointerException e) { return false; }
     }
 

@@ -28,6 +28,7 @@ import com.dotfx.pgnutil.Board;
 import com.dotfx.pgnutil.IllegalMoveException;
 import com.dotfx.pgnutil.PgnGame;
 import com.dotfx.pgnutil.PositionId;
+import sun.reflect.generics.tree.Tree;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -443,11 +444,12 @@ public final class EcoTree
 ////        EcoTree tree1 = getScidInstance();
 ////        tree1.printTranspositions();
 //
-//        EcoTree tree1 = new EcoTree(FileType.SCIDDB);
-////        tree1.writeTree(new File("test.out"));
-//        EcoTree tree2 = new EcoTree(FileType.STD);
+//        EcoTree tree1 = new EcoTree(FileType.LICHESS);
+////        tree1.printTree();
+//        tree1.writeTree(new File("test.out"));
+////        EcoTree tree2 = new EcoTree(FileType.STD);
 ////        printDiff(tree1, tree2, false);
-//        tree2.printTranspositions();
+////        tree1.printTranspositions();
 //
 ////        List<TreeNode> nodeList = tree1.get("1. d4 Nf6 2. c4 e6 3. Nf3 c5 4. d5 exd5 5. cxd5 d6 6. Nc3 g6 7. e4 Bg7 " +
 ////                "8. Be2 O-O 9. O-O a6 10. a4").getPath();
