@@ -28,7 +28,6 @@ import com.dotfx.pgnutil.Board;
 import com.dotfx.pgnutil.IllegalMoveException;
 import com.dotfx.pgnutil.PgnGame;
 import com.dotfx.pgnutil.PositionId;
-import sun.reflect.generics.tree.Tree;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -113,6 +112,7 @@ public final class EcoTree
     
     public TreeNode getDeepestNode(PgnGame game) { return topNode.getBottomNode(game); }
     public TreeNode getDeepestDefined(PgnGame game) { return topNode.getBottomDefinedNode(game); }
+    public TreeNode getDeepestDefined(List<PgnGame.Move> moveList) { return topNode.getBottomDefinedNode(moveList); }
     public TreeNode get(PgnGame game, int maxDepth) { return topNode.getBottomNode(game, maxDepth); }
     
     /**
@@ -277,12 +277,12 @@ public final class EcoTree
     
     private void printTranspositions()
     {
-        Map<String, Set<TreeNode>> fenMap = reader.getPositionMap();
+        Map<String,Set<TreeNode>> posMap = reader.getPositionMap();
         int transCount = 0;
         
-        for (String fen : fenMap.keySet())
+        for (String posSt : posMap.keySet())
         {
-            Set<TreeNode> transposed = fenMap.get(fen);
+            Set<TreeNode> transposed = posMap.get(posSt);
             if (transposed.size() < 2) continue;
             transCount++;
             
@@ -343,7 +343,6 @@ public final class EcoTree
     private void writeTree(File outFile) throws IOException, IllegalMoveException
     {
         List<TreeNode> children = topNode.getChildren();
-        Set<TreeNode> positionNodeSet = new HashSet<>();
 
         try (Writer writer = new FileWriter(outFile, false))
         {
@@ -362,21 +361,18 @@ public final class EcoTree
                 sb.append(node.getCode()).append(StdReader.LINE_DELIM).append(node.getDesc()).
                         append(StdReader.LINE_DELIM);
 
-                for (TreeNode subPathNode : node.getPath())
+                List<TreeNode> path = node.getPath();
+                Board board = new Board(true);
+
+                for (TreeNode subPathNode : path)
                 {
-                    String moveSt = subPathNode.getMove();
-                    sb.append(moveSt).append(StdReader.FIELD_DELIM);
-
-                    if (!positionNodeSet.contains(subPathNode)) // write the position i.d., if it is not redundant
-                    {
-                        Board board = new Board(true);
-                        sb.append(board.move(subPathNode.getPath()).positionId());
-//                        sb.append(board.move(subPathNode.getPath()).toShortFen().trim());
-                        positionNodeSet.add(subPathNode);
-                    }
-
-                    sb.append(StdReader.TUPLE_DELIM);
+                    board.move(subPathNode.getMove());
+                    sb.append(subPathNode.getMove()).append(StdReader.MOVE_DELIM);
                 }
+
+                sb.setLength(sb.length() - 1);
+                sb.append(StdReader.LINE_DELIM);
+                sb.append(board.positionId());
 
                 sb.append("\n");
                 writer.write(sb.toString());
@@ -444,12 +440,15 @@ public final class EcoTree
 ////        EcoTree tree1 = getScidInstance();
 ////        tree1.printTranspositions();
 //
-//        EcoTree tree1 = new EcoTree(FileType.LICHESS);
+//        EcoTree tree1 = new EcoTree(FileType.SCIDDB);
 ////        tree1.printTree();
-//        tree1.writeTree(new File("test.out"));
+////        tree1.writeTree(new File("test.out"));
 ////        EcoTree tree2 = new EcoTree(FileType.STD);
 ////        printDiff(tree1, tree2, false);
 ////        tree1.printTranspositions();
+////        System.out.println("nodes: " + tree1.positionCount());
+//
+//        Board board = new Board(true).move("Nf3").move("e5").move("e4").move("Nc6").move("Bb5");
 //
 ////        List<TreeNode> nodeList = tree1.get("1. d4 Nf6 2. c4 e6 3. Nf3 c5 4. d5 exd5 5. cxd5 d6 6. Nc3 g6 7. e4 Bg7 " +
 ////                "8. Be2 O-O 9. O-O a6 10. a4").getPath();

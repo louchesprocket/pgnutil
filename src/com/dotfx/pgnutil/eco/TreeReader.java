@@ -51,6 +51,8 @@ abstract class TreeReader
      */
     void handleNewNode(TreeNode node) throws IllegalMoveException
     {
+        if (node.getSpecCode().length() == 0 && node.getSpecDesc().length() == 0) return;
+
         Board board = new Board(true);
         board.move(node.getPath());
         String posSt = board.positionId().toString();

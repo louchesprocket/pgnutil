@@ -159,9 +159,13 @@ public final class TreeNode implements Comparable<TreeNode>
 
     public TreeNode getBottomDefinedNode(PgnGame game)
     {
+        return getBottomDefinedNode(game.getMoves());
+    }
+
+    public TreeNode getBottomDefinedNode(List<PgnGame.Move> moveList)
+    {
         TreeNode ret = this;
         TreeNode next = ret;
-        List<PgnGame.Move> moveList = game.getMoves();
 
         for (int i = 0; i < moveList.size(); i++)
         {

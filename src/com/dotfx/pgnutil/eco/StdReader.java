@@ -47,8 +47,7 @@ final class StdReader extends TreeReader
     }
 
     public static final String LINE_DELIM="|";
-    public static final String TUPLE_DELIM = ";";
-    public static final String FIELD_DELIM = ",";
+    public static final String MOVE_DELIM = " ";
 
     /**
      * Reads processed files with stored position hashes.
@@ -63,8 +62,7 @@ final class StdReader extends TreeReader
     {
         String line;
         String lineDelim = Pattern.quote(LINE_DELIM);
-        String tupleDelim = Pattern.quote(TUPLE_DELIM);
-        String fieldDelim = Pattern.quote(FIELD_DELIM);
+        String moveDelim = Pattern.quote(MOVE_DELIM);
 
         try (BufferedReader dbReader = new BufferedReader(new InputStreamReader(in)))
         {
@@ -72,30 +70,24 @@ final class StdReader extends TreeReader
             {
                 TreeNode node = topNode;
                 String parts[] = line.split(lineDelim);
-                String tuples[] = parts[2].split(tupleDelim);
+                String moves[] = parts[2].split(moveDelim);
 
-                for (int i = 0; i < tuples.length; i++) // for each move + position hash
+                for (int i = 0; i < moves.length; i++) // for each move + position hash
                 {
-                    // field[0] is the move; field[1] is the position hash
-                    String fields[] = tuples[i].split(fieldDelim);
-
-                    if (i == tuples.length - 1) node = node.addNode(fields[0], parts[0], parts[1], this);
-                    else node = node.addNode(fields[0], "", "", this);
-
-                    if (fields.length > 1) // has position hash
-                    {
-                        Set<TreeNode> nodeSet = positionMap.get(fields[1]);
-
-                        if (nodeSet == null)
-                        {
-                            nodeSet = new HashSet<>();
-                            positionMap.put(fields[1], nodeSet);
-                        }
-
-                        nodeSet.add(node);
-                        node.setPositionId(fields[1]);
-                    }
+                    if (i == moves.length - 1) node = node.addNode(moves[i], parts[0], parts[1], this);
+                    else node = node.addNode(moves[i], "", "", this);
                 }
+
+                Set<TreeNode> nodeSet = positionMap.get(parts[3]);
+
+                if (nodeSet == null)
+                {
+                    nodeSet = new HashSet<>();
+                    positionMap.put(parts[3], nodeSet);
+                }
+
+                nodeSet.add(node);
+                node.setPositionId(parts[3]);
             }
         }
     }

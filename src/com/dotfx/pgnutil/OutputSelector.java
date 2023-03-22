@@ -175,7 +175,7 @@ public final class OutputSelector
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            sb.append(type.getEcoTree().getDeepestNode(game).getCode());
+            sb.append(type.getEcoTree().getDeepestDefined(game).getCode());
         }
     }
 
@@ -188,7 +188,7 @@ public final class OutputSelector
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            sb.append(type.getEcoTree().getDeepestNode(game).getDesc());
+            sb.append(type.getEcoTree().getDeepestDefined(game).getDesc());
         }
     }
 
@@ -201,7 +201,7 @@ public final class OutputSelector
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            sb.append(new TreeNodeSet(type.getEcoTree().getDeepestNode(game)).getMoveString());
+            sb.append(new TreeNodeSet(type.getEcoTree().getDeepestDefined(game)).getMoveString());
         }
     }
 

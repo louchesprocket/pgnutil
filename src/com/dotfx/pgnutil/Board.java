@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public class Board
 {
-    public static enum Square
+    public enum Square
     {
         A1, B1, C1, D1, E1, F1, G1, H1,
         A2, B2, C2, D2, E2, F2, G2, H2,
@@ -55,9 +55,7 @@ public class Board
         static
         {
             Square values[] = Square.values();
-            
-            for (int i = 0; i < values.length; i++)
-                values[i].location = i;
+            for (int i = 0; i < values.length; i++) values[i].location = i;
             
             for (Square s : Square.values())
             {
@@ -180,9 +178,7 @@ public class Board
     private static final int blackKCastleSquares[] = new int[] {60, 61, 62};
     private static final int blackQCastleSquares[] = new int[] {58, 59, 60};
     private static final Color[] COLORS = new Color[] {Color.WHITE, Color.BLACK};
-    
-    private static final int[] NMOVES =
-        new int[] {6, 15, 17, 10, -6, -15, -17, -10};
+    private static final int[] NMOVES = new int[] {6, 15, 17, 10, -6, -15, -17, -10};
     
     private final Piece position[];
     private short ply; // zero at initial position
