@@ -185,7 +185,7 @@ public class EcoStatsOutputSelector
     private final Value value;
     private final OutputHandler handler;
 
-    public EcoStatsOutputSelector(OutputSelector selector, EcoStats es) throws InvalidSelectorException
+    public EcoStatsOutputSelector(OutputSelector selector) throws InvalidSelectorException
     {
         value = Value.get(selector.getValue());
 

@@ -21,66 +21,106 @@
 package com.dotfx.pgnutil;
 
 import com.dotfx.pgnutil.CLOptions.OptId;
+import com.dotfx.pgnutil.eco.EcoTree;
 
 import java.util.Arrays;
 import java.util.Set;
 
 public class CLOptionResolver
 {
-    private static int cmin;
     private static final OptId[] ECOOPTS = new OptId[] {OptId.STDECO, OptId.SCIDECO, OptId.XSTDECO, OptId.XSCIDECO};
 
     private interface OptHandler
     {
-        void handleIfAny();
-        void handleIfNone();
+        default void handleIfAny() {}
+        default void handleIfNone() {}
     }
 
-    private static class CminHandler implements OptHandler
+    private static class EcoOpeningsHandler implements OptHandler
     {
         @Override
         public void handleIfAny()
         {
-            OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MinGamesProcessor(cmin));
+            Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, false);
+            PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+            PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
         }
+    }
 
+    private static class ScidEcoOpeningsHandler implements OptHandler
+    {
         @Override
-        public void handleIfNone()
+        public void handleIfAny()
         {
-            OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MinGamesProcessor(cmin));
+            Tallier os = EcoStats.getInstance(EcoTree.FileType.SCIDDB, false);
+            PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+            PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+        }
+    }
+
+    private static class XEcoOpeningsHandler implements OptHandler
+    {
+        @Override
+        public void handleIfAny()
+        {
+            Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, true);
+            PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+            PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+        }
+    }
+
+    private static class XScidEcoOpeningsHandler implements OptHandler
+    {
+        @Override
+        public void handleIfAny()
+        {
+            Tallier os = EcoStats.getInstance(EcoTree.FileType.SCIDDB, true);
+            PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+            PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
         }
     }
 
     private static class ConditionSet
     {
-        private final OptId opt;
+        private final OptId opts[];
         private final OptId ifAnyOf[];
         private final OptId ifNoneOf[];
         private final OptHandler handler;
 
-        private ConditionSet(OptId opt, OptId ifAnyOf[], OptId ifNoneOf[], OptHandler handler)
+        private ConditionSet(OptId opts[], OptId ifAnyOf[], OptId ifNoneOf[], OptHandler handler)
         {
-            this.opt = opt;
+            this.opts = opts;
             this.ifAnyOf = ifAnyOf;
             this.ifNoneOf = ifNoneOf;
             this.handler = handler;
         }
 
+        OptId[] getOpts() { return opts; }
         OptId[] getIfAnyOf() { return ifAnyOf; }
         OptId[] getIfNoneOf() { return ifNoneOf; }
 
-        void handle(Set<OptId> setOpts)
+        void handle(final Set<OptId> setOpts)
         {
+            if (!Arrays.stream(getOpts()).anyMatch(setOpts::contains)) return;
+
             // https://stackoverflow.com/questions/11796371/check-if-one-list-contains-element-from-the-other
             if (Arrays.stream(getIfAnyOf()).anyMatch(setOpts::contains)) handler.handleIfAny();
             if (!Arrays.stream(getIfNoneOf()).anyMatch(setOpts::contains)) handler.handleIfNone();
         }
     }
 
-    public static final void resolveOpts(Set<OptId> setOpts)
+    public static final void resolveOpts(final Set<OptId> setOpts)
     {
-//        new ConditionSet(OptId.MINGAMECOUNT, ECOOPTS, ECOOPTS, new CminHandler()).handle(setOpts);
-    }
+        new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.STDECO}, new OptId[] {},
+                new EcoOpeningsHandler()).handle(setOpts);
 
-    static void setCmin(int n) { cmin = n; }
+        new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.SCIDECO}, new OptId[] {},
+                new ScidEcoOpeningsHandler()).handle(setOpts);
+
+        new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.XSTDECO}, new OptId[] {},
+                new XEcoOpeningsHandler()).handle(setOpts);
+
+        new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.XSCIDECO}, new OptId[] {},
+                new XScidEcoOpeningsHandler()).handle(setOpts);
+    }
 }

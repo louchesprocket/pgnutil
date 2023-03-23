@@ -1016,7 +1016,7 @@ public class CLOptions
 
     // ECO stats
 
-    @Option(name = ECO, depends = {O}, aliases = "-eco_stats",
+    @Option(name = ECO, depends = {O}, forbids = {SECO, XE, XSECO}, aliases = "-eco_stats",
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each ECO code")
     private void ecoOpenings(boolean o)
     {
@@ -1027,13 +1027,10 @@ public class CLOptions
         }
         
         countOption(OptId.STDECO);
-        
-        Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, false);
-        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
-        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+        // The rest is handled in CLOptionResolver
     }
 
-    @Option(name = SECO, depends = {O}, aliases = "-scid_eco_stats",
+    @Option(name = SECO, depends = {O}, forbids = {ECO, XE, XSECO}, aliases = "-scid_eco_stats",
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each Scid ECO code")
     private void ScidEcoOpenings(boolean o)
     {
@@ -1044,13 +1041,10 @@ public class CLOptions
         }
         
         countOption(OptId.SCIDECO);
-        
-        Tallier os = EcoStats.getInstance(EcoTree.FileType.SCIDDB, false);
-        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
-        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+        // The rest is handled in CLOptionResolver
     }
 
-    @Option(name = XE, depends = {O}, aliases = "-trans_eco_stats",
+    @Option(name = XE, depends = {O}, forbids = {ECO, SECO, XSECO}, aliases = "-trans_eco_stats",
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each ECO code, " +
                     "matching openings transpositionally")
     private void XEcoOpenings(boolean o)
@@ -1062,13 +1056,10 @@ public class CLOptions
         }
         
         countOption(OptId.XSTDECO);
-        
-        Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, true);
-        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
-        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+        // The rest is handled in CLOptionResolver
     }
 
-    @Option(name = XSECO, depends = {O}, aliases = "-trans_scid_eco_stats",
+    @Option(name = XSECO, depends = {O}, forbids = {ECO, XE, SECO}, aliases = "-trans_scid_eco_stats",
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each Scid ECO code, " +
                     "matching openings transpositionally")
     private void XScidEcoOpenings(boolean o)
@@ -1080,10 +1071,7 @@ public class CLOptions
         }
         
         countOption(OptId.XSCIDECO);
-        
-        Tallier os = EcoStats.getInstance(EcoTree.FileType.SCIDDB, true);
-        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
-        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+        // The rest is handled in CLOptionResolver
     }
 
     @Option(name = CMIN, depends = {O}, aliases = "-count_min", metaVar = "<min>",

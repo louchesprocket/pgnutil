@@ -113,9 +113,7 @@ public class EcoStats implements Tallier
         if (selectors != null && selectors.length > 0)
         {
             this.selectors = new EcoStatsOutputSelector[selectors.length];
-
-            for (int i = 0; i < selectors.length; i++)
-                this.selectors[i] = new EcoStatsOutputSelector(selectors[i], this);
+            for (int i = 0; i < selectors.length; i++) this.selectors[i] = new EcoStatsOutputSelector(selectors[i]);
         }
     }
 
