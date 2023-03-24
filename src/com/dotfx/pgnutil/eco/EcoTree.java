@@ -129,7 +129,7 @@ public final class EcoTree
     
     public TreeNodeSet getDeepestTranspositionSet(PgnGame game) throws IllegalMoveException
     {
-        try { return getDeepestTranspositionSet(game.getMoves(), 0); }
+        try { return getDeepestTranspositionSet(game.getMoves()); }
 
         catch (IllegalMoveException | NullPointerException | StringIndexOutOfBoundsException e)
         {
@@ -142,15 +142,14 @@ public final class EcoTree
     /**
      *
      * @param moveList
-     * @param startAt in plies, with starting position as 0
      * @return
      * @throws IllegalMoveException
      */
-    public TreeNodeSet getDeepestTranspositionSet(List<PgnGame.Move> moveList, int startAt) throws IllegalMoveException
+    public TreeNodeSet getDeepestTranspositionSet(List<PgnGame.Move> moveList) throws IllegalMoveException
     {
         Map<String,Set<TreeNode>> posMap = reader.getPositionMap();
-        Board board = new Board(true).goToMove(moveList.subList(0, startAt));
-        Set<TreeNode> deepest = board.getPly() > 0 ? posMap.get(board.positionId().toString()) : null;
+        Board board = new Board(true);
+        Set<TreeNode> deepest = null;
 
         for (int i = board.getPly(); i < moveList.size() && i <= reader.getDeepestPly(); i++)
         {

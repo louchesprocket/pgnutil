@@ -206,11 +206,8 @@ public class OpeningStats implements Tallier
             TreeNode scidNode = scidEcoTree != null ? scidEcoTree.get(game, openingMoveList.size()) : null;
 
             opening = new Opening(openingId, ecoNode, scidNode,
-                useXStdEco ?
-                    ecoTree.getDeepestTranspositionSet(openingMoveList, ecoNode != null ? ecoNode.getPly() : 0) : null,
-                useXScidEco ?
-                    scidEcoTree.getDeepestTranspositionSet(openingMoveList, scidNode != null ? scidNode.getPly() : 0) :
-                        null);
+                useXStdEco ? ecoTree.getDeepestTranspositionSet(openingMoveList) : null,
+                useXScidEco ? scidEcoTree.getDeepestTranspositionSet(openingMoveList) : null);
 
             openingsMap.put(openingId, opening);
         }

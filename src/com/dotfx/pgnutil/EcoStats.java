@@ -129,7 +129,7 @@ public class EcoStats implements Tallier
                 return;
         }
 
-        TreeNodeSet treeNodeSet = transpose ? ecoTree.getDeepestTranspositionSet(game.getOpeningMoveList(), 0) :
+        TreeNodeSet treeNodeSet = transpose ? ecoTree.getDeepestTranspositionSet(game.getOpeningMoveList()) :
                 new TreeNodeSet(ecoTree.getDeepestDefined(game.getOpeningMoveList()));
 
         OpeningScore os = openingsMap.get(treeNodeSet);

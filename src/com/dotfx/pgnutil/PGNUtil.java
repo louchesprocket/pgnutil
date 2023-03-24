@@ -724,7 +724,7 @@ public class PGNUtil
         }
     }
     
-    public static final String VERSION = "0.6.2";
+    public static final String VERSION = "0.6.3";
     
     // All of these are static in order to avoid parameter-passing overhead.
     
