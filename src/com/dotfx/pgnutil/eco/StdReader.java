@@ -72,7 +72,7 @@ final class StdReader extends TreeReader
                 String parts[] = line.split(lineDelim);
                 String moves[] = parts[2].split(moveDelim);
 
-                for (int i = 0; i < moves.length; i++) // for each move + position hash
+                for (int i = 0; i < moves.length; i++) // for each move
                 {
                     if (i == moves.length - 1) node = node.addNode(moves[i], parts[0], parts[1], this);
                     else node = node.addNode(moves[i], "", "", this);

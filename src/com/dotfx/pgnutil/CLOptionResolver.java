@@ -23,13 +23,10 @@ package com.dotfx.pgnutil;
 import com.dotfx.pgnutil.CLOptions.OptId;
 import com.dotfx.pgnutil.eco.EcoTree;
 
-import java.util.Arrays;
-import java.util.Set;
+import java.util.*;
 
 public class CLOptionResolver
 {
-    private static final OptId[] ECOOPTS = new OptId[] {OptId.STDECO, OptId.SCIDECO, OptId.XSTDECO, OptId.XSCIDECO};
-
     private interface OptHandler
     {
         default void handleIfAny() {}
@@ -80,47 +77,73 @@ public class CLOptionResolver
         }
     }
 
+    private static class MatchPlayerHandler implements OptHandler
+    {
+        @Override
+        public void handleIfAny()
+        {
+            if (CLOptions.getCount(OptId.MATCHPLAYER) > 1 &&
+                Arrays.stream(PGNUtil.outputSelectors).anyMatch(os -> os.getValue() == OutputSelector.Value.OPPONENT))
+                {
+                    System.err.println("The 'opponent' selector only works while matching one player ('" +
+                            CLOptions.MP + "')!");
+
+                    System.exit(-1);
+                };
+        }
+    }
+
     private static class ConditionSet
     {
-        private final OptId opts[];
-        private final OptId ifAnyOf[];
-        private final OptId ifNoneOf[];
+        private final Set<OptId> opts;
+        private final Set<OptId> ifAnyOf;
+        private final Set<OptId> ifNoneOf;
         private final OptHandler handler;
 
         private ConditionSet(OptId opts[], OptId ifAnyOf[], OptId ifNoneOf[], OptHandler handler)
         {
-            this.opts = opts;
-            this.ifAnyOf = ifAnyOf;
-            this.ifNoneOf = ifNoneOf;
+            this.opts = new HashSet<>(Arrays.asList(opts));
+            this.ifAnyOf = ifAnyOf == null ? new HashSet<>() : new HashSet<>(Arrays.asList(ifAnyOf));
+            this.ifNoneOf = ifNoneOf == null ? new HashSet<>() : new HashSet<>(Arrays.asList(ifNoneOf));
             this.handler = handler;
         }
 
-        OptId[] getOpts() { return opts; }
-        OptId[] getIfAnyOf() { return ifAnyOf; }
-        OptId[] getIfNoneOf() { return ifNoneOf; }
-
-        void handle(final Set<OptId> setOpts)
+        void handle(OptId opt, final Set<OptId> setOpts)
         {
-            if (!Arrays.stream(getOpts()).anyMatch(setOpts::contains)) return;
-
+            if (!opts.contains(opt)) return;
             // https://stackoverflow.com/questions/11796371/check-if-one-list-contains-element-from-the-other
-            if (Arrays.stream(getIfAnyOf()).anyMatch(setOpts::contains)) handler.handleIfAny();
-            if (!Arrays.stream(getIfNoneOf()).anyMatch(setOpts::contains)) handler.handleIfNone();
+            if (ifAnyOf.stream().anyMatch(setOpts::contains)) handler.handleIfAny();
+            if (!ifNoneOf.stream().anyMatch(setOpts::contains)) handler.handleIfNone();
         }
     }
 
+    private static final List<ConditionSet> conditionList = new ArrayList<>();
+
     public static final void resolveOpts(final Set<OptId> setOpts)
     {
-        new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.STDECO}, new OptId[] {},
-                new EcoOpeningsHandler()).handle(setOpts);
+        addCondition(new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.STDECO}, null,
+                new EcoOpeningsHandler()));
 
-        new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.SCIDECO}, new OptId[] {},
-                new ScidEcoOpeningsHandler()).handle(setOpts);
+        addCondition(new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.SCIDECO}, null,
+                new ScidEcoOpeningsHandler()));
 
-        new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.XSTDECO}, new OptId[] {},
-                new XEcoOpeningsHandler()).handle(setOpts);
+        addCondition(new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.XSTDECO}, null,
+                new XEcoOpeningsHandler()));
 
-        new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.XSCIDECO}, new OptId[] {},
-                new XScidEcoOpeningsHandler()).handle(setOpts);
+        addCondition(new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.XSCIDECO}, null,
+                new XScidEcoOpeningsHandler()));
+
+        addCondition(new ConditionSet(new OptId[] {OptId.MATCHPLAYER}, new OptId[] {OptId.SELECTORS}, null,
+                new MatchPlayerHandler()));
+
+        process(setOpts);
+    }
+
+    private static final void addCondition(ConditionSet conditionSet) { conditionList.add(conditionSet); }
+
+    private static final void process(final Set<OptId> setOpts)
+    {
+        for (OptId opt : setOpts)
+            for (ConditionSet cs : conditionList) cs.handle(opt, setOpts);
     }
 }

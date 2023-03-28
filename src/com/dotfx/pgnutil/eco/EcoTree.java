@@ -121,11 +121,6 @@ public final class EcoTree
      * @return 
      */
     public TreeNode get(String moveSt) { return topNode.getBottomNode(moveSt); }
-
-    public TreeNodeSet getTranspositions(TreeNode node)
-    {
-        return new TreeNodeSet(reader.getPositionMap().get(node.getPositionId()));
-    }
     
     public TreeNodeSet getDeepestTranspositionSet(PgnGame game) throws IllegalMoveException
     {

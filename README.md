@@ -59,7 +59,7 @@ Searches for ECO codes may, of course, be performed with the <nobr>"-mt"</nobr> 
 
 ``pgnutil -me 'A42' -i mygames.pgn``
 
-will return every game in which the ECO opening A42 was played, ignoring any "ECO" tags. Note that ECO codes for this option are matched for the entire game, not just the "opening" as defined under [Openings](#openings), below. Other ECO-related matching commands are:
+will return every game in which the ECO opening A42 was played, ignoring any "ECO" tags. Note that ECO codes for this option are matched for the entire game, not just the "opening" as defined under [Openings](#openings), below. Other ECO-related matching options are:
 
 * -med: match ECO description
 * -mxe: match ECO code, searching positions transpositionally
@@ -209,7 +209,7 @@ The opening-statistics function has its own set of output selectors:
 * 	draws: the number of draws for this opening
 * 	drawpct: the number of draws for this opening expressed as a percentage of all games having a result
 
-In addition, any of the [ECO-related output selectors](#eco-related_output_selectors) may be used in this context, but will be applied only to the opening moves of the game.
+In addition, any of the [ECO-related output selectors](#eco-related_output_selectors) may be used in this context, but will apply only to the opening moves of the game.
 
 So we can use the previous example to generate a list of opening identifers (note addition of the "-s" option):
 
