@@ -82,10 +82,17 @@ public class CLOptionResolver
         @Override
         public void handleIfAny()
         {
+            final OutputSelector.Value[] v = new OutputSelector.Value[1];
+
             if (CLOptions.getCount(OptId.MATCHPLAYER) > 1 &&
-                Arrays.stream(PGNUtil.outputSelectors).anyMatch(os -> os.getValue() == OutputSelector.Value.OPPONENT))
+                    // hack to save the offending selector
+                Arrays.stream(PGNUtil.outputSelectors).anyMatch(os -> ((v[0] = os.getValue()) != null) &&
+                        os.getValue() == OutputSelector.Value.OPPONENT ||
+                        os.getValue() == OutputSelector.Value.OPPONENTELO ||
+                        os.getValue() == OutputSelector.Value.PLAYER ||
+                        os.getValue() == OutputSelector.Value.PLAYERELO))
                 {
-                    System.err.println("The 'opponent' selector only works while matching one player ('" +
+                    System.err.println("Output selector '" + v[0] + "' only works while matching one player ('" +
                             CLOptions.MP + "')!");
 
                     System.exit(-1);

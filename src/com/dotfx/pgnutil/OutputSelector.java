@@ -96,15 +96,21 @@ public final class OutputSelector
         }
     }
 
+    private static final class PlayerOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            if (PGNUtil.playerPattern.matcher(game.getWhite()).find()) sb.append(game.getWhite());
+            else sb.append(game.getBlack());
+        }
+    }
+
     private static final class OpponentOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(PgnGame game, StringBuilder sb) throws InvalidSelectorException
+        public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            if (PGNUtil.playerPattern == null)
-                throw new InvalidSelectorException("'" + OutputSelector.Value.OPPONENT + "' " +
-                        "selector requires option '" + CLOptions.MP + "'");
-
             if (PGNUtil.playerPattern.matcher(game.getWhite()).find()) sb.append(game.getBlack());
             else sb.append(game.getWhite());
         }
@@ -113,12 +119,8 @@ public final class OutputSelector
     private static final class PlayerEloOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(PgnGame game, StringBuilder sb) throws InvalidSelectorException
+        public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            if (PGNUtil.playerPattern == null)
-                throw new InvalidSelectorException("'" + OutputSelector.Value.OPPONENT + "' " +
-                        "selector requires option '" + CLOptions.MP + "'");
-
             if (PGNUtil.playerPattern.matcher(game.getWhite()).find()) sb.append(game.getValue("WhiteElo"));
             else sb.append(game.getValue("BlackElo"));
         }
@@ -127,12 +129,8 @@ public final class OutputSelector
     private static final class OpponentEloOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(PgnGame game, StringBuilder sb) throws InvalidSelectorException
+        public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            if (PGNUtil.playerPattern == null)
-                throw new InvalidSelectorException("'" + OutputSelector.Value.OPPONENT + "' " +
-                        "selector requires option '" + CLOptions.MP + "'");
-
             if (PGNUtil.playerPattern.matcher(game.getWhite()).find()) sb.append(game.getValue("BlackElo"));
             else sb.append(game.getValue("WhiteElo"));
         }
@@ -407,7 +405,7 @@ public final class OutputSelector
         ROUNDCOUNT("roundcount", null),
         
         // additional player-results selectors
-        PLAYER("player", null),
+        PLAYER("player", new PlayerOutputHandler()),
         WINS("wins", null),
         LOSSES("losses", null),
         NORESULTS("noresults", null),

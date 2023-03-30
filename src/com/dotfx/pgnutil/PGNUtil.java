@@ -267,12 +267,7 @@ public class PGNUtil
     
     static final class MatchPlayerProcessor implements GameProcessor
     {
-        private final Pattern playerPattern;
-        
-        public MatchPlayerProcessor(Pattern p)
-        {
-            PGNUtil.playerPattern = playerPattern = p;
-        }
+        public MatchPlayerProcessor(Pattern p) { playerPattern = p; }
         
         @Override public boolean processGame()
         {

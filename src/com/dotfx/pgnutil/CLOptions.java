@@ -794,7 +794,7 @@ public class CLOptions
 
         int n = PGNUtil.replaceProcessors.size();
         
-        // This one must go last.
+        // These must go last.
         PGNUtil.replaceProcessors.add(n, new PGNUtil.ReplaceProcessor(Pattern.compile(replaceTokens[1],
                 Pattern.DOTALL), replaceTokens[2]));
         
