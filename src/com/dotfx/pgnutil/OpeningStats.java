@@ -202,8 +202,8 @@ public class OpeningStats implements Tallier
         {
             List<PgnGame.Move> openingMoveList = game.getOpeningMoveList();
             if (openingMoveList.size() == 0) return; // no book moves
-            TreeNode ecoNode = ecoTree != null ? ecoTree.get(game, openingMoveList.size()) : null;
-            TreeNode scidNode = scidEcoTree != null ? scidEcoTree.get(game, openingMoveList.size()) : null;
+            TreeNode ecoNode = ecoTree != null ? ecoTree.getDeepestDefined(openingMoveList) : null;
+            TreeNode scidNode = scidEcoTree != null ? scidEcoTree.getDeepestDefined(openingMoveList) : null;
 
             opening = new Opening(openingId, ecoNode, scidNode,
                 useXStdEco ? ecoTree.getDeepestTranspositionSet(openingMoveList) : null,
