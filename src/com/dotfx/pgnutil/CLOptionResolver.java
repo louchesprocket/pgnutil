@@ -21,7 +21,6 @@
 package com.dotfx.pgnutil;
 
 import com.dotfx.pgnutil.CLOptions.OptId;
-import com.dotfx.pgnutil.eco.EcoTree;
 
 import java.util.*;
 
@@ -33,45 +32,12 @@ public class CLOptionResolver
         default void handleIfNone() {}
     }
 
-    private static class EcoOpeningsHandler implements OptHandler
+    private static class OpeningsHandler implements OptHandler
     {
         @Override
-        public void handleIfAny()
+        public void handleIfNone()
         {
-            Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, false);
-            PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
-            PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
-        }
-    }
-
-    private static class ScidEcoOpeningsHandler implements OptHandler
-    {
-        @Override
-        public void handleIfAny()
-        {
-            Tallier os = EcoStats.getInstance(EcoTree.FileType.SCIDDB, false);
-            PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
-            PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
-        }
-    }
-
-    private static class XEcoOpeningsHandler implements OptHandler
-    {
-        @Override
-        public void handleIfAny()
-        {
-            Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, true);
-            PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
-            PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
-        }
-    }
-
-    private static class XScidEcoOpeningsHandler implements OptHandler
-    {
-        @Override
-        public void handleIfAny()
-        {
-            Tallier os = EcoStats.getInstance(EcoTree.FileType.SCIDDB, true);
+            Tallier os = OpeningStats.getInstance();
             PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
             PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
         }
@@ -115,42 +81,22 @@ public class CLOptionResolver
             this.handler = handler;
         }
 
-        void handle(OptId opt, final Set<OptId> setOpts)
+        private void handle(final Set<OptId> setOpts)
         {
-            if (!opts.contains(opt)) return;
             // https://stackoverflow.com/questions/11796371/check-if-one-list-contains-element-from-the-other
+            if (!opts.stream().anyMatch(setOpts::contains)) return;
             if (ifAnyOf.stream().anyMatch(setOpts::contains)) handler.handleIfAny();
             if (!ifNoneOf.stream().anyMatch(setOpts::contains)) handler.handleIfNone();
         }
     }
 
-    private static final List<ConditionSet> conditionList = new ArrayList<>();
-
     public static final void resolveOpts(final Set<OptId> setOpts)
     {
-        addCondition(new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.STDECO}, null,
-                new EcoOpeningsHandler()));
+        new ConditionSet(new OptId[] {OptId.OPENINGS}, null,
+                new OptId[] {OptId.STDECO, OptId.SCIDECO, OptId.XSTDECO, OptId.XSCIDECO},
+                new OpeningsHandler()).handle(setOpts);
 
-        addCondition(new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.SCIDECO}, null,
-                new ScidEcoOpeningsHandler()));
-
-        addCondition(new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.XSTDECO}, null,
-                new XEcoOpeningsHandler()));
-
-        addCondition(new ConditionSet(new OptId[] {OptId.OPENINGS}, new OptId[] {OptId.XSCIDECO}, null,
-                new XScidEcoOpeningsHandler()));
-
-        addCondition(new ConditionSet(new OptId[] {OptId.MATCHPLAYER}, new OptId[] {OptId.SELECTORS}, null,
-                new MatchPlayerHandler()));
-
-        process(setOpts);
-    }
-
-    private static final void addCondition(ConditionSet conditionSet) { conditionList.add(conditionSet); }
-
-    private static final void process(final Set<OptId> setOpts)
-    {
-        for (OptId opt : setOpts)
-            for (ConditionSet cs : conditionList) cs.handle(opt, setOpts);
+        new ConditionSet(new OptId[] {OptId.MATCHPLAYER}, new OptId[] {OptId.SELECTORS}, null,
+                new MatchPlayerHandler()).handle(setOpts);
     }
 }

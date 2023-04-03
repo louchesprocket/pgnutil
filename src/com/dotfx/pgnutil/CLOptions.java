@@ -958,10 +958,7 @@ public class CLOptions
         }
         
         countOption(OptId.get(O));
-        
-        Tallier os = OpeningStats.getInstance();
-        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
-        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+        // The rest is handled in CLOptionResolver.
     }
 
     // ECO stats
@@ -977,7 +974,9 @@ public class CLOptions
         }
         
         countOption(OptId.get(ECO));
-        // The rest is handled in CLOptionResolver.
+        Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, false);
+        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
     @Option(name = SECO, depends = {O}, forbids = {ECO, XE, XSECO}, aliases = "-scid_eco_stats",
@@ -991,7 +990,9 @@ public class CLOptions
         }
         
         countOption(OptId.get(SECO));
-        // The rest is handled in CLOptionResolver.
+        Tallier os = EcoStats.getInstance(EcoTree.FileType.SCIDDB, false);
+        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
     @Option(name = XE, depends = {O}, forbids = {ECO, SECO, XSECO}, aliases = "-trans_eco_stats",
@@ -1006,7 +1007,9 @@ public class CLOptions
         }
         
         countOption(OptId.get(XE));
-        // The rest is handled in CLOptionResolver.
+        Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, true);
+        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
     @Option(name = XSECO, depends = {O}, forbids = {ECO, XE, SECO}, aliases = "-trans_scid_eco_stats",
@@ -1021,7 +1024,9 @@ public class CLOptions
         }
         
         countOption(OptId.get(XSECO));
-        // The rest is handled in CLOptionResolver.
+        Tallier os = EcoStats.getInstance(EcoTree.FileType.SCIDDB, true);
+        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
     @Option(name = CMIN, depends = {O}, aliases = "-count_min", metaVar = "<min>",
