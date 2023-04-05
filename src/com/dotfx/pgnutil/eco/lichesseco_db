@@ -1884,6 +1884,7 @@ D50|Queen's Gambit Declined: Pseudo-Tarrasch Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 c
 D51|Queen's Gambit Declined: Modern Variation, Knight Defense|d4 d5 c4 e6 Nc3 Nf6 Bg5 Nbd7 e3|a1e39c16576f0f9c
 D53|Queen's Gambit Declined: Modern Variation, Heral Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 Bxf6|d45576833d8c9d05
 D40|Queen's Gambit Declined: Semi-Tarrasch Defense, Pillsbury Variation|d4 d5 c4 e6 Nc3 Nf6 Nf3 c5 Bg5|ee2b242120d595cc
+D10|Slav Defense: Exchange Variation, Boor Attack|d4 d5 c4 c6 cxd5 cxd5 Nc3 Nf6 f3|2f2176b8caa80ccf
 D30|Semi-Slav Defense: Quiet Variation|d4 d5 c4 c6 Nf3 Nf6 e3 e6 Nbd2|3231ff19d8df6e9f
 D15|Slav Defense: Chameleon Variation, Advance System|d4 d5 c4 c6 Nf3 Nf6 Nc3 a6 c5|83e44d5ecfa9e950
 D16|Slav Defense: Alapin Variation|d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4|106eaa47ab5d1afc
@@ -2041,6 +2042,8 @@ C29|Vienna Game: Vienna Gambit, Bardeleben Variation|e4 e5 Nc3 Nf6 f4 d5 fxe5 Nx
 B01|Scandinavian Defense: Bronstein Variation|e4 d5 exd5 Qxd5 Nc3 Qd6 d4 Nf6 Nf3 a6|e7d0f00d8ea633f0
 B01|Scandinavian Defense: Anderssen Counterattack, Collijn Variation|e4 d5 exd5 Qxd5 Nc3 Qa5 d4 e5 Nf3 Bg4|98a94ba64f5c2b10
 B01|Scandinavian Defense: Classical Variation|e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 Bf5|160db76293dadb53
+B01|Scandinavian Defense: Valencian Variation, Ilundain Variation|e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 c6|9f9f2edddb9844a1
+B01|Scandinavian Defense: Valencian Variation, Main Line|e4 d5 exd5 Qxd5 Nc3 Qd8 d4 Nf6 Nf3 Bg4|b2fa7c97e57b357c
 C02|French Defense: Advance Variation, Euwe Variation|e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Bd7|d321b73d941146e3
 C02|French Defense: Advance Variation, Wade Variation|e4 e6 d4 d5 e5 c5 c3 Qb6 Nf3 Bd7|f97a0389760c7d73
 C01|French Defense: Exchange Variation, Bogoljubov Variation|e4 e6 d4 d5 exd5 exd5 Nc3 Nf6 Bg5 Nc6|fb47bb5ecc8b8729

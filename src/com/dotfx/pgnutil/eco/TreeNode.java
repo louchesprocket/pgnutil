@@ -55,9 +55,7 @@ public final class TreeNode implements Comparable<TreeNode>
     public int getPly() {
         return ply;
     }
-    public String getMove() {
-        return moveSt;
-    }
+    public String getMove() { return moveSt; }
     public String getSpecCode() {
         return code;
     }
@@ -76,9 +74,7 @@ public final class TreeNode implements Comparable<TreeNode>
     public TreeNode getParent() {
         return parent;
     }
-    public String getMoveText() {
-        return PgnGame.Move.getMoveOnly(moveSt);
-    }
+    public String getMoveText() { return PgnGame.Move.getMoveOnly(moveSt); }
     public TreeNode branchTo(TreeNode node) {
         return branchTo(node.getMove());
     }

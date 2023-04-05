@@ -28,8 +28,24 @@ public class CLOptionResolver
 {
     private interface OptHandler
     {
+        default void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts) {}
         default void handleIfAny() {}
         default void handleIfNone() {}
+    }
+
+    private static class MutexHandler implements OptHandler
+    {
+        @Override
+        public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+        {
+            if (checkOpts.stream().filter(setOpts::contains).count() > 1)
+            {
+                StringJoiner sj = new StringJoiner(",' '", "'", "'");
+                for (OptId opt : checkOpts) sj.add(opt.toString());
+                System.err.println("Only one of " + sj + " may be set at a time.");
+                System.exit(-1);
+            }
+        }
     }
 
     private static class OpeningsHandler implements OptHandler
@@ -68,14 +84,14 @@ public class CLOptionResolver
 
     private static class ConditionSet
     {
-        private final Set<OptId> opts;
+        private final Set<OptId> checkOpts;
         private final Set<OptId> ifAnyOf;
         private final Set<OptId> ifNoneOf;
         private final OptHandler handler;
 
-        private ConditionSet(OptId opts[], OptId ifAnyOf[], OptId ifNoneOf[], OptHandler handler)
+        private ConditionSet(OptId checkOpts[], OptId ifAnyOf[], OptId ifNoneOf[], OptHandler handler)
         {
-            this.opts = new HashSet<>(Arrays.asList(opts));
+            this.checkOpts = new HashSet<>(Arrays.asList(checkOpts));
             this.ifAnyOf = ifAnyOf == null ? new HashSet<>() : new HashSet<>(Arrays.asList(ifAnyOf));
             this.ifNoneOf = ifNoneOf == null ? new HashSet<>() : new HashSet<>(Arrays.asList(ifNoneOf));
             this.handler = handler;
@@ -83,8 +99,8 @@ public class CLOptionResolver
 
         private void handle(final Set<OptId> setOpts)
         {
-            // https://stackoverflow.com/questions/11796371/check-if-one-list-contains-element-from-the-other
-            if (!opts.stream().anyMatch(setOpts::contains)) return;
+            if (!checkOpts.stream().anyMatch(setOpts::contains)) return;
+            handler.handleOpts(setOpts, checkOpts);
             if (ifAnyOf.stream().anyMatch(setOpts::contains)) handler.handleIfAny();
             if (!ifNoneOf.stream().anyMatch(setOpts::contains)) handler.handleIfNone();
         }
@@ -92,8 +108,21 @@ public class CLOptionResolver
 
     public static final void resolveOpts(final Set<OptId> setOpts)
     {
-        new ConditionSet(new OptId[] {OptId.OPENINGS}, null,
-                new OptId[] {OptId.STDECO, OptId.SCIDECO, OptId.XSTDECO, OptId.XSCIDECO},
+        final OptId topLevelOpts[] =
+                new OptId[] {OptId.DUPLICATES, OptId.DUPLICATEMOVES, OptId.DUPLICATEOPENINGS, OptId.OPENINGS,
+                        OptId.EVENTS, OptId.PLAYERRESULTS, OptId.CHECKSEQUENTIALROUNDS};
+
+        final OptId openingsOpts[] =
+                new OptId[] {OptId.STDECO, OptId.SCIDECO, OptId.XSTDECO, OptId.XSCIDECO};
+
+        final OptId matchOpeningOpts[] =
+                new OptId[] {OptId.MATCHOPENING, OptId.NOTMATCHOPENING, OptId.OPENINGFILE, OptId.NOTOPENINGFILE};
+
+        new ConditionSet(topLevelOpts, null, null, new MutexHandler()).handle(setOpts);
+        new ConditionSet(openingsOpts, null, null, new MutexHandler()).handle(setOpts);
+        new ConditionSet(matchOpeningOpts, null, null, new MutexHandler()).handle(setOpts);
+
+        new ConditionSet(new OptId[] {OptId.OPENINGS}, null, openingsOpts,
                 new OpeningsHandler()).handle(setOpts);
 
         new ConditionSet(new OptId[] {OptId.MATCHPLAYER}, new OptId[] {OptId.SELECTORS}, null,

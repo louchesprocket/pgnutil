@@ -169,14 +169,13 @@ public final class EcoTree
     public int positionCount() { return topNode.deepCount(); }
 
     /**
-     * Finds different codes.  Tries to go to the bottom of that.
+     * Finds different codes and descriptions for equal nodes.
      *
      * @param that
-     * @param ignoreDepth
      * @param checkDesc
      * @return
      */
-    private List<TreeNode> diff(EcoTree that, boolean ignoreDepth, boolean checkDesc)
+    private List<TreeNode> codeDescDiff(EcoTree that, boolean checkDesc)
     {
         List<TreeNode> ret = new ArrayList<>();
         List<TreeNode> thatChildren = that.topNode.getChildren();
@@ -185,45 +184,41 @@ public final class EcoTree
         {
             TreeNode thatNode = thatChildren.get(0);
             TreeNode myNode = topNode.getBottomNode(thatNode.getPath());
-            int mySize = myNode.getPath().size();
-            int thatSize = thatNode.getPath().size();
 
-            if (ignoreDepth || thatNode.getPly() == myNode.getPly())
+            if (thatNode.getPly() == myNode.getPly())
             {
-                if (mySize != thatSize)
-                {
-                    StringBuilder sb = new StringBuilder();
-                    
-                    for (TreeNode node : myNode.getPath())
-                    {
-                        int ply = node.getPly();
-                        if (ply != 1) sb.append(" ");
-                        if (ply % 2 == 1) sb.append((ply + 1)/2).append(".");
-                        sb.append(node.getMove());
-                    }
-                    
-                    sb.append("\n");
-                    
-                    for (TreeNode node : thatNode.getPath())
-                    {
-                        int ply = node.getPly();
-                        if (ply != 1) sb.append(" ");
-                        if (ply % 2 == 1) sb.append((ply + 1)/2).append(".");
-                        sb.append(node.getMove());
-                    }
-                    
-                    System.out.println("\n===== node diff:\n" + sb.toString());
-                }
-                
                 if (!myNode.getStdCode().equals(thatNode.getStdCode())) ret.add(thatNode);
                 if (checkDesc && !myNode.getDesc().equals(thatNode.getDesc())) ret.add(thatNode);
-                
                 thatChildren.addAll(thatNode.getChildren());
             }
             
             thatChildren.remove(thatNode);
         }
         
+        return ret;
+    }
+
+    /**
+     *
+     * @param that
+     * @return list of extra nodes contained in that, as compared to this
+     */
+    private List<TreeNode> findExtraNodes(EcoTree that)
+    {
+        List<TreeNode> ret = new ArrayList<>();
+        List<TreeNode> thatChildren = that.topNode.getChildren();
+
+        while (thatChildren.size() > 0)
+        {
+            TreeNode thatNode = thatChildren.get(0);
+
+            if (topNode.getBottomNode(thatNode.getPath()).getPath().size() != thatNode.getPath().size())
+                ret.add(thatNode);
+
+            thatChildren.remove(thatNode);
+            thatChildren.addAll(thatNode.getChildren());
+        }
+
         return ret;
     }
     
@@ -402,7 +397,45 @@ public final class EcoTree
 
     public static void printDiff(EcoTree tree1, EcoTree tree2, boolean checkDesc)
     {
-        List<TreeNode> treeDiff = tree1.diff(tree2, false, checkDesc);
+        System.out.println("missing nodes in tree 1 =====");
+
+        for (TreeNode node : tree1.findExtraNodes(tree2))
+        {
+            System.out.print(node.getCode() + "|");
+            System.out.print(node.getDesc() + "|");
+            List<TreeNode> nodePath = node.getPath();
+
+            for (TreeNode pathNode : nodePath)
+            {
+                int ply = pathNode.getPly();
+                if (ply != 1) System.out.print(" ");
+                if (ply % 2 == 1) System.out.print(((ply + 1)/2) + ".");
+                System.out.print(pathNode.getMove());
+            }
+
+            System.out.println();
+        }
+
+        System.out.println("missing nodes in tree 2 =====");
+
+        for (TreeNode node : tree2.findExtraNodes(tree1))
+        {
+            System.out.print(node.getCode() + "|");
+            System.out.print(node.getDesc() + "|");
+            List<TreeNode> nodePath = node.getPath();
+
+            for (TreeNode pathNode : nodePath)
+            {
+                int ply = pathNode.getPly();
+                if (ply != 1) System.out.print(" ");
+                if (ply % 2 == 1) System.out.print(((ply + 1)/2) + ".");
+                System.out.print(pathNode.getMove());
+            }
+
+            System.out.println();
+        }
+
+        List<TreeNode> treeDiff = tree1.codeDescDiff(tree2, checkDesc);
 
         // Prints tree2 code, tree1 code, moves
         for (TreeNode tree2Node : treeDiff)
@@ -434,15 +467,16 @@ public final class EcoTree
 ////        EcoTree tree1 = getScidInstance();
 ////        tree1.printTranspositions();
 //
-//        EcoTree tree1 = new EcoTree(FileType.SCIDDB);
+//        EcoTree tree1 = new EcoTree(FileType.LICHESS);
 ////        tree1.printTree();
 ////        tree1.writeTree(new File("test.out"));
-////        EcoTree tree2 = new EcoTree(FileType.STD);
-////        printDiff(tree1, tree2, false);
+//        EcoTree tree2 = new EcoTree(FileType.STD);
+//        printDiff(tree1, tree2, true);
 ////        tree1.printTranspositions();
-////        System.out.println("nodes: " + tree1.positionCount());
+//        System.out.println("nodes: " + tree1.positionCount());
+//        System.out.println("nodes: " + tree2.positionCount());
 //
-//        Board board = new Board(true).move("Nf3").move("e5").move("e4").move("Nc6").move("Bb5");
+////        Board board = new Board(true).move("Nf3").move("e5").move("e4").move("Nc6").move("Bb5");
 //
 ////        List<TreeNode> nodeList = tree1.get("1. d4 Nf6 2. c4 e6 3. Nf3 c5 4. d5 exd5 5. cxd5 d6 6. Nc3 g6 7. e4 Bg7 " +
 ////                "8. Be2 O-O 9. O-O a6 10. a4").getPath();

@@ -367,7 +367,7 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPlayerProcessor(Pattern.compile(regex, Pattern.DOTALL)));
     }
 
-    @Option(name = MO, forbids = {OF, NMO, NOF}, aliases = "-match_opening", metaVar = "<oid1,oid2,...>",
+    @Option(name = MO, aliases = "-match_opening", metaVar = "<oid1,oid2,...>",
         usage = "output games in which the opening-book moves are the same as any of <oid,oid2,...>")
     private void setOpening(String openingsSt)
     {
@@ -381,7 +381,7 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.MatchOpeningProcessor(getOpeningsSet(openingsSt)));
     }
 
-    @Option(name = OF, forbids = {MO, NMO, NOF}, aliases = "-opening_file", metaVar = "<file>",
+    @Option(name = OF, aliases = "-opening_file", metaVar = "<file>",
         usage = "output games in which the opening-book moves are any of those contained in <file>")
     private void setOpeningFile(File of)
     {
@@ -395,7 +395,7 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.MatchOpeningProcessor(getOpeningsSet(readFully(of))));
     }
 
-    @Option(name = NMO, forbids = {MO, OF, NOF}, aliases = "-not_match_opening", metaVar = "<oid1,oid2,...>",
+    @Option(name = NMO, aliases = "-not_match_opening", metaVar = "<oid1,oid2,...>",
         usage = "output games in which the opening-book moves are not the same as any of <oid,oid2,...>")
     private void setNotOpening(String openingsSt)
     {
@@ -409,7 +409,7 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.NotMatchOpeningProcessor(getOpeningsSet(openingsSt)));
     }
 
-    @Option(name = NOF, forbids = {OF, NMO, MO}, aliases = "-not_opening_file", metaVar = "<file>",
+    @Option(name = NOF, aliases = "-not_opening_file", metaVar = "<file>",
         usage = "output games in which the opening-book moves are none of those contained in <file>")
     private void setNotOpeningFile(File of)
     {
@@ -423,7 +423,7 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.NotMatchOpeningProcessor(getOpeningsSet(readFully(of))));
     }
 
-    @Option(name = MPOS, forbids = {}, aliases = "-match_pos", metaVar = "<move_string>",
+    @Option(name = MPOS, aliases = "-match_pos", metaVar = "<move_string>",
         usage = "output games that contain the position reached by SAN string <move_string>")
     private void setPosition(String moveSt)
     {
@@ -447,7 +447,7 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionProcessor(board));
     }
 
-    @Option(name = ME, forbids = {}, aliases = "-match_eco", metaVar = "<regex>",
+    @Option(name = ME, aliases = "-match_eco", metaVar = "<regex>",
         usage = "output games belonging to ECO code <regex>")
     private void setEco(String eco)
     {
@@ -463,7 +463,7 @@ public class CLOptions
             EcoTree.FileType.STD));
     }
 
-    @Option(name = MED, forbids = {}, aliases = "-match_eco_desc", metaVar = "<regex>",
+    @Option(name = MED, aliases = "-match_eco_desc", metaVar = "<regex>",
         usage = "output games whose ECO description matches <regex>")
     private void setEcoDesc(String eco)
     {
@@ -479,7 +479,7 @@ public class CLOptions
             EcoTree.FileType.STD));
     }
 
-    @Option(name = MSE, forbids = {}, aliases = "-match_scid_eco", metaVar = "<regex>",
+    @Option(name = MSE, aliases = "-match_scid_eco", metaVar = "<regex>",
         usage = "output games belonging to Scid ECO code <regex>")
     private void setScidEco(String eco)
     {
@@ -495,7 +495,7 @@ public class CLOptions
             EcoTree.FileType.SCIDDB));
     }
 
-    @Option(name = MSED, forbids = {}, aliases = "-match_scid_eco_desc", metaVar = "<regex>",
+    @Option(name = MSED, aliases = "-match_scid_eco_desc", metaVar = "<regex>",
         usage = "output games whose Scid ECO description matches <regex>")
     private void setScidEcoDesc(String eco)
     {
@@ -511,7 +511,7 @@ public class CLOptions
             EcoTree.FileType.SCIDDB));
     }
 
-    @Option(name = MXE, forbids = {}, aliases = "-match_trans_eco", metaVar = "<regex>",
+    @Option(name = MXE, aliases = "-match_trans_eco", metaVar = "<regex>",
         usage = "output games belonging to ECO code <regex>, matching transpositionally")
     private void setXEco(String eco)
     {
@@ -527,7 +527,7 @@ public class CLOptions
             EcoTree.FileType.STD));
     }
 
-    @Option(name = MXED, forbids = {}, aliases = "-match_trans_eco_desc", metaVar = "<regex>",
+    @Option(name = MXED, aliases = "-match_trans_eco_desc", metaVar = "<regex>",
         usage = "output games whose ECO description matches <regex>, matching transpositionally")
     private void setXEcoDesc(String eco)
     {
@@ -543,7 +543,7 @@ public class CLOptions
             EcoTree.FileType.STD));
     }
 
-    @Option(name = MXSE, forbids = {}, aliases = "-match_trans_scid_eco", metaVar = "<regex>",
+    @Option(name = MXSE, aliases = "-match_trans_scid_eco", metaVar = "<regex>",
         usage = "output games belonging to Scid ECO code <regex>, matching transpositionally")
     private void setXScidEco(String eco)
     {
@@ -559,7 +559,7 @@ public class CLOptions
             EcoTree.FileType.SCIDDB));
     }
 
-    @Option(name = MXSED, forbids = {}, aliases = "-match_trans_scid_eco_desc", metaVar = "<regex>",
+    @Option(name = MXSED, aliases = "-match_trans_scid_eco_desc", metaVar = "<regex>",
         usage = "output games whose Scid ECO description matches <regex>, matching transpositionally")
     private void setXScidEcoDesc(String eco)
     {
@@ -854,7 +854,7 @@ public class CLOptions
 
     // duplicates
 
-    @Option(name = D, forbids = {DO, DM, O, E, CSR, P, S}, aliases = "-duplicates",
+    @Option(name = D, forbids = {S}, aliases = "-duplicates",
         usage = "list games containing identical players and move lists; each line of output contains one set of " +
                 "two or more game numbers in which duplicates are found")
     private void duplicates(boolean d)
@@ -871,7 +871,7 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.DuplicateExitProcessor(handler));
     }
 
-    @Option(name = DO, forbids = {D, DM, O, E, CSR, P, S}, aliases = "-duplicate_openings",
+    @Option(name = DO, forbids = {S}, aliases = "-duplicate_openings",
         usage = "list games containing identical players and openings; each line of output contains one set of two " +
                 "or more game numbers in which duplicates are found")
     private void duplicateOpenings(boolean d)
@@ -889,7 +889,7 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.DuplicateExitProcessor(handler));
     }
 
-    @Option(name = DM, forbids = {D, DO, O, E, CSR, P, S}, aliases = "-duplicate_moves",
+    @Option(name = DM, forbids = {S}, aliases = "-duplicate_moves",
         usage = "list games containing identical moves; each line of output contains one set of two or more " +
                 "game numbers in which duplicates are found")
     private void duplicatePostOpenings(boolean d)
@@ -908,7 +908,7 @@ public class CLOptions
 
     // events
 
-    @Option(name = E, forbids = {D, DO, DM, O, CSR, P}, aliases = "-events",
+    @Option(name = E, aliases = "-events",
         usage = "list one event per line, with game numbers (ordinal position of the game as it was read from the " +
                 "input source)")
     private void events(boolean e)
@@ -927,7 +927,7 @@ public class CLOptions
 
     // event errors
 
-    @Option(name = CSR, forbids = {D, DO, DM, O, E, P, S}, aliases = "-check_sequential_rounds",
+    @Option(name = CSR, forbids = {S}, aliases = "-check_sequential_rounds",
         usage = "list each event containing non-sequential rounds, one event per line, with " +
         "information about each non-sequential round found")
     private void eventErrors(boolean e)
@@ -946,7 +946,7 @@ public class CLOptions
 
     // opening stats
 
-    @Option(name = O, forbids = {D, DO, DM, E, CSR, P}, aliases = "-opening_stats",
+    @Option(name = O, aliases = "-opening_stats",
             usage = "print win/loss/draw statistics for each opening.  Valid output selectors ('" + S + "') include: " +
             "'eco,' 'oid,' 'count,' 'wwins,' 'bwins,' 'draws,' 'wwinpct,' 'bwinpct,' 'diff,' 'diffpct,' 'drawpct'")
     private void openings(boolean o)
@@ -963,7 +963,7 @@ public class CLOptions
 
     // ECO stats
 
-    @Option(name = ECO, depends = {O}, forbids = {SECO, XE, XSECO}, aliases = "-eco_stats",
+    @Option(name = ECO, depends = {O}, aliases = "-eco_stats",
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each ECO code")
     private void ecoOpenings(boolean o)
     {
@@ -979,7 +979,7 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
-    @Option(name = SECO, depends = {O}, forbids = {ECO, XE, XSECO}, aliases = "-scid_eco_stats",
+    @Option(name = SECO, depends = {O}, aliases = "-scid_eco_stats",
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each Scid ECO code")
     private void ScidEcoOpenings(boolean o)
     {
@@ -995,7 +995,7 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
-    @Option(name = XE, depends = {O}, forbids = {ECO, SECO, XSECO}, aliases = "-trans_eco_stats",
+    @Option(name = XE, depends = {O}, aliases = "-trans_eco_stats",
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each ECO code, " +
                     "matching openings transpositionally")
     private void XEcoOpenings(boolean o)
@@ -1012,7 +1012,7 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
-    @Option(name = XSECO, depends = {O}, forbids = {ECO, XE, SECO}, aliases = "-trans_scid_eco_stats",
+    @Option(name = XSECO, depends = {O}, aliases = "-trans_scid_eco_stats",
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each Scid ECO code, " +
                     "matching openings transpositionally")
     private void XScidEcoOpenings(boolean o)
