@@ -23,6 +23,7 @@ package com.dotfx.pgnutil;
 import com.dotfx.pgnutil.CLOptions.OptId;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CLOptionResolver
 {
@@ -38,10 +39,12 @@ public class CLOptionResolver
         @Override
         public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
         {
-            if (checkOpts.stream().filter(setOpts::contains).count() > 1)
+            Set<OptId> conflicts = checkOpts.stream().filter(setOpts::contains).collect(Collectors.toSet());
+
+            if (conflicts.size() > 1)
             {
                 StringJoiner sj = new StringJoiner(",' '", "'", "'");
-                for (OptId opt : checkOpts) sj.add(opt.toString());
+                for (OptId opt : conflicts) sj.add(opt.toString());
                 System.err.println("Only one of " + sj + " may be set at a time.");
                 System.exit(-1);
             }
