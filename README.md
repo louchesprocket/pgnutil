@@ -57,9 +57,9 @@ Position searches are performed with the "-mpos" (match position) option, where 
 
 Searches for ECO codes may, of course, be performed with the <nobr>"-mt"</nobr> option if the games in question have that tag. A more general way to perform ECO searches is with the <nobr>"-me"</nobr> (match ECO) option. For example:
 
-``pgnutil -me 'A42' -i mygames.pgn``
+``pgnutil -me 'A4[23]' -i mygames.pgn``
 
-will return every game in which the ECO opening A42 was played, ignoring any "ECO" tags. Note that ECO codes for this option are matched for the entire game, not just the "opening" as defined under [Openings](#openings), below. Other ECO-related matching options are:
+will return every game in which the ECO openings A42 or A43 were played, ignoring any "ECO" tags. Note that ECO codes for this option are matched for the entire game, not just the "opening" as defined under [Openings](#openings), below. Other ECO-related matching options are:
 
 * -med: match ECO description
 * -mxe: match ECO code, searching positions transpositionally
