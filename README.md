@@ -150,7 +150,7 @@ Note that any of the transpositional selectors ("xstdeco," "xscideco," "xstdecod
 
 ### Special Output Options
 
-The "special" output options include "-d" (duplicates), "-dm" (duplicate moves), "-do" (duplicate [openings](#openings)), "-e" (events), "-csr" (check sequential rounds), "-o" ([opening](#openings) statistics), and "-p" (player statistics). Any of these may be combined with any matching and replacing options (see above).
+The "special" output options include "-d" (duplicates), "-dm" (duplicate moves), "-do" (duplicate [openings](#openings)), "-e" (events), "-csr" (check sequential rounds), "-o" ([opening](#openings) statistics), and "-p" (player statistics). Any of these may be combined with any [matching](#matching) and [replacing](#replacing) options (see above).
 
 To find duplicate games (defined as games with the same players and same move list) in the file mygames.pgn:
 
