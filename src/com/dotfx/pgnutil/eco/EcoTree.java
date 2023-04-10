@@ -72,13 +72,20 @@ public final class EcoTree
         private boolean isResource() { return isResource; }
         private TreeReader getReader() { return readerFactory.newInstance(); }
 
-        public EcoTree getEcoTree()
+        public EcoTree getEcoTree() { return getEcoTree(null, null); }
+
+        public EcoTree getEcoTree(FileType typeOverride, File pathOverride)
         {
-            try { if (treeInstance == null) treeInstance = new EcoTree(this); }
+            try
+            {
+                if (treeInstance == null)
+                    treeInstance = new EcoTree(typeOverride == null ? this : typeOverride,
+                            pathOverride == null ? null : pathOverride);
+            }
 
             catch (IOException | IllegalMoveException e)
             {
-                e.printStackTrace();
+                System.err.println("error while reading ECO file " + pathOverride == null ? path : pathOverride);
                 System.exit(-1);
             }
 
@@ -436,6 +443,7 @@ public final class EcoTree
         }
 
         List<TreeNode> treeDiff = tree1.codeDescDiff(tree2, checkDesc);
+        System.out.println("code or description differences =====");
 
         // Prints tree2 code, tree1 code, moves
         for (TreeNode tree2Node : treeDiff)

@@ -69,6 +69,8 @@ will return every game in which the ECO openings A42 or A43 were played, ignorin
 * -mxse: match Scid ECO code, searching positions transpositionally
 * -mxsed: match Scid ECO description, searching positions transpositionally
 
+For all ECO-related operations, the standard (non-Scid) ECO database may be specified on the command line with the "-ef" (ECO file) option. This file should use the same format as Lichess (see https://github.com/lichess-org/chess-openings). If this option is not set, pgnutil will use its own internal database.
+
 ### Replacing
 
 The "-r" option performs replacements on the game text.  For example, to strip comments (or, to be precise, all text between curly braces) from mygames.pgn:

@@ -52,6 +52,7 @@ public class CLOptions
     public static final String DO = "-do";
     public static final String E = "-e";
     public static final String ECO = "-eco"; // ECO output for "-o"
+    public static final String EF = "-ef"; // specify standard ECO file
     public static final String ELO = "-elo";
     public static final String GN = "-gn";
     public static final String H = "-h";
@@ -115,6 +116,7 @@ public class CLOptions
         DUPLICATEMOVES(DM),
         DUPLICATEOPENINGS(DO),
         STDECO(ECO),
+        ECOFILE(EF),
         ELOFILE(ELO),
         EVENTS(E),
         GAMENUM(GN),
@@ -445,6 +447,21 @@ public class CLOptions
         }
         
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionProcessor(board));
+    }
+
+    @Option(name = EF, aliases = "-eco_file", metaVar = "<file>",
+            usage = "use <file> as the standard (Lichess-formatted) ECO database for any ECO-related operation. " +
+                    "See https://github.com/lichess-org/chess-openings")
+    private void ecoFile(File ef)
+    {
+        if (getCount(OptId.get(EF)) > 0)
+        {
+            System.err.println("Option '" + OptId.get(EF) + "' cannot be set more than once!");
+            System.exit(-1);
+        }
+
+        countOption(OptId.get(EF));
+        EcoTree.FileType.STD.getEcoTree(EcoTree.FileType.LICHESS, ef); // read Lichess-formatted d.b. as standard
     }
 
     @Option(name = ME, aliases = "-match_eco", metaVar = "<regex>",
