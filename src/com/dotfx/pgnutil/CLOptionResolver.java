@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 public class CLOptionResolver
 {
-    private interface OptHandler
+    public interface OptHandler
     {
         default void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts) {}
         default void handleIfAny() {}
@@ -109,6 +109,13 @@ public class CLOptionResolver
         }
     }
 
+    private static final List<ConditionSet> conditionList = new ArrayList<>();
+
+    public static final void addCondition(OptId checkOpts[], OptId ifAnyOf[], OptId ifNoneOf[], OptHandler handler)
+    {
+        conditionList.add(new ConditionSet(checkOpts, ifAnyOf, ifNoneOf, handler));
+    }
+
     public static final void resolveOpts(final Set<OptId> setOpts)
     {
         final OptId topLevelOpts[] =
@@ -130,5 +137,8 @@ public class CLOptionResolver
 
         new ConditionSet(new OptId[] {OptId.MATCHPLAYER}, new OptId[] {OptId.SELECTORS}, null,
                 new MatchPlayerHandler()).handle(setOpts);
+
+        // anything else requiring delayed initialization
+        for (ConditionSet cs : conditionList) cs.handle(setOpts);
     }
 }

@@ -26,11 +26,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import com.dotfx.pgnutil.eco.EcoTree;
@@ -475,9 +471,18 @@ public class CLOptions
         }
         
         countOption(OptId.get(ME));
-        
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.FileType.STD));
+
+        // delayed initialization, in case "-ef" is set
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(ME)}, null, null,
+                new CLOptionResolver.OptHandler()
+                {
+                    @Override
+                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    {
+                        PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
+                                EcoTree.FileType.STD));
+                    }
+                });
     }
 
     @Option(name = MED, aliases = "-match_eco_desc", metaVar = "<regex>",
@@ -491,9 +496,18 @@ public class CLOptions
         }
         
         countOption(OptId.get(MED));
-        
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.FileType.STD));
+
+        // delayed initialization, in case "-ef" is set
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(MED)}, null, null,
+                new CLOptionResolver.OptHandler()
+                {
+                    @Override
+                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    {
+                        PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco,
+                                Pattern.DOTALL), EcoTree.FileType.STD));
+                    }
+                });
     }
 
     @Option(name = MSE, aliases = "-match_scid_eco", metaVar = "<regex>",
@@ -507,9 +521,18 @@ public class CLOptions
         }
         
         countOption(OptId.get(MSE));
-        
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.FileType.SCIDDB));
+
+        // delayed initialization, in case "-ef" is set
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(MSE)}, null, null,
+                new CLOptionResolver.OptHandler()
+                {
+                    @Override
+                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    {
+                        PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
+                                EcoTree.FileType.SCIDDB));
+                    }
+                });
     }
 
     @Option(name = MSED, aliases = "-match_scid_eco_desc", metaVar = "<regex>",
@@ -523,9 +546,18 @@ public class CLOptions
         }
         
         countOption(OptId.get(MSED));
-        
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.FileType.SCIDDB));
+
+        // delayed initialization, in case "-ef" is set
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(MSED)}, null, null,
+                new CLOptionResolver.OptHandler()
+                {
+                    @Override
+                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    {
+                        PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco,
+                                Pattern.DOTALL), EcoTree.FileType.SCIDDB));
+                    }
+                });
     }
 
     @Option(name = MXE, aliases = "-match_trans_eco", metaVar = "<regex>",
@@ -539,9 +571,18 @@ public class CLOptions
         }
         
         countOption(OptId.get(MXE));
-        
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.FileType.STD));
+
+        // delayed initialization, in case "-ef" is set
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(MXE)}, null, null,
+                new CLOptionResolver.OptHandler()
+                {
+                    @Override
+                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    {
+                        PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
+                                EcoTree.FileType.STD));
+                    }
+                });
     }
 
     @Option(name = MXED, aliases = "-match_trans_eco_desc", metaVar = "<regex>",
@@ -555,9 +596,18 @@ public class CLOptions
         }
         
         countOption(OptId.get(MXED));
-        
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.FileType.STD));
+
+        // delayed initialization, in case "-ef" is set
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(MXED)}, null, null,
+                new CLOptionResolver.OptHandler()
+                {
+                    @Override
+                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    {
+                        PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco,
+                                Pattern.DOTALL), EcoTree.FileType.STD));
+                    }
+                });
     }
 
     @Option(name = MXSE, aliases = "-match_trans_scid_eco", metaVar = "<regex>",
@@ -571,9 +621,18 @@ public class CLOptions
         }
         
         countOption(OptId.get(MXSE));
-        
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.FileType.SCIDDB));
+
+        // delayed initialization, in case "-ef" is set
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(MXSE)}, null, null,
+                new CLOptionResolver.OptHandler()
+                {
+                    @Override
+                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    {
+                        PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
+                                EcoTree.FileType.SCIDDB));
+                    }
+                });
     }
 
     @Option(name = MXSED, aliases = "-match_trans_scid_eco_desc", metaVar = "<regex>",
@@ -587,9 +646,18 @@ public class CLOptions
         }
         
         countOption(OptId.get(MXSED));
-        
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco, Pattern.DOTALL),
-            EcoTree.FileType.SCIDDB));
+
+        // delayed initialization, in case "-ef" is set
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(MXSED)}, null, null,
+                new CLOptionResolver.OptHandler()
+                {
+                    @Override
+                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    {
+                        PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco,
+                                Pattern.DOTALL), EcoTree.FileType.SCIDDB));
+                    }
+                });
     }
 
     @Option(name = APF, aliases = "-any_player_file", metaVar = "<file>",
