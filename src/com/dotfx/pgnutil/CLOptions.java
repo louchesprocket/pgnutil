@@ -28,6 +28,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.dotfx.pgnutil.eco.EcoTree;
 import org.kohsuke.args4j.Option;
@@ -362,7 +363,13 @@ public class CLOptions
         }
         
         countOption(OptId.get(MP));
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchPlayerProcessor(Pattern.compile(regex, Pattern.DOTALL)));
+        Pattern playerPattern = Pattern.compile(regex, Pattern.DOTALL);
+
+        if (getCount(OptId.get(MP)) == 1)
+            CLOptionResolver.addCondition(new OptId[] {OptId.get(MP)}, new OptId[] {OptId.SELECTORS}, null,
+                    new CLOptionResolver.PlayerHandler(playerPattern));
+
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchPlayerProcessor(playerPattern));
     }
 
     @Option(name = MO, aliases = "-match_opening", metaVar = "<oid1,oid2,...>",

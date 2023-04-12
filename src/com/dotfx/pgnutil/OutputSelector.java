@@ -25,6 +25,7 @@ import com.dotfx.pgnutil.eco.TreeNodeSet;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -96,42 +97,58 @@ public final class OutputSelector
         }
     }
 
-    private static final class PlayerOutputHandler implements OutputHandler
+    public static final class PlayerOutputHandler implements OutputHandler
     {
+        private final Pattern playerPattern;
+
+        public PlayerOutputHandler(Pattern playerPattern) { this.playerPattern = playerPattern; }
+
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            if (PGNUtil.playerPattern.matcher(game.getWhite()).find()) sb.append(game.getWhite());
+            if (playerPattern.matcher(game.getWhite()).find()) sb.append(game.getWhite());
             else sb.append(game.getBlack());
         }
     }
 
-    private static final class OpponentOutputHandler implements OutputHandler
+    public static final class OpponentOutputHandler implements OutputHandler
     {
+        private final Pattern playerPattern;
+
+        public OpponentOutputHandler(Pattern playerPattern) { this.playerPattern = playerPattern; }
+
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            if (PGNUtil.playerPattern.matcher(game.getWhite()).find()) sb.append(game.getBlack());
+            if (playerPattern.matcher(game.getWhite()).find()) sb.append(game.getBlack());
             else sb.append(game.getWhite());
         }
     }
 
-    private static final class PlayerEloOutputHandler implements OutputHandler
+    public static final class PlayerEloOutputHandler implements OutputHandler
     {
+        private final Pattern playerPattern;
+
+        public PlayerEloOutputHandler(Pattern playerPattern) { this.playerPattern = playerPattern; }
+
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            if (PGNUtil.playerPattern.matcher(game.getWhite()).find()) sb.append(game.getValue("WhiteElo"));
+            if (playerPattern.matcher(game.getWhite()).find()) sb.append(game.getValue("WhiteElo"));
             else sb.append(game.getValue("BlackElo"));
         }
     }
 
-    private static final class OpponentEloOutputHandler implements OutputHandler
+    public static final class OpponentEloOutputHandler implements OutputHandler
     {
+        private final Pattern playerPattern;
+
+        public OpponentEloOutputHandler(Pattern playerPattern) { this.playerPattern = playerPattern; }
+
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            if (PGNUtil.playerPattern.matcher(game.getWhite()).find()) sb.append(game.getValue("BlackElo"));
+            if (playerPattern.matcher(game.getWhite()).find()) sb.append(game.getValue("BlackElo"));
             else sb.append(game.getValue("WhiteElo"));
         }
     }
@@ -367,9 +384,9 @@ public final class OutputSelector
         OPENINGMOVES("openingmoves", new OpeningMovesOutputHandler()),
         OPENINGFEN("openingfen", new OpeningFenOutputHandler()),
         OPID("opid", new OpeningIdOutputHandler()), // opening position identifier
-        OPPONENT("opponent", new OpponentOutputHandler()),
-        OPPONENTELO("opponentelo", new OpponentEloOutputHandler()),
-        PLAYERELO("playerelo", new PlayerEloOutputHandler()),
+        OPPONENT("opponent", null),
+        OPPONENTELO("opponentelo", null),
+        PLAYERELO("playerelo", null),
         PLIES("plies", new PliesOutputHandler()),
         STDECO("stdeco", new EcoOutputHandler(EcoTree.FileType.STD)),
         STDECODESC("stdecodesc", new EcoDescOutputHandler(EcoTree.FileType.STD)),
@@ -405,7 +422,7 @@ public final class OutputSelector
         ROUNDCOUNT("roundcount", null),
         
         // additional player-results selectors
-        PLAYER("player", new PlayerOutputHandler()),
+        PLAYER("player", null),
         WINS("wins", null),
         LOSSES("losses", null),
         NORESULTS("noresults", null),
@@ -443,7 +460,7 @@ public final class OutputSelector
     
     private final Value value;
     private final String literal;
-    private final OutputHandler handler;
+    private OutputHandler handler;
     
     public OutputSelector(String literal)
     {
@@ -453,7 +470,8 @@ public final class OutputSelector
         handler = (value.getOutputHandler() == null ? new DefaultOutputHandler() : value.getOutputHandler());
         this.literal = literal;
     }
-    
+
+    public void setOutputHandler(OutputHandler handler) { this.handler = handler; }
     public Value getValue() { return value; }
 
     public void appendOutput(PgnGame game, StringBuilder sb) throws InvalidSelectorException

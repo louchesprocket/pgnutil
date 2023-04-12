@@ -267,11 +267,13 @@ public class PGNUtil
     
     static final class MatchPlayerProcessor implements GameProcessor
     {
-        public MatchPlayerProcessor(Pattern p) { playerPattern = p; }
+        private Pattern p;
+
+        public MatchPlayerProcessor(Pattern p) { this.p = p; }
         
         @Override public boolean processGame()
         {
-            return playerPattern.matcher(game.getWhite()).find() || playerPattern.matcher(game.getBlack()).find();
+            return p.matcher(game.getWhite()).find() || p.matcher(game.getBlack()).find();
         }
     }
     
@@ -728,8 +730,7 @@ public class PGNUtil
     static List<PGNFile> pgnFileList;
     static final List<GameProcessor> matchProcessors = new ArrayList<>();
     static final List<GameProcessor> replaceProcessors = new ArrayList<>();
-    
-    static Pattern playerPattern;
+
     static Map<String,Integer> eloMap;
     
     static GameHandler handler;

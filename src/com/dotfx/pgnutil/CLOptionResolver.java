@@ -23,6 +23,7 @@ package com.dotfx.pgnutil;
 import com.dotfx.pgnutil.CLOptions.OptId;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class CLOptionResolver
@@ -62,26 +63,52 @@ public class CLOptionResolver
         }
     }
 
-    private static class MatchPlayerHandler implements OptHandler
+    public static class PlayerHandler implements OptHandler
     {
+        private final Pattern playerPattern;
+
+        public PlayerHandler(Pattern playerPattern) { this.playerPattern = playerPattern; }
+
         @Override
         public void handleIfAny()
         {
-            final OutputSelector.Value[] v = new OutputSelector.Value[1];
+            List<OutputSelector.Value> checkValues =
+                    Arrays.asList(new OutputSelector.Value[] {OutputSelector.Value.OPPONENT,
+                            OutputSelector.Value.OPPONENTELO, OutputSelector.Value.PLAYER,
+                            OutputSelector.Value.PLAYERELO});
 
-            if (CLOptions.getCount(OptId.MATCHPLAYER) > 1 &&
-                    // hack to save the offending selector
-                Arrays.stream(PGNUtil.outputSelectors).anyMatch(os -> ((v[0] = os.getValue()) != null) &&
-                        os.getValue() == OutputSelector.Value.OPPONENT ||
-                        os.getValue() == OutputSelector.Value.OPPONENTELO ||
-                        os.getValue() == OutputSelector.Value.PLAYER ||
-                        os.getValue() == OutputSelector.Value.PLAYERELO))
+            List<OutputSelector> osList = Arrays.stream(PGNUtil.outputSelectors).filter(os ->
+                    checkValues.contains(os.getValue())).collect(Collectors.toList());
+
+            if (CLOptions.getCount(OptId.MATCHPLAYER) > 1 && osList.size() > 0)
             {
-                System.err.println("Output selector '" + v[0] + "' only works while matching one player ('" +
-                        CLOptions.MP + "')!");
+                System.err.println("Output selector '" + osList.get(0) + "' only works while matching " +
+                        "one player ('" + CLOptions.MP + "')!");
 
                 System.exit(-1);
             };
+
+            for (OutputSelector os : osList)
+            {
+                switch (os.getValue())
+                {
+                    case OPPONENT:
+                        os.setOutputHandler(new OutputSelector.OpponentOutputHandler(playerPattern));
+                        break;
+
+                    case OPPONENTELO:
+                        os.setOutputHandler(new OutputSelector.OpponentEloOutputHandler(playerPattern));
+                        break;
+
+                    case PLAYER:
+                        os.setOutputHandler(new OutputSelector.PlayerOutputHandler(playerPattern));
+                        break;
+
+                    case PLAYERELO:
+                        os.setOutputHandler(new OutputSelector.PlayerEloOutputHandler(playerPattern));
+                        break;
+                }
+            }
         }
     }
 
@@ -134,9 +161,6 @@ public class CLOptionResolver
 
         new ConditionSet(new OptId[] {OptId.OPENINGS}, null, openingsOpts,
                 new OpeningsHandler()).handle(setOpts);
-
-        new ConditionSet(new OptId[] {OptId.MATCHPLAYER}, new OptId[] {OptId.SELECTORS}, null,
-                new MatchPlayerHandler()).handle(setOpts);
 
         // anything else requiring delayed initialization
         for (ConditionSet cs : conditionList) cs.handle(setOpts);
