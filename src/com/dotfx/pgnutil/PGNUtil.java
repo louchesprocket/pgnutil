@@ -721,17 +721,13 @@ public class PGNUtil
         }
     }
     
-    public static final String VERSION = "0.6.4";
-    
-    // All of these are static in order to avoid parameter-passing overhead.
+    public static final String VERSION = "0.7";
     
     static Pattern bookMarker;
     private static PgnGame game;
     static List<PGNFile> pgnFileList;
     static final List<GameProcessor> matchProcessors = new ArrayList<>();
     static final List<GameProcessor> replaceProcessors = new ArrayList<>();
-
-    static Map<String,Integer> eloMap;
     
     static GameHandler handler;
     static ExitProcessor exitProcessor;

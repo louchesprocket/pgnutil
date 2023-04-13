@@ -187,7 +187,6 @@ public class CLOptions
         }
     }
 
-    public static Integer maxEloDiff;
     private static final Map<OptId,Integer> OPTMAP = new HashMap<>();
     
     private void countOption(OptId opt)
@@ -484,7 +483,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
                                 EcoTree.FileType.STD));
@@ -509,7 +508,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco,
                                 Pattern.DOTALL), EcoTree.FileType.STD));
@@ -534,7 +533,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
                                 EcoTree.FileType.SCIDDB));
@@ -559,7 +558,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco,
                                 Pattern.DOTALL), EcoTree.FileType.SCIDDB));
@@ -584,7 +583,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
                                 EcoTree.FileType.STD));
@@ -609,7 +608,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco,
                                 Pattern.DOTALL), EcoTree.FileType.STD));
@@ -634,7 +633,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
                                 EcoTree.FileType.SCIDDB));
@@ -659,7 +658,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco,
                                 Pattern.DOTALL), EcoTree.FileType.SCIDDB));
@@ -1207,7 +1206,8 @@ public class CLOptions
         }
 
         countOption(OptId.get(HED));
-        CLOptions.maxEloDiff = maxEloDiff;
+        EcoStats.setMaxEloDiff(maxEloDiff);
+        OpeningStats.setMaxEloDiff(maxEloDiff);
     }
 
     @Option(name = ELO, depends = {HED}, aliases = "-elo_file", metaVar = "<file>",
@@ -1223,7 +1223,7 @@ public class CLOptions
         
         countOption(OptId.get(ELO));
         
-        PGNUtil.eloMap = new HashMap<>();
+        Map<String,Integer> eloMap = new HashMap<>();
         Pattern playerPattern = Pattern.compile("^(\\S.*\\S)\\s+-?\\d+$");
         Pattern eloPattern = Pattern.compile("^.*\\s+(-?\\d+)$");
         
@@ -1234,9 +1234,12 @@ public class CLOptions
                 String s = fileScanner.nextLine().trim();
                 if (s.length() == 0) continue;
                 
-                PGNUtil.eloMap.put(playerPattern.matcher(s).replaceAll("$1"),
+                eloMap.put(playerPattern.matcher(s).replaceAll("$1"),
                     Integer.valueOf(eloPattern.matcher(s).replaceAll("$1")));
             }
+
+            EcoStats.setEloMap(eloMap);
+            OpeningStats.setEloMap(eloMap);
         }
         
         catch (FileNotFoundException e)

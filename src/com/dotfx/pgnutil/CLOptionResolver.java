@@ -30,22 +30,20 @@ public class CLOptionResolver
 {
     public interface OptHandler
     {
-        default void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts) {}
-        default void handleIfAny() {}
-        default void handleIfNone() {}
+        default void handleOpts(Collection<OptId> setOpts, Set<OptId> setIntersects) {}
+        default void handleIfAny(Collection<OptId> setOpts, Set<OptId> ifAnyIntersects) {}
+        default void handleIfNone(Collection<OptId> setOpts) {}
     }
 
     private static class MutexHandler implements OptHandler
     {
         @Override
-        public void handleOpts(Collection<OptId> setOpts, Collection<OptId> checkOpts)
+        public void handleOpts(Collection<OptId> setOpts, Set<OptId> setIntersects)
         {
-            Set<OptId> conflicts = checkOpts.stream().filter(setOpts::contains).collect(Collectors.toSet());
-
-            if (conflicts.size() > 1)
+            if (setIntersects.size() > 1)
             {
                 StringJoiner sj = new StringJoiner(",' '", "'", "'");
-                for (OptId opt : conflicts) sj.add(opt.toString());
+                for (OptId opt : setIntersects) sj.add(opt.toString());
                 System.err.println("Only one of " + sj + " may be set at a time.");
                 System.exit(-1);
             }
@@ -55,7 +53,7 @@ public class CLOptionResolver
     private static class OpeningsHandler implements OptHandler
     {
         @Override
-        public void handleIfNone()
+        public void handleIfNone(Collection<OptId> setOpts)
         {
             Tallier os = OpeningStats.getInstance();
             PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
@@ -70,7 +68,7 @@ public class CLOptionResolver
         public PlayerHandler(Pattern playerPattern) { this.playerPattern = playerPattern; }
 
         @Override
-        public void handleIfAny()
+        public void handleIfAny(Collection<OptId> setOpts, Set<OptId> ifAnyIntersects)
         {
             List<OutputSelector.Value> checkValues =
                     Arrays.asList(new OutputSelector.Value[] {OutputSelector.Value.OPPONENT,
@@ -129,10 +127,14 @@ public class CLOptionResolver
 
         private void handle(final Set<OptId> setOpts)
         {
-            if (!checkOpts.stream().anyMatch(setOpts::contains)) return;
-            handler.handleOpts(setOpts, checkOpts);
-            if (ifAnyOf.stream().anyMatch(setOpts::contains)) handler.handleIfAny();
-            if (!ifNoneOf.stream().anyMatch(setOpts::contains)) handler.handleIfNone();
+            Set<OptId> intersects = checkOpts.stream().filter(setOpts::contains).collect(Collectors.toSet());
+            if (intersects.size() == 0) return;
+            handler.handleOpts(setOpts, intersects);
+
+            intersects = ifAnyOf.stream().filter(setOpts::contains).collect(Collectors.toSet());
+            if (intersects.size() > 0) handler.handleIfAny(setOpts, intersects);
+
+            if (!ifNoneOf.stream().anyMatch(setOpts::contains)) handler.handleIfNone(setOpts);
         }
     }
 

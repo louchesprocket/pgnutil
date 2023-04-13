@@ -29,6 +29,7 @@ import com.dotfx.pgnutil.eco.TreeNodeSet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -89,6 +90,8 @@ public class EcoStats implements Tallier
 
     private static EcoStatsOutputSelector selectors[];
     private static EcoStats instance;
+    private static Integer maxEloDiff;
+    private static Map<String,Integer> eloMap;
     
     private final TreeMap<TreeNodeSet,OpeningScore> openingsMap;
     private EcoTree ecoTree;
@@ -117,15 +120,18 @@ public class EcoStats implements Tallier
         }
     }
 
+    public static void setMaxEloDiff(Integer maxEloDiff) { EcoStats.maxEloDiff = maxEloDiff; }
+    public static void setEloMap(Map<String,Integer> eloMap) { EcoStats.eloMap = eloMap; }
+
     @Override
     public void tally(PgnGame game) throws IllegalMoveException
     {
-        if (CLOptions.maxEloDiff != null)
+        if (maxEloDiff != null)
         {
-            Integer whiteElo = PGNUtil.eloMap.get(game.getWhite().trim());
-            Integer blackElo = PGNUtil.eloMap.get(game.getBlack().trim());
+            Integer whiteElo = eloMap.get(game.getWhite().trim());
+            Integer blackElo = eloMap.get(game.getBlack().trim());
 
-            if (whiteElo == null || blackElo == null || Math.abs(whiteElo - blackElo) > CLOptions.maxEloDiff)
+            if (whiteElo == null || blackElo == null || Math.abs(whiteElo - blackElo) > maxEloDiff)
                 return;
         }
 
