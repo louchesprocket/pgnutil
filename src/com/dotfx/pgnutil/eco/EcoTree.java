@@ -480,7 +480,7 @@ public final class EcoTree
 ////        tree1.writeTree(new File("test.out"));
 //        EcoTree tree2 = new EcoTree(FileType.STD);
 //        printDiff(tree1, tree2, true);
-////        tree1.printTranspositions();
+//////        tree1.printTranspositions();
 //        System.out.println("nodes: " + tree1.positionCount());
 //        System.out.println("nodes: " + tree2.positionCount());
 //
