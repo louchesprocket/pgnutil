@@ -49,6 +49,7 @@ public final class PgnGame
     private static final HashFunction HASHFUNC;
     private static final int BUFSIZE = 1024;
     private static final int COMMENT_BUFSIZE = 1024;
+    private static Pattern bookMarker;
     
     public enum Result
     {
@@ -153,9 +154,8 @@ public final class PgnGame
 
         // Aquarium: "[Black|White] out of book"
         // Banksia: "End of opening"
-        OUT_OF_BOOK = PGNUtil.bookMarker == null ?
-            Pattern.compile("(out\\s+of\\s+book)|(^End\\s+of\\s+opening)", Pattern.DOTALL):
-            PGNUtil.bookMarker;
+        OUT_OF_BOOK = bookMarker == null ?
+            Pattern.compile("(out\\s+of\\s+book)|(^End\\s+of\\s+opening)", Pattern.DOTALL) : bookMarker;
     }
     
     private final int number;
@@ -205,6 +205,8 @@ public final class PgnGame
             lastMoveNumber = move.getNumber();
         }
     }
+
+    public static void setBookMarker(String regex) { bookMarker = Pattern.compile(regex, Pattern.DOTALL); }
     
     /**
      * 

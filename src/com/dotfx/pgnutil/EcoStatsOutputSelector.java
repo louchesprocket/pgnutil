@@ -20,7 +20,6 @@
 
 package com.dotfx.pgnutil;
 
-import com.dotfx.pgnutil.CLOptions.OptId;
 import com.dotfx.pgnutil.eco.TreeNodeSet;
 
 import java.util.*;
@@ -142,32 +141,30 @@ public class EcoStatsOutputSelector
 
     public enum Value
     {
-        BWINPCT(OutputSelector.Value.BWINPCT, new BlackWinPctOutputHandler(), new OptId[] {}),
-        BWINS(OutputSelector.Value.BWINS, new BlackWinsOutputHandler(), new OptId[] {}),
-        COUNT(OutputSelector.Value.COUNT, new CountOutputHandler(), new OptId[] {}), // also applies to player results
-        DIFF(OutputSelector.Value.DIFF, new DiffOutputHandler(), new OptId[] {}),
-        DIFFPCT(OutputSelector.Value.DIFFPCT, new DiffPctOutputHandler(), new OptId[] {}),
-        DRAWPCT(OutputSelector.Value.DRAWPCT, new DrawPctOutputHandler(), new OptId[] {}),
-        DRAWS(OutputSelector.Value.DRAWS, new DrawsOutputHandler(), new OptId[] {}), // also applies to player results
-        WWINPCT(OutputSelector.Value.WWINPCT, new WhiteWinPctOutputHandler(), new OptId[] {}),
-        WWINS(OutputSelector.Value.WWINS, new WhiteWinsOutputHandler(), new OptId[] {}),
+        BWINPCT(OutputSelector.Value.BWINPCT, new BlackWinPctOutputHandler()),
+        BWINS(OutputSelector.Value.BWINS, new BlackWinsOutputHandler()),
+        COUNT(OutputSelector.Value.COUNT, new CountOutputHandler()), // also applies to player results
+        DIFF(OutputSelector.Value.DIFF, new DiffOutputHandler()),
+        DIFFPCT(OutputSelector.Value.DIFFPCT, new DiffPctOutputHandler()),
+        DRAWPCT(OutputSelector.Value.DRAWPCT, new DrawPctOutputHandler()),
+        DRAWS(OutputSelector.Value.DRAWS, new DrawsOutputHandler()), // also applies to player results
+        WWINPCT(OutputSelector.Value.WWINPCT, new WhiteWinPctOutputHandler()),
+        WWINS(OutputSelector.Value.WWINS, new WhiteWinsOutputHandler()),
 
-        ECO(OutputSelector.Value.ECO, new EcoOutputHandler(), new OptId[] {}),
-        ECODESC(OutputSelector.Value.ECODESC, new EcoDescOutputHandler(), new OptId[] {}),
-        ECOMOVES(OutputSelector.Value.ECOMOVES, new EcoMovesOutputHandler(), new OptId[] {});
+        ECO(OutputSelector.Value.ECO, new EcoOutputHandler()),
+        ECODESC(OutputSelector.Value.ECODESC, new EcoDescOutputHandler()),
+        ECOMOVES(OutputSelector.Value.ECOMOVES, new EcoMovesOutputHandler());
 
         private static final Map<OutputSelector.Value,Value> sigMap = new HashMap<>();
         private final OutputSelector.Value signifier;
         private final OutputHandler outputHandler;
-        private final OptId conflicting[];
 
         static { for (Value v : Value.values()) sigMap.put(v.signifier, v); }
 
-        Value(OutputSelector.Value signifier, OutputHandler outputHandler, OptId conflicting[])
+        Value(OutputSelector.Value signifier, OutputHandler outputHandler)
         {
             this.signifier = signifier;
             this.outputHandler = outputHandler;
-            this.conflicting = conflicting;
         }
 
         @Override public String toString() { return signifier.toString(); }
@@ -179,7 +176,6 @@ public class EcoStatsOutputSelector
         }
 
         public OutputHandler getOutputHandler() { return outputHandler; }
-        public OptId[] getConflicting() { return conflicting; }
     }
 
     private final Value value;
@@ -191,12 +187,6 @@ public class EcoStatsOutputSelector
 
         if (value == null)
             throw new InvalidSelectorException("output selector '" + selector + "' is invalid in this context");
-
-        for (OptId opt : value.getConflicting())
-        {
-            if (CLOptions.isSet(opt))
-                throw new InvalidSelectorException("output selector '" + selector + "' is invalid in this context");
-        }
 
         handler = value.getOutputHandler();
     }

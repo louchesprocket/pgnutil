@@ -276,6 +276,42 @@ public class PGNUtil
             return p.matcher(game.getWhite()).find() || p.matcher(game.getBlack()).find();
         }
     }
+
+    static final class MinEloProcessor implements GameProcessor
+    {
+        private Integer minElo;
+
+        public MinEloProcessor(Integer minElo) { this.minElo = minElo; }
+
+        @Override public boolean processGame()
+        {
+            try
+            {
+                return minElo <= Integer.parseInt(game.getValue("WhiteElo")) &&
+                        minElo <= Integer.parseInt(game.getValue("BlackElo"));
+            }
+
+            catch (NumberFormatException e) { return false; }
+        }
+    }
+
+    static final class MaxEloProcessor implements GameProcessor
+    {
+        private Integer maxElo;
+
+        public MaxEloProcessor(Integer maxElo) { this.maxElo = maxElo; }
+
+        @Override public boolean processGame()
+        {
+            try
+            {
+                return maxElo >= Integer.parseInt(game.getValue("WhiteElo")) &&
+                        maxElo >= Integer.parseInt(game.getValue("BlackElo"));
+            }
+
+            catch (NumberFormatException e) { return false; }
+        }
+    }
     
     static final class MatchTimeCtrlProcessor implements GameProcessor
     {
@@ -721,12 +757,11 @@ public class PGNUtil
         }
     }
     
-    public static final String VERSION = "0.7";
-    
-    static Pattern bookMarker;
+    public static final String VERSION = "0.7.1";
+
     private static PgnGame game;
     static List<PGNFile> pgnFileList;
-    static final List<GameProcessor> matchProcessors = new ArrayList<>();
+    private static final List<GameProcessor> matchProcessors = new ArrayList<>();
     static final List<GameProcessor> replaceProcessors = new ArrayList<>();
     
     static GameHandler handler;
@@ -735,11 +770,7 @@ public class PGNUtil
     
     static long gamesRead = 0L;
     static long charsRead = 0L;
-    
-    static void setBookMarker(String regex)
-    {
-        bookMarker = Pattern.compile(regex, Pattern.DOTALL);
-    }
+
     static void addMatchProcessor(GameProcessor gp) { matchProcessors.add(gp); }
     static void setHandler(GameHandler printer) { PGNUtil.handler = printer; }
     static void setExitProcessor(ExitProcessor proc) { exitProcessor = proc; }

@@ -28,7 +28,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import com.dotfx.pgnutil.eco.EcoTree;
 import org.kohsuke.args4j.Option;
@@ -55,11 +54,13 @@ public class CLOptions
     public static final String H = "-h";
     public static final String HDRAW = "-hdraw";
     public static final String HED = "-hed";
+    public static final String HELO = "-helo";
     public static final String HOOB = "-hoob";
     public static final String HPC = "-hpc";
     public static final String HWD = "-hwd";
     public static final String I = "-i";
     public static final String LDRAW = "-ldraw";
+    public static final String LELO = "-lelo";
     public static final String LOOB = "-loob";
     public static final String LPC = "-lpc";
     public static final String LWD = "-lwd";
@@ -117,12 +118,14 @@ public class CLOptions
         ELOFILE(ELO),
         EVENTS(E),
         GAMENUM(GN),
+        HIELO(HELO),
         HIOOBCOUNT(HOOB),
         HIPLYCOUNT(HPC),
         HIWINDIFF(HWD),
         INPUTFILE(I),
         LOOOBCOUNT(LOOB),
         LOPLYCOUNT(LPC),
+        LOWELO(LELO),
         LOWINDIFF(LWD),
         MATCH(M),
         MATCHECO(ME),
@@ -369,6 +372,34 @@ public class CLOptions
                     new CLOptionResolver.PlayerHandler(playerPattern));
 
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPlayerProcessor(playerPattern));
+    }
+
+    @Option(name = LELO, aliases = "-min_elo", metaVar = "<value>",
+            usage = "output games where the Elo rating of both players is at least <value>")
+    private void setMinElo(Integer minElo)
+    {
+        if (getCount(OptId.get(LELO)) > 0)
+        {
+            System.err.println("Option '" + OptId.get(LELO) + "' cannot be set more than once!");
+            System.exit(-1);
+        }
+
+        countOption(OptId.get(LELO));
+        PGNUtil.addMatchProcessor(new PGNUtil.MinEloProcessor(minElo));
+    }
+
+    @Option(name = HELO, aliases = "-max_elo", metaVar = "<value>",
+            usage = "output games where the Elo rating of both players is at most <value>")
+    private void setMaxElo(Integer maxElo)
+    {
+        if (getCount(OptId.get(HELO)) > 0)
+        {
+            System.err.println("Option '" + OptId.get(HELO) + "' cannot be set more than once!");
+            System.exit(-1);
+        }
+
+        countOption(OptId.get(HELO));
+        PGNUtil.addMatchProcessor(new PGNUtil.MaxEloProcessor(maxElo));
     }
 
     @Option(name = MO, aliases = "-match_opening", metaVar = "<oid1,oid2,...>",
@@ -820,7 +851,7 @@ public class CLOptions
         }
         
         countOption(OptId.get(BM));
-        PGNUtil.setBookMarker(regex);
+        PgnGame.setBookMarker(regex);
     }
 
     @Option(name = LOOB, aliases = "-lo_oob", metaVar = "<min>",
@@ -1298,6 +1329,7 @@ public class CLOptions
         PGNUtil.outputSelectors = new OutputSelector[tokens.length];
         
         for (int i = 0; i < tokens.length; i++) PGNUtil.outputSelectors[i] = new OutputSelector(tokens[i]);
+        // fine if it gets overwritten
         if (PGNUtil.handler == null) PGNUtil.handler = new PGNUtil.SelectGameHandler(PGNUtil.outputSelectors);
     }
 
