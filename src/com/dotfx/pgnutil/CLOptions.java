@@ -60,6 +60,7 @@ public class CLOptions
     public static final String HWD = "-hwd";
     public static final String I = "-i";
     public static final String LDRAW = "-ldraw";
+    public static final String LED = "-led";
     public static final String LELO = "-lelo";
     public static final String LOOB = "-loob";
     public static final String LPC = "-lpc";
@@ -126,6 +127,7 @@ public class CLOptions
         LOOOBCOUNT(LOOB),
         LOPLYCOUNT(LPC),
         LOWELO(LELO),
+        LOWELODIFF(LED),
         LOWINDIFF(LWD),
         MATCH(M),
         MATCHECO(ME),
@@ -374,8 +376,8 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPlayerProcessor(playerPattern));
     }
 
-    @Option(name = LELO, aliases = "-min_elo", metaVar = "<value>",
-            usage = "output games where the Elo rating of both players is at least <value>")
+    @Option(name = LELO, aliases = "-lo_elo", metaVar = "<value>",
+            usage = "output games where the elo rating of both players is at least <value>")
     private void setMinElo(Integer minElo)
     {
         if (getCount(OptId.get(LELO)) > 0)
@@ -388,8 +390,8 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.MinEloProcessor(minElo));
     }
 
-    @Option(name = HELO, aliases = "-max_elo", metaVar = "<value>",
-            usage = "output games where the Elo rating of both players is at most <value>")
+    @Option(name = HELO, aliases = "-hi_elo", metaVar = "<value>",
+            usage = "output games where the elo rating of both players is at most <value>")
     private void setMaxElo(Integer maxElo)
     {
         if (getCount(OptId.get(HELO)) > 0)
@@ -400,6 +402,48 @@ public class CLOptions
 
         countOption(OptId.get(HELO));
         PGNUtil.addMatchProcessor(new PGNUtil.MaxEloProcessor(maxElo));
+    }
+
+    @Option(name = HED, aliases = "-hi_elo_diff", metaVar = "<diff>",
+            usage = "output games in which the difference in player elo ratings is at most <diff>")
+    private void setMaxEloDiff(Integer maxEloDiff)
+    {
+        if (getCount(OptId.get(HED)) > 0)
+        {
+            System.err.println("Option '" + OptId.get(HED) + "' cannot be set more than once!");
+            System.exit(-1);
+        }
+
+        countOption(OptId.get(HED));
+        PGNUtil.addMatchProcessor(new PGNUtil.MaxEloDiffProcessor(maxEloDiff));
+    }
+
+    @Option(name = LED, aliases = "-lo_elo_diff", metaVar = "<diff>",
+            usage = "output games in which the difference in player elo ratings is at least <diff>")
+    private void setMinEloDiff(Integer minEloDiff)
+    {
+        if (getCount(OptId.get(LED)) > 0)
+        {
+            System.err.println("Option '" + OptId.get(LED) + "' cannot be set more than once!");
+            System.exit(-1);
+        }
+
+        countOption(OptId.get(LED));
+        PGNUtil.addMatchProcessor(new PGNUtil.MinEloDiffProcessor(minEloDiff));
+    }
+
+    @Option(name = ELO, aliases = "-elo_file", metaVar = "<file>",
+            usage = "use elo ratings contained in the file <file> for any elo-matching operation")
+    private void setEloFile(File eloFile)
+    {
+        if (getCount(OptId.get(ELO)) > 0)
+        {
+            System.err.println("Option '" + OptId.get(ELO) + "' cannot be set more than once!");
+            System.exit(-1);
+        }
+
+        countOption(OptId.get(ELO));
+        EloResolver.readEloMap(eloFile);
     }
 
     @Option(name = MO, aliases = "-match_opening", metaVar = "<oid1,oid2,...>",
@@ -1223,67 +1267,6 @@ public class CLOptions
         
         countOption(OptId.get(LDRAW));
         OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MinDrawProcessor(min));
-    }
-
-    @Option(name = HED, depends = {O, ELO}, aliases = "-hi_elo_diff", metaVar = "<diff>",
-        usage = "in combination with '" + O + "' and '" + ELO + "' options, print only openings for which the " +
-                "difference in player elo ratings is at most <diff>")
-    private void setMaxEloDiff(Integer maxEloDiff)
-    {
-        if (getCount(OptId.get(HED)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(HED) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
-        countOption(OptId.get(HED));
-        EcoStats.setMaxEloDiff(maxEloDiff);
-        OpeningStats.setMaxEloDiff(maxEloDiff);
-    }
-
-    @Option(name = ELO, depends = {HED}, aliases = "-elo_file", metaVar = "<file>",
-        usage = "in combination with '" + O + "' and '" + HED + "' options, use elo ratings contained in the " +
-                "file <file>")
-    private void setEloFile(File of)
-    {
-        if (getCount(OptId.get(ELO)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(ELO) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
-        countOption(OptId.get(ELO));
-        
-        Map<String,Integer> eloMap = new HashMap<>();
-        Pattern playerPattern = Pattern.compile("^(\\S.*\\S)\\s+-?\\d+$");
-        Pattern eloPattern = Pattern.compile("^.*\\s+(-?\\d+)$");
-        
-        try (Scanner fileScanner = new Scanner(of))
-        {
-            while (fileScanner.hasNextLine())
-            {
-                String s = fileScanner.nextLine().trim();
-                if (s.length() == 0) continue;
-                
-                eloMap.put(playerPattern.matcher(s).replaceAll("$1"),
-                    Integer.valueOf(eloPattern.matcher(s).replaceAll("$1")));
-            }
-
-            EcoStats.setEloMap(eloMap);
-            OpeningStats.setEloMap(eloMap);
-        }
-        
-        catch (FileNotFoundException e)
-        {
-            System.err.println("File '" + of + "' not found.");
-            System.exit(-1);
-        }
-        
-        catch (NumberFormatException e)
-        {
-            System.err.println("Invalid integer value.  " + e.getMessage());
-            System.exit(-1);
-        }
     }
     
     // player results

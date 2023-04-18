@@ -29,7 +29,6 @@ import com.dotfx.pgnutil.eco.TreeNodeSet;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -90,11 +89,9 @@ public class EcoStats implements Tallier
 
     private static EcoStatsOutputSelector selectors[];
     private static EcoStats instance;
-    private static Integer maxEloDiff;
-    private static Map<String,Integer> eloMap;
     
     private final TreeMap<TreeNodeSet,OpeningScore> openingsMap;
-    private EcoTree ecoTree;
+    private final EcoTree ecoTree;
     private boolean transpose;
 
     private EcoStats(EcoTree.FileType type, boolean transpose)
@@ -120,21 +117,9 @@ public class EcoStats implements Tallier
         }
     }
 
-    public static void setMaxEloDiff(Integer maxEloDiff) { EcoStats.maxEloDiff = maxEloDiff; }
-    public static void setEloMap(Map<String,Integer> eloMap) { EcoStats.eloMap = eloMap; }
-
     @Override
     public void tally(PgnGame game) throws IllegalMoveException
     {
-        if (maxEloDiff != null)
-        {
-            Integer whiteElo = eloMap.get(game.getWhite().trim());
-            Integer blackElo = eloMap.get(game.getBlack().trim());
-
-            if (whiteElo == null || blackElo == null || Math.abs(whiteElo - blackElo) > maxEloDiff)
-                return;
-        }
-
         TreeNodeSet treeNodeSet = transpose ? ecoTree.getDeepestTranspositionSet(game.getOpeningMoveList()) :
                 new TreeNodeSet(ecoTree.getDeepestDefined(game.getOpeningMoveList()));
 

@@ -287,8 +287,9 @@ public class PGNUtil
         {
             try
             {
-                return minElo <= Integer.parseInt(game.getValue("WhiteElo")) &&
-                        minElo <= Integer.parseInt(game.getValue("BlackElo"));
+                Integer whiteElo = EloResolver.getWhiteElo(game);
+                Integer blackElo = EloResolver.getBlackElo(game);
+                return whiteElo != null && blackElo != null && whiteElo >= minElo && blackElo >= minElo;
             }
 
             catch (NumberFormatException e) { return false; }
@@ -305,8 +306,47 @@ public class PGNUtil
         {
             try
             {
-                return maxElo >= Integer.parseInt(game.getValue("WhiteElo")) &&
-                        maxElo >= Integer.parseInt(game.getValue("BlackElo"));
+                Integer whiteElo = EloResolver.getWhiteElo(game);
+                Integer blackElo = EloResolver.getBlackElo(game);
+                return whiteElo != null && blackElo != null && whiteElo <= maxElo && blackElo <= maxElo;
+            }
+
+            catch (NumberFormatException e) { return false; }
+        }
+    }
+
+    static final class MaxEloDiffProcessor implements GameProcessor
+    {
+        private Integer maxDiff;
+
+        public MaxEloDiffProcessor(Integer maxDiff) { this.maxDiff = maxDiff; }
+
+        @Override public boolean processGame()
+        {
+            try
+            {
+                Integer whiteElo = EloResolver.getWhiteElo(game);
+                Integer blackElo = EloResolver.getBlackElo(game);
+                return whiteElo != null && blackElo != null && Math.abs(whiteElo - blackElo) <= maxDiff;
+            }
+
+            catch (NumberFormatException e) { return false; }
+        }
+    }
+
+    static final class MinEloDiffProcessor implements GameProcessor
+    {
+        private Integer minDiff;
+
+        public MinEloDiffProcessor(Integer minDiff) { this.minDiff = minDiff; }
+
+        @Override public boolean processGame()
+        {
+            try
+            {
+                Integer whiteElo = EloResolver.getWhiteElo(game);
+                Integer blackElo = EloResolver.getBlackElo(game);
+                return whiteElo != null && blackElo != null && Math.abs(whiteElo - blackElo) >= minDiff;
             }
 
             catch (NumberFormatException e) { return false; }

@@ -128,8 +128,6 @@ public class OpeningStats implements Tallier
 
     private static OpeningStatsOutputSelector selectors[];
     private static OpeningStats instance;
-    private static Integer maxEloDiff;
-    private static Map<String,Integer> eloMap;
     
     private final Map<MoveListId,Opening> openingsMap;
     private EcoTree ecoTree;
@@ -164,9 +162,6 @@ public class OpeningStats implements Tallier
         }
     }
 
-    public static void setMaxEloDiff(Integer maxEloDiff) { OpeningStats.maxEloDiff = maxEloDiff; }
-    public static void setEloMap(Map<String,Integer> eloMap) { OpeningStats.eloMap = eloMap; }
-
     public void setUseEco(EcoTree.FileType type)
     {
         if (type == EcoTree.FileType.STD) ecoTree = type.getEcoTree();
@@ -191,15 +186,6 @@ public class OpeningStats implements Tallier
     @Override
     public void tally(PgnGame game) throws IllegalMoveException
     {
-        if (maxEloDiff != null)
-        {
-            Integer whiteElo = eloMap.get(game.getWhite().trim());
-            Integer blackElo = eloMap.get(game.getBlack().trim());
-
-            if (whiteElo == null || blackElo == null || Math.abs(whiteElo - blackElo) > maxEloDiff)
-                return;
-        }
-
         MoveListId openingId = game.openingId();
         Opening opening = openingsMap.get(openingId);
 
