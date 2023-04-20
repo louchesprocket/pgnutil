@@ -31,7 +31,7 @@ public class EloResolver
 {
     private static final Map<String,Integer> eloMap = new HashMap<>();
 
-    public static final void readEloMap(File eloFile)
+    public static void readEloMap(File eloFile)
     {
         final Pattern playerPattern = Pattern.compile("^(\\S.*\\S)\\s+-?\\d+$");
         final Pattern eloPattern = Pattern.compile("^.*\\s+(-?\\d+)$");

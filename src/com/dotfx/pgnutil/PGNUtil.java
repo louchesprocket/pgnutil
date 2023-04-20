@@ -285,14 +285,9 @@ public class PGNUtil
 
         @Override public boolean processGame()
         {
-            try
-            {
-                Integer whiteElo = EloResolver.getWhiteElo(game);
-                Integer blackElo = EloResolver.getBlackElo(game);
-                return whiteElo != null && blackElo != null && whiteElo >= minElo && blackElo >= minElo;
-            }
-
-            catch (NumberFormatException e) { return false; }
+            Integer whiteElo = EloResolver.getWhiteElo(game);
+            Integer blackElo = EloResolver.getBlackElo(game);
+            return whiteElo != null && blackElo != null && whiteElo >= minElo && blackElo >= minElo;
         }
     }
 
@@ -304,14 +299,9 @@ public class PGNUtil
 
         @Override public boolean processGame()
         {
-            try
-            {
-                Integer whiteElo = EloResolver.getWhiteElo(game);
-                Integer blackElo = EloResolver.getBlackElo(game);
-                return whiteElo != null && blackElo != null && whiteElo <= maxElo && blackElo <= maxElo;
-            }
-
-            catch (NumberFormatException e) { return false; }
+            Integer whiteElo = EloResolver.getWhiteElo(game);
+            Integer blackElo = EloResolver.getBlackElo(game);
+            return whiteElo != null && blackElo != null && whiteElo <= maxElo && blackElo <= maxElo;
         }
     }
 
@@ -323,14 +313,9 @@ public class PGNUtil
 
         @Override public boolean processGame()
         {
-            try
-            {
-                Integer whiteElo = EloResolver.getWhiteElo(game);
-                Integer blackElo = EloResolver.getBlackElo(game);
-                return whiteElo != null && blackElo != null && Math.abs(whiteElo - blackElo) <= maxDiff;
-            }
-
-            catch (NumberFormatException e) { return false; }
+            Integer whiteElo = EloResolver.getWhiteElo(game);
+            Integer blackElo = EloResolver.getBlackElo(game);
+            return whiteElo != null && blackElo != null && Math.abs(whiteElo - blackElo) <= maxDiff;
         }
     }
 
@@ -342,14 +327,9 @@ public class PGNUtil
 
         @Override public boolean processGame()
         {
-            try
-            {
-                Integer whiteElo = EloResolver.getWhiteElo(game);
-                Integer blackElo = EloResolver.getBlackElo(game);
-                return whiteElo != null && blackElo != null && Math.abs(whiteElo - blackElo) >= minDiff;
-            }
-
-            catch (NumberFormatException e) { return false; }
+            Integer whiteElo = EloResolver.getWhiteElo(game);
+            Integer blackElo = EloResolver.getBlackElo(game);
+            return whiteElo != null && blackElo != null && Math.abs(whiteElo - blackElo) >= minDiff;
         }
     }
     
@@ -530,17 +510,16 @@ public class PGNUtil
     // replacement processors
     
     /**
-     * An instance of this must be the last processor in the
-     * replaceProcessors list.
+     * An instance of this must be the last processor in the replaceProcessors list.
      */
     static final class ReplaceProcessor implements GameProcessor
     {
-        private final Pattern replacePattern2; // to be replaced
+        private final Pattern replacePattern; // to be replaced
         private final String replacement;
         
         public ReplaceProcessor(Pattern replacePattern, String replacement)
         {
-            replacePattern2 = replacePattern;
+            this.replacePattern = replacePattern;
             this.replacement = replacement;
         }
         
@@ -548,14 +527,11 @@ public class PGNUtil
         {
             try
             {
-                game = game.replace(replacePattern2, replacement);
-                return false;
+                game = game.replace(replacePattern, replacement);
+                return true;
             }
             
-            catch (IOException | PGNException e)
-            {
-                throw new ProcessorException(e);
-            }
+            catch (IOException | PGNException e) { throw new ProcessorException(e); }
         }
     }
     
@@ -564,11 +540,7 @@ public class PGNUtil
         private final Pattern replacePattern1; // eligibility pattern
         
         public ReplaceContainsProcessor(Pattern p) { replacePattern1 = p; }
-        
-        @Override public boolean processGame()
-        {
-            return game.matches(replacePattern1);
-        }
+        @Override public boolean processGame() { return game.matches(replacePattern1); }
     }
     
     static final class ReplaceWinProcessor implements GameProcessor
@@ -797,21 +769,24 @@ public class PGNUtil
         }
     }
     
-    public static final String VERSION = "0.7.1";
+    public static final String VERSION = "0.8";
 
     private static PgnGame game;
-    static List<PGNFile> pgnFileList;
+    private static List<PgnFile> pgnFileList;
+
     private static final List<GameProcessor> matchProcessors = new ArrayList<>();
-    static final List<GameProcessor> replaceProcessors = new ArrayList<>();
-    
-    static GameHandler handler;
-    static ExitProcessor exitProcessor;
+    private static final List<GameProcessor> replaceProcessors = new ArrayList<>();
+    private static GameHandler handler;
+    private static ExitProcessor exitProcessor;
+
     static OutputSelector outputSelectors[];
     
     static long gamesRead = 0L;
     static long charsRead = 0L;
 
+    static void addInputFile(PgnFile f) { pgnFileList.add(f); }
     static void addMatchProcessor(GameProcessor gp) { matchProcessors.add(gp); }
+    static void addReplaceProcessor(GameProcessor gp) { replaceProcessors.add(gp); }
     static void setHandler(GameHandler printer) { PGNUtil.handler = printer; }
     static void setExitProcessor(ExitProcessor proc) { exitProcessor = proc; }
     
@@ -830,7 +805,7 @@ public class PGNUtil
             CLOptionResolver.resolveOpts(CLOptions.getSetOpts());
             
             if (pgnFileList.isEmpty())
-                pgnFileList.add(new PGNFile(new BufferedReader(new InputStreamReader(System.in))));
+                pgnFileList.add(new PgnFile(new BufferedReader(new InputStreamReader(System.in))));
             
             if (handler == null) handler = new DefaultGameHandler();
             handler.init();
@@ -865,7 +840,7 @@ public class PGNUtil
         
         try
         {
-            for (PGNFile pgn : pgnFileList)
+            for (PgnFile pgn : pgnFileList)
             {
                 nextGame:
                 while ((game = pgn.nextGame()) != null)

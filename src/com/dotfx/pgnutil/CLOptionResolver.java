@@ -50,6 +50,24 @@ public class CLOptionResolver
         }
     }
 
+    public static class ReplaceHandler implements OptHandler
+    {
+        private final Pattern searchPattern;
+        private final String replacement;
+
+        public ReplaceHandler(Pattern searchPattern, String replacement)
+        {
+            this.searchPattern = searchPattern;
+            this.replacement = replacement;
+        }
+
+        @Override
+        public void handleOpts(Collection<OptId> setOpts, Set<OptId> setIntersects)
+        {
+            PGNUtil.addReplaceProcessor(new PGNUtil.ReplaceProcessor(searchPattern, replacement));
+        }
+    }
+
     private static class OpeningsHandler implements OptHandler
     {
         @Override
@@ -70,10 +88,8 @@ public class CLOptionResolver
         @Override
         public void handleIfAny(Collection<OptId> setOpts, Set<OptId> ifAnyIntersects)
         {
-            List<OutputSelector.Value> checkValues =
-                    Arrays.asList(new OutputSelector.Value[] {OutputSelector.Value.OPPONENT,
-                            OutputSelector.Value.OPPONENTELO, OutputSelector.Value.PLAYER,
-                            OutputSelector.Value.PLAYERELO});
+            List<OutputSelector.Value> checkValues = Arrays.asList(OutputSelector.Value.OPPONENT,
+                    OutputSelector.Value.OPPONENTELO, OutputSelector.Value.PLAYER, OutputSelector.Value.PLAYERELO);
 
             List<OutputSelector> osList = Arrays.stream(PGNUtil.outputSelectors).filter(os ->
                     checkValues.contains(os.getValue())).collect(Collectors.toList());
@@ -110,6 +126,15 @@ public class CLOptionResolver
         }
     }
 
+    private static class DefaultSelectorsHandler implements OptHandler
+    {
+        @Override
+        public void handleIfNone(Collection<OptId> setOpts)
+        {
+            PGNUtil.setHandler(new PGNUtil.SelectGameHandler(PGNUtil.outputSelectors));
+        }
+    }
+
     private static class ConditionSet
     {
         private final Set<OptId> checkOpts;
@@ -140,7 +165,7 @@ public class CLOptionResolver
 
     private static final List<ConditionSet> conditionList = new ArrayList<>();
 
-    public static final void addCondition(OptId checkOpts[], OptId ifAnyOf[], OptId ifNoneOf[], OptHandler handler)
+    public static void addCondition(OptId checkOpts[], OptId ifAnyOf[], OptId ifNoneOf[], OptHandler handler)
     {
         conditionList.add(new ConditionSet(checkOpts, ifAnyOf, ifNoneOf, handler));
     }
@@ -163,6 +188,9 @@ public class CLOptionResolver
 
         new ConditionSet(new OptId[] {OptId.OPENINGS}, null, openingsOpts,
                 new OpeningsHandler()).handle(setOpts);
+
+        new ConditionSet(new OptId[] {OptId.SELECTORS}, null, topLevelOpts,
+                new DefaultSelectorsHandler()).handle(setOpts);
 
         // anything else requiring delayed initialization
         for (ConditionSet cs : conditionList) cs.handle(setOpts);

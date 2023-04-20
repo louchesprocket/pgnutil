@@ -35,33 +35,32 @@ import java.io.IOException;
  *
  * @author Mark Chen
  */
-public class PGNFile
+public class PgnFile
 {
     public static final int COPY_BUF_INIT_SIZE = 32768;
     private final CopyReader reader;
     private int gameCounter;
     
-    public PGNFile(String file) throws FileNotFoundException, IOException
+    public PgnFile(String file) throws FileNotFoundException, IOException
     {
         reader = new CopyReader(new BufferedReader(new FileReader(file)),
             COPY_BUF_INIT_SIZE);
     }
     
-    public PGNFile(InputStream is) throws IOException
+    public PgnFile(InputStream is) throws IOException
     {
         reader = new CopyReader(new BufferedReader(new InputStreamReader(is)),
             COPY_BUF_INIT_SIZE);
     }
     
     /**
-     * This constructor uses the exact Reader supplied by the caller (except
-     * for wrapping it in a CopyReader so that the original game text can be
-     * retrieved).
+     * This constructor uses the exact Reader supplied by the caller (except for wrapping it in a CopyReader so that
+     * the original game text can be retrieved).
      * 
      * @param reader Reader containing PGN-formatted text
      * @throws IOException 
      */
-    public PGNFile(BufferedReader reader) throws IOException
+    public PgnFile(BufferedReader reader) throws IOException
     {
         this.reader = new CopyReader(reader, COPY_BUF_INIT_SIZE);
     }

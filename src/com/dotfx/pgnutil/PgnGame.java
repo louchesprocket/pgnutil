@@ -960,7 +960,7 @@ public final class PgnGame
     {
         CopyReader reader =
             new CopyReader(new StringReader(replacee.matcher(origText).
-                replaceAll(replacement)), PGNFile.COPY_BUF_INIT_SIZE);
+                replaceAll(replacement)), PgnFile.COPY_BUF_INIT_SIZE);
         
         return parseNext(getNumber(), reader);
     }

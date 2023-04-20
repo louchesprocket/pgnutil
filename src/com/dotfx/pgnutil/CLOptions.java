@@ -946,7 +946,7 @@ public class CLOptions
         // 18677762/handling-delimiter-with-escape-characters-in-java-string-split-method
         // First, however, we must escape any escaped backslashes.
         String replaceTokens[] =
-            replaceStr.replace("\\\\", "\0").split("(?<!\\\\)/", -1);
+                replaceStr.replace("\\\\", "\0").split("(?<!\\\\)/", -1);
 
         if (replaceTokens.length != 3)
         {
@@ -958,14 +958,12 @@ public class CLOptions
             replaceTokens[i] = replaceTokens[i].replace("\0",
                 "\\\\").replace("\\/", "/");
 
-        int n = PGNUtil.replaceProcessors.size();
-        
-        // These must go last.
-        PGNUtil.replaceProcessors.add(n, new PGNUtil.ReplaceProcessor(Pattern.compile(replaceTokens[1],
-                Pattern.DOTALL), replaceTokens[2]));
-        
-        PGNUtil.replaceProcessors.add(n, new PGNUtil.ReplaceContainsProcessor(Pattern.compile(replaceTokens[0],
+        PGNUtil.addReplaceProcessor(new PGNUtil.ReplaceContainsProcessor(Pattern.compile(replaceTokens[0],
                 Pattern.DOTALL)));
+        
+        // The actual replacer must go last.
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(R)}, null, null,
+            new CLOptionResolver.ReplaceHandler(Pattern.compile(replaceTokens[1], Pattern.DOTALL), replaceTokens[2]));
     }
 
     @Option(name = RW, depends = {R}, aliases = "-replace_winner", metaVar = "<regex>",
@@ -979,10 +977,7 @@ public class CLOptions
         }
         
         countOption(OptId.get(RW));
-        int n = PGNUtil.replaceProcessors.size();
-        
-        PGNUtil.replaceProcessors.add(n == 0 ? 0 : n - 1,
-                new PGNUtil.ReplaceWinProcessor(Pattern.compile(regex, Pattern.DOTALL)));
+        PGNUtil.addReplaceProcessor(new PGNUtil.ReplaceWinProcessor(Pattern.compile(regex, Pattern.DOTALL)));
     }
 
     @Option(name = RL, depends = {R}, aliases = "-replace_loser", metaVar = "<regex>",
@@ -996,10 +991,7 @@ public class CLOptions
         }
         
         countOption(OptId.get(RL));
-        int n = PGNUtil.replaceProcessors.size();
-        
-        PGNUtil.replaceProcessors.add(n == 0 ? 0 : n - 1,
-            new PGNUtil.ReplaceLossProcessor(Pattern.compile(regex, Pattern.DOTALL)));
+        PGNUtil.addReplaceProcessor(new PGNUtil.ReplaceLossProcessor(Pattern.compile(regex, Pattern.DOTALL)));
     }
 
     @Option(name = RO, depends = {R}, aliases = "-replace_opening", metaVar = "<oid1,oid2,...>",
@@ -1014,8 +1006,7 @@ public class CLOptions
         }
         
         countOption(OptId.get(RO));
-        int n = PGNUtil.replaceProcessors.size();
-        PGNUtil.replaceProcessors.add(n == 0 ? 0 : n - 1, new PGNUtil.ReplaceOpeningProcessor(opening));
+        PGNUtil.addReplaceProcessor(new PGNUtil.ReplaceOpeningProcessor(opening));
     }
 
     // duplicates
@@ -1308,12 +1299,11 @@ public class CLOptions
         }
         
         countOption(OptId.get(S));
+
         String tokens[] = spec.split(",\\W*");
         PGNUtil.outputSelectors = new OutputSelector[tokens.length];
-        
         for (int i = 0; i < tokens.length; i++) PGNUtil.outputSelectors[i] = new OutputSelector(tokens[i]);
-        // fine if it gets overwritten
-        if (PGNUtil.handler == null) PGNUtil.handler = new PGNUtil.SelectGameHandler(PGNUtil.outputSelectors);
+        // The rest is handled in CLOptionResolver.
     }
 
     @Option(name = OD, forbids = {D, DO, DM}, aliases = "-output_delim",
@@ -1345,7 +1335,7 @@ public class CLOptions
     {
         countOption(OptId.get(I));
         
-        try { PGNUtil.pgnFileList.add(new PGNFile(new BufferedReader(new FileReader(f)))); }
+        try { PGNUtil.addInputFile(new PgnFile(new BufferedReader(new FileReader(f)))); }
         
         catch (FileNotFoundException e)
         {
