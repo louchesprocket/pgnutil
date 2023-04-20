@@ -104,7 +104,7 @@ public class CLOptions
     public static final String XE = "-xeco"; // transpositional ECO output for "-o"
     public static final String XSECO = "-xseco"; // transpositional SCID ECO output for "-o"
     
-    public static enum OptId
+    public enum OptId
     {
         ANYPLAYERFILE(APF),
         AQUARIUM(AQ),

@@ -71,7 +71,6 @@ public class PGNUtil
         private final Pattern matchPattern;
         
         public ContainsProcessor(Pattern p) { matchPattern = p; }
-        
         @Override public boolean processGame()
         {
             return game.matches(matchPattern);
@@ -83,7 +82,6 @@ public class PGNUtil
         private final Pattern notMatchPattern;
         
         public NotContainsProcessor(Pattern p) { notMatchPattern = p; }
-        
         @Override public boolean processGame()
         {
             return !game.matches(notMatchPattern);
@@ -106,7 +104,7 @@ public class PGNUtil
             try
             {
                 String value = game.get(tag);
-                return (value != null) && tagPattern.matcher(value).find();
+                return tagPattern.matcher(value).find();
             }
             
             catch (InvalidSelectorException e) { return false; }
@@ -129,7 +127,7 @@ public class PGNUtil
             try
             {
                 String value = game.get(tag);
-                return (value == null) || !tagPattern.matcher(value).find();
+                return !tagPattern.matcher(value).find();
             }
             
             catch (InvalidSelectorException e) { return false; }
@@ -142,7 +140,7 @@ public class PGNUtil
         
         public MatchGameNumProcessor(String s) throws NumberFormatException
         {
-            ranges = new ArrayList();
+            ranges = new ArrayList<>();
             
             for (String token : s.split(",\\W*"))
             { 
@@ -267,7 +265,7 @@ public class PGNUtil
     
     static final class MatchPlayerProcessor implements GameProcessor
     {
-        private Pattern p;
+        private final Pattern p;
 
         public MatchPlayerProcessor(Pattern p) { this.p = p; }
         
@@ -279,7 +277,7 @@ public class PGNUtil
 
     static final class MinEloProcessor implements GameProcessor
     {
-        private Integer minElo;
+        private final Integer minElo;
 
         public MinEloProcessor(Integer minElo) { this.minElo = minElo; }
 
@@ -293,7 +291,7 @@ public class PGNUtil
 
     static final class MaxEloProcessor implements GameProcessor
     {
-        private Integer maxElo;
+        private final Integer maxElo;
 
         public MaxEloProcessor(Integer maxElo) { this.maxElo = maxElo; }
 
@@ -307,7 +305,7 @@ public class PGNUtil
 
     static final class MaxEloDiffProcessor implements GameProcessor
     {
-        private Integer maxDiff;
+        private final Integer maxDiff;
 
         public MaxEloDiffProcessor(Integer maxDiff) { this.maxDiff = maxDiff; }
 
@@ -321,7 +319,7 @@ public class PGNUtil
 
     static final class MinEloDiffProcessor implements GameProcessor
     {
-        private Integer minDiff;
+        private final Integer minDiff;
 
         public MinEloDiffProcessor(Integer minDiff) { this.minDiff = minDiff; }
 
@@ -345,7 +343,7 @@ public class PGNUtil
         @Override public boolean processGame()
         {
             TimeCtrl timeCtrl = game.getTimeCtrl();
-            return timeCtrl != null ? timeCtrl.equals(matchTimeCtrl) : false;
+            return timeCtrl != null && timeCtrl.equals(matchTimeCtrl);
         }
     }
     
@@ -383,7 +381,7 @@ public class PGNUtil
         {
             if (plies < 1) return true;
             PgnGame.Move firstOobMove = game.getFirstOobMove();
-            return firstOobMove == null ? false : game.getPlyCount() - firstOobMove.getPly() >= plies;
+            return firstOobMove != null && game.getPlyCount() - firstOobMove.getPly() >= plies;
         }
     }
     
@@ -397,7 +395,7 @@ public class PGNUtil
         {
             PgnGame.Move firstOobMove = game.getFirstOobMove();
             // if all book moves, return true
-            return firstOobMove == null ? true : game.getPlyCount() - firstOobMove.getPly() <= plies;
+            return firstOobMove == null || game.getPlyCount() - firstOobMove.getPly() <= plies;
         }
     }
     
@@ -605,11 +603,6 @@ public class PGNUtil
         void handle() throws InvalidSelectorException, IllegalMoveException;
     }
     
-    static class NullGameHandler implements GameHandler
-    {
-        @Override public void handle() throws InvalidSelectorException {}
-    }
-    
     private static final class DefaultGameHandler implements GameHandler
     {
         @Override public void handle() throws InvalidSelectorException
@@ -644,7 +637,7 @@ public class PGNUtil
             duplicates = new HashSet();
         }
         
-        final void handle(HashCode hash) throws InvalidSelectorException
+        final void handle(HashCode hash)
         {
             SortedSet<Integer> gameIdxes = gameMap.get(hash);
             if (gameIdxes != null) duplicates.add(hash);
@@ -660,18 +653,7 @@ public class PGNUtil
         
         final SortedSet<SortedSet<Integer>> getDuplicates()
         {
-            SortedSet<SortedSet<Integer>> ret = new TreeSet<>
-            (
-                new Comparator<SortedSet<Integer>>()
-                {
-                    @Override
-                    public int compare(SortedSet<Integer> s1, SortedSet<Integer> s2)
-                    {
-                        return s1.first() - s2.first();
-                    }
-                }
-            );
-            
+            SortedSet<SortedSet<Integer>> ret = new TreeSet<>(Comparator.comparingInt(SortedSet::first));
             for (HashCode duplicate : duplicates) ret.add(gameMap.get(duplicate));
             return ret;
         }
@@ -679,7 +661,7 @@ public class PGNUtil
     
     static final class DuplicateGameHandler extends DuplicateHandler
     {
-        @Override public final void handle() throws InvalidSelectorException
+        @Override public void handle() throws InvalidSelectorException
         {
             super.handle(game.getHash());
         }
@@ -695,7 +677,7 @@ public class PGNUtil
     
     static final class DuplicateOpeningHandler extends DuplicateHandler
     {
-        @Override public final void handle() throws InvalidSelectorException
+        @Override public void handle() throws InvalidSelectorException
         {
             super.handle(game.getPlayerOpeningHash());
         }
@@ -772,7 +754,7 @@ public class PGNUtil
     public static final String VERSION = "0.8";
 
     private static PgnGame game;
-    private static List<PgnFile> pgnFileList;
+    private static final List<PgnFile> pgnFileList = new ArrayList<>();
 
     private static final List<GameProcessor> matchProcessors = new ArrayList<>();
     private static final List<GameProcessor> replaceProcessors = new ArrayList<>();
@@ -781,8 +763,8 @@ public class PGNUtil
 
     static OutputSelector outputSelectors[];
     
-    static long gamesRead = 0L;
-    static long charsRead = 0L;
+    private static long gamesRead = 0L;
+    private static long charsRead = 0L;
 
     static void addInputFile(PgnFile f) { pgnFileList.add(f); }
     static void addMatchProcessor(GameProcessor gp) { matchProcessors.add(gp); }
@@ -795,7 +777,6 @@ public class PGNUtil
         CLOptions options = new CLOptions();
         CmdLineParser parser = new CmdLineParser(options);
         exitProcessor = new NullExitProcessor();
-        pgnFileList = new ArrayList<>();
         long startTime = 0L;
         
         try

@@ -43,14 +43,13 @@ import java.util.regex.Pattern;
  */
 public final class PgnGame
 {
-    public static final Pattern OUT_OF_BOOK;
     public static final String ROUND_TAG;
     public static final int HASHSEED = 0xa348ccf1;
     private static final HashFunction HASHFUNC;
     private static final int BUFSIZE = 1024;
     private static final int COMMENT_BUFSIZE = 1024;
     private static Pattern bookMarker;
-    
+
     public enum Result
     {
         WHITEWIN("1-0"),
@@ -91,7 +90,7 @@ public final class PgnGame
             this.color = color;
             this.number = number;
             this.move = move;
-            this.comments = new ArrayList();
+            this.comments = new ArrayList<>();
             
             for (String comment : comments)
                 this.comments.add(comment.replaceAll("[\n\r]", " "));
@@ -135,13 +134,12 @@ public final class PgnGame
         public String toString()
         {
             StringBuilder sb = new StringBuilder();
+
             sb.append(number).append(".");
             if (color.equals(Color.BLACK)) sb.append("..");
             sb.append(" ").append(move);
             if (comments.size() > 0) sb.append(" ");
-            
-            for (String comment : comments)
-                sb.append("{").append(comment).append("}");
+            for (String comment : comments) sb.append("{").append(comment).append("}");
             
             return sb.toString();
         }
@@ -154,8 +152,7 @@ public final class PgnGame
 
         // Aquarium: "[Black|White] out of book"
         // Banksia: "End of opening"
-        OUT_OF_BOOK = bookMarker == null ?
-            Pattern.compile("(out\\s+of\\s+book)|(^End\\s+of\\s+opening)", Pattern.DOTALL) : bookMarker;
+        bookMarker = Pattern.compile("(out\\s+of\\s+book)|(^End\\s+of\\s+opening)", Pattern.DOTALL);
     }
     
     private final int number;
@@ -236,12 +233,12 @@ public final class PgnGame
     public static PgnGame parseNext(int number, CopyReader reader)
         throws IOException, PGNException
     {
-        ArrayList<String> moveComments = new ArrayList();
+        ArrayList<String> moveComments = new ArrayList<>();
         char buf[] = new char[BUFSIZE];
         int next, i, j;
         CaseInsensitiveMap<String,String> tagpairs = new CaseInsensitiveMap<>();
-        List<PgnGame.Move> moves = new ArrayList();
-        List<String> gameComments = new ArrayList();
+        List<PgnGame.Move> moves = new ArrayList<>();
+        List<String> gameComments = new ArrayList<>();
         
         while (true) // parse tag pairs
         {
@@ -434,7 +431,7 @@ public final class PgnGame
                 (short)Math.round((float)i / (float)2), moveStr, moveComments);
             
             moves.add(move);
-            moveComments = new ArrayList();
+            moveComments = new ArrayList<>();
         }
     }
     
@@ -607,7 +604,7 @@ public final class PgnGame
                 // present move.  Otherwise, the first move with a comment is
                 // the first out-of-book move.
 
-                if (move.hasComment(OUT_OF_BOOK)) return moves.get(move.getPly());
+                if (move.hasComment(bookMarker)) return moves.get(move.getPly());
                 if (firstCommentMove == null) firstCommentMove = move;
             }
         }
@@ -631,7 +628,7 @@ public final class PgnGame
                 // Presence of oobMarker means that book moves include the present move.  Otherwise, the first move
                 // with a comment is the first out-of-book move.
 
-                if (move.hasComment(OUT_OF_BOOK)) return move;
+                if (move.hasComment(bookMarker)) return move;
                 if (firstCommentMove == null) firstCommentMove = move;
             }
         }
@@ -706,7 +703,7 @@ public final class PgnGame
     
     public Board getOpeningPosition() throws IllegalMoveException
     {
-        return getOpeningPosition(OUT_OF_BOOK);
+        return getOpeningPosition(bookMarker);
     }
     
     public PositionId getOpid(Pattern oobMarker) throws IllegalMoveException
@@ -716,7 +713,7 @@ public final class PgnGame
     
     public PositionId getOpid() throws IllegalMoveException
     {
-        return getOpeningPosition(OUT_OF_BOOK).positionId();
+        return getOpeningPosition(bookMarker).positionId();
     }
     
     public String getOpeningFen(Pattern oobMarker) throws IllegalMoveException
@@ -726,7 +723,7 @@ public final class PgnGame
     
     public String getOpeningFen() throws IllegalMoveException
     {
-        return getOpeningPosition(OUT_OF_BOOK).toFen();
+        return getOpeningPosition(bookMarker).toFen();
     }
 
     /**
@@ -748,7 +745,7 @@ public final class PgnGame
                 
                 if (firstCommentIdx == -1) firstCommentIdx = sb.length(); 
                 
-                if (move.hasComment(OUT_OF_BOOK))
+                if (move.hasComment(bookMarker))
                 {
                     if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
                     sb.append(move.getMove());
@@ -788,7 +785,7 @@ public final class PgnGame
 
                 if (firstCommentIdx == -1) firstCommentIdx = i;
 
-                if (move.hasComment(OUT_OF_BOOK))
+                if (move.hasComment(bookMarker))
                 {
                     oobIdx = i;
                     break;
@@ -825,7 +822,7 @@ public final class PgnGame
                 
                 if (firstCommentIdx == -1) firstCommentIdx = sb.length(); 
                 
-                if (move.hasComment(OUT_OF_BOOK))
+                if (move.hasComment(bookMarker))
                 {
                     if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
                     sb.append(move.getMoveOnly());
@@ -844,7 +841,7 @@ public final class PgnGame
     }
 
     public MoveListId openingId(Pattern oobMarker) { return new MoveListId(getOpeningString()); }
-    public MoveListId openingId() { return openingId(OUT_OF_BOOK); }
+    public MoveListId openingId() { return openingId(bookMarker); }
     
     public HashCode getPlayerOpeningHash()
     {
