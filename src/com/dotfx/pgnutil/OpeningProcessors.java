@@ -48,8 +48,7 @@ public class OpeningProcessors
     {
         private final int minGames;
         
-        public
-        MinGamesProcessor(int minGames) { this.minGames = minGames; }
+        public MinGamesProcessor(int minGames) { this.minGames = minGames; }
         
         @Override public boolean processOpening(OpeningScore opening)
         {

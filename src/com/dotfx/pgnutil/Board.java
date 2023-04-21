@@ -96,10 +96,9 @@ public class Board
         {
             return sigMap.get(signifier);
         }
-        
         public static PieceType get(char signifier)
         {
-            return sigMap.get(new String(new char[] {signifier}));
+            return sigMap.get(String.valueOf(signifier));
         }
     }
     
@@ -149,8 +148,7 @@ public class Board
         @Override
         public String toString()
         {
-            return color == Color.WHITE ? getType().toString().toUpperCase() :
-                getType().toString().toLowerCase();
+            return color == Color.WHITE ? getType().toString().toUpperCase() : getType().toString().toLowerCase();
         }
         
         @Override
@@ -329,13 +327,10 @@ public class Board
                 if (moveColor == Color.WHITE)
                 {
                     if (diff == 8) return destPiece == null;
-                    
-                    if (diff == 16 && endRank == 3)
-                        return destPiece == null && position[start + 8] == null;
+                    if (diff == 16 && endRank == 3) return destPiece == null && position[start + 8] == null;
                     
                     if ((diff == 7 || diff == 9) && hi/8 - low/8 == 1)
-                        return (destPiece != null || end == epCandidate)
-                            && !destSameColor;
+                        return (destPiece != null || end == epCandidate) && !destSameColor;
                     
                     return false;
                 }
@@ -343,29 +338,20 @@ public class Board
                 else
                 {
                     if (diff == -8) return destPiece == null;
-                    
-                    if (diff == -16 && endRank == 4)
-                        return destPiece == null && position[start - 8] == null;
+                    if (diff == -16 && endRank == 4) return destPiece == null && position[start - 8] == null;
                     
                     if ((diff == -7 || diff == -9) && hi/8 - low/8 == 1)
-                        return (destPiece != null || end == epCandidate)
-                            && !destSameColor;
+                        return (destPiece != null || end == epCandidate) && !destSameColor;
                     
                     return false;
                 }
                 
             case ROOK:
                 if (low / 8 == hi / 8) // same rank
-                {
-                    for (i = low + 1; i < hi; i++)
-                        if (position[i] != null) return false;
-                }
+                    for (i = low + 1; i < hi; i++) if (position[i] != null) return false;
                 
                 else if (span % 8 == 0) // same file
-                {
-                    for (i = low + 8; i < hi; i += 8)
-                        if (position[i] != null) return false;
-                }
+                    for (i = low + 8; i < hi; i += 8) if (position[i] != null) return false;
                 
                 else return false;
                 
@@ -389,10 +375,7 @@ public class Board
                 if (span % 7 == 0 && span != 63)
                 {
                     for (i = low + 7; i < hi; i += 7)
-                    {
-                        if (i/8 - (i - 7)/8 != 1 || position[i] != null)
-                            return false;
-                    }
+                        if (i/8 - (i - 7)/8 != 1 || position[i] != null) return false;
                     
                     return !destSameColor && i/8 - (i - 7)/8 == 1;
                 }
@@ -400,10 +383,7 @@ public class Board
                 else if (span % 9 == 0)
                 {
                     for (i = low + 9; i < hi; i += 9)
-                    {
-                        if (i/8 - (i - 9)/8 != 1 || position[i] != null)
-                            return false;
-                    }
+                        if (i/8 - (i - 9)/8 != 1 || position[i] != null) return false;
                     
                     return !destSameColor && i/8 - (i - 9)/8 == 1;
                 }
@@ -412,24 +392,15 @@ public class Board
                 
             case QUEEN:
                 if (low / 8 == hi / 8) // same rank
-                {
-                    for (i = low + 1; i < hi; i++)
-                        if (position[i] != null) return false;
-                }
+                    for (i = low + 1; i < hi; i++) if (position[i] != null) return false;
                 
                 else if (span % 8 == 0) // same file
-                {
-                    for (i = low + 8; i < hi; i += 8)
-                        if (position[i] != null) return false;
-                }
+                    for (i = low + 8; i < hi; i += 8) if (position[i] != null) return false;
                 
                 else if (span % 7 == 0 && span != 63) // same diagonal
                 {
                     for (i = low + 7; i < hi; i += 7)
-                    {
-                        if (i/8 - (i - 7)/8 != 1 || position[i] != null)
-                            return false;
-                    }
+                        if (i/8 - (i - 7)/8 != 1 || position[i] != null) return false;
                     
                     return !destSameColor && i/8 - (i - 7)/8 == 1;
                 }
@@ -437,10 +408,7 @@ public class Board
                 else if (span % 9 == 0) // same diagonal
                 {
                     for (i = low + 9; i < hi; i += 9)
-                    {
-                        if (i/8 - (i - 9)/8 != 1 || position[i] != null)
-                            return false;
-                    }
+                        if (i/8 - (i - 9)/8 != 1 || position[i] != null) return false;
                     
                     return !destSameColor && i/8 - (i - 9)/8 == 1;
                 }
@@ -462,25 +430,21 @@ public class Board
                         if (moveColor == Color.WHITE)
                         {
                             if (end - start == 2) // king side
-                                return position[5] == null &&
-                                    position[6] == null && whiteCanCastleK;
+                                return position[5] == null && position[6] == null && whiteCanCastleK;
                             
                             else // queen side
-                                return position[1] == null &&
-                                    position[2] == null &&
-                                    position[3] == null && whiteCanCastleQ;
+                                return position[1] == null && position[2] == null && position[3] == null &&
+                                        whiteCanCastleQ;
                         }
                         
                         else
                         {
                             if (end - start == 2) // king side
-                                return position[61] == null &&
-                                    position[62] == null && blackCanCastleK;
+                                return position[61] == null && position[62] == null && blackCanCastleK;
                             
                             else // queen side
-                                return position[57] == null &&
-                                    position[58] == null &&
-                                    position[59] == null && blackCanCastleQ;
+                                return position[57] == null && position[58] == null && position[59] == null &&
+                                        blackCanCastleQ;
                         }
                         
                     default: return false;
@@ -506,8 +470,7 @@ public class Board
         // en passant capture
         if (end == epCandidate && movingPiece.getType() == PieceType.PAWN)
         {
-            int savedCaptureLoc =
-                color == Color.WHITE ? epCandidate - 8 : epCandidate + 8;
+            int savedCaptureLoc = color == Color.WHITE ? epCandidate - 8 : epCandidate + 8;
             
             Piece savedCapture = position[savedCaptureLoc];
             
@@ -515,8 +478,7 @@ public class Board
             position[start] = null;
             position[savedCaptureLoc] = null;
             
-            boolean ret = isInCheck(color,
-                new int[] {color == Color.WHITE ? whiteKingLoc : blackKingLoc});
+            boolean ret = isInCheck(color, new int[] {color == Color.WHITE ? whiteKingLoc : blackKingLoc});
             
             position[start] = movingPiece;
             position[end] = null;
@@ -563,8 +525,7 @@ public class Board
                     else blackKingLoc = (byte)end;
                 }
 
-                return isInCheck(color, new int[]
-                    {color == Color.WHITE ? whiteKingLoc : blackKingLoc});
+                return isInCheck(color, new int[] {color == Color.WHITE ? whiteKingLoc : blackKingLoc});
             }
             
             finally
@@ -586,14 +547,10 @@ public class Board
             Piece saved = position[square]; // save contents of test square
             position[square] = position[savedKingLoc]; // move king to test square
             
-            if (savedKingLoc != square)
-                position[savedKingLoc] = null; // empty king's previous square
+            if (savedKingLoc != square) position[savedKingLoc] = null; // empty king's previous square
             
             for (int i = 0; i < 64; i++)
-            {
-                if (position[i] != null && position[i].getColor() != color &&
-                    canMove(i, square)) return true;
-            }
+                if (position[i] != null && position[i].getColor() != color && canMove(i, square)) return true;
             
             position[savedKingLoc] = position[square]; // restore king to origin
             position[square] = saved; // restore test square
@@ -604,8 +561,7 @@ public class Board
     
     public boolean moveTest(int start, int end)
     {
-        return end >= 0 && end < 64 && canMove(start, end) &&
-            !isMovingIntoCheck(start, end);
+        return end >= 0 && end < 64 && canMove(start, end) && !isMovingIntoCheck(start, end);
     }
     
     /**
@@ -642,7 +598,7 @@ public class Board
 
                     if (piece.getColor() == Color.WHITE)
                     {
-                        whiteKingLoc = (byte) end;
+                        whiteKingLoc = (byte)end;
                         whiteCanCastleK = false;
                         whiteCanCastleQ = false;
 
@@ -661,7 +617,7 @@ public class Board
 
                     else
                     {
-                        blackKingLoc = (byte) end;
+                        blackKingLoc = (byte)end;
                         blackCanCastleK = false;
                         blackCanCastleQ = false;
 
@@ -838,9 +794,8 @@ public class Board
             {
                 Piece piece = position[i];
                 
-                if (piece != null && piece.getType() == PieceType.PAWN &&
-                    piece.getColor() == color && canMove(i, endSquare) &&
-                    !isMovingIntoCheck(i, endSquare))
+                if (piece != null && piece.getType() == PieceType.PAWN && piece.getColor() == color &&
+                    canMove(i, endSquare) && !isMovingIntoCheck(i, endSquare))
                     return move(i, endSquare, promoteTo);
             }
         
@@ -871,9 +826,8 @@ public class Board
                 {
                     Piece piece = position[i];
 
-                    if (piece != null && piece.getType() == pieceType &&
-                        piece.getColor() == color && canMove(i, endSquare) &&
-                        !isMovingIntoCheck(i, endSquare))
+                    if (piece != null && piece.getType() == pieceType && piece.getColor() == color &&
+                        canMove(i, endSquare) && !isMovingIntoCheck(i, endSquare))
                         return move(i, endSquare, promoteTo);
                 }
             }
@@ -886,9 +840,8 @@ public class Board
                 {
                     Piece piece = position[i];
 
-                    if (piece != null && piece.getType() == pieceType &&
-                        piece.getColor() == color && canMove(i, endSquare) &&
-                        !isMovingIntoCheck(i, endSquare))
+                    if (piece != null && piece.getType() == pieceType && piece.getColor() == color &&
+                        canMove(i, endSquare) && !isMovingIntoCheck(i, endSquare))
                         return move(i, endSquare, promoteTo);
                 }
             }
@@ -900,8 +853,7 @@ public class Board
         {
             Piece piece = position[i];
             
-            if (piece != null && piece.getType() == pieceType &&
-                piece.getColor() == color && i != endSquare &&
+            if (piece != null && piece.getType() == pieceType && piece.getColor() == color && i != endSquare &&
                 canMove(i, endSquare) && !isMovingIntoCheck(i, endSquare))
                 return move(i, endSquare, promoteTo);
         }
@@ -962,13 +914,12 @@ public class Board
             {
                 Piece piece = position[i];
                 
-                if (piece != null && piece.getType() == PieceType.PAWN &&
-                    piece.getColor() == color && moveTest(i, endSquare))
+                if (piece != null && piece.getType() == PieceType.PAWN && piece.getColor() == color &&
+                    moveTest(i, endSquare))
                     return coordToSan(i, endSquare, promoteTo);
             }
         
-            throw new IllegalMoveException("illegal move: '" + san +
-                "' at ply " + (ply + 1));
+            throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
         }
         
         String sanStart = san.substring(0, len - 2); // destination chopped off
@@ -985,9 +936,7 @@ public class Board
         {
             int disambigLen = disambig.length();
             
-            if (disambigLen == 2)
-                return coordToSan(Square.get(disambig).getLocation(), endSquare,
-                    promoteTo);
+            if (disambigLen == 2) return coordToSan(Square.get(disambig).getLocation(), endSquare, promoteTo);
             
             char disambigChar = disambig.charAt(0);
             
@@ -1013,8 +962,8 @@ public class Board
                 {
                     Piece piece = position[i];
 
-                    if (piece != null && piece.getType() == pieceType &&
-                        piece.getColor() == color && moveTest(i, endSquare))
+                    if (piece != null && piece.getType() == pieceType && piece.getColor() == color &&
+                        moveTest(i, endSquare))
                         return coordToSan(i, endSquare, promoteTo);
                 }
             }
@@ -1026,8 +975,8 @@ public class Board
         {
             Piece piece = position[i];
             
-            if (piece != null && piece.getType() == pieceType &&
-                piece.getColor() == color && moveTest(i, endSquare))
+            if (piece != null && piece.getType() == pieceType && piece.getColor() == color &&
+                moveTest(i, endSquare))
                 return coordToSan(i, endSquare, promoteTo);
         }
         
@@ -1044,11 +993,7 @@ public class Board
         StringBuilder ret = new StringBuilder();
         
         try { pieceType = position[start].getType(); }
-        
-        catch (NullPointerException e)
-        {
-            throw new IllegalMoveException("illegal move at ply " + (ply + 1));
-        }
+        catch (NullPointerException e) { throw new IllegalMoveException("illegal move at ply " + (ply + 1)); }
         
         if (pieceType == PieceType.PAWN)
         {
@@ -1074,8 +1019,7 @@ public class Board
             ret.append(Square.get(end));
             int endRank = end/8;
             
-            if (endRank == 0 || endRank == 7)
-                ret.append("=").append(promoteTo).append(getCheckSymbol(otherColor));
+            if (endRank == 0 || endRank == 7) ret.append("=").append(promoteTo).append(getCheckSymbol(otherColor));
             
             return ret.toString();
         }
@@ -1096,8 +1040,7 @@ public class Board
             
             move(start, end, null);
             
-            return ret.append("K").append(captureSt).
-                append(Square.get(end)).toString();
+            return ret.append("K").append(captureSt).append(Square.get(end)).toString();
         }
         
         boolean disambigRank = false;
@@ -1161,9 +1104,7 @@ public class Board
         }
         
         move(start, end, null);
-        
-        return ret.append(captureSt).append(Square.get(end)).
-            append(getCheckSymbol(otherColor)).toString();
+        return ret.append(captureSt).append(Square.get(end)).append(getCheckSymbol(otherColor)).toString();
     }
     
     /**
@@ -1177,7 +1118,6 @@ public class Board
         int end = Square.get(move.substring(2, 4)).getLocation();
         
         PieceType promoteTo = move.length() > 4 ? PieceType.get(move.substring(4,5)) : null; // ?
-        
         return coordToSan(start, end, promoteTo);
     }
     
@@ -1188,8 +1128,7 @@ public class Board
      */
     private String getCheckSymbol(Color color)
     {
-        if (isInCheck(color,
-            new int[] {color == Color.WHITE ? whiteKingLoc : blackKingLoc}))
+        if (isInCheck(color, new int[] {color == Color.WHITE ? whiteKingLoc : blackKingLoc}))
         {
             for (int i = 0; i < 64; i++)
             {
@@ -1221,29 +1160,19 @@ public class Board
                         case ROOK:
                             for (int j = 1; j < 7; j++)
                             {
-                                if (i + j < 64 && moveTest(i, i + j))
-                                    return "+";
-                                
-                                if (i - j >= 0 && moveTest(i, i - j))
-                                    return "+";
+                                if (i + j < 64 && moveTest(i, i + j)) return "+";
+                                if (i - j >= 0 && moveTest(i, i - j)) return "+";
                             }
                             
-                            for (int j = 8; j + i < 64; j += 8)
-                                if (moveTest(i, i + j)) return "+";
-                            
-                            for (int j = 8; i - j >= 0; j += 8)
-                                if (moveTest(i, i - j)) return "+";
-                            
+                            for (int j = 8; j + i < 64; j += 8) if (moveTest(i, i + j)) return "+";
+                            for (int j = 8; i - j >= 0; j += 8) if (moveTest(i, i - j)) return "+";
                             break;
                             
                         case KNIGHT:
                             for (int j = 0; j < NMOVES.length; j++)
                             {
                                 int dest = i + NMOVES[j];
-                                
-                                if (dest >= 0 && dest < 64 &&
-                                    moveTest(i, dest))
-                                    return "+";
+                                if (dest >= 0 && dest < 64 && moveTest(i, dest)) return "+";
                             }
                             
                             break;
@@ -1266,11 +1195,8 @@ public class Board
                         case QUEEN:
                             for (int j = 1; j < 7; j++)
                             {
-                                if (i + j < 64 && moveTest(i, i + j))
-                                    return "+";
-                                
-                                if (i - j >= 0 && moveTest(i, i - j))
-                                    return "+";
+                                if (i + j < 64 && moveTest(i, i + j)) return "+";
+                                if (i - j >= 0 && moveTest(i, i - j)) return "+";
                             }
                             
                             for (int j = 8; j + i < 64; j += 8)
@@ -1343,9 +1269,7 @@ public class Board
         
         ret.append(" ").append(COLORS[ply % 2]).append(" ");
         
-        if (!whiteCanCastleK && !whiteCanCastleQ && !blackCanCastleK &&
-            !blackCanCastleQ)
-            ret.append("- ");
+        if (!whiteCanCastleK && !whiteCanCastleQ && !blackCanCastleK && !blackCanCastleQ) ret.append("- ");
         
         else
         {
@@ -1394,8 +1318,7 @@ public class Board
         
         ret.append(" ").append(COLORS[ply % 2]).append(" ");
         
-        if (!whiteCanCastleK && !whiteCanCastleQ && !blackCanCastleK &&
-            !blackCanCastleQ)
+        if (!whiteCanCastleK && !whiteCanCastleQ && !blackCanCastleK && !blackCanCastleQ)
             ret.append("-");
         
         else
@@ -1430,8 +1353,7 @@ public class Board
 //            blackPieceCount != that.blackPieceCount)
 //            return false;
         
-        return ply % 2 == that.ply % 2 &&
-            Arrays.equals(position, that.position);
+        return ply % 2 == that.ply % 2 && Arrays.equals(position, that.position);
     }
     
     public PositionId positionId()
@@ -1490,10 +1412,7 @@ public class Board
                 halfMoveClock == that.halfMoveClock;
         }
         
-        catch (ClassCastException | NullPointerException e)
-        {
-            return false;
-        }
+        catch (ClassCastException | NullPointerException e) { return false; }
     }
     
     @Override
