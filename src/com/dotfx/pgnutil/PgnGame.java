@@ -226,7 +226,7 @@ public final class PgnGame
             if (end <= start) continue;
             moveList.add(move.substring(start, end + 1));
         }
-        
+
         return moveList;
     }
     

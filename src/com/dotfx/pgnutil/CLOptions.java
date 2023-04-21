@@ -519,7 +519,7 @@ public class CLOptions
         
         catch (IllegalMoveException | NullPointerException e)
         {
-            System.err.println("illegal move in parameter: '" + moveSt + "'");
+            System.err.println(e.getLocalizedMessage());
             System.exit(-1);
         }
         
