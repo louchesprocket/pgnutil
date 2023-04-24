@@ -91,6 +91,7 @@ public class CLOptions
     public static final String P = "-p";
     public static final String PERF = "-perf";
     public static final String PF = "-pf";
+    public static final String PP = "-pp";
     public static final String R = "-r";
     public static final String RL = "-rl";
     public static final String RO = "-ro";
@@ -157,6 +158,7 @@ public class CLOptions
         PERFORMANCE(PERF),
         PLAYERFILE(PF),
         PLAYERRESULTS(P),
+        PRINTPOS(PP),
         REPLACE(R),
         REPLACELOSER(RL),
         REPLACEOPENING(RO),
@@ -287,6 +289,24 @@ public class CLOptions
         }
         
         return openingSet;
+    }
+
+    // utility
+
+    @Option(name = PP, aliases = "-print_position", metaVar = "<move_list>", hidden = true,
+            usage = "output a board representation following the <move_list>")
+    private void printPosition(String moveSt)
+    {
+        if (getCount(OptId.get(PP)) > 0)
+        {
+            System.err.println("Option '" + OptId.get(PP) + "' cannot be set more than once!");
+            System.exit(-1);
+        }
+
+        countOption(OptId.get(PP));
+
+        CLOptionResolver.addCondition(new OptId[] {OptId.PRINTPOS}, null, null,
+                new CLOptionResolver.PrintPositionHandler(moveSt));
     }
     
     // matchers
@@ -517,9 +537,15 @@ public class CLOptions
         Board board = new Board(true);
         try { board.goTo(PgnGame.parseMoveString(moveSt)); }
         
-        catch (IllegalMoveException | NullPointerException e)
+        catch (IllegalMoveException e)
         {
             System.err.println(e.getLocalizedMessage());
+            System.exit(-1);
+        }
+
+        catch (NullPointerException e)
+        {
+            System.err.println("illegal move in parameter '" + moveSt + "'");
             System.exit(-1);
         }
         

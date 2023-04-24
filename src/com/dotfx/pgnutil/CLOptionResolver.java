@@ -35,6 +35,35 @@ public class CLOptionResolver
         default void handleIfNone(Collection<OptId> setOpts) {}
     }
 
+    public static class PrintPositionHandler implements OptHandler
+    {
+        private final String moveSt;
+
+        public PrintPositionHandler(String moveSt) { this.moveSt = moveSt; }
+
+        @Override
+        public void handleOpts(Collection<OptId> setOpts, Set<OptId> setIntersects)
+        {
+            if (setOpts.size() > 1)
+            {
+                System.err.println("Option '" + OptId.PRINTPOS + "' cannot be used with other other options.");
+                System.exit(-1);
+            }
+
+            try
+            {
+                System.out.println(new Board(true).goTo(PgnGame.parseMoveString(moveSt)));
+                System.exit(0);
+            }
+
+            catch (IllegalMoveException e)
+            {
+                System.err.println("illeggal move: " + e.getLocalizedMessage());
+                System.exit(-1);
+            }
+        }
+    }
+
     private static class MutexHandler implements OptHandler
     {
         @Override

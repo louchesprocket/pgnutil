@@ -66,7 +66,42 @@ public class Board
         
         public int getLocation() { return location; }
         public static Square get(int square) { return squares[square]; }
-        public static Square get(String s) { return nameMap.get(s.toLowerCase());}
+
+        public static Square get(String s) throws IllegalMoveException
+        {
+            return get(s.charAt(0), s.charAt(1));
+        }
+
+        public static Square get(char file, char rank) throws IllegalMoveException
+        {
+            int rankTerm;
+
+            switch (rank)
+            {
+                case '1': rankTerm = 0; break;
+                case '2': rankTerm = 8; break;
+                case '3': rankTerm = 16; break;
+                case '4': rankTerm = 24; break;
+                case '5': rankTerm = 32; break;
+                case '6': rankTerm = 40; break;
+                case '7': rankTerm = 48; break;
+                case '8': rankTerm = 56; break;
+                default: throw new IllegalMoveException("illegal square: '" + file + rank + "'");
+            }
+
+            switch (file)
+            {
+                case 'a': return squares[rankTerm];
+                case 'b': return squares[rankTerm + 1];
+                case 'c': return squares[rankTerm + 2];
+                case 'd': return squares[rankTerm + 3];
+                case 'e': return squares[rankTerm + 4];
+                case 'f': return squares[rankTerm + 5];
+                case 'g': return squares[rankTerm + 6];
+                case 'h': return squares[rankTerm + 7];
+                default: throw new IllegalMoveException("illegal square: '" + file + rank + "'");
+            }
+        }
         
         @Override
         public String toString() { return name().toLowerCase(); }
@@ -76,8 +111,8 @@ public class Board
     {
         PAWN("p"),
         ROOK("R"),
-        BISHOP("B"),
         KNIGHT("N"),
+        BISHOP("B"),
         QUEEN("Q"),
         KING("K");
         
@@ -89,87 +124,79 @@ public class Board
             for (PieceType r : PieceType.values()) sigMap.put(r.toString(), r);
         }
         
-        private PieceType(String signifier) { this.signifier = signifier; }
+        PieceType(String signifier) { this.signifier = signifier; }
         @Override public String toString() { return signifier; }
         
         public static PieceType get(String signifier)
         {
             return sigMap.get(signifier);
         }
-        
-        public static PieceType get(char signifier)
-        {
-            return sigMap.get(new String(new char[] {signifier}));
-        }
+        public static PieceType get(char signifier) { return sigMap.get(String.valueOf(signifier)); }
     }
     
-    public static class Piece
+    public enum Piece
     {
-        private final PieceType fileType;
+        WHITE_PAWN(Color.WHITE, PieceType.PAWN, 0),
+        WHITE_ROOK(Color.WHITE, PieceType.ROOK, 1),
+        WHITE_KNIGHT(Color.WHITE, PieceType.KNIGHT, 2),
+        WHITE_BISHOP(Color.WHITE, PieceType.BISHOP, 3),
+        WHITE_QUEEN(Color.WHITE, PieceType.QUEEN, 4),
+        WHITE_KING(Color.WHITE, PieceType.KING, 5),
+
+        BLACK_PAWN(Color.BLACK, PieceType.PAWN, 6),
+        BLACK_ROOK(Color.BLACK, PieceType.ROOK, 7),
+        BLACK_KNIGHT(Color.BLACK, PieceType.KNIGHT, 8),
+        BLACK_BISHOP(Color.BLACK, PieceType.BISHOP, 9),
+        BLACK_QUEEN(Color.BLACK, PieceType.QUEEN, 10),
+        BLACK_KING(Color.BLACK, PieceType.KING, 11);
+
+        private final PieceType pieceType;
         private final Color color;
+        private final int code;
         
-        public Piece(Color color, PieceType fileType)
+        Piece(Color color, PieceType pieceType, int code)
         {
-            this.fileType = fileType;
+            this.pieceType = pieceType;
             this.color = color;
+            this.code = code;
         }
-        
-        public PieceType getType() { return fileType; }
-        public Color getColor() { return color; }
-        
-        public byte toByte()
+
+        public static Piece get(Color color, PieceType type)
         {
             if (color == Color.WHITE)
-            {
-                switch (fileType)
+                switch (type)
                 {
-                    case PAWN: return (byte)0;
-                    case ROOK: return (byte)1;
-                    case KNIGHT: return (byte)2;
-                    case BISHOP: return (byte)3;
-                    case QUEEN: return (byte)4;
-                    default: return (byte)5; // king
+                    case PAWN: return WHITE_PAWN;
+                    case ROOK: return WHITE_ROOK;
+                    case KNIGHT: return WHITE_KNIGHT;
+                    case BISHOP: return WHITE_BISHOP;
+                    case QUEEN: return WHITE_QUEEN;
+                    case KING: return WHITE_KING;
+                    default: return null;
                 }
-            }
-            
+
             else
-            {
-                switch (fileType)
+                switch (type)
                 {
-                    case PAWN: return (byte)6;
-                    case ROOK: return (byte)7;
-                    case KNIGHT: return (byte)8;
-                    case BISHOP: return (byte)9;
-                    case QUEEN: return (byte)10;
-                    default: return (byte)11; // king
+                    case PAWN: return BLACK_PAWN;
+                    case ROOK: return BLACK_ROOK;
+                    case KNIGHT: return BLACK_KNIGHT;
+                    case BISHOP: return BLACK_BISHOP;
+                    case QUEEN: return BLACK_QUEEN;
+                    case KING: return BLACK_KING;
+                    default: return null;
                 }
-            }
         }
+        
+        public PieceType getType() { return pieceType; }
+        public Color getColor() { return color; }
+        public byte toByte() { return (byte)code; }
         
         @Override
         public String toString()
         {
             return color == Color.WHITE ? getType().toString().toUpperCase() :
                 getType().toString().toLowerCase();
-        }
-        
-        @Override
-        public boolean equals(Object other)
-        {
-            try
-            {
-                Piece that = (Piece)other;
-                if (that.fileType != fileType) return false;
-                return that.color == color;
-            }
-            
-            catch (ClassCastException | NullPointerException e) { return false; }
-        }
-        
-        @Override
-        public int hashCode()
-        {
-            return Piece.class.hashCode() ^ fileType.hashCode() ^ color.hashCode();
         }
     }
     
@@ -209,33 +236,31 @@ public class Board
         
         for (int i = 8; i < 16; i++)
         {
-            position[i] = new Piece(Color.WHITE, PieceType.PAWN);
-            position[i + 40] = new Piece(Color.BLACK, PieceType.PAWN);
+            position[i] = Piece.WHITE_PAWN;
+            position[i + 40] = Piece.BLACK_PAWN;
         }
         
-        position[0] = new Piece(Color.WHITE, PieceType.ROOK);
-        position[1] = new Piece(Color.WHITE, PieceType.KNIGHT);
-        position[2] = new Piece(Color.WHITE, PieceType.BISHOP);
-        position[3] = new Piece(Color.WHITE, PieceType.QUEEN);
-        position[4] = new Piece(Color.WHITE, PieceType.KING);
-        position[5] = new Piece(Color.WHITE, PieceType.BISHOP);
-        position[6] = new Piece(Color.WHITE, PieceType.KNIGHT);
-        position[7] = new Piece(Color.WHITE, PieceType.ROOK);
+        position[0] = Piece.WHITE_ROOK;
+        position[1] = Piece.WHITE_KNIGHT;
+        position[2] = Piece.WHITE_BISHOP;
+        position[3] = Piece.WHITE_QUEEN;
+        position[4] = Piece.WHITE_KING;
+        position[5] = Piece.WHITE_BISHOP;
+        position[6] = Piece.WHITE_KNIGHT;
+        position[7] = Piece.WHITE_ROOK;
         
-        position[56] = new Piece(Color.BLACK, PieceType.ROOK);
-        position[57] = new Piece(Color.BLACK, PieceType.KNIGHT);
-        position[58] = new Piece(Color.BLACK, PieceType.BISHOP);
-        position[59] = new Piece(Color.BLACK, PieceType.QUEEN);
-        position[60] = new Piece(Color.BLACK, PieceType.KING);
-        position[61] = new Piece(Color.BLACK, PieceType.BISHOP);
-        position[62] = new Piece(Color.BLACK, PieceType.KNIGHT);
-        position[63] = new Piece(Color.BLACK, PieceType.ROOK);
+        position[56] = Piece.BLACK_ROOK;
+        position[57] = Piece.BLACK_KNIGHT;
+        position[58] = Piece.BLACK_BISHOP;
+        position[59] = Piece.BLACK_QUEEN;
+        position[60] = Piece.BLACK_KING;
+        position[61] = Piece.BLACK_BISHOP;
+        position[62] = Piece.BLACK_KNIGHT;
+        position[63] = Piece.BLACK_ROOK;
     }
     
-    public Board(Piece position[], short ply, byte epCandidate,
-        boolean whiteCanCastleQ, boolean whiteCanCastleK,
-        boolean blackCanCastleQ, boolean blackCanCastleK, byte whiteKingLoc,
-        byte blackKingLoc, short halfMoveClock)
+    public Board(Piece position[], short ply, byte epCandidate, boolean whiteCanCastleQ, boolean whiteCanCastleK,
+        boolean blackCanCastleQ, boolean blackCanCastleK, byte whiteKingLoc, byte blackKingLoc, short halfMoveClock)
     {
         byte whiteCount = 0;
         byte blackCount = 0;
@@ -381,10 +406,7 @@ public class Board
                 if (span % 7 == 0 && span != 63)
                 {
                     for (i = low + 7; i < hi; i += 7)
-                    {
-                        if (i/8 - (i - 7)/8 != 1 || position[i] != null)
-                            return false;
-                    }
+                        if (i/8 - (i - 7)/8 != 1 || position[i] != null) return false;
                     
                     return !destSameColor && i/8 - (i - 7)/8 == 1;
                 }
@@ -392,10 +414,7 @@ public class Board
                 else if (span % 9 == 0)
                 {
                     for (i = low + 9; i < hi; i += 9)
-                    {
-                        if (i/8 - (i - 9)/8 != 1 || position[i] != null)
-                            return false;
-                    }
+                        if (i/8 - (i - 9)/8 != 1 || position[i] != null) return false;
                     
                     return !destSameColor && i/8 - (i - 9)/8 == 1;
                 }
@@ -418,10 +437,7 @@ public class Board
                 else if (span % 7 == 0 && span != 63) // same diagonal
                 {
                     for (i = low + 7; i < hi; i += 7)
-                    {
-                        if (i/8 - (i - 7)/8 != 1 || position[i] != null)
-                            return false;
-                    }
+                        if (i/8 - (i - 7)/8 != 1 || position[i] != null) return false;
                     
                     return !destSameColor && i/8 - (i - 7)/8 == 1;
                 }
@@ -429,10 +445,7 @@ public class Board
                 else if (span % 9 == 0) // same diagonal
                 {
                     for (i = low + 9; i < hi; i += 9)
-                    {
-                        if (i/8 - (i - 9)/8 != 1 || position[i] != null)
-                            return false;
-                    }
+                        if (i/8 - (i - 9)/8 != 1 || position[i] != null) return false;
                     
                     return !destSameColor && i/8 - (i - 9)/8 == 1;
                 }
@@ -454,24 +467,20 @@ public class Board
                         if (moveColor == Color.WHITE)
                         {
                             if (end - start == 2) // king side
-                                return position[5] == null &&
-                                    position[6] == null && whiteCanCastleK;
+                                return position[5] == null && position[6] == null && whiteCanCastleK;
                             
                             else // queen side
-                                return position[1] == null &&
-                                    position[2] == null &&
+                                return position[1] == null && position[2] == null &&
                                     position[3] == null && whiteCanCastleQ;
                         }
                         
                         else
                         {
                             if (end - start == 2) // king side
-                                return position[61] == null &&
-                                    position[62] == null && blackCanCastleK;
+                                return position[61] == null && position[62] == null && blackCanCastleK;
                             
                             else // queen side
-                                return position[57] == null &&
-                                    position[58] == null &&
+                                return position[57] == null && position[58] == null &&
                                     position[59] == null && blackCanCastleQ;
                         }
                         
@@ -555,8 +564,7 @@ public class Board
                     else blackKingLoc = (byte)end;
                 }
 
-                return isInCheck(color, new int[]
-                    {color == Color.WHITE ? whiteKingLoc : blackKingLoc});
+                return isInCheck(color, new int[] {color == Color.WHITE ? whiteKingLoc : blackKingLoc});
             }
             
             finally
@@ -582,10 +590,7 @@ public class Board
                 position[savedKingLoc] = null; // empty king's previous square
             
             for (int i = 0; i < 64; i++)
-            {
-                if (position[i] != null && position[i].getColor() != color &&
-                    canMove(i, square)) return true;
-            }
+                if (position[i] != null && position[i].getColor() != color && canMove(i, square)) return true;
             
             position[savedKingLoc] = position[square]; // restore king to origin
             position[square] = saved; // restore test square
@@ -596,8 +601,7 @@ public class Board
     
     public boolean moveTest(int start, int end)
     {
-        return end >= 0 && end < 64 && canMove(start, end) &&
-            !isMovingIntoCheck(start, end);
+        return end >= 0 && end < 64 && canMove(start, end) && !isMovingIntoCheck(start, end);
     }
     
     /**
@@ -719,7 +723,7 @@ public class Board
 
                     else if (endRank == 0 || endRank == 7)
                     {
-                        position[end] = new Piece(piece.getColor(), promoteTo);
+                        position[end] = Piece.get(piece.getColor(), promoteTo);
                         epCandidate = -1;
                     }
 
@@ -824,7 +828,7 @@ public class Board
         
         if (Character.isLowerCase(sanFirstChar)) // pawn move
         {
-            firstSquare = Square.get(new String(new char[] {sanFirstChar, '2'})).getLocation();
+            firstSquare = Square.get(sanFirstChar, '2').getLocation();
             
             for (int i = firstSquare; i < 56; i += 8)
             {
@@ -857,7 +861,7 @@ public class Board
             
             if (Character.isLetter(disambigChar)) // file
             {
-                firstSquare = Square.get(new String(new char[] {disambigChar, '1'})).getLocation();
+                firstSquare = Square.get(disambigChar, '1').getLocation();
             
                 for (int i = firstSquare; i < 64; i += 8)
                 {
@@ -872,7 +876,7 @@ public class Board
             
             else // rank
             {
-                firstSquare = Square.get(new String(new char[] {'a', disambigChar})).getLocation();
+                firstSquare = Square.get('a', disambigChar).getLocation();
                 
                 for (int i = firstSquare; i < firstSquare + 8; i++)
                 {
@@ -948,7 +952,7 @@ public class Board
         
         if (Character.isLowerCase(sanFirstChar)) // pawn move
         {
-            firstSquare = Square.get(new String(new char[] {sanFirstChar, '2'})).getLocation();
+            firstSquare = Square.get(sanFirstChar, '2').getLocation();
             
             for (int i = firstSquare; i < 56; i += 8)
             {
@@ -985,7 +989,7 @@ public class Board
             
             if (Character.isLetter(disambigChar)) // file
             {
-                firstSquare = Square.get(new String(new char[] {disambigChar, '1'})).getLocation();
+                firstSquare = Square.get(disambigChar, '1').getLocation();
             
                 for (int i = firstSquare; i < 64; i += 8)
                 {
@@ -999,7 +1003,7 @@ public class Board
             
             else // rank
             {
-                firstSquare = Square.get(new String(new char[] {'a', disambigChar})).getLocation();
+                firstSquare = Square.get('a', disambigChar).getLocation();
                 
                 for (int i = firstSquare; i < firstSquare + 8; i++)
                 {
@@ -1153,9 +1157,7 @@ public class Board
         }
         
         move(start, end, null);
-        
-        return ret.append(captureSt).append(Square.get(end)).
-            append(getCheckSymbol(otherColor)).toString();
+        return ret.append(captureSt).append(Square.get(end)).append(getCheckSymbol(otherColor)).toString();
     }
     
     /**
@@ -1168,8 +1170,7 @@ public class Board
         int start = Square.get(move.substring(0, 2)).getLocation();
         int end = Square.get(move.substring(2, 4)).getLocation();
         
-        PieceType promoteTo = move.length() > 4 ? PieceType.get(move.substring(4,5)) : null; // ?
-        
+        PieceType promoteTo = move.length() > 4 ? PieceType.get(move.substring(4, 5)) : null; // ?
         return coordToSan(start, end, promoteTo);
     }
     
@@ -1180,8 +1181,7 @@ public class Board
      */
     private String getCheckSymbol(Color color)
     {
-        if (isInCheck(color,
-            new int[] {color == Color.WHITE ? whiteKingLoc : blackKingLoc}))
+        if (isInCheck(color, new int[] {color == Color.WHITE ? whiteKingLoc : blackKingLoc}))
         {
             for (int i = 0; i < 64; i++)
             {
@@ -1213,18 +1213,12 @@ public class Board
                         case ROOK:
                             for (int j = 1; j < 7; j++)
                             {
-                                if (i + j < 64 && moveTest(i, i + j))
-                                    return "+";
-                                
-                                if (i - j >= 0 && moveTest(i, i - j))
-                                    return "+";
+                                if (i + j < 64 && moveTest(i, i + j)) return "+";
+                                if (i - j >= 0 && moveTest(i, i - j)) return "+";
                             }
                             
-                            for (int j = 8; j + i < 64; j += 8)
-                                if (moveTest(i, i + j)) return "+";
-                            
-                            for (int j = 8; i - j >= 0; j += 8)
-                                if (moveTest(i, i - j)) return "+";
+                            for (int j = 8; j + i < 64; j += 8) if (moveTest(i, i + j)) return "+";
+                            for (int j = 8; i - j >= 0; j += 8) if (moveTest(i, i - j)) return "+";
                             
                             break;
                             
@@ -1233,9 +1227,7 @@ public class Board
                             {
                                 int dest = i + NMOVES[j];
                                 
-                                if (dest >= 0 && dest < 64 &&
-                                    moveTest(i, dest))
-                                    return "+";
+                                if (dest >= 0 && dest < 64 && moveTest(i, dest)) return "+";
                             }
                             
                             break;
@@ -1258,11 +1250,8 @@ public class Board
                         case QUEEN:
                             for (int j = 1; j < 7; j++)
                             {
-                                if (i + j < 64 && moveTest(i, i + j))
-                                    return "+";
-                                
-                                if (i - j >= 0 && moveTest(i, i - j))
-                                    return "+";
+                                if (i + j < 64 && moveTest(i, i + j)) return "+";
+                                if (i - j >= 0 && moveTest(i, i - j)) return "+";
                             }
                             
                             for (int j = 8; j + i < 64; j += 8)
@@ -1334,10 +1323,7 @@ public class Board
         }
         
         ret.append(" ").append(COLORS[ply % 2]).append(" ");
-        
-        if (!whiteCanCastleK && !whiteCanCastleQ && !blackCanCastleK &&
-            !blackCanCastleQ)
-            ret.append("- ");
+        if (!whiteCanCastleK && !whiteCanCastleQ && !blackCanCastleK && !blackCanCastleQ) ret.append("- ");
         
         else
         {
@@ -1385,10 +1371,7 @@ public class Board
         }
         
         ret.append(" ").append(COLORS[ply % 2]).append(" ");
-        
-        if (!whiteCanCastleK && !whiteCanCastleQ && !blackCanCastleK &&
-            !blackCanCastleQ)
-            ret.append("-");
+        if (!whiteCanCastleK && !whiteCanCastleQ && !blackCanCastleK && !blackCanCastleQ) ret.append("-");
         
         else
         {
@@ -1406,10 +1389,7 @@ public class Board
      * @param that
      * @return true if all pieces are in the same places
      */
-    public boolean looseEquals(Board that)
-    {
-        return Arrays.equals(position, that.position);
-    }
+    public boolean looseEquals(Board that) { return Arrays.equals(position, that.position); }
     
     /**
      * 
@@ -1422,8 +1402,7 @@ public class Board
 //            blackPieceCount != that.blackPieceCount)
 //            return false;
         
-        return ply % 2 == that.ply % 2 &&
-            Arrays.equals(position, that.position);
+        return ply % 2 == that.ply % 2 && Arrays.equals(position, that.position);
     }
     
     public PositionId positionId()

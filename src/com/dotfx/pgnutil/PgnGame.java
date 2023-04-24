@@ -593,18 +593,17 @@ public final class PgnGame
      */
     public Move getFirstOobMove()
     {
-        if (moves.size() < 1) return null;
+        int plyCount = moves.size();
         Move firstCommentMove = null;
         
         for (Move move : moves)
         {
             if (move.getComments().size() > 0)
             {
-                // Presence of oobMarker means that book moves include the
-                // present move.  Otherwise, the first move with a comment is
-                // the first out-of-book move.
+                // Presence of oobMarker means that book moves include the present move.  Otherwise, the first move
+                // with a comment is the first out-of-book move.
 
-                if (move.hasComment(bookMarker)) return moves.get(move.getPly());
+                if (move.hasComment(bookMarker) && plyCount > move.getPly()) return moves.get(move.getPly());
                 if (firstCommentMove == null) firstCommentMove = move;
             }
         }
@@ -618,7 +617,6 @@ public final class PgnGame
      */
     public Move getLastBookMove()
     {
-        if (moves.size() < 1) return null;
         Move firstCommentMove = null;
 
         for (Move move : moves)
