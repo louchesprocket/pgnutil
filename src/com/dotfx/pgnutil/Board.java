@@ -307,13 +307,10 @@ public class Board
         this.blackPieceCount = other.blackPieceCount;
     }
 
-    public int getPly() { return ply; }
-    public Board copy()
-    {
-        return new Board(this);
-    }
+    public final int getPly() { return ply; }
+    public final Board copy() { return new Board(this); }
     
-    public boolean canMove(int start, int end)
+    public final boolean canMove(int start, int end)
     {
         if (start < 0 || start > 63 || end < 0 || end > 63) return false;
         
@@ -495,10 +492,9 @@ public class Board
      * 
      * @param start
      * @param end
-     * @return true if the mover is moving into check or (in case of castling)
-     * out of or through check
+     * @return true if the mover is moving into check or (in case of castling) out of or through check
      */
-    private boolean isMovingIntoCheck(int start, int end)
+    private final boolean isMovingIntoCheck(int start, int end)
     {
         Piece movingPiece = position[start];
         Color color = movingPiece.getColor();
@@ -507,17 +503,14 @@ public class Board
         // en passant capture
         if (end == epCandidate && movingPiece.getType() == PieceType.PAWN)
         {
-            int savedCaptureLoc =
-                color == Color.WHITE ? epCandidate - 8 : epCandidate + 8;
-            
+            int savedCaptureLoc = color == Color.WHITE ? epCandidate - 8 : epCandidate + 8;
             Piece savedCapture = position[savedCaptureLoc];
             
             position[end] = position[start];
             position[start] = null;
             position[savedCaptureLoc] = null;
             
-            boolean ret = isInCheck(color,
-                new int[] {color == Color.WHITE ? whiteKingLoc : blackKingLoc});
+            boolean ret = isInCheck(color, new int[] {color == Color.WHITE ? whiteKingLoc : blackKingLoc});
             
             position[start] = movingPiece;
             position[end] = null;
@@ -577,7 +570,7 @@ public class Board
         }
     }
     
-    private boolean isInCheck(Color color, int squares[])
+    private final boolean isInCheck(Color color, int squares[])
     {
         int savedKingLoc = color == Color.WHITE ? whiteKingLoc : blackKingLoc;
         
@@ -599,7 +592,7 @@ public class Board
         return false;
     }
     
-    public boolean moveTest(int start, int end)
+    public final boolean moveTest(int start, int end)
     {
         return end >= 0 && end < 64 && canMove(start, end) && !isMovingIntoCheck(start, end);
     }
@@ -612,7 +605,7 @@ public class Board
      * @param promoteTo
      * @return 
      */
-    public Board move(int start, int end, PieceType promoteTo) throws IllegalMoveException
+    public final Board move(int start, int end, PieceType promoteTo) throws IllegalMoveException
     {
         ply++;
         
@@ -742,29 +735,29 @@ public class Board
         return this;
     }
     
-    public Board copyAndMove(int start, int end, PieceType promoteTo) throws IllegalMoveException
+    public final Board copyAndMove(int start, int end, PieceType promoteTo) throws IllegalMoveException
     {
         return copy().move(start, end, promoteTo);
     }
     
-    public Board move(PgnGame.Move move) throws IllegalMoveException
+    public final Board move(PgnGame.Move move) throws IllegalMoveException
     {
         return move(move.getMoveOnly());
     }
     
-    public Board move(List<TreeNode> moveList) throws IllegalMoveException
+    public final Board move(List<TreeNode> moveList) throws IllegalMoveException
     {
         for (TreeNode node : moveList) move(node.getMoveText());
         return this;
     }
     
-    public Board goTo(List<String> moveList) throws IllegalMoveException
+    public final Board goTo(List<String> moveList) throws IllegalMoveException
     {
         for (String moveSt : moveList) move(moveSt);
         return this;
     }
 
-    public Board goToMove(List<PgnGame.Move> moveList) throws IllegalMoveException
+    public final Board goToMove(List<PgnGame.Move> moveList) throws IllegalMoveException
     {
         for (PgnGame.Move move : moveList) move(move);
         return this;
@@ -777,7 +770,7 @@ public class Board
      * @return
      * @throws IllegalMoveException 
      */
-    public Board move(String san) throws IllegalMoveException
+    public final Board move(String san) throws IllegalMoveException
     {
         Color color = COLORS[ply % 2];
         PieceType promoteTo = null;
@@ -801,7 +794,7 @@ public class Board
             
             else if (color == Color.BLACK && canMove(60, 62) && !isMovingIntoCheck(60, 62))
                 return move(60, 62, null);
-        
+
             throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
         }
         
@@ -911,7 +904,7 @@ public class Board
      * @return example: "Ngf6+"
      * @throws IllegalMoveException 
      */
-    public String normalize(String san) throws IllegalMoveException
+    public final String normalize(String san) throws IllegalMoveException
     {
         Color color = COLORS[ply % 2];
         PieceType promoteTo = null;
@@ -1030,7 +1023,7 @@ public class Board
         throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
     }
     
-    public String coordToSan(int start, int end, PieceType promoteTo)
+    public final String coordToSan(int start, int end, PieceType promoteTo)
         throws IllegalMoveException
     {
         Color moveColor = COLORS[ply % 2];
@@ -1165,7 +1158,7 @@ public class Board
      * @param move example: "e2e4"
      * @return 
      */
-    public String coordToSan(String move) throws IllegalMoveException
+    public final String coordToSan(String move) throws IllegalMoveException
     {
         int start = Square.get(move.substring(0, 2)).getLocation();
         int end = Square.get(move.substring(2, 4)).getLocation();
@@ -1179,7 +1172,7 @@ public class Board
      * @param color
      * @return 
      */
-    private String getCheckSymbol(Color color)
+    private final String getCheckSymbol(Color color)
     {
         if (isInCheck(color, new int[] {color == Color.WHITE ? whiteKingLoc : blackKingLoc}))
         {
@@ -1294,7 +1287,7 @@ public class Board
         return "";
     }
     
-    public String toFen()
+    public final String toFen()
     {
         StringBuilder ret = new StringBuilder();
         
@@ -1342,7 +1335,7 @@ public class Board
         return ret.toString();
     }
     
-    public String toShortFen()
+    public final String toShortFen()
     {
         StringBuilder ret = new StringBuilder();
         
@@ -1389,14 +1382,14 @@ public class Board
      * @param that
      * @return true if all pieces are in the same places
      */
-    public boolean looseEquals(Board that) { return Arrays.equals(position, that.position); }
+    public final boolean looseEquals(Board that) { return Arrays.equals(position, that.position); }
     
     /**
      * 
      * @param that
      * @return true if all pieces are in the same places and same side to move
      */
-    public boolean positionEquals(Board that)
+    public final boolean positionEquals(Board that)
     {
 //        if (whitePieceCount != that.whitePieceCount ||
 //            blackPieceCount != that.blackPieceCount)
@@ -1405,7 +1398,7 @@ public class Board
         return ply % 2 == that.ply % 2 && Arrays.equals(position, that.position);
     }
     
-    public PositionId positionId()
+    public final PositionId positionId()
     {
         byte buf[] = new byte[65];
         
@@ -1420,11 +1413,11 @@ public class Board
         return new PositionId(buf);
     }
     
-    public int getWhitePieceCount() { return whitePieceCount; }
-    public int getBlackPieceCount() { return blackPieceCount; }
+    public final int getWhitePieceCount() { return whitePieceCount; }
+    public final int getBlackPieceCount() { return blackPieceCount; }
     
     @Override
-    public String toString()
+    public final String toString()
     {
         StringBuilder sb = new StringBuilder();
         
@@ -1445,7 +1438,7 @@ public class Board
     }
     
     @Override
-    public boolean equals(Object other)
+    public final boolean equals(Object other)
     {
         try
         {
@@ -1468,7 +1461,7 @@ public class Board
     }
     
     @Override
-    public int hashCode()
+    public final int hashCode()
     {
         return Board.class.hashCode() ^ Arrays.hashCode(position) ^
             Short.hashCode(ply) ^ Byte.hashCode(epCandidate) ^

@@ -942,8 +942,7 @@ public final class PgnGame
         {
             if (board.move(move).positionEquals(pos)) return true;
             
-            if (board.getWhitePieceCount() < whitePieceCount ||
-                board.getBlackPieceCount() < blackPieceCount)
+            if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount)
                 return false;
         }
         
@@ -954,8 +953,8 @@ public final class PgnGame
         throws PGNException, IOException
     {
         CopyReader reader =
-            new CopyReader(new StringReader(replacee.matcher(origText).
-                replaceAll(replacement)), PgnFile.COPY_BUF_INIT_SIZE);
+            new CopyReader(new StringReader(replacee.matcher(origText).replaceAll(replacement)),
+                    PgnFile.COPY_BUF_INIT_SIZE);
         
         return parseNext(getNumber(), reader);
     }

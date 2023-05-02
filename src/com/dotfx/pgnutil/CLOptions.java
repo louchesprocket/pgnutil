@@ -1381,8 +1381,7 @@ public class CLOptions
     static boolean help = false;
 
     @Option(name = V, forbids = {D, DO, DM, E, CSR, O, M, GN, NM, MW, ML, MP, MO, NMO, R, H},
-        aliases = "-version",
-        usage = "print version information")
+        aliases = "-version", usage = "print version information")
     private void version(boolean v)
     {
         System.out.println("pgnutil version " + PGNUtil.VERSION);
