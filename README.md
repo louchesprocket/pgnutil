@@ -63,7 +63,7 @@ will return every game in which the ECO openings A42 or A43 were played, ignorin
 
 * -med: match ECO description
 * -mxe: match ECO code, searching positions transpositionally
-* -mxed: ECO description, searching positions transpositionally
+* -mxed: match ECO description, searching positions transpositionally
 * -mse: match Scid ECO code
 * -msed: match Scid ECO description
 * -mxse: match Scid ECO code, searching positions transpositionally
@@ -215,7 +215,7 @@ In addition, any of the [ECO-related output selectors](#eco-related_output_selec
 
 So we can use the previous example to generate a list of opening identifers (note addition of the "-s" option):
 
-``pgnutil -mt 'Event/Nunn 1' -o -cmin 100 -ldp -.1 -hdp .1 -hdraw .5 -i -s oid mygames.pgn``
+``pgnutil -mt 'Event/Nunn 1' -o -cmin 100 -lwd -.1 -hwd .1 -hdraw .5 -s oid -i mygames.pgn``
 
 which may produce output such as:
 

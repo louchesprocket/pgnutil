@@ -848,8 +848,7 @@ public class Board
         
         if (disambig != null)
         {
-            int disambigLen = disambig.length();
-            if (disambigLen == 2) return move(Square.get(disambig).getLocation(), endSquare, promoteTo);
+            if (disambig.length() == 2) return move(Square.get(disambig).getLocation(), endSquare, promoteTo);
             char disambigChar = disambig.charAt(0);
             
             if (Character.isLetter(disambigChar)) // file
