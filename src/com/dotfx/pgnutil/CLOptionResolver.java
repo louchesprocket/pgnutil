@@ -46,7 +46,7 @@ public class CLOptionResolver
         {
             if (setOpts.size() > 1)
             {
-                System.err.println("Option '" + OptId.PRINTPOS + "' cannot be used with other other options.");
+                System.err.println("Option '" + OptId.PRINTPOS + "' cannot be used with other options.");
                 System.exit(-1);
             }
 
@@ -58,7 +58,7 @@ public class CLOptionResolver
 
             catch (IllegalMoveException e)
             {
-                System.err.println("illeggal move: " + e.getLocalizedMessage());
+                System.err.println("illegal move: " + e.getLocalizedMessage());
                 System.exit(-1);
             }
         }
@@ -179,14 +179,14 @@ public class CLOptionResolver
             this.handler = handler;
         }
 
-        private void handle(final Set<OptId> setOpts)
+        private final void handle(final Set<OptId> setOpts)
         {
             Set<OptId> intersects = checkOpts.stream().filter(setOpts::contains).collect(Collectors.toSet());
             if (intersects.size() == 0) return;
             handler.handleOpts(setOpts, intersects);
 
-            intersects = ifAnyOf.stream().filter(setOpts::contains).collect(Collectors.toSet());
-            if (intersects.size() > 0) handler.handleIfAny(setOpts, intersects);
+            Set<OptId> anyIntersects = ifAnyOf.stream().filter(setOpts::contains).collect(Collectors.toSet());
+            if (anyIntersects.size() > 0) handler.handleIfAny(setOpts, anyIntersects);
 
             if (!ifNoneOf.stream().anyMatch(setOpts::contains)) handler.handleIfNone(setOpts);
         }
