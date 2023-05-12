@@ -21,6 +21,7 @@
 package com.dotfx.pgnutil;
 
 import com.dotfx.pgnutil.CLOptions.OptId;
+import com.dotfx.pgnutil.eco.EcoTree;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -152,6 +153,21 @@ public class CLOptionResolver
                         break;
                 }
             }
+        }
+    }
+
+    public static class StdEcoHandler implements OptHandler
+    {
+        private final boolean transpose;
+
+        public StdEcoHandler(boolean transpose) { this.transpose = transpose; }
+
+        @Override
+        public void handleOpts(Collection<OptId> setOpts, Set<OptId> setIntersects)
+        {
+            Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, transpose);
+            PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+            PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
         }
     }
 

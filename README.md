@@ -213,7 +213,7 @@ The opening-statistics function has its own set of output selectors:
 
 In addition, any of the [ECO-related output selectors](#eco-related_output_selectors) may be used in this context, but will apply only to the opening moves of the game.
 
-So we can use the previous example to generate a list of opening identifers (note addition of the "-s" option):
+We can use the previous example to generate a list of opening identifers (note addition of the "-s" option):
 
 ``pgnutil -mt 'Event/Nunn 1' -o -cmin 100 -lwd -.1 -hwd .1 -hdraw .5 -s oid -i mygames.pgn``
 

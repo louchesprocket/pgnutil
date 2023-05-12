@@ -220,8 +220,7 @@ public class CLOptions
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file)))
         {
-            while ((line = reader.readLine()) != null)
-                fileLineSet.add(line.trim());
+            while ((line = reader.readLine()) != null) fileLineSet.add(line.trim());
         }
 
         catch (FileNotFoundException e)
@@ -248,8 +247,7 @@ public class CLOptions
             char buf[] = new char[1024];
             int read;
             
-            while ((read = reader.read(buf, 0, buf.length)) >= 0)
-                writer.write(buf, 0, read);
+            while ((read = reader.read(buf, 0, buf.length)) >= 0) writer.write(buf, 0, read);
         }
         
         catch (FileNotFoundException e)
@@ -1157,9 +1155,10 @@ public class CLOptions
         }
         
         countOption(OptId.get(ECO));
-        Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, false);
-        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
-        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+
+        // delay tree initialization in case "-ef" is set
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(ECO)}, null, null,
+                new CLOptionResolver.StdEcoHandler(false));
     }
 
     @Option(name = SECO, depends = {O}, aliases = "-scid_eco_stats",
@@ -1190,9 +1189,10 @@ public class CLOptions
         }
         
         countOption(OptId.get(XE));
-        Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, true);
-        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
-        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+
+        // delay tree initialization in case "-ef" is set
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(XE)}, null, null,
+                new CLOptionResolver.StdEcoHandler(true));
     }
 
     @Option(name = XSECO, depends = {O}, aliases = "-trans_scid_eco_stats",
