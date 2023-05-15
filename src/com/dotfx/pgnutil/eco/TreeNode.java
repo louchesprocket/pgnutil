@@ -282,10 +282,11 @@ public final class TreeNode implements Comparable<TreeNode>
             handler.handleNewNode(branch);
         }
 
-        else
+        else if (code != null && code.length() > 0)
         {
-            if (code != null && code.length() > 0) branch.setSpecCode(code);
-            if (desc != null && desc.length() > 0) branch.setSpecDesc(desc);
+            branch.setSpecCode(code);
+            branch.setSpecDesc(desc);
+            handler.handleNewNode(branch);
         }
 
         return branch;
