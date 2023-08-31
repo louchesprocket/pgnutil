@@ -263,7 +263,7 @@ public final class TreeNode implements Comparable<TreeNode>
     }
 
     /**
-     * Adds a node if it does not already exist.
+     * Adds a node if it does not already exist. Updates code and description, if supplied.
      *
      * @param moveSt a single move in SAN
      * @param code

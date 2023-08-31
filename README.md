@@ -136,7 +136,7 @@ means, "For every game in which the 'Event' tag contains the text 'Nunn 1' and i
 There are also several output selectors relating to ECO codes:
 
 * 	stdeco: output the standard ECO code for the game, matching move sequences
-* 	xstdeco: output the ECO code for the game, matching positions transpositionally
+* 	xstdeco: output the standard ECO code for the game, matching positions transpositionally
 * 	scideco: output the Scid ECO code for the game, matching move sequences
 * 	xscideco: output the Scid ECO code for the game, matching positions transpositionally
 * 	stdecodesc: output the standard description of the opening, matching move sequences
