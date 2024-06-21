@@ -37,26 +37,37 @@ public class Clock implements Comparable<Clock>
         String clockParts[] = clockSt.split(":");
         int partCount = clockParts.length;
         if (partCount > 3) throw new InvalidClockException(clockSt);
-        
+
         try
         {
-            seconds = Integer.valueOf(clockParts[partCount - 1]) +
-                (partCount >= 2 ? Integer.valueOf(clockParts[partCount - 2]) * 60 : 0) +
-                (partCount == 3 ? Integer.valueOf(clockParts[0]) * 3600 : 0);
+            if (clockParts[0].charAt(0) == '-') // engine has faulty time management
+            {
+                clockParts[0] = clockParts[0].substring(1);
+
+                seconds = -(Integer.valueOf(clockParts[partCount - 1]) +
+                            (partCount >= 2 ? Integer.valueOf(clockParts[partCount - 2]) * 60 : 0) +
+                            (partCount == 3 ? Integer.valueOf(clockParts[0]) * 3600 : 0));
+            }
+
+            else seconds = Integer.valueOf(clockParts[partCount - 1]) +
+                            (partCount >= 2 ? Integer.valueOf(clockParts[partCount - 2]) * 60 : 0) +
+                            (partCount == 3 ? Integer.valueOf(clockParts[0]) * 3600 : 0);
         }
-        
+
         catch (NumberFormatException e)
         {
-            throw new InvalidClockException(clockSt);
+            throw new InvalidClockException("invalid time: " + "'" + clockSt + "'");
         }
     }
     
     public int getHrs() { return seconds / 3600; }
     public int getMins() { return (seconds % 3600) / 60; }
     public int getSecs() { return seconds % 60; }
-    
-    public int inMins() { return seconds / 60; }
+
     public int inSecs() { return seconds; }
+
+    @Override
+    public boolean equals(Object that) { return seconds == ((Clock)that).seconds; }
     
     @Override
     public int compareTo(Clock that) { return seconds - that.seconds; }
@@ -64,6 +75,9 @@ public class Clock implements Comparable<Clock>
     @Override
     public String toString()
     {
+        if (seconds < 0)
+            return String.format("-%01d:%02d:%02d", Math.abs(getHrs()), Math.abs(getMins()), Math.abs(getSecs()));
+
         return String.format("%01d:%02d:%02d", getHrs(), getMins(), getSecs());
     }
 }

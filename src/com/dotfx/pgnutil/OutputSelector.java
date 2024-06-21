@@ -24,6 +24,7 @@ import com.dotfx.pgnutil.eco.EcoTree;
 import com.dotfx.pgnutil.eco.TreeNodeSet;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -177,6 +178,73 @@ public final class OutputSelector
             catch (IllegalMoveException e)
             {
                 System.err.println("in game " + game.getNumber() + ": " + e.getMessage());
+            }
+        }
+    }
+
+    // Aquarium only
+    static final class LowClockOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getLowClock());
+        }
+    }
+
+    // Aquarium only
+    static final class LowClockWhiteOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getLowClockWhite());
+        }
+    }
+
+    // Aquarium only
+    static final class LowClockBlackOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getLowClockBlack());
+        }
+    }
+
+    // Aquarium only
+    static final class LowClockPlayersOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            List<String> lowClockPlayers = game.getLowClockPlayers();
+            sb.append(lowClockPlayers.get(0));
+            if (lowClockPlayers.size() > 1) sb.append(CLOptions.valueDelim).append(lowClockPlayers.get(1));
+        }
+    }
+
+    // Aquarium only
+    static final class ClockBelowPlayersOutputHandler implements OutputHandler
+    {
+        private final Clock clock;
+
+        public ClockBelowPlayersOutputHandler(Clock clock) { this.clock = clock; }
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            boolean whiteAdded = false;
+
+            if (game.getLowClockWhite().compareTo(clock) < 0)
+            {
+                sb.append(game.getWhite());
+                whiteAdded = true;
+            }
+
+            if (game.getLowClockBlack().compareTo(clock) < 0)
+            {
+                if (whiteAdded) sb.append(CLOptions.valueDelim);
+                sb.append(game.getBlack());
             }
         }
     }
@@ -372,10 +440,16 @@ public final class OutputSelector
         WHITETYPE("whitetype", null),
         
         // special
+
+        CBPLAYERS("cbplayers", null), // Aquarium only. Handler set in CLOptionResolver.ClockBelowHandler
         GAMENO("gameno", new GameNumOutputHandler()),
+        LOWCLOCK("lowclock", new LowClockOutputHandler()), // Aquarium only
+        LOWCLOCKBLACK("lowclockblack", new LowClockBlackOutputHandler()), // Aquarium only
+        LOWCLOCKPLAYERS("lowclockplayers", new LowClockPlayersOutputHandler()), // Aquarium only
+        LOWCLOCKWHITE("lowclockwhite", new LowClockWhiteOutputHandler()), // Aquarium only
         TAGS("tags", new TagsOutputHandler()),
         TEXTSIZE("textsize", new TextSizeOutputHandler()),
-        TIMECTRL("timectrl", new TimeCtrlOutputHandler()), // infers time control, if tag not present
+        TIMECTRL("timectrl", new TimeCtrlOutputHandler()), // Aquarium only. Infers time control, if tag not present
         WINNER("winner", new WinnerOutputHandler()),
         LOSER("loser", new LoserOutputHandler()),
         MOVES("moves", new MoveListOutputHandler()),
@@ -384,8 +458,8 @@ public final class OutputSelector
         OPENINGMOVES("openingmoves", new OpeningMovesOutputHandler()),
         OPENINGFEN("openingfen", new OpeningFenOutputHandler()),
         OPID("opid", new OpeningIdOutputHandler()), // opening position identifier
-        OPPONENT("opponent", null),
-        OPPONENTELO("opponentelo", null),
+        OPPONENT("opponent", null), // handler set in CLOptionResolver.PlayerHandler
+        OPPONENTELO("opponentelo", null), // handler set in CLOptionResolver.PlayerHandler
         PLAYERELO("playerelo", null),
         PLIES("plies", new PliesOutputHandler()),
         STDECO("stdeco", new EcoOutputHandler(EcoTree.FileType.STD)),

@@ -275,6 +275,32 @@ public class PGNUtil
         }
     }
 
+    static final class ClockBelowProcessor implements GameProcessor
+    {
+        private final Clock c;
+
+        public ClockBelowProcessor(Clock c) { this.c = c; }
+
+        @Override public boolean processGame()
+        {
+            if (game.getLowClock().compareTo(c) < 0) return true;
+            return false;
+        }
+    }
+
+    static final class ClockNotBelowProcessor implements GameProcessor
+    {
+        private final Clock c;
+
+        public ClockNotBelowProcessor(Clock c) { this.c = c; }
+
+        @Override public boolean processGame()
+        {
+            if (game.getLowClock().compareTo(c) < 0) return false;
+            return true;
+        }
+    }
+
     static final class MinEloProcessor implements GameProcessor
     {
         private final Integer minElo;
@@ -751,7 +777,7 @@ public class PGNUtil
         }
     }
     
-    public static final String VERSION = "0.8.1";
+    public static final String VERSION = "1.0";
 
     private static PgnGame game;
     private static final List<PgnFile> pgnFileList = new ArrayList<>();

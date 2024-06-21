@@ -171,6 +171,23 @@ public class CLOptionResolver
         }
     }
 
+    public static class ClockBelowHandler implements OptHandler
+    {
+        private final Clock clock;
+
+        public ClockBelowHandler(Clock clock) { this.clock = clock; }
+
+        @Override
+        public void handleIfAny(Collection<OptId> setOpts, Set<OptId> ifAnyIntersects)
+        {
+            List<OutputSelector> osList = Arrays.stream(PGNUtil.outputSelectors).filter(os ->
+                    os.getValue() == OutputSelector.Value.CBPLAYERS).collect(Collectors.toList());
+
+            for (OutputSelector os : osList)
+                os.setOutputHandler(new OutputSelector.ClockBelowPlayersOutputHandler(clock));
+        }
+    }
+
     private static class DefaultSelectorsHandler implements OptHandler
     {
         @Override

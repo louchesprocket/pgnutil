@@ -164,6 +164,8 @@ public final class PgnGame
     // cached values for internal use
     private List<Move> openingMoveList;
     private String openingString;
+
+    private Clock lowClockWhite, lowClockBlack;
     private final Map<EcoTree.FileType,TreeNodeSet> xEcoCacheMap; // transposed ECO TreeNodeSets
     
     public PgnGame(int number, CaseInsensitiveMap<String,String> tagPairs, List<String> gameComments, List<Move> moves,
@@ -846,6 +848,69 @@ public final class PgnGame
         StringBuilder sb = new StringBuilder();
         sb.append(getWhite()).append('\0').append(getBlack()).append('\0').append(getOpeningString());
         return HASHFUNC.hashBytes(sb.toString().getBytes());
+    }
+
+    // Aquarium only
+    private void getLowClocks()
+    {
+        for (PgnGame.Move move : getMoves())
+        {
+            Clock moveClock = move.getAquariumVars().getClk();
+
+            if (move.getColor() == Color.WHITE)
+            {
+                if (moveClock != null && (lowClockWhite == null || moveClock.compareTo(lowClockWhite) < 0))
+                    lowClockWhite = moveClock;
+            }
+
+            else
+            {
+                if (moveClock != null && (lowClockBlack == null || moveClock.compareTo(lowClockBlack) < 0))
+                    lowClockBlack = moveClock;
+            }
+        }
+    }
+
+    // Aquarium only
+    public Clock getLowClockWhite()
+    {
+        if (lowClockWhite != null) return lowClockWhite;
+        getLowClocks();
+        return lowClockWhite;
+    }
+
+    // Aquarium only
+    public Clock getLowClockBlack()
+    {
+        if (lowClockBlack != null) return lowClockBlack;
+        getLowClocks();
+        return lowClockBlack;
+    }
+
+    // Aquarium only
+    public Clock getLowClock()
+    {
+        if (getLowClockWhite().compareTo(getLowClockBlack()) <= 0) return getLowClockWhite();
+        return getLowClockBlack();
+    }
+
+    // Aquarium only
+    public List<String> getLowClockPlayers()
+    {
+        List<String> ret = new ArrayList<>();
+        int comp = getLowClockWhite().compareTo(getLowClockBlack());
+
+        if (comp < 0) ret.add(getWhite());
+
+        else if (comp == 0)
+        {
+            ret.add(getWhite());
+            ret.add(getBlack());
+        }
+
+        else ret.add(getBlack());
+
+        return ret;
     }
     
     /**

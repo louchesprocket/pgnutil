@@ -41,6 +41,8 @@ public class CLOptions
     public static final String APF = "-apf";
     public static final String AQ = "-aq";
     public static final String BM = "-bm";
+    public static final String CB = "-cb";
+    public static final String CNB = "-cnb";
     public static final String CMIN = "-cmin";
     public static final String CSR = "-csr";
     public static final String D = "-d";
@@ -99,6 +101,7 @@ public class CLOptions
     public static final String S = "-s";
     public static final String SECO = "-seco"; // SCID ECO output for "-o"
     public static final String TC = "-tc";
+    public static final String TF = "-tf"; // find time faults
     public static final String V = "-v";
     public static final String VD = "-vd";
     public static final String VG = "-vg";
@@ -112,6 +115,8 @@ public class CLOptions
         BOOKMARKER(BM),
         MINGAMECOUNT(CMIN),
         CHECKSEQUENTIALROUNDS(CSR),
+        CLOCKBELOW(CB),
+        CLOCKNOTBELOW(CNB),
         DUPLICATES(D),
         DUPLICATEMOVES(DM),
         DUPLICATEOPENINGS(DO),
@@ -166,6 +171,7 @@ public class CLOptions
         SCIDECO(SECO),
         SELECTORS(S),
         TIMECONTROL(TC),
+        TIMEFAULT(TF),
         VALUEDELIM(VD),
         XSTDECO(XE),
         XSCIDECO(XSECO);
@@ -394,6 +400,20 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPlayerProcessor(playerPattern));
     }
 
+    @Option(name = TF, aliases = "-time_fault",
+            usage = "output games where at least one player's clock went negative (Aquarium only)")
+    private void setTimeFault(boolean tf)
+    {
+        if (getCount(OptId.get(TF)) > 0)
+        {
+            System.err.println("Option '" + OptId.get(TF) + "' cannot be set more than once!");
+            System.exit(-1);
+        }
+
+        countOption(OptId.get(TF));
+        PGNUtil.addMatchProcessor(new PGNUtil.ContainsProcessor(Pattern.compile("\\[%clk -", Pattern.DOTALL)));
+    }
+
     @Option(name = LELO, aliases = "-lo_elo", metaVar = "<value>",
             usage = "output games where the elo rating of both players is at least <value>")
     private void setMinElo(Integer minElo)
@@ -448,6 +468,56 @@ public class CLOptions
 
         countOption(OptId.get(LED));
         PGNUtil.addMatchProcessor(new PGNUtil.MinEloDiffProcessor(minEloDiff));
+    }
+
+    @Option(name = CB, aliases = "-clock_below", metaVar = "<time>",
+            usage = "output games in which at least one player's clock went below <time> (Aquarium only)")
+    private void setClockBelow(String time)
+    {
+        if (getCount(OptId.get(CB)) > 0)
+        {
+            System.err.println("Option '" + OptId.get(CB) + "' cannot be set more than once!");
+            System.exit(-1);
+        }
+
+        countOption(OptId.get(CB));
+
+        try
+        {
+            Clock clock = new Clock(time);
+
+            CLOptionResolver.addCondition(new OptId[] {OptId.get(CB)}, new OptId[] {OptId.SELECTORS}, null,
+                    new CLOptionResolver.ClockBelowHandler(clock));
+
+            PGNUtil.addMatchProcessor(new PGNUtil.ClockBelowProcessor(clock));
+        }
+
+        catch (InvalidClockException e)
+        {
+            System.err.println(e.getLocalizedMessage());
+            System.exit(-1);
+        }
+    }
+
+    @Option(name = CNB, aliases = "-clock_not_below", metaVar = "<time>",
+            usage = "output games in which neither player's clock went below <time> (Aquarium only)")
+    private void setClockNotBelow(String time)
+    {
+        if (getCount(OptId.get(CNB)) > 0)
+        {
+            System.err.println("Option '" + OptId.get(CNB) + "' cannot be set more than once!");
+            System.exit(-1);
+        }
+
+        countOption(OptId.get(CNB));
+
+        try { PGNUtil.addMatchProcessor(new PGNUtil.ClockNotBelowProcessor(new Clock(time))); }
+
+        catch (InvalidClockException e)
+        {
+            System.err.println(e.getLocalizedMessage());
+            System.exit(-1);
+        }
     }
 
     @Option(name = ELO, aliases = "-elo_file", metaVar = "<file>",

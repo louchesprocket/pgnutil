@@ -57,7 +57,7 @@ public class AquariumVars
                 
                 varNameStartIdx += 2;
                 
-                for (i = varNameStartIdx + 2; i < commentLen; i++)
+                for (i = varNameStartIdx + 1; i < commentLen; i++)
                 {
                     char oneChar = comment.charAt(i);
                     if (oneChar == ' ' || oneChar == '\t') break; 
@@ -74,7 +74,7 @@ public class AquariumVars
                 
                 varValStartIdx = i;
                 
-                for (i = varValStartIdx + 2; i < commentLen; i++)
+                for (i = varValStartIdx + 1; i < commentLen; i++)
                 {
                     char oneChar = comment.charAt(i);
                     if (oneChar == ']') break; 
