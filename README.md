@@ -111,7 +111,7 @@ Similarly, values within a field are, by default, separated by commas.  If a dif
 
 There are several "special" selectors recognized by the "-s" option.  For example:
 
-* 	moves: causes pgnutil to output the game's move list
+*	moves: causes pgnutil to output the game's move list
 * 	tags: causes pgnutil to output an alphabetized list of the game's header tags
 * 	decoratedmoves: causes pgnutil to output the game's move list and move comments
 * 	openingmoves: causes pgnutil to output the opening move list (see [Openings](#openings), below)
@@ -123,6 +123,9 @@ There are several "special" selectors recognized by the "-s" option.  For exampl
 * 	opponentelo: when the "-mp" (match player) option is used, output the value of the "Elo" header for the opposing player
 * 	gameno: causes pgnutil to output the game's ordinal position within the PGN file
 * 	plies: causes pgnutil to output the number of half-moves present in the game
+* 	cbplayers: for Aquarium games only, and in conjunction with the "-cb" option (see [Time (Aquarium Only)](#time-aquarium-only), below), causes pgnutil to output the names of players whose clocks fell below the indicated time threshold
+* 	lowclockwhite: for Aquarium games only, causes pgnutil to output the lowest clock value for the white player (see [Time (Aquarium Only)](#time-aquarium-only), below)
+* 	lowclockblack: for Aquarium games only, causes pgnutil to output the lowest clock value for the black player (see [Time (Aquarium Only)](#time-aquarium-only), below)
 * 	textsize: causes pgnutil to output the size (in characters) of the original game text
 
 Thus, the command:
@@ -249,6 +252,28 @@ which matches the "out-of-book" marker for both Aquarium and Banksia. This regul
 will search for games matching any of the openings from myopeningsfile, using "my book marker" as the demarcation between "book" moves and engine moves.
 
 If pgnutil fails to find the out-of-book marker for a game, it assumes that the first commented move is the first non-book move. This corresponds to Arena's behavior. Therefore, pgnutil's default behavior (without the "-bm" option) will correctly identify the out-of-book condition for Aquarium, Banksia, and Arena.
+
+### Time (Aquarium Only)
+
+Several options and [output selectors](#output-selectors) make use of Aquarium's time annotations to allow filtering of games based on minimum clock conditions. These features are chiefly intended to assist with engines that have faulty time management, and are particularly useful in conjunction with Aquarium's "No flag loss" option in the engine-tournament interface. In games where this option was set, pgnutil can be used to search and report on conditions where a player's clock went negative.
+
+The clock-below ("-cb") option takes a parameter (formatted as either integer seconds or as "h:mm:ss") to select games where at least one player's clock fell below the indicated value. For example,
+
+``pgnutil -cb -0:01:10 -i mygames.pgn``
+
+will return every game from the file mygames.pgn wherein at least one player's clock fell below negative one minute and ten seconds.
+
+Conversely, we can use the clock-not-below ("-cnb") option to return every game wherein neither player's clock fell below the same threshold:
+
+``pgnutil -cnb -70 -i mygames.pgn``
+
+In conjunction with the "-cb" option, the "cbplayers" [output selector](#output-selectors) allows us to discover the offending players:
+
+``pgnutil -cb -70 -s cbplayers -i mygames.pgn``
+
+If we further wish to know the lowest clock value for each player in these games, we can add the "lowclockwhite" and "lowclockblack" [output selectors](#output-selectors):
+
+``pgnutil -cb -70 -s cbplayers,lowclockwhite,lowclockblack -i mygames.pgn``
 
 
 ## Known Issues
