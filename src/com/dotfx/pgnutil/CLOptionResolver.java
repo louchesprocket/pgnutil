@@ -180,11 +180,12 @@ public class CLOptionResolver
         @Override
         public void handleIfAny(Collection<OptId> setOpts, Set<OptId> ifAnyIntersects)
         {
-            List<OutputSelector> osList = Arrays.stream(PGNUtil.outputSelectors).filter(os ->
-                    os.getValue() == OutputSelector.Value.CBPLAYERS).collect(Collectors.toList());
-
-            for (OutputSelector os : osList)
-                os.setOutputHandler(new OutputSelector.ClockBelowPlayersOutputHandler(clock));
+            for (int i = 0; i < PGNUtil.outputSelectors.length; i++)
+            {
+                if (PGNUtil.outputSelectors[i].getValue() == OutputSelector.Value.CBPLAYERS)
+                    PGNUtil.outputSelectors[i].
+                            setOutputHandler(new OutputSelector.ClockBelowPlayersOutputHandler(clock));
+            }
         }
     }
 

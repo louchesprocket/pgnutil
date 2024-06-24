@@ -39,21 +39,26 @@ public class OpeningStats implements Tallier
 {
     public static class Opening extends OpeningScore
     {
+        private final String openingSt;
         private final MoveListId oid;
         private final TreeNode eco;
         private final TreeNode scidEco;
         private final TreeNodeSet xEcoSet;
         private final TreeNodeSet xScidEcoSet;
         
-        Opening(MoveListId oid, TreeNode eco, TreeNode scidEco, TreeNodeSet xEcoSet, TreeNodeSet xScidEcoSet)
+        Opening(String openingSt, MoveListId oid, TreeNode eco, TreeNode scidEco, TreeNodeSet xEcoSet,
+                TreeNodeSet xScidEcoSet)
         {
             super();
+            this.openingSt = openingSt;
             this.oid = oid;
             this.eco = eco;
             this.scidEco = scidEco;
             this.xEcoSet = xEcoSet;
             this.xScidEcoSet = xScidEcoSet;
         }
+
+        public String getOpeningSt() { return openingSt; }
 
         public MoveListId getId() { return oid; }
 
@@ -126,6 +131,7 @@ public class OpeningStats implements Tallier
         }
     }
 
+    private static boolean saveOpeningMoves = false;
     private static OpeningStatsOutputSelector selectors[];
     private static OpeningStats instance;
     
@@ -158,7 +164,12 @@ public class OpeningStats implements Tallier
             this.selectors = new OpeningStatsOutputSelector[selectors.length];
 
             for (int i = 0; i < selectors.length; i++)
+            {
                 this.selectors[i] = new OpeningStatsOutputSelector(selectors[i], this);
+
+                if (this.selectors[i].getValue() == OpeningStatsOutputSelector.Value.OPENINGMOVES)
+                    saveOpeningMoves = true;
+            }
         }
     }
 
@@ -196,7 +207,7 @@ public class OpeningStats implements Tallier
             TreeNode ecoNode = ecoTree != null ? ecoTree.getDeepestDefined(openingMoveList) : null;
             TreeNode scidNode = scidEcoTree != null ? scidEcoTree.getDeepestDefined(openingMoveList) : null;
 
-            opening = new Opening(openingId, ecoNode, scidNode,
+            opening = new Opening(saveOpeningMoves ? game.getFullOpeningString() : null, openingId, ecoNode, scidNode,
                 useXStdEco ? ecoTree.getDeepestTranspositionSet(openingMoveList) : null,
                 useXScidEco ? scidEcoTree.getDeepestTranspositionSet(openingMoveList) : null);
 

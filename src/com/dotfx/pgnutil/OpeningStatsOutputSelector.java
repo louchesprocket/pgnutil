@@ -34,6 +34,18 @@ public class OpeningStatsOutputSelector
         void configTallier(OpeningStats os);
     }
 
+    private static final class OpeningStOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        {
+            sb.append(opening.getOpeningSt());
+        }
+
+        @Override
+        public void configTallier(OpeningStats os) {}
+    }
+
     private static final class OidOutputHandler implements OutputHandler
     {
         @Override
@@ -252,6 +264,7 @@ public class OpeningStatsOutputSelector
 
     public enum Value
     {
+        OPENINGMOVES(OutputSelector.Value.OPENINGMOVES, new OpeningStOutputHandler()),
         OID(OutputSelector.Value.OID, new OidOutputHandler()),
         BWINPCT(OutputSelector.Value.BWINPCT, new BlackWinPctOutputHandler()),
         BWINS(OutputSelector.Value.BWINS, new BlackWinsOutputHandler()),

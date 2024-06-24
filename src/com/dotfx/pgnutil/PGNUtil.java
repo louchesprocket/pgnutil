@@ -756,10 +756,7 @@ public class PGNUtil
     {
         private final Tallier iteratorProvider;
         
-        TallyExitProcessor(Tallier iteratorProvider)
-        {
-            this.iteratorProvider = iteratorProvider;
-        }
+        TallyExitProcessor(Tallier iteratorProvider) { this.iteratorProvider = iteratorProvider; }
         
         @Override public void process()
         {
