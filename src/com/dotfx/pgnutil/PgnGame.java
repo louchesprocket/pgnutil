@@ -489,13 +489,13 @@ public final class PgnGame
 
     /**
      *
-     * @return hash of player names and game moves
+     * @return hash of player names and game half-moves up to <plies>
      */
-    public HashCode getHash()
+    public HashCode getHash(int plies)
     {
         StringBuilder sb = new StringBuilder();
         sb.append(getWhite()).append('\0').append(getBlack());
-        for (Move move : getMoves()) sb.append(move.getMove());
+        appendMoves(sb, plies);
         return HASHFUNC.hashBytes(sb.toString().getBytes());
     }
 
@@ -503,11 +503,24 @@ public final class PgnGame
      *
      * @return hash of game moves
      */
-    public HashCode getMoveHash()
+    public HashCode getMoveHash(int plies)
     {
         StringBuilder sb = new StringBuilder();
-        for (Move move : getMoves()) sb.append(move.getMove());
+        appendMoves(sb, plies);
         return HASHFUNC.hashBytes(sb.toString().getBytes());
+    }
+
+    private void appendMoves(StringBuilder sb, int plies)
+    {
+        List<Move> moveList = getMoves();
+
+        if (plies < 1) for (Move move : moveList) sb.append(move.getMove());
+
+        else
+        {
+            int limit = plies > moveList.size() ? moveList.size() : plies;
+            for (int i = 0; i < limit; i++) sb.append(moveList.get(i).getMove());
+        }
     }
     
     public int getNumber() { return number; }

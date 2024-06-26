@@ -142,13 +142,13 @@ public class PGNUtil
         {
             ranges = new ArrayList<>();
             
-            for (String token : s.split(",\\W*"))
+            for (String token : s.replaceAll("#.*", "").split(",\\W*"))
             { 
                 String rangeBounds[] = token.split("-");
-                Integer rangeStart = Integer.valueOf(rangeBounds[0]);
+                Integer rangeStart = Integer.valueOf(rangeBounds[0].trim());
 
-                ranges.add(new SimpleEntry(rangeStart, rangeBounds.length == 1 ?
-                        rangeStart : Integer.valueOf(rangeBounds[1])));
+                ranges.add(new SimpleEntry<>(rangeStart, rangeBounds.length == 1 ?
+                        rangeStart : Integer.valueOf(rangeBounds[1].trim())));
             }
         }
         
@@ -157,9 +157,7 @@ public class PGNUtil
             int gameno = game.getNumber();
             
             for (SimpleEntry<Integer,Integer> range : ranges)
-            {
                 if (gameno >= range.getKey() && gameno <= range.getValue()) return true;
-            }
             
             return false;
         }
@@ -687,17 +685,23 @@ public class PGNUtil
     
     static final class DuplicateGameHandler extends DuplicateHandler
     {
+        private final int plies;
+
+        public DuplicateGameHandler(int plies) { this.plies = plies; }
         @Override public void handle() throws InvalidSelectorException
         {
-            super.handle(game.getHash());
+            super.handle(game.getHash(plies));
         }
     }
 
     static final class DuplicateMoveHandler extends DuplicateHandler
     {
+        private final int plies;
+
+        public DuplicateMoveHandler(int plies) { this.plies = plies; }
         @Override public void handle() throws InvalidSelectorException
         {
-            super.handle(game.getMoveHash());
+            super.handle(game.getMoveHash(plies));
         }
     }
     

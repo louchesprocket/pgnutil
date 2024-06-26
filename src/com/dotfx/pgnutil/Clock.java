@@ -75,9 +75,8 @@ public class Clock implements Comparable<Clock>
     @Override
     public String toString()
     {
-        if (seconds < 0)
-            return String.format("-%01d:%02d:%02d", Math.abs(getHrs()), Math.abs(getMins()), Math.abs(getSecs()));
-
-        return String.format("%01d:%02d:%02d", getHrs(), getMins(), getSecs());
+        return seconds < 0 ?
+                String.format("-%01d:%02d:%02d", Math.abs(getHrs()), Math.abs(getMins()), Math.abs(getSecs())) :
+                String.format("%01d:%02d:%02d", getHrs(), getMins(), getSecs());
     }
 }

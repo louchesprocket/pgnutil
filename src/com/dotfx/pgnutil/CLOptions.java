@@ -52,6 +52,7 @@ public class CLOptions
     public static final String ECO = "-eco"; // ECO output for "-o"
     public static final String EF = "-ef"; // specify standard ECO file
     public static final String ELO = "-elo";
+    public static final String GF = "-gf";
     public static final String GN = "-gn";
     public static final String H = "-h";
     public static final String HDRAW = "-hdraw";
@@ -124,6 +125,7 @@ public class CLOptions
         ECOFILE(EF),
         ELOFILE(ELO),
         EVENTS(E),
+        GAMEFILE(GF),
         GAMENUM(GN),
         HIELO(HELO),
         HIOOBCOUNT(HOOB),
@@ -247,7 +249,7 @@ public class CLOptions
     private static String readFully(File file)
     {
         CharArrayWriter writer = new CharArrayWriter();
-        
+
         try (BufferedReader reader = new BufferedReader(new FileReader(file)))
         {
             char buf[] = new char[1024];
@@ -267,7 +269,7 @@ public class CLOptions
             System.err.println("Error reading file '" + file + "'");
             System.exit(-1);
         }
-        
+
         return writer.toString();
     }
     
@@ -332,6 +334,27 @@ public class CLOptions
         catch (NumberFormatException e)
         {
             System.err.println("exception: argument to '" + GN + "' option must be an integer");
+            System.exit(-1);
+        }
+    }
+
+    @Option(name = GF, aliases = "-game_num_file", metaVar = "<file>",
+            usage = "output games whose ordinal positions in the input source are listed in <file>")
+    private void setGameFile(File gf)
+    {
+        if (getCount(OptId.get(GF)) > 0)
+        {
+            System.err.println("Option '" + OptId.get(GF) + "' cannot be set more than once!");
+            System.exit(-1);
+        }
+
+        countOption(OptId.get(GF));
+
+        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchGameNumProcessor(readFully(gf))); }
+
+        catch (NumberFormatException e)
+        {
+            System.err.println("exception: file '" + gf + "' must contain only integer ranges");
             System.exit(-1);
         }
     }
@@ -1105,10 +1128,11 @@ public class CLOptions
 
     // duplicates
 
-    @Option(name = D, forbids = {S}, aliases = "-duplicates",
-        usage = "list games containing identical players and move lists; each line of output contains one set of " +
-                "two or more game numbers in which duplicates are found")
-    private void duplicates(boolean d)
+    @Option(name = D, forbids = {S}, aliases = "-duplicates", metaVar = "<plies>",
+        usage = "list games containing identical players and move lists up to <plies> half-moves ('0' means the " +
+            "whole game); each line of output contains one set of two or more game numbers in which duplicates are " +
+            "found")
+    private void duplicates(int plies)
     {
         if (getCount(OptId.get(D)) > 0)
         {
@@ -1117,7 +1141,7 @@ public class CLOptions
         }
         
         countOption(OptId.get(D));
-        PGNUtil.DuplicateGameHandler handler = new PGNUtil.DuplicateGameHandler();
+        PGNUtil.DuplicateGameHandler handler = new PGNUtil.DuplicateGameHandler(plies);
         PGNUtil.setHandler(handler);
         PGNUtil.setExitProcessor(new PGNUtil.DuplicateExitProcessor(handler));
     }
@@ -1140,10 +1164,10 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.DuplicateExitProcessor(handler));
     }
 
-    @Option(name = DM, forbids = {S}, aliases = "-duplicate_moves",
-        usage = "list games containing identical moves; each line of output contains one set of two or more " +
-                "game numbers in which duplicates are found")
-    private void duplicatePostOpenings(boolean d)
+    @Option(name = DM, forbids = {S}, aliases = "-duplicate_moves", metaVar = "<plies>",
+        usage = "list games containing identical move lists up to <plies> half-moves ('0' means the whole game); " +
+                "each line of output contains one set of two or more game numbers in which duplicates are found")
+    private void duplicatePostOpenings(int plies)
     {
         if (getCount(OptId.get(DM)) > 0)
         {
@@ -1152,7 +1176,7 @@ public class CLOptions
         }
         
         countOption(OptId.get(DM));
-        PGNUtil.DuplicateMoveHandler handler = new PGNUtil.DuplicateMoveHandler();
+        PGNUtil.DuplicateMoveHandler handler = new PGNUtil.DuplicateMoveHandler(plies);
         PGNUtil.setHandler(handler);
         PGNUtil.setExitProcessor(new PGNUtil.DuplicateExitProcessor(handler));
     }
