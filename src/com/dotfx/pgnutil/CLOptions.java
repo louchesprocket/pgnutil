@@ -52,7 +52,7 @@ public class CLOptions
     public static final String ECO = "-eco"; // ECO output for "-o"
     public static final String EF = "-ef"; // specify standard ECO file
     public static final String ELO = "-elo";
-    public static final String GF = "-gf";
+    public static final String GN = "-gn";
     public static final String GNF = "-gnf";
     public static final String H = "-h";
     public static final String HDRAW = "-hdraw";
@@ -125,8 +125,8 @@ public class CLOptions
         ECOFILE(EF),
         ELOFILE(ELO),
         EVENTS(E),
+        GAMENUM(GN),
         GAMENUMFILE(GNF),
-        GAMENUM(GNF),
         HIELO(HELO),
         HIOOBCOUNT(HOOB),
         HIPLYCOUNT(HPC),
@@ -317,44 +317,44 @@ public class CLOptions
     
     // matchers
 
-    @Option(name = GNF, aliases = "-game_num_file", metaVar = "<range1,range2,...>",
+    @Option(name = GN, aliases = "-game_num", metaVar = "<range1,range2,...>",
         usage = "output games whose ordinal position in the input source is contained in <range1,range2,...>")
     private void setGameNum(String gameno)
+    {
+        if (getCount(OptId.get(GN)) > 0)
+        {
+            System.err.println("Option '" + OptId.get(GN) + "' cannot be set more than once!");
+            System.exit(-1);
+        }
+        
+        countOption(OptId.get(GN));
+        
+        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchGameNumProcessor(gameno)); }
+        
+        catch (NumberFormatException e)
+        {
+            System.err.println("exception: argument to '" + GN + "' option must contain only integers");
+            System.exit(-1);
+        }
+    }
+
+    @Option(name = GNF, aliases = "-game_num_file", metaVar = "<file>",
+            usage = "output games whose ordinal positions in the input source are listed in <file>")
+    private void setGameFile(File gnf)
     {
         if (getCount(OptId.get(GNF)) > 0)
         {
             System.err.println("Option '" + OptId.get(GNF) + "' cannot be set more than once!");
             System.exit(-1);
         }
-        
+
         countOption(OptId.get(GNF));
-        
-        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchGameNumProcessor(gameno)); }
-        
-        catch (NumberFormatException e)
-        {
-            System.err.println("exception: argument to '" + GNF + "' option must be an integer");
-            System.exit(-1);
-        }
-    }
 
-    @Option(name = GF, aliases = "-game_num_file", metaVar = "<file>",
-            usage = "output games whose ordinal positions in the input source are listed in <file>")
-    private void setGameFile(File gf)
-    {
-        if (getCount(OptId.get(GF)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(GF) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
-        countOption(OptId.get(GF));
-
-        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchGameNumProcessor(readFully(gf))); }
+        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchGameNumProcessor(readFully(gnf))); }
 
         catch (NumberFormatException e)
         {
-            System.err.println("exception: file '" + gf + "' must contain only integer ranges");
+            System.err.println("exception: file '" + gnf + "' must contain only integer ranges");
             System.exit(-1);
         }
     }
