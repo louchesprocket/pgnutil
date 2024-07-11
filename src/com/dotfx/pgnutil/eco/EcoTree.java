@@ -468,21 +468,21 @@ public final class EcoTree
         System.out.println("DIFF: " + treeDiff.size());
     }
     
-//    public static void main(String args[]) throws Exception
-//    {
+    public static void main(String args[]) throws Exception
+    {
 //        long start = System.currentTimeMillis();
 ////        EcoTree tree1 = new EcoTree(Type.SCID);
 ////        EcoTree tree1 = getScidInstance();
 ////        tree1.printTranspositions();
 //
-//        EcoTree tree1 = new EcoTree(FileType.LICHESS);
-////        tree1.printTree();
-////        tree1.writeTree(new File("test.out"));
-//        EcoTree tree2 = new EcoTree(FileType.STD);
-//        printDiff(tree1, tree2, true);
+        EcoTree tree1 = new EcoTree(FileType.LICHESS);
+//        tree1.printTree();
+        tree1.writeTree(new File("test.out"));
+        EcoTree tree2 = new EcoTree(FileType.STD);
+        printDiff(tree1, tree2, true);
 //////        tree1.printTranspositions();
-//        System.out.println("nodes: " + tree1.positionCount());
-//        System.out.println("nodes: " + tree2.positionCount());
+        System.out.println("tree 1 nodes: " + tree1.positionCount());
+        System.out.println("tree 2 nodes: " + tree2.positionCount());
 //
 ////        Board board = new Board(true).move("Nf3").move("e5").move("e4").move("Nc6").move("Bb5");
 //
@@ -498,5 +498,5 @@ public final class EcoTree
 ////        System.out.println("NODE COUNT: " + tree1.positionCount());
 ////        printDiff(tree1, tree2);
 //        System.out.println("ELAPSED: " + (System.currentTimeMillis() - start) + "ms");
-//    }
+    }
 }

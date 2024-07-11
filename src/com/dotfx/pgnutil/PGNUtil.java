@@ -242,8 +242,7 @@ public class PGNUtil
         @Override public boolean processGame()
         {
             String winner = game.getWinner();
-            if (winner == null) return false;
-            return matchWinPattern.matcher(winner).find();
+            return winner != null && matchWinPattern.matcher(winner).find();
         }
     }
     
@@ -256,8 +255,7 @@ public class PGNUtil
         @Override public boolean processGame()
         {
             String loser = game.getLoser();
-            if (loser == null) return false;
-            return matchLossPattern.matcher(loser).find();
+            return loser != null && matchLossPattern.matcher(loser).find();
         }
     }
     
