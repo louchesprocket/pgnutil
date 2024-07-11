@@ -278,12 +278,7 @@ public class PGNUtil
         private final Clock c;
 
         public ClockBelowProcessor(Clock c) { this.c = c; }
-
-        @Override public boolean processGame()
-        {
-            if (game.getLowClock().compareTo(c) < 0) return true;
-            return false;
-        }
+        @Override public boolean processGame() { return game.getLowClock().compareTo(c) < 0; }
     }
 
     static final class ClockNotBelowProcessor implements GameProcessor
@@ -291,12 +286,7 @@ public class PGNUtil
         private final Clock c;
 
         public ClockNotBelowProcessor(Clock c) { this.c = c; }
-
-        @Override public boolean processGame()
-        {
-            if (game.getLowClock().compareTo(c) < 0) return false;
-            return true;
-        }
+        @Override public boolean processGame() { return game.getLowClock().compareTo(c) >= 0; }
     }
 
     static final class MinEloProcessor implements GameProcessor

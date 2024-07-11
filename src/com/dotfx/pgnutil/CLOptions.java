@@ -53,7 +53,7 @@ public class CLOptions
     public static final String EF = "-ef"; // specify standard ECO file
     public static final String ELO = "-elo";
     public static final String GF = "-gf";
-    public static final String GN = "-gn";
+    public static final String GNF = "-gnf";
     public static final String H = "-h";
     public static final String HDRAW = "-hdraw";
     public static final String HED = "-hed";
@@ -125,8 +125,8 @@ public class CLOptions
         ECOFILE(EF),
         ELOFILE(ELO),
         EVENTS(E),
-        GAMEFILE(GF),
-        GAMENUM(GN),
+        GAMENUMFILE(GNF),
+        GAMENUM(GNF),
         HIELO(HELO),
         HIOOBCOUNT(HOOB),
         HIPLYCOUNT(HPC),
@@ -317,23 +317,23 @@ public class CLOptions
     
     // matchers
 
-    @Option(name = GN, aliases = "-game_number", metaVar = "<range1,range2,...>",
+    @Option(name = GNF, aliases = "-game_num_file", metaVar = "<range1,range2,...>",
         usage = "output games whose ordinal position in the input source is contained in <range1,range2,...>")
     private void setGameNum(String gameno)
     {
-        if (getCount(OptId.get(GN)) > 0)
+        if (getCount(OptId.get(GNF)) > 0)
         {
-            System.err.println("Option '" + OptId.get(GN) + "' cannot be set more than once!");
+            System.err.println("Option '" + OptId.get(GNF) + "' cannot be set more than once!");
             System.exit(-1);
         }
         
-        countOption(OptId.get(GN));
+        countOption(OptId.get(GNF));
         
         try { PGNUtil.addMatchProcessor(new PGNUtil.MatchGameNumProcessor(gameno)); }
         
         catch (NumberFormatException e)
         {
-            System.err.println("exception: argument to '" + GN + "' option must be an integer");
+            System.err.println("exception: argument to '" + GNF + "' option must be an integer");
             System.exit(-1);
         }
     }
@@ -1470,11 +1470,11 @@ public class CLOptions
         }
     }
 
-    @Option(name = H, forbids = {D, DO, DM, E, CSR, O, M, GN, NM, MW, ML, MP, MO, NMO, R, V},
+    @Option(name = H, forbids = {D, DO, DM, E, CSR, O, M, GNF, NM, MW, ML, MP, MO, NMO, R, V},
         aliases = "-help", usage = "print usage information")
     static boolean help = false;
 
-    @Option(name = V, forbids = {D, DO, DM, E, CSR, O, M, GN, NM, MW, ML, MP, MO, NMO, R, H},
+    @Option(name = V, forbids = {D, DO, DM, E, CSR, O, M, GNF, NM, MW, ML, MP, MO, NMO, R, H},
         aliases = "-version", usage = "print version information")
     private void version(boolean v)
     {
