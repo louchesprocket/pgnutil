@@ -124,7 +124,7 @@ public class CLOptionResolver
             List<OutputSelector> osList = Arrays.stream(PGNUtil.outputSelectors).filter(os ->
                     checkValues.contains(os.getValue())).collect(Collectors.toList());
 
-            if (CLOptions.getCount(OptId.MATCHPLAYER) > 1 && osList.size() > 0)
+            if (CLOptions.getCount(OptId.MATCHPLAYER) > 1 && !osList.isEmpty())
             {
                 System.err.println("Output selector '" + osList.get(0) + "' only works while matching " +
                         "one player ('" + CLOptions.MP + "')!");
@@ -216,13 +216,13 @@ public class CLOptionResolver
         private final void handle(final Set<OptId> setOpts)
         {
             Set<OptId> intersects = checkOpts.stream().filter(setOpts::contains).collect(Collectors.toSet());
-            if (intersects.size() == 0) return;
+            if (intersects.isEmpty()) return;
             handler.handleOpts(setOpts, intersects);
 
             Set<OptId> anyIntersects = ifAnyOf.stream().filter(setOpts::contains).collect(Collectors.toSet());
-            if (anyIntersects.size() > 0) handler.handleIfAny(setOpts, anyIntersects);
+            if (!anyIntersects.isEmpty()) handler.handleIfAny(setOpts, anyIntersects);
 
-            if (!ifNoneOf.stream().anyMatch(setOpts::contains)) handler.handleIfNone(setOpts);
+            if (ifNoneOf.stream().noneMatch(setOpts::contains)) handler.handleIfNone(setOpts);
         }
     }
 
@@ -233,7 +233,7 @@ public class CLOptionResolver
         conditionList.add(new ConditionSet(checkOpts, ifAnyOf, ifNoneOf, handler));
     }
 
-    public static final void resolveOpts(final Set<OptId> setOpts)
+    public static void resolveOpts(final Set<OptId> setOpts)
     {
         final OptId topLevelOpts[] =
                 new OptId[] {OptId.DUPLICATES, OptId.DUPLICATEMOVES, OptId.DUPLICATEOPENINGS, OptId.OPENINGS,
