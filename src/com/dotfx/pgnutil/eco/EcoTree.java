@@ -31,11 +31,12 @@ import com.dotfx.pgnutil.PositionId;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -79,8 +80,7 @@ public final class EcoTree
             try
             {
                 if (treeInstance == null)
-                    treeInstance = new EcoTree(typeOverride == null ? this : typeOverride,
-                            pathOverride == null ? null : pathOverride);
+                    treeInstance = new EcoTree(typeOverride == null ? this : typeOverride, pathOverride);
             }
 
             catch (IOException | IllegalMoveException e)
@@ -93,8 +93,8 @@ public final class EcoTree
         }
     }
     
-    private TreeNode topNode;
-    private TreeReader reader;
+    private final TreeNode topNode;
+    private final TreeReader reader;
 
     private EcoTree(FileType fileType) throws IOException, IllegalMoveException
     {
@@ -108,9 +108,10 @@ public final class EcoTree
 
         try (InputStream in = pathOverride == null ?
                 (fileType.isResource() ?
-                        new BufferedInputStream(EcoTree.class.getResource(fileType.getPath()).openStream()) :
-                        new BufferedInputStream(new FileInputStream(fileType.getPath()))) :
-                new BufferedInputStream(new FileInputStream(pathOverride)))
+                        new BufferedInputStream(Objects.requireNonNull(EcoTree.class.getResource(fileType.getPath())).
+                                openStream()) :
+                        new BufferedInputStream(Files.newInputStream(Paths.get(fileType.getPath())))) :
+                new BufferedInputStream(Files.newInputStream(pathOverride.toPath())))
         {
             reader.readTree(in, topNode);
         }
@@ -187,7 +188,7 @@ public final class EcoTree
         List<TreeNode> ret = new ArrayList<>();
         List<TreeNode> thatChildren = that.topNode.getChildren();
         
-        while (thatChildren.size() > 0)
+        while (!thatChildren.isEmpty())
         {
             TreeNode thatNode = thatChildren.get(0);
             TreeNode myNode = topNode.getBottomNode(thatNode.getPath());
@@ -215,7 +216,7 @@ public final class EcoTree
         List<TreeNode> ret = new ArrayList<>();
         List<TreeNode> thatChildren = that.topNode.getChildren();
 
-        while (thatChildren.size() > 0)
+        while (!thatChildren.isEmpty())
         {
             TreeNode thatNode = thatChildren.get(0);
 
@@ -234,7 +235,7 @@ public final class EcoTree
         Map<PositionId,List<TreeNode>> ret = new HashMap<>();
         List<TreeNode> children = topNode.getChildren();
         
-        while (children.size() > 0)
+        while (!children.isEmpty())
         {
             Board board = new Board(true);
             TreeNode oneChild = children.get(0);
@@ -342,13 +343,13 @@ public final class EcoTree
 
         try (Writer writer = new FileWriter(outFile, false))
         {
-            while (children.size() > 0)
+            while (!children.isEmpty())
             {
                 TreeNode node = children.get(0);
                 children.addAll(node.getChildren());
                 children.remove(node);
 
-                if (node.getSpecCode().length() == 0 && node.getSpecDesc().length() == 0) continue;
+                if (node.getSpecCode().isEmpty() && node.getSpecDesc().isEmpty()) continue;
 
                 // At this point, we have a path ending with either a code or a description (presumably both).
 
@@ -380,7 +381,7 @@ public final class EcoTree
     {
         List<TreeNode> children = topNode.getChildren();
 
-        while (children.size() > 0)
+        while (!children.isEmpty())
         {
             TreeNode node = children.get(0);
             List<TreeNode> nodePath = node.getPath();

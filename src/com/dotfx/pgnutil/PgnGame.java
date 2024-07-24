@@ -138,7 +138,7 @@ public final class PgnGame
             sb.append(number).append(".");
             if (color.equals(Color.BLACK)) sb.append("..");
             sb.append(" ").append(move);
-            if (comments.size() > 0) sb.append(" ");
+            if (!comments.isEmpty()) sb.append(" ");
             for (String comment : comments) sb.append("{").append(comment).append("}");
             
             return sb.toString();
@@ -518,7 +518,7 @@ public final class PgnGame
 
         else
         {
-            int limit = plies > moveList.size() ? moveList.size() : plies;
+            int limit = Math.min(plies, moveList.size());
             for (int i = 0; i < limit; i++) sb.append(moveList.get(i).getMove());
         }
     }
@@ -613,7 +613,7 @@ public final class PgnGame
         
         for (Move move : moves)
         {
-            if (move.getComments().size() > 0)
+            if (!move.getComments().isEmpty())
             {
                 // Presence of oobMarker means that book moves include the present move.  Otherwise, the first move
                 // with a comment is the first out-of-book move.
@@ -636,7 +636,7 @@ public final class PgnGame
 
         for (Move move : moves)
         {
-            if (move.getComments().size() > 0)
+            if (!move.getComments().isEmpty())
             {
                 // Presence of oobMarker means that book moves include the present move.  Otherwise, the first move
                 // with a comment is the first out-of-book move.
@@ -688,7 +688,7 @@ public final class PgnGame
         {
             Move move = moves.get(i);
             
-            if (move.getComments().size() > 0)
+            if (!move.getComments().isEmpty())
             {
                 // Presence of oobMarker means that book moves include the
                 // present move.  Otherwise, the first move with a comment is
@@ -751,7 +751,7 @@ public final class PgnGame
         
         for (Move move : moves)
         {
-            if (move.getComments().size() > 0)
+            if (!move.getComments().isEmpty())
             {
                 // Presence of oobMarker means that book moves include the present move.  Otherwise, the first move
                 // with a comment is the first out-of-book move.
@@ -791,7 +791,7 @@ public final class PgnGame
         {
             Move move = moves.get(i);
 
-            if (move.getComments().size() > 0)
+            if (!move.getComments().isEmpty())
             {
                 // Presence of oobMarker means that book moves include the present move.  Otherwise, the first move
                 // with a comment is the first out-of-book move.
@@ -828,7 +828,7 @@ public final class PgnGame
         
         for (Move move : moves)
         {
-            if (move.getComments().size() > 0)
+            if (!move.getComments().isEmpty())
             {
                 // Presence of oobMarker means that book moves include the present move.  Otherwise, the first move
                 // with a comment is the first out-of-book move.
@@ -1078,7 +1078,7 @@ public final class PgnGame
      */
     public boolean isDuplicateOf(Object other)
     {
-        if (other == null || !(other instanceof PgnGame)) return false;
+        if (!(other instanceof PgnGame)) return false;
         
         PgnGame otherGame = (PgnGame)other;
         String thisWhite = getWhite();
@@ -1124,7 +1124,7 @@ public final class PgnGame
         
         List<String> comments = getGameComments();
         
-        if (comments.size() > 0)
+        if (!comments.isEmpty())
         {
             for (String comment : comments)
             {

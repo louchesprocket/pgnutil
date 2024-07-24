@@ -797,7 +797,7 @@ public class PGNUtil
         try
         {
             parser.parseArgument(args);
-            if (options.help) throw new CmdLineException("");
+            if (CLOptions.help) throw new CmdLineException("");
             CLOptionResolver.resolveOpts(CLOptions.getSetOpts());
             
             if (pgnFileList.isEmpty())

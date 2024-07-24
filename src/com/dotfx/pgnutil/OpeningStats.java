@@ -161,13 +161,13 @@ public class OpeningStats implements Tallier
 
         else
         {
-            this.selectors = new OpeningStatsOutputSelector[selectors.length];
+            OpeningStats.selectors = new OpeningStatsOutputSelector[selectors.length];
 
             for (int i = 0; i < selectors.length; i++)
             {
-                this.selectors[i] = new OpeningStatsOutputSelector(selectors[i], this);
+                OpeningStats.selectors[i] = new OpeningStatsOutputSelector(selectors[i], this);
 
-                if (this.selectors[i].getValue() == OpeningStatsOutputSelector.Value.OPENINGMOVES)
+                if (OpeningStats.selectors[i].getValue() == OpeningStatsOutputSelector.Value.OPENINGMOVES)
                     saveOpeningMoves = true;
             }
         }
