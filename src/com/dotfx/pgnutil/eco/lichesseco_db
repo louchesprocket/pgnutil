@@ -2077,6 +2077,7 @@ C01|French Defense: Exchange Variation, Bogoljubow Variation|e4 e6 d4 d5 exd5 ex
 C03|French Defense: Guimard Variation, Thunderbunny Variation|e4 e6 d4 d5 Nd2 Nc6 c3 dxe4 Nxe4 e5|d08f2815dda17c99
 C09|French Defense: Tarrasch Variation, Open System, Main Line|e4 e6 d4 d5 Nd2 c5 exd5 exd5 Ngf3 Nc6|4aa1b4a29bbee10f
 C08|French Defense: Tarrasch Variation, Open System, Advance Line|e4 e6 d4 d5 Nd2 c5 exd5 exd5 Ngf3 c4|732fceb5da84a19b
+C11|French Defense: Steinitz Variation|e4 e6 d4 d5 Nc3 a6 Nf3 Nf6 e5 Nfd7|248b4fd5565f36b1
 C17|French Defense: Winawer Variation, Retreat Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Ba5|823701f0dd69a579
 C15|French Defense: Winawer Variation, Fingerslip Variation, Kunin Double Gambit|e4 e6 d4 d5 Nc3 Bb4 Bd2 dxe4 Qg4 Qxd4|35448dd0d0ef98b7
 C15|French Defense: Winawer Variation, Alekhine Gambit Accepted|e4 e6 d4 d5 Nc3 Bb4 Ne2 dxe4 a3 Bxc3|bafe4ebb213e1a12
@@ -2294,6 +2295,9 @@ B01|Scandinavian Defense: Portuguese Gambit, Jadoul Variation|e4 d5 exd5 Nf6 d4 
 B01|Scandinavian Defense: Portuguese Gambit, Melbourne Shuffle Variation|e4 d5 exd5 Nf6 d4 Bg4 f3 Bf5 Bb5 Nbd7 Nc3|2061c51ba8493e37
 C02|French Defense: Advance Variation, Milner-Barry Gambit|e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 Bd3|b65ef3492ed19396
 C02|French Defense: Advance Variation, Main Line|e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 a3|b951b4de31f3706f
+C14|French Defense: Classical Variation|e4 e6 d4 d5 Nc3 a6 Nf3 Nf6 e5 Nfd7 Bg5|d5f7cbe54645e0ba
+C11|French Defense: Steinitz Variation|e4 e6 d4 d5 Nc3 a6 Nf3 Nf6 e5 Nfd7 a3|b326b6baeb1575a8
+C11|French Defense: Steinitz Variation|e4 e6 d4 d5 Nc3 a6 Nf3 Nf6 e5 Nfd7 Ne2|27db6273d2f4e784
 C15|French Defense: Winawer Variation, Kondratiyev Variation|e4 e6 d4 d5 Nc3 Bb4 Bd3 c5 exd5 Qxd5 Bd2|4a791acb12b41ff8
 C17|French Defense: Winawer Variation, Bogoljubow Variation, Icelandic Defense|e4 e6 d4 d5 Nc3 Bb4 e5 c5 Bd2 Ne7 f4|38035a86ba5fa330
 C18|French Defense: Winawer Variation, Advance Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3|87493fd903f92012
