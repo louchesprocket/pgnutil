@@ -71,6 +71,7 @@ public class CLOptions
     public static final String M = "-m";
     public static final String ME = "-me"; // match ECO
     public static final String MED = "-med"; // match ECO desription
+    public static final String MFEN = "-mfen"; // match FEN
     public static final String ML = "-ml";
     public static final String MO = "-mo";
     public static final String MP = "-mp";
@@ -140,6 +141,7 @@ public class CLOptions
         MATCH(M),
         MATCHECO(ME),
         MATCHECODESC(MED),
+        MATCHFEN(MFEN),
         MATCHLOSER(ML),
         MATCHOPENING(MO),
         MATCHPLAYER(MP),
@@ -423,7 +425,7 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPlayerProcessor(playerPattern));
     }
 
-    @Option(name = TF, aliases = "-time_fault",
+    @Option(name = TF, aliases = "-time_fault", forbids = {CB},
             usage = "output games where at least one player's clock went negative (Aquarium only)")
     private void setTimeFault(boolean tf)
     {
@@ -493,7 +495,7 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.MinEloDiffProcessor(minEloDiff));
     }
 
-    @Option(name = CB, aliases = "-clock_below", metaVar = "<time>",
+    @Option(name = CB, aliases = "-clock_below", forbids = {TF}, metaVar = "<time>",
             usage = "output games in which at least one player's clock went below <time> (Aquarium only)")
     private void setClockBelow(String time)
     {
@@ -613,7 +615,7 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.NotMatchOpeningProcessor(getOpeningsSet(readFully(of))));
     }
 
-    @Option(name = MPOS, aliases = "-match_pos", metaVar = "<move_string>",
+    @Option(name = MPOS, aliases = "-match_pos", forbids = {MFEN}, metaVar = "<move_string>",
         usage = "output games that contain the position reached by SAN string <move_string>")
     private void setPosition(String moveSt)
     {
@@ -641,6 +643,33 @@ public class CLOptions
         }
         
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionProcessor(board));
+    }
+
+    @Option(name = MFEN, aliases = "-match_fen", forbids = {MPOS}, metaVar = "<fen>",
+            usage = "output games that contain the FEN position <fen>")
+    private void setFen(String fen)
+    {
+        if (getCount(OptId.get(MFEN)) > 0)
+        {
+            System.err.println("Option '" + OptId.get(MFEN) + "' cannot be set more than once!");
+            System.exit(-1);
+        }
+
+        countOption(OptId.get(MFEN));
+
+        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionProcessor(Board.fromFen(fen))); }
+
+        catch (InvalidFenException e)
+        {
+            System.err.println(e.getLocalizedMessage());
+            System.exit(-1);
+        }
+
+        catch (NullPointerException e)
+        {
+            System.err.println("bad FEN string '" + fen + "'");
+            System.exit(-1);
+        }
     }
 
     @Option(name = EF, aliases = "-eco_file", metaVar = "<file>",

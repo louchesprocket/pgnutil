@@ -187,6 +187,26 @@ public class Board
                     default: return null;
                 }
         }
+
+        public static Piece get(Character p)
+        {
+            switch (p)
+            {
+                case 'P': return WHITE_PAWN;
+                case 'p': return BLACK_PAWN;
+                case 'R': return WHITE_ROOK;
+                case 'r': return BLACK_ROOK;
+                case 'N': return WHITE_KNIGHT;
+                case 'n': return BLACK_KNIGHT;
+                case 'B': return WHITE_BISHOP;
+                case 'b': return BLACK_BISHOP;
+                case 'Q': return WHITE_QUEEN;
+                case 'q': return BLACK_QUEEN;
+                case 'K': return WHITE_KING;
+                case 'k': return BLACK_KING;
+                default: return null;
+            }
+        }
         
         public PieceType getType() { return pieceType; }
         public Color getColor() { return color; }
@@ -288,6 +308,71 @@ public class Board
         whitePieceCount = whiteCount;
         blackPieceCount = blackCount;
     }
+
+    /**
+     * This constructor figures out where the kings are.
+     *
+     * @param position
+     * @param ply
+     * @param epCandidate
+     * @param whiteCanCastleQ
+     * @param whiteCanCastleK
+     * @param blackCanCastleQ
+     * @param blackCanCastleK
+     * @param halfMoveClock
+     * @throws InvalidPositionException
+     */
+    public Board(Piece position[], short ply, byte epCandidate, boolean whiteCanCastleQ, boolean whiteCanCastleK,
+                 boolean blackCanCastleQ, boolean blackCanCastleK, short halfMoveClock)
+            throws InvalidPositionException
+    {
+        byte whiteCount = 0;
+        byte blackCount = 0;
+
+        whiteKingLoc = blackKingLoc = -1;
+
+        this.position = position;
+        this.ply = ply;
+        this.epCandidate = epCandidate;
+        this.whiteCanCastleQ = whiteCanCastleQ;
+        this.whiteCanCastleK = whiteCanCastleK;
+        this.blackCanCastleQ = blackCanCastleQ;
+        this.blackCanCastleK = blackCanCastleK;
+        this.halfMoveClock = halfMoveClock;
+
+        for (int i = 0; i < 64; i++)
+        {
+            if (position[i] != null)
+            {
+                if (position[i].getColor() == Color.WHITE)
+                {
+                    whiteCount++;
+
+                    if (position[i] == Piece.WHITE_KING)
+                    {
+                        if (whiteKingLoc != -1) throw new InvalidPositionException("too many kings");
+                        whiteKingLoc = (byte)i;
+                    }
+                }
+
+                else
+                {
+                    blackCount++;
+
+                    if (position[i] == Piece.BLACK_KING)
+                    {
+                        if (blackKingLoc != -1) throw new InvalidPositionException("too many kings");
+                        blackKingLoc = (byte)i;
+                    }
+                }
+            }
+        }
+
+        if (whiteKingLoc == -1 || blackKingLoc == -1) throw new InvalidPositionException("missing king");
+
+        whitePieceCount = whiteCount;
+        blackPieceCount = blackCount;
+    }
     
     public Board(Board other)
     {
@@ -309,6 +394,7 @@ public class Board
 
     public final int getPly() { return ply; }
     public final Board copy() { return new Board(this); }
+    public final Square getEpSquare() { return Square.get(epCandidate); }
     
     public final boolean canMove(int start, int end)
     {
@@ -1284,6 +1370,74 @@ public class Board
         }
         
         return "";
+    }
+
+    public static Board fromFen(String fenSt) throws InvalidFenException
+    {
+        String[] fen = fenSt.trim().split(" ");
+        Piece[] position = new Piece[64];
+        Arrays.fill(position, null);
+        int file = 0, rank = 7;
+
+        for (int stPos = 0; stPos < fen[0].length(); stPos++)
+        {
+            char currentChar = fen[0].charAt(stPos);
+
+            switch (currentChar)
+            {
+                case 'P':
+                case 'p':
+                case 'R':
+                case 'r':
+                case 'N':
+                case 'n':
+                case 'B':
+                case 'b':
+                case 'Q':
+                case 'q':
+                case 'K':
+                case 'k':
+                    if (file > 7) throw new InvalidFenException("invalid FEN: '" + fenSt + "'");
+                    position[rank * 8 + file] = Piece.get(currentChar);
+                    file++;
+                    break;
+
+                case '/':
+                    rank--;
+                    if (rank < 0 || file != 8) throw new InvalidFenException("invalid FEN: '" + fenSt + "'");
+                    file = 0;
+                    break;
+
+                default:
+                    int skipSquares = Character.getNumericValue(currentChar);
+                    file += skipSquares;
+                    if (skipSquares < 1 || file > 8) throw new InvalidFenException("invalid FEN: '" + fenSt + "'");
+            }
+        }
+
+        //public Board(Piece position[], short ply, byte epCandidate, boolean whiteCanCastleQ, boolean whiteCanCastleK,
+        // boolean blackCanCastleQ, boolean blackCanCastleK, short halfMoveClock)
+
+        try
+        {
+            short currentPly = (short)((Short.parseShort(fen[5]) - 1) * 2 + (fen[1].equals("w") ? 0 : 1));
+
+            return new Board(
+                    position,
+                    currentPly,
+                    (byte)(fen[3].equals("-") ? -1 : Square.get(fen[3]).getLocation()),
+                    fen[2].contains("Q"),
+                    fen[2].contains("K"),
+                    fen[2].contains("q"),
+                    fen[2].contains("k"),
+                    (short)(currentPly - Short.parseShort(fen[4]))
+            );
+        }
+
+        catch (IllegalMoveException | NumberFormatException | NullPointerException | InvalidPositionException e)
+        {
+            throw new InvalidFenException("invalid FEN: '" + fenSt + "'");
+        }
     }
     
     public final String toFen()
