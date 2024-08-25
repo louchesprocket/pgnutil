@@ -245,9 +245,13 @@ public class CLOptionResolver
         final OptId matchOpeningOpts[] =
                 new OptId[] {OptId.MATCHOPENING, OptId.NOTMATCHOPENING, OptId.OPENINGFILE, OptId.NOTOPENINGFILE};
 
+        final OptId matchPositionOpts[] =
+                new OptId[] {OptId.MATCHPOSITION, OptId.MATCHFEN, OptId.FENFILE};
+
         new ConditionSet(topLevelOpts, null, null, new MutexHandler()).handle(setOpts);
         new ConditionSet(openingsOpts, null, null, new MutexHandler()).handle(setOpts);
         new ConditionSet(matchOpeningOpts, null, null, new MutexHandler()).handle(setOpts);
+        new ConditionSet(matchPositionOpts, null, null, new MutexHandler()).handle(setOpts);
 
         new ConditionSet(new OptId[] {OptId.OPENINGS}, null, openingsOpts,
                 new OpeningsHandler()).handle(setOpts);

@@ -52,6 +52,7 @@ public class CLOptions
     public static final String ECO = "-eco"; // ECO output for "-o"
     public static final String EF = "-ef"; // specify standard ECO file
     public static final String ELO = "-elo";
+    public static final String FF = "-ff";
     public static final String GN = "-gn";
     public static final String GNF = "-gnf";
     public static final String H = "-h";
@@ -126,6 +127,7 @@ public class CLOptions
         ECOFILE(EF),
         ELOFILE(ELO),
         EVENTS(E),
+        FENFILE(FF),
         GAMENUM(GN),
         GAMENUMFILE(GNF),
         HIELO(HELO),
@@ -615,7 +617,7 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.NotMatchOpeningProcessor(getOpeningsSet(readFully(of))));
     }
 
-    @Option(name = MPOS, aliases = "-match_pos", forbids = {MFEN}, metaVar = "<move_string>",
+    @Option(name = MPOS, aliases = "-match_pos", metaVar = "<move_string>",
         usage = "output games that contain the position reached by SAN string <move_string>")
     private void setPosition(String moveSt)
     {
@@ -645,7 +647,7 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionProcessor(board));
     }
 
-    @Option(name = MFEN, aliases = "-match_fen", forbids = {MPOS}, metaVar = "<fen>",
+    @Option(name = MFEN, aliases = "-match_fen", metaVar = "<fen>",
             usage = "output games that contain the FEN position <fen>")
     private void setFen(String fen)
     {
@@ -664,12 +666,30 @@ public class CLOptions
             System.err.println(e.getLocalizedMessage());
             System.exit(-1);
         }
+    }
 
-        catch (NullPointerException e)
+    @Option(name = FF, aliases = "-fen_file", metaVar = "<file>",
+            usage = "output games that contain any of the FEN positions listed in <file>")
+    private void setFenFile(File fenFile)
+    {
+        if (getCount(OptId.get(FF)) > 0)
         {
-            System.err.println("bad FEN string '" + fen + "'");
+            System.err.println("Option '" + OptId.get(FF) + "' cannot be set more than once!");
             System.exit(-1);
         }
+
+        countOption(OptId.get(FF));
+        Set<Board> positionSet = new HashSet<>();
+
+        try { for (String fen : readLinesSet(fenFile)) positionSet.add(Board.fromFen(fen)); }
+
+        catch (InvalidFenException e)
+        {
+            System.err.println(e.getLocalizedMessage());
+            System.exit(-1);
+        }
+
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(positionSet));
     }
 
     @Option(name = EF, aliases = "-eco_file", metaVar = "<file>",

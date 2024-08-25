@@ -428,6 +428,31 @@ public class PGNUtil
             }
         }
     }
+
+    static final class MatchPositionSetProcessor implements GameProcessor
+    {
+        private final Set<Board> positionSet;
+
+        public MatchPositionSetProcessor(Set<Board> positionSet)
+        {
+            this.positionSet = positionSet;
+        }
+
+        @Override public boolean processGame()
+        {
+            try
+            {
+                for (Board board : positionSet) if (game.containsPosition(board)) return true;
+                return false;
+            }
+
+            catch (IllegalMoveException | StringIndexOutOfBoundsException | NullPointerException e)
+            {
+                System.err.println("PGN error in game #" + game.getNumber() + ": " + e.getMessage());
+                return false;
+            }
+        }
+    }
     
     static final class MatchEcoProcessor implements GameProcessor
     {
@@ -707,11 +732,7 @@ public class PGNUtil
         
         TallyHandler(Tallier tallier) { this.tallier = tallier; }
         @Override public void init() throws InvalidSelectorException { tallier.init(outputSelectors); }
-        
-        @Override public void handle() throws IllegalMoveException
-        {
-            tallier.tally(game);
-        }
+        @Override public void handle() throws IllegalMoveException { tallier.tally(game); }
     }
     
     // exit processors
@@ -766,7 +787,7 @@ public class PGNUtil
         }
     }
     
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "1.1";
 
     private static PgnGame game;
     private static final List<PgnFile> pgnFileList = new ArrayList<>();

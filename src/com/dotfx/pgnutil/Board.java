@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * @author Mark Chen <chen@dotfx.com>
  */
-public class Board
+public class Board implements Comparable<Board>
 {
     public enum Square
     {
@@ -322,7 +322,7 @@ public class Board
      * @param halfMoveClock
      * @throws InvalidPositionException
      */
-    public Board(Piece position[], short ply, byte epCandidate, boolean whiteCanCastleQ, boolean whiteCanCastleK,
+    public Board(Piece position[], short ply, Square epCandidate, boolean whiteCanCastleQ, boolean whiteCanCastleK,
                  boolean blackCanCastleQ, boolean blackCanCastleK, short halfMoveClock)
             throws InvalidPositionException
     {
@@ -333,12 +333,13 @@ public class Board
 
         this.position = position;
         this.ply = ply;
-        this.epCandidate = epCandidate;
         this.whiteCanCastleQ = whiteCanCastleQ;
         this.whiteCanCastleK = whiteCanCastleK;
         this.blackCanCastleQ = blackCanCastleQ;
         this.blackCanCastleK = blackCanCastleK;
         this.halfMoveClock = halfMoveClock;
+
+        this.epCandidate = epCandidate == null ? -1 : (byte)epCandidate.getLocation();
 
         for (int i = 0; i < 64; i++)
         {
@@ -1397,8 +1398,9 @@ public class Board
                 case 'q':
                 case 'K':
                 case 'k':
-                    if (file > 7) throw new InvalidFenException("invalid FEN: '" + fenSt + "'");
-                    position[rank * 8 + file] = Piece.get(currentChar);
+                    Piece piece = Piece.get(currentChar);
+                    if (file > 7 || piece == null) throw new InvalidFenException("invalid FEN: '" + fenSt + "'");
+                    position[rank * 8 + file] = piece;
                     file++;
                     break;
 
@@ -1415,9 +1417,6 @@ public class Board
             }
         }
 
-        //public Board(Piece position[], short ply, byte epCandidate, boolean whiteCanCastleQ, boolean whiteCanCastleK,
-        // boolean blackCanCastleQ, boolean blackCanCastleK, short halfMoveClock)
-
         try
         {
             short currentPly = (short)((Short.parseShort(fen[5]) - 1) * 2 + (fen[1].equals("w") ? 0 : 1));
@@ -1425,16 +1424,17 @@ public class Board
             return new Board(
                     position,
                     currentPly,
-                    (byte)(fen[3].equals("-") ? -1 : Square.get(fen[3]).getLocation()),
-                    fen[2].contains("Q"),
+                    fen[3].equals("-") ? null : Square.get(fen[3]), // e.p. square
+                    fen[2].contains("Q"), // castling possibilities . . .
                     fen[2].contains("K"),
                     fen[2].contains("q"),
                     fen[2].contains("k"),
-                    (short)(currentPly - Short.parseShort(fen[4]))
+                    (short)(currentPly - Short.parseShort(fen[4])) // half-move clock
             );
         }
 
-        catch (IllegalMoveException | NumberFormatException | NullPointerException | InvalidPositionException e)
+        catch (IllegalMoveException | NumberFormatException | NullPointerException | IndexOutOfBoundsException |
+               InvalidPositionException e)
         {
             throw new InvalidFenException("invalid FEN: '" + fenSt + "'");
         }
@@ -1588,6 +1588,46 @@ public class Board
         }
         
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(Board that)
+    {
+        if (that == null) return 1;
+
+        for (int i = 0; i < position.length; i++)
+        {
+            if (position[i] == null)
+            {
+                if (that.position[i] != null) return -1;
+                else continue;
+            }
+
+            if (that.position[i] == null) return 1;
+
+            if (position[i].toByte() > that.position[i].toByte()) return 1;
+            if (position[i].toByte() < that.position[i].toByte()) return -1;
+        }
+
+        if (ply > that.ply) return 1;
+        if (ply < that.ply) return -1;
+
+        if (epCandidate > that.epCandidate) return 1;
+        if (epCandidate < that.epCandidate) return -1;
+
+        if (whiteCanCastleK && !that.whiteCanCastleK) return 1;
+        if (!whiteCanCastleK && that.whiteCanCastleK) return -1;
+
+        if (whiteCanCastleQ && !that.whiteCanCastleQ) return 1;
+        if (!whiteCanCastleQ && that.whiteCanCastleQ) return -1;
+
+        if (blackCanCastleK && !that.blackCanCastleK) return 1;
+        if (!blackCanCastleK && that.blackCanCastleK) return -1;
+
+        if (blackCanCastleQ && !that.blackCanCastleQ) return 1;
+        if (!blackCanCastleQ && that.blackCanCastleQ) return -1;
+
+        return halfMoveClock - that.halfMoveClock;
     }
     
     @Override
