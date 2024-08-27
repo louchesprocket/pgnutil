@@ -73,7 +73,7 @@ public class TreeNodeSet implements Comparable<TreeNodeSet>
             {
                 int ply = pathNode.getPly();
                 if (ply != 1) sb.append(" ");
-                if (ply % 2 == 1) sb.append(((ply + 1) / 2)).append(".");
+                if ((ply & 1) == 1) sb.append(((ply + 1) / 2)).append(".");
                 sb.append(pathNode.getMove());
             }
 

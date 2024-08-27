@@ -36,6 +36,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -429,7 +430,7 @@ public final class PgnGame
             if (next == -1) throw new PGNException("unexpected eof");
             buf[0] = (char)next;
             
-            PgnGame.Move move = new PgnGame.Move(i % 2 == 0 ? Color.BLACK : Color.WHITE,
+            PgnGame.Move move = new PgnGame.Move((i & 1) == 0 ? Color.BLACK : Color.WHITE,
                 (short)Math.round((float)i / (float)2), moveStr, moveComments);
             
             moves.add(move);
@@ -1024,6 +1025,22 @@ public final class PgnGame
                 return false;
         }
         
+        return false;
+    }
+
+    public boolean containsPosition(final Set<LooseBoard> positionSet, int minWhitePieces, int minBlackPieces)
+            throws IllegalMoveException
+    {
+        LooseBoard looseBoard = new LooseBoard(new Board(true));
+        Board board = looseBoard.getBoard();
+
+        for (PgnGame.Move move : getMoves())
+        {
+            board.move(move);
+            if (board.getWhitePieceCount() < minWhitePieces || board.getBlackPieceCount() < minBlackPieces) break;
+            if (positionSet.contains(looseBoard)) return true;
+        }
+
         return false;
     }
     

@@ -629,7 +629,7 @@ public class CLOptions
         
         countOption(OptId.get(MPOS));
         
-        Board board = new Board(true);
+        LooseBoard board = new LooseBoard(true);
         try { board.goTo(PgnGame.parseMoveString(moveSt)); }
         
         catch (IllegalMoveException e)
@@ -644,7 +644,7 @@ public class CLOptions
             System.exit(-1);
         }
         
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionProcessor(board));
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(Collections.singleton(board)));
     }
 
     @Option(name = MFEN, aliases = "-match_fen", metaVar = "<fen>",
@@ -659,7 +659,11 @@ public class CLOptions
 
         countOption(OptId.get(MFEN));
 
-        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionProcessor(Board.fromFen(fen))); }
+        try
+        {
+            PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(
+                    Collections.singleton(new LooseBoard(Board.fromFen(fen)))));
+        }
 
         catch (InvalidFenException e)
         {
@@ -679,9 +683,9 @@ public class CLOptions
         }
 
         countOption(OptId.get(FF));
-        Set<Board> positionSet = new HashSet<>();
+        Set<LooseBoard> positionSet = new HashSet<>();
 
-        try { for (String fen : readLinesSet(fenFile)) positionSet.add(Board.fromFen(fen)); }
+        try { for (String fen : readLinesSet(fenFile)) positionSet.add(new LooseBoard(Board.fromFen(fen))); }
 
         catch (InvalidFenException e)
         {

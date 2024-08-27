@@ -291,7 +291,7 @@ public final class EcoTree
                 {
                     int moveno = (pathNode.getPly() + 1)/2;
                     
-                    if (pathNode.getPly() % 2 == 1) System.out.print(moveno + ". " );
+                    if ((pathNode.getPly() & 1) == 1) System.out.print(moveno + ". " );
                     System.out.print(pathNode.getMove() + " ");
                 }
                 
@@ -392,7 +392,7 @@ public final class EcoTree
             {
                 int ply = pathNode.getPly();
                 if (ply != 1) System.out.print(" ");
-                if (ply % 2 == 1) System.out.print(((ply + 1)/2) + ".");
+                if ((ply & 1) == 1) System.out.print(((ply + 1)/2) + ".");
                 System.out.print(pathNode.getMove());
             }
 
@@ -417,7 +417,7 @@ public final class EcoTree
             {
                 int ply = pathNode.getPly();
                 if (ply != 1) System.out.print(" ");
-                if (ply % 2 == 1) System.out.print(((ply + 1)/2) + ".");
+                if ((ply & 1) == 1) System.out.print(((ply + 1)/2) + ".");
                 System.out.print(pathNode.getMove());
             }
 
@@ -436,7 +436,7 @@ public final class EcoTree
             {
                 int ply = pathNode.getPly();
                 if (ply != 1) System.out.print(" ");
-                if (ply % 2 == 1) System.out.print(((ply + 1)/2) + ".");
+                if ((ply & 1) == 1) System.out.print(((ply + 1)/2) + ".");
                 System.out.print(pathNode.getMove());
             }
 
@@ -459,7 +459,7 @@ public final class EcoTree
             {
                 int ply = pathNode.getPly();
                 if (ply != 1) System.out.print(" ");
-                if (ply % 2 == 1) System.out.print(((ply + 1)/2) + ".");
+                if ((ply & 1) == 1) System.out.print(((ply + 1)/2) + ".");
                 System.out.print(pathNode.getMove());
             }
 

@@ -396,6 +396,7 @@ public class Board implements Comparable<Board>
     public final int getPly() { return ply; }
     public final Board copy() { return new Board(this); }
     public final Square getEpSquare() { return Square.get(epCandidate); }
+    public final Piece[] getPosition() { return position; }
     
     public final boolean canMove(int start, int end)
     {
@@ -859,7 +860,7 @@ public class Board implements Comparable<Board>
      */
     public final Board move(String san) throws IllegalMoveException
     {
-        Color color = COLORS[ply % 2];
+        Color color = (ply ^ 1) > ply ? Color.WHITE : Color.BLACK;
         PieceType promoteTo = null;
         int len = san.length();
         int chopLen = len;
@@ -992,7 +993,7 @@ public class Board implements Comparable<Board>
      */
     public final String normalize(String san) throws IllegalMoveException
     {
-        Color color = COLORS[ply % 2];
+        Color color = (ply ^ 1) > ply ? Color.WHITE : Color.BLACK;
         PieceType promoteTo = null;
         int len = san.length();
         int chopLen = len;
@@ -1112,8 +1113,8 @@ public class Board implements Comparable<Board>
     public final String coordToSan(int start, int end, PieceType promoteTo)
         throws IllegalMoveException
     {
-        Color moveColor = COLORS[ply % 2];
-        Color otherColor = COLORS[(ply + 1) % 2];
+        Color moveColor = (ply ^ 1) > ply ? Color.WHITE : Color.BLACK;
+        Color otherColor = (ply ^ 1) > ply ? Color.BLACK : Color.WHITE;
         PieceType pieceType;
         String captureSt = position[end] == null ? "" : "x";
         StringBuilder ret = new StringBuilder();
@@ -1468,7 +1469,7 @@ public class Board implements Comparable<Board>
             if (i > 0) ret.append("/");
         }
         
-        ret.append(" ").append(COLORS[ply % 2]).append(" ");
+        ret.append(" ").append((ply ^ 1) > ply ? Color.WHITE : Color.BLACK).append(" ");
         if (!whiteCanCastleK && !whiteCanCastleQ && !blackCanCastleK && !blackCanCastleQ) ret.append("- ");
         
         else
@@ -1516,7 +1517,7 @@ public class Board implements Comparable<Board>
             if (i > 0) ret.append("/");
         }
         
-        ret.append(" ").append(COLORS[ply % 2]).append(" ");
+        ret.append(" ").append((ply ^ 1) > ply ? Color.WHITE : Color.BLACK).append(" ");
         if (!whiteCanCastleK && !whiteCanCastleQ && !blackCanCastleK && !blackCanCastleQ) ret.append("-");
         
         else
@@ -1548,7 +1549,7 @@ public class Board implements Comparable<Board>
 //            blackPieceCount != that.blackPieceCount)
 //            return false;
         
-        return ply % 2 == that.ply % 2 && Arrays.equals(position, that.position);
+        return (ply & 1) == (that.ply & 1) && Arrays.equals(position, that.position);
     }
     
     public final PositionId positionId()
@@ -1561,7 +1562,7 @@ public class Board implements Comparable<Board>
             else buf[i] = position[i].toByte();
         }
         
-        buf[64] = (byte)(ply % 2);
+        buf[64] = (byte)(ply & 1);
         
         return new PositionId(buf);
     }
@@ -1631,7 +1632,7 @@ public class Board implements Comparable<Board>
     }
     
     @Override
-    public final boolean equals(Object other)
+    public boolean equals(Object other)
     {
         try
         {
@@ -1654,7 +1655,7 @@ public class Board implements Comparable<Board>
     }
     
     @Override
-    public final int hashCode()
+    public int hashCode()
     {
         return Board.class.hashCode() ^ Arrays.hashCode(position) ^
             Short.hashCode(ply) ^ Byte.hashCode(epCandidate) ^

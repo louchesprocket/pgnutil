@@ -43,6 +43,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 //import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -410,41 +411,22 @@ public class PGNUtil
             return firstOobMove == null || game.getPlyCount() - firstOobMove.getPly() <= plies;
         }
     }
-    
-    static final class MatchPositionProcessor implements GameProcessor
-    {
-        private final Board pos;
-        
-        MatchPositionProcessor(Board pos) { this.pos = pos; }
-        
-        @Override public boolean processGame()
-        {
-            try { return game.containsPosition(pos); }
-            
-            catch (IllegalMoveException | StringIndexOutOfBoundsException | NullPointerException e)
-            {
-                System.err.println("PGN error in game #" + game.getNumber() + ": " + e.getMessage());
-                return false;
-            }
-        }
-    }
 
     static final class MatchPositionSetProcessor implements GameProcessor
     {
-        private final Set<Board> positionSet;
+        private final Set<LooseBoard> positionSet;
+        private final int minWhitePieces, minBlackPieces;
 
-        public MatchPositionSetProcessor(Set<Board> positionSet)
+        public MatchPositionSetProcessor(Set<LooseBoard> positionSet)
         {
             this.positionSet = positionSet;
+            minWhitePieces = positionSet.stream().mapToInt(LooseBoard::getWhitePieceCount).min().orElse(0);
+            minBlackPieces = positionSet.stream().mapToInt(LooseBoard::getBlackPieceCount).min().orElse(0);
         }
 
         @Override public boolean processGame()
         {
-            try
-            {
-                for (Board board : positionSet) if (game.containsPosition(board)) return true;
-                return false;
-            }
+            try { return game.containsPosition(positionSet, minWhitePieces, minBlackPieces); }
 
             catch (IllegalMoveException | StringIndexOutOfBoundsException | NullPointerException e)
             {
