@@ -39,10 +39,11 @@ public class LooseBoard implements Comparable<LooseBoard>
     public int getWhitePieceCount() { return board.getWhitePieceCount(); }
     public int getBlackPieceCount() { return board.getBlackPieceCount(); }
 
-    public void goTo(List<String> moveList)
+    public LooseBoard goTo(List<String> moveList)
             throws IllegalMoveException
     {
         board.goTo(moveList);
+        return this;
     }
 
     public int compareTo(LooseBoard that)

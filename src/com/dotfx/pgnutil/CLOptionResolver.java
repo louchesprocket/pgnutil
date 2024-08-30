@@ -31,9 +31,9 @@ public class CLOptionResolver
 {
     public interface OptHandler
     {
-        default void handleOpts(Collection<OptId> setOpts, Set<OptId> setIntersects) {}
-        default void handleIfAny(Collection<OptId> setOpts, Set<OptId> ifAnyIntersects) {}
-        default void handleIfNone(Collection<OptId> setOpts) {}
+        default void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects) {}
+        default void handleIfAny(Map<OptId,Integer> setOpts, Set<OptId> ifAnyIntersects) {}
+        default void handleIfNone(Map<OptId,Integer> setOpts) {}
     }
 
     public static class PrintPositionHandler implements OptHandler
@@ -43,7 +43,7 @@ public class CLOptionResolver
         public PrintPositionHandler(String moveSt) { this.moveSt = moveSt; }
 
         @Override
-        public void handleOpts(Collection<OptId> setOpts, Set<OptId> setIntersects)
+        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
         {
             if (setOpts.size() > 1)
             {
@@ -68,7 +68,7 @@ public class CLOptionResolver
     private static class MutexHandler implements OptHandler
     {
         @Override
-        public void handleOpts(Collection<OptId> setOpts, Set<OptId> setIntersects)
+        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
         {
             if (setIntersects.size() > 1)
             {
@@ -76,6 +76,22 @@ public class CLOptionResolver
                 for (OptId opt : setIntersects) sj.add(opt.toString());
                 System.err.println("Only one of " + sj + " may be set at a time.");
                 System.exit(-1);
+            }
+        }
+    }
+
+    private static class SingletonHandler implements OptHandler
+    {
+        @Override
+        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
+        {
+            for (OptId opt : setIntersects)
+            {
+                if (setOpts.get(opt) > 1)
+                {
+                    System.err.println("Option '" + opt + "' may only be set once.");
+                    System.exit(-1);
+                }
             }
         }
     }
@@ -92,7 +108,7 @@ public class CLOptionResolver
         }
 
         @Override
-        public void handleOpts(Collection<OptId> setOpts, Set<OptId> setIntersects)
+        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
         {
             PGNUtil.addReplaceProcessor(new PGNUtil.ReplaceProcessor(searchPattern, replacement));
         }
@@ -101,7 +117,7 @@ public class CLOptionResolver
     private static class OpeningsHandler implements OptHandler
     {
         @Override
-        public void handleIfNone(Collection<OptId> setOpts)
+        public void handleIfNone(Map<OptId,Integer> setOpts)
         {
             Tallier os = OpeningStats.getInstance();
             PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
@@ -116,7 +132,17 @@ public class CLOptionResolver
         public PlayerHandler(Pattern playerPattern) { this.playerPattern = playerPattern; }
 
         @Override
-        public void handleIfAny(Collection<OptId> setOpts, Set<OptId> ifAnyIntersects)
+        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
+        {
+            if (CLOptions.getCount(OptId.MATCHPLAYER) > 2)
+            {
+                System.err.println("Option '" + OptId.MATCHPLAYER + "' may not be set more than twice.");
+                System.exit(-1);
+            }
+        }
+
+        @Override
+        public void handleIfAny(Map<OptId,Integer> setOpts, Set<OptId> ifAnyIntersects)
         {
             List<OutputSelector.Value> checkValues = Arrays.asList(OutputSelector.Value.OPPONENT,
                     OutputSelector.Value.OPPONENTELO, OutputSelector.Value.PLAYER, OutputSelector.Value.PLAYERELO);
@@ -163,7 +189,7 @@ public class CLOptionResolver
         public StdEcoHandler(boolean transpose) { this.transpose = transpose; }
 
         @Override
-        public void handleOpts(Collection<OptId> setOpts, Set<OptId> setIntersects)
+        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
         {
             Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, transpose);
             PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
@@ -178,7 +204,7 @@ public class CLOptionResolver
         public ClockBelowHandler(Clock clock) { this.clock = clock; }
 
         @Override
-        public void handleIfAny(Collection<OptId> setOpts, Set<OptId> ifAnyIntersects)
+        public void handleIfAny(Map<OptId,Integer> setOpts, Set<OptId> ifAnyIntersects)
         {
             for (int i = 0; i < PGNUtil.outputSelectors.length; i++)
             {
@@ -192,7 +218,7 @@ public class CLOptionResolver
     private static class DefaultSelectorsHandler implements OptHandler
     {
         @Override
-        public void handleIfNone(Collection<OptId> setOpts)
+        public void handleIfNone(Map<OptId,Integer> setOpts)
         {
             PGNUtil.setHandler(new PGNUtil.SelectGameHandler(PGNUtil.outputSelectors));
         }
@@ -213,16 +239,16 @@ public class CLOptionResolver
             this.handler = handler;
         }
 
-        private final void handle(final Set<OptId> setOpts)
+        private final void handle(final Map<OptId,Integer> setOpts)
         {
-            Set<OptId> intersects = checkOpts.stream().filter(setOpts::contains).collect(Collectors.toSet());
+            Set<OptId> intersects = setOpts.keySet().stream().filter(checkOpts::contains).collect(Collectors.toSet());
             if (intersects.isEmpty()) return;
             handler.handleOpts(setOpts, intersects);
 
-            Set<OptId> anyIntersects = ifAnyOf.stream().filter(setOpts::contains).collect(Collectors.toSet());
+            Set<OptId> anyIntersects = setOpts.keySet().stream().filter(ifAnyOf::contains).collect(Collectors.toSet());
             if (!anyIntersects.isEmpty()) handler.handleIfAny(setOpts, anyIntersects);
 
-            if (ifNoneOf.stream().noneMatch(setOpts::contains)) handler.handleIfNone(setOpts);
+            if (setOpts.keySet().stream().noneMatch(ifNoneOf::contains)) handler.handleIfNone(setOpts);
         }
     }
 
@@ -230,30 +256,44 @@ public class CLOptionResolver
 
     public static void addCondition(OptId checkOpts[], OptId ifAnyOf[], OptId ifNoneOf[], OptHandler handler)
     {
+        if (conditionList.stream().anyMatch(cond -> Arrays.deepEquals(checkOpts, cond.checkOpts.toArray()))) return;
         conditionList.add(new ConditionSet(checkOpts, ifAnyOf, ifNoneOf, handler));
     }
 
-    public static void resolveOpts(final Set<OptId> setOpts)
+    public static void resolveOpts(final Map<OptId,Integer> setOpts)
     {
-        final OptId topLevelOpts[] =
-                new OptId[] {OptId.DUPLICATES, OptId.DUPLICATEMOVES, OptId.DUPLICATEOPENINGS, OptId.OPENINGS,
-                        OptId.EVENTS, OptId.PLAYERRESULTS, OptId.CHECKSEQUENTIALROUNDS};
+        final OptId topLevelOpts[] = new OptId[] {OptId.DUPLICATES, OptId.DUPLICATEMOVES, OptId.DUPLICATEOPENINGS,
+                OptId.OPENINGS, OptId.EVENTS, OptId.PLAYERRESULTS, OptId.CHECKSEQUENTIALROUNDS};
 
-        final OptId openingsOpts[] =
-                new OptId[] {OptId.STDECO, OptId.SCIDECO, OptId.XSTDECO, OptId.XSCIDECO};
+        final OptId ecoOpts[] = new OptId[] {OptId.STDECO, OptId.SCIDECO, OptId.XSTDECO, OptId.XSCIDECO};
 
         final OptId matchOpeningOpts[] =
                 new OptId[] {OptId.MATCHOPENING, OptId.NOTMATCHOPENING, OptId.OPENINGFILE, OptId.NOTOPENINGFILE};
 
         final OptId matchPositionOpts[] =
-                new OptId[] {OptId.MATCHPOSITION, OptId.MATCHFEN, OptId.FENFILE};
+                new OptId[] {OptId.MATCHPOSITION, OptId.POSITIONFILE, OptId.MATCHFEN, OptId.FENFILE};
+
+        final OptId SingletonOpts[] =
+                new OptId[] {OptId.MATCHPOSITION, OptId.POSITIONFILE, OptId.MATCHFEN, OptId.FENFILE, OptId.PRINTPOS,
+                OptId.GAMENUM, OptId.GAMENUMFILE, OptId.MATCHWINNER, OptId.MATCHLOSER, OptId.TIMEFAULT, OptId.LOWELO,
+                OptId.HIELO, OptId.LOWELODIFF, OptId.HIELODIFF, OptId.CLOCKBELOW, OptId.CLOCKNOTBELOW, OptId.ELOFILE,
+                OptId.MATCHOPENING, OptId.NOTMATCHOPENING, OptId.OPENINGFILE, OptId.NOTOPENINGFILE, OptId.ECOFILE,
+                OptId.MATCHECO, OptId.MATCHECODESC, OptId.MATCHSCIDECO, OptId.MATCHSCIDECODESC, OptId.MATCHTRANSECO,
+                OptId.MATCHTRANSECODESC, OptId.MATCHTRANSSCIDECO, OptId.MATCHTRANSSCIDECODESC, OptId.ANYPLAYERFILE,
+                OptId.PLAYERFILE, OptId.NOTPLAYERFILE, OptId.TIMECONTROL, OptId.LOPLYCOUNT, OptId.HIPLYCOUNT,
+                OptId.BOOKMARKER, OptId.LOOOBCOUNT, OptId.HIOOBCOUNT, OptId.REPLACE, OptId.REPLACEWINNER,
+                OptId.REPLACELOSER, OptId.REPLACEOPENING, OptId.DUPLICATES, OptId.DUPLICATEMOVES,
+                OptId.DUPLICATEOPENINGS, OptId.EVENTS, OptId.CHECKSEQUENTIALROUNDS, OptId.OPENINGS, OptId.STDECO,
+                OptId.SCIDECO, OptId.XSTDECO, OptId.XSCIDECO, OptId.MINGAMECOUNT, OptId.LOWINDIFF, OptId.HIWINDIFF,
+                OptId.MAXDRAW, OptId.MINDRAW, OptId.PLAYERRESULTS, OptId.SELECTORS};
 
         new ConditionSet(topLevelOpts, null, null, new MutexHandler()).handle(setOpts);
-        new ConditionSet(openingsOpts, null, null, new MutexHandler()).handle(setOpts);
+        new ConditionSet(ecoOpts, null, null, new MutexHandler()).handle(setOpts);
         new ConditionSet(matchOpeningOpts, null, null, new MutexHandler()).handle(setOpts);
         new ConditionSet(matchPositionOpts, null, null, new MutexHandler()).handle(setOpts);
+        new ConditionSet(SingletonOpts, null, null, new SingletonHandler()).handle(setOpts);
 
-        new ConditionSet(new OptId[] {OptId.OPENINGS}, null, openingsOpts,
+        new ConditionSet(new OptId[] {OptId.OPENINGS}, null, ecoOpts,
                 new OpeningsHandler()).handle(setOpts);
 
         new ConditionSet(new OptId[] {OptId.SELECTORS}, null, topLevelOpts,

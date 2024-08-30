@@ -96,6 +96,7 @@ public class CLOptions
     public static final String P = "-p";
     public static final String PERF = "-perf";
     public static final String PF = "-pf";
+    public static final String POSF = "-posf";
     public static final String PP = "-pp";
     public static final String R = "-r";
     public static final String RL = "-rl";
@@ -131,6 +132,7 @@ public class CLOptions
         GAMENUM(GN),
         GAMENUMFILE(GNF),
         HIELO(HELO),
+        HIELODIFF(HED),
         HIOOBCOUNT(HOOB),
         HIPLYCOUNT(HPC),
         HIWINDIFF(HWD),
@@ -169,6 +171,7 @@ public class CLOptions
         PERFORMANCE(PERF),
         PLAYERFILE(PF),
         PLAYERRESULTS(P),
+        POSITIONFILE(POSF),
         PRINTPOS(PP),
         REPLACE(R),
         REPLACELOSER(RL),
@@ -307,14 +310,6 @@ public class CLOptions
             usage = "output a board representation following the <move_list>")
     private void printPosition(String moveSt)
     {
-        if (getCount(OptId.get(PP)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(PP) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
-        countOption(OptId.get(PP));
-
         CLOptionResolver.addCondition(new OptId[] {OptId.PRINTPOS}, null, null,
                 new CLOptionResolver.PrintPositionHandler(moveSt));
     }
@@ -325,14 +320,8 @@ public class CLOptions
         usage = "output games whose ordinal position in the input source is contained in <range1,range2,...>")
     private void setGameNum(String gameno)
     {
-        if (getCount(OptId.get(GN)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(GN) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(GN));
-        
+
         try { PGNUtil.addMatchProcessor(new PGNUtil.MatchGameNumProcessor(gameno)); }
         
         catch (NumberFormatException e)
@@ -346,12 +335,6 @@ public class CLOptions
             usage = "output games whose ordinal positions in the input source are listed in <file>")
     private void setGameFile(File gnf)
     {
-        if (getCount(OptId.get(GNF)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(GNF) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
         countOption(OptId.get(GNF));
 
         try { PGNUtil.addMatchProcessor(new PGNUtil.MatchGameNumProcessor(readFully(gnf))); }
@@ -383,12 +366,6 @@ public class CLOptions
         usage = "output games won by player <regex>")
     private void setWinner(String regex)
     {
-        if (getCount(OptId.get(MW)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(MW) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(MW));
         PGNUtil.addMatchProcessor(new PGNUtil.MatchWinProcessor(Pattern.compile(regex, Pattern.DOTALL)));
     }
@@ -397,12 +374,6 @@ public class CLOptions
         usage = "output games lost by player <regex>")
     private void setLoser(String regex)
     {
-        if (getCount(OptId.get(ML)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(ML) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(ML));
         PGNUtil.addMatchProcessor(new PGNUtil.MatchLossProcessor(Pattern.compile(regex, Pattern.DOTALL)));
     }
@@ -411,18 +382,11 @@ public class CLOptions
             usage = "output games where <regex> is a player")
     private void setPlayer(String regex)
     {
-        if (getCount(OptId.get(MP)) > 1)
-        {
-            System.err.println("Option '" + OptId.get(MP) + "' cannot be set more than twice!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(MP));
         Pattern playerPattern = Pattern.compile(regex, Pattern.DOTALL);
 
-        if (getCount(OptId.get(MP)) == 1)
-            CLOptionResolver.addCondition(new OptId[] {OptId.get(MP)}, new OptId[] {OptId.SELECTORS}, null,
-                    new CLOptionResolver.PlayerHandler(playerPattern));
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(MP)}, new OptId[] {OptId.SELECTORS}, null,
+                new CLOptionResolver.PlayerHandler(playerPattern));
 
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPlayerProcessor(playerPattern));
     }
@@ -431,12 +395,6 @@ public class CLOptions
             usage = "output games where at least one player's clock went negative (Aquarium only)")
     private void setTimeFault(boolean tf)
     {
-        if (getCount(OptId.get(TF)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(TF) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
         countOption(OptId.get(TF));
         PGNUtil.addMatchProcessor(new PGNUtil.ContainsProcessor(Pattern.compile("\\[%clk -", Pattern.DOTALL)));
     }
@@ -445,12 +403,6 @@ public class CLOptions
             usage = "output games where the elo rating of both players is at least <value>")
     private void setMinElo(Integer minElo)
     {
-        if (getCount(OptId.get(LELO)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(LELO) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
         countOption(OptId.get(LELO));
         PGNUtil.addMatchProcessor(new PGNUtil.MinEloProcessor(minElo));
     }
@@ -459,12 +411,6 @@ public class CLOptions
             usage = "output games where the elo rating of both players is at most <value>")
     private void setMaxElo(Integer maxElo)
     {
-        if (getCount(OptId.get(HELO)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(HELO) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
         countOption(OptId.get(HELO));
         PGNUtil.addMatchProcessor(new PGNUtil.MaxEloProcessor(maxElo));
     }
@@ -473,12 +419,6 @@ public class CLOptions
             usage = "output games in which the difference in player elo ratings is at most <diff>")
     private void setMaxEloDiff(Integer maxEloDiff)
     {
-        if (getCount(OptId.get(HED)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(HED) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
         countOption(OptId.get(HED));
         PGNUtil.addMatchProcessor(new PGNUtil.MaxEloDiffProcessor(maxEloDiff));
     }
@@ -487,12 +427,6 @@ public class CLOptions
             usage = "output games in which the difference in player elo ratings is at least <diff>")
     private void setMinEloDiff(Integer minEloDiff)
     {
-        if (getCount(OptId.get(LED)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(LED) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
         countOption(OptId.get(LED));
         PGNUtil.addMatchProcessor(new PGNUtil.MinEloDiffProcessor(minEloDiff));
     }
@@ -501,12 +435,6 @@ public class CLOptions
             usage = "output games in which at least one player's clock went below <time> (Aquarium only)")
     private void setClockBelow(String time)
     {
-        if (getCount(OptId.get(CB)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(CB) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
         countOption(OptId.get(CB));
 
         try
@@ -530,12 +458,6 @@ public class CLOptions
             usage = "output games in which neither player's clock went below <time> (Aquarium only)")
     private void setClockNotBelow(String time)
     {
-        if (getCount(OptId.get(CNB)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(CNB) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
         countOption(OptId.get(CNB));
 
         try { PGNUtil.addMatchProcessor(new PGNUtil.ClockNotBelowProcessor(new Clock(time))); }
@@ -551,12 +473,6 @@ public class CLOptions
             usage = "use elo ratings contained in the file <file> for any elo-matching operation")
     private void setEloFile(File eloFile)
     {
-        if (getCount(OptId.get(ELO)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(ELO) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
         countOption(OptId.get(ELO));
         EloResolver.readEloMap(eloFile);
     }
@@ -565,12 +481,6 @@ public class CLOptions
         usage = "output games in which the opening-book moves are the same as any of <oid,oid2,...>")
     private void setOpening(String openingsSt)
     {
-        if (getCount(OptId.get(MO)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(MO) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(MO));
         PGNUtil.addMatchProcessor(new PGNUtil.MatchOpeningProcessor(getOpeningsSet(openingsSt)));
     }
@@ -579,12 +489,6 @@ public class CLOptions
         usage = "output games in which the opening-book moves are any of those contained in <file>")
     private void setOpeningFile(File of)
     {
-        if (getCount(OptId.get(OF)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(OF) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(OF));
         PGNUtil.addMatchProcessor(new PGNUtil.MatchOpeningProcessor(getOpeningsSet(readFully(of))));
     }
@@ -593,12 +497,6 @@ public class CLOptions
         usage = "output games in which the opening-book moves are not the same as any of <oid,oid2,...>")
     private void setNotOpening(String openingsSt)
     {
-        if (getCount(OptId.get(NMO)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(NMO) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(NMO));
         PGNUtil.addMatchProcessor(new PGNUtil.NotMatchOpeningProcessor(getOpeningsSet(openingsSt)));
     }
@@ -607,12 +505,6 @@ public class CLOptions
         usage = "output games in which the opening-book moves are none of those contained in <file>")
     private void setNotOpeningFile(File of)
     {
-        if (getCount(OptId.get(NOF)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(NOF) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(NOF));
         PGNUtil.addMatchProcessor(new PGNUtil.NotMatchOpeningProcessor(getOpeningsSet(readFully(of))));
     }
@@ -621,14 +513,8 @@ public class CLOptions
         usage = "output games that contain the position reached by SAN string <move_string>")
     private void setPosition(String moveSt)
     {
-        if (getCount(OptId.get(MPOS)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(MPOS) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(MPOS));
-        
+
         LooseBoard board = new LooseBoard(true);
         try { board.goTo(PgnGame.parseMoveString(moveSt)); }
         
@@ -647,16 +533,37 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(Collections.singleton(board)));
     }
 
+    @Option(name = POSF, aliases = "-position_file", metaVar = "<file>",
+            usage = "output games that contain any of the positions reached by SAN strings listed in <file>")
+    private void setPosFile(File posFile)
+    {
+        countOption(OptId.get(POSF));
+        Set<LooseBoard> positionSet = new HashSet<>();
+
+        for (String moveSt : readLinesSet(posFile))
+        {
+            try { positionSet.add(new LooseBoard(true).goTo(PgnGame.parseMoveString(moveSt))); }
+
+            catch (IllegalMoveException e)
+            {
+                System.err.println(e.getLocalizedMessage());
+                System.exit(-1);
+            }
+
+            catch (NullPointerException e)
+            {
+                System.err.println("illegal move in parameter '" + moveSt + "'");
+                System.exit(-1);
+            }
+        }
+
+        PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(positionSet));
+    }
+
     @Option(name = MFEN, aliases = "-match_fen", metaVar = "<fen>",
             usage = "output games that contain the FEN position <fen>")
     private void setFen(String fen)
     {
-        if (getCount(OptId.get(MFEN)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(MFEN) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
         countOption(OptId.get(MFEN));
 
         try
@@ -676,12 +583,6 @@ public class CLOptions
             usage = "output games that contain any of the FEN positions listed in <file>")
     private void setFenFile(File fenFile)
     {
-        if (getCount(OptId.get(FF)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(FF) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
         countOption(OptId.get(FF));
         Set<LooseBoard> positionSet = new HashSet<>();
 
@@ -701,12 +602,6 @@ public class CLOptions
                     "See https://github.com/lichess-org/chess-openings")
     private void ecoFile(File ef)
     {
-        if (getCount(OptId.get(EF)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(EF) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-
         countOption(OptId.get(EF));
         EcoTree.FileType.STD.getEcoTree(EcoTree.FileType.LICHESS, ef); // read Lichess-formatted d.b. as standard
     }
@@ -715,12 +610,6 @@ public class CLOptions
         usage = "output games belonging to ECO code <regex>")
     private void setEco(String eco)
     {
-        if (getCount(OptId.get(ME)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(ME) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(ME));
 
         // delayed initialization, in case "-ef" is set
@@ -728,7 +617,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
+                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
                                 EcoTree.FileType.STD));
@@ -740,12 +629,6 @@ public class CLOptions
         usage = "output games whose ECO description matches <regex>")
     private void setEcoDesc(String eco)
     {
-        if (getCount(OptId.get(MED)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(MED) + "' cannot be " + "set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(MED));
 
         // delayed initialization, in case "-ef" is set
@@ -753,7 +636,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
+                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco,
                                 Pattern.DOTALL), EcoTree.FileType.STD));
@@ -765,12 +648,6 @@ public class CLOptions
         usage = "output games belonging to Scid ECO code <regex>")
     private void setScidEco(String eco)
     {
-        if (getCount(OptId.get(MSE)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(MSE) + "' cannot be " + "set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(MSE));
 
         // delayed initialization, in case "-ef" is set
@@ -778,7 +655,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
+                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
                                 EcoTree.FileType.SCIDDB));
@@ -790,12 +667,6 @@ public class CLOptions
         usage = "output games whose Scid ECO description matches <regex>")
     private void setScidEcoDesc(String eco)
     {
-        if (getCount(OptId.get(MSED)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(MSED) + "' cannot be " + "set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(MSED));
 
         // delayed initialization, in case "-ef" is set
@@ -803,7 +674,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
+                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco,
                                 Pattern.DOTALL), EcoTree.FileType.SCIDDB));
@@ -815,12 +686,6 @@ public class CLOptions
         usage = "output games belonging to ECO code <regex>, matching transpositionally")
     private void setXEco(String eco)
     {
-        if (getCount(OptId.get(MXE)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(MXE) + "' cannot be " + "set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(MXE));
 
         // delayed initialization, in case "-ef" is set
@@ -828,7 +693,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
+                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
                                 EcoTree.FileType.STD));
@@ -840,12 +705,6 @@ public class CLOptions
         usage = "output games whose ECO description matches <regex>, matching transpositionally")
     private void setXEcoDesc(String eco)
     {
-        if (getCount(OptId.get(MXED)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(MXED) + "' cannot be " + "set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(MXED));
 
         // delayed initialization, in case "-ef" is set
@@ -853,7 +712,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
+                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco,
                                 Pattern.DOTALL), EcoTree.FileType.STD));
@@ -865,12 +724,6 @@ public class CLOptions
         usage = "output games belonging to Scid ECO code <regex>, matching transpositionally")
     private void setXScidEco(String eco)
     {
-        if (getCount(OptId.get(MXSE)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(MXSE) + "' cannot be " + "set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(MXSE));
 
         // delayed initialization, in case "-ef" is set
@@ -878,7 +731,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
+                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
                                 EcoTree.FileType.SCIDDB));
@@ -890,12 +743,6 @@ public class CLOptions
         usage = "output games whose Scid ECO description matches <regex>, matching transpositionally")
     private void setXScidEcoDesc(String eco)
     {
-        if (getCount(OptId.get(MXSED)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(MXSED) + "' cannot be " + "set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(MXSED));
 
         // delayed initialization, in case "-ef" is set
@@ -903,7 +750,7 @@ public class CLOptions
                 new CLOptionResolver.OptHandler()
                 {
                     @Override
-                    public void handleOpts(Collection<OptId> setOpts, Set<OptId> intersects)
+                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco,
                                 Pattern.DOTALL), EcoTree.FileType.SCIDDB));
@@ -915,12 +762,6 @@ public class CLOptions
         usage = "output games in which either player is contained in <file>")
     private void setAnyPlayerFile(File playerFile)
     {
-        if (getCount(OptId.get(APF)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(APF) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(APF));
         PGNUtil.addMatchProcessor(new PGNUtil.MatchAnyPlayerSetProcessor(readLinesSet(playerFile)));
     }
@@ -929,12 +770,6 @@ public class CLOptions
         usage = "output games in which both players are contained in <file>")
     private void setPlayerFile(File playerFile)
     {
-        if (getCount(OptId.get(PF)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(PF) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(PF));
         PGNUtil.addMatchProcessor(new PGNUtil.MatchAllPlayerSetProcessor(readLinesSet(playerFile)));
     }
@@ -943,12 +778,6 @@ public class CLOptions
         usage = "output games in which neither player is contained in <file>")
     private void setNotPlayerFile(File playerFile)
     {
-        if (getCount(OptId.get(NPF)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(NPF) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(NPF));
         PGNUtil.addMatchProcessor(new PGNUtil.NotMatchPlayerSetProcessor(readLinesSet(playerFile)));
     }
@@ -1009,12 +838,6 @@ public class CLOptions
         usage = "match games in which the time control is <timectrl>")
     private void setTimeControl(String timectrl)
     {
-        if (getCount(OptId.get(TC)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(TC) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(TC));
         
         try { PGNUtil.addMatchProcessor(new PGNUtil.MatchTimeCtrlProcessor(timectrl));}
@@ -1030,12 +853,6 @@ public class CLOptions
         usage = "output games containing at least <min> plies")
     private void setLoPlies(int plies)
     {
-        if (getCount(OptId.get(LPC)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(LPC) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(LPC));
         PGNUtil.addMatchProcessor(new PGNUtil.MinPlyCountProcessor(plies));
     }
@@ -1044,12 +861,6 @@ public class CLOptions
         usage = "output games containing at most <max> plies")
     private void setHiPlies(int plies)
     {
-        if (getCount(OptId.get(HPC)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(HPC) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(HPC));
         PGNUtil.addMatchProcessor(new PGNUtil.MaxPlyCountProcessor(plies));
     }
@@ -1058,12 +869,6 @@ public class CLOptions
         usage = "use <regex> as the delimiter between book and non-book moves")
     private void setBookMarker(String regex)
     {
-        if (getCount(OptId.get(BM)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(BM) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(BM));
         PgnGame.setBookMarker(regex);
     }
@@ -1072,12 +877,6 @@ public class CLOptions
         usage = "output games containing at least <min> out-of-book plies")
     private void setLoOob(int plies)
     {
-        if (getCount(OptId.get(LOOB)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(LOOB) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(LOOB));
         PGNUtil.addMatchProcessor(new PGNUtil.MinOobProcessor(plies));
     }
@@ -1086,12 +885,6 @@ public class CLOptions
         usage = "output games containing at most <max> out-of-book plies")
     private void setHiOob(int plies)
     {
-        if (getCount(OptId.get(HOOB)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(HOOB) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(HOOB));
         PGNUtil.addMatchProcessor(new PGNUtil.MaxOobProcessor(plies));
     }
@@ -1103,12 +896,6 @@ public class CLOptions
                 "with <repl>")
     private void setReplace(String replaceStr)
     {
-        if (getCount(OptId.get(R)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(R) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(R));
         
         // The regex passed to split() allows escaping of the delimiter character
@@ -1140,12 +927,6 @@ public class CLOptions
         usage = "in combination with '" + R + "' option, select games won by player <regex> for replacement")
     private void replaceWinner(String regex)
     {
-        if (getCount(OptId.get(RW)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(RW) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(RW));
         PGNUtil.addReplaceProcessor(new PGNUtil.ReplaceWinProcessor(Pattern.compile(regex, Pattern.DOTALL)));
     }
@@ -1154,12 +935,6 @@ public class CLOptions
         usage = "in combination with '" + R + "' option, select games lost by player <regex> for replacement")
     private void replaceLoser(String regex)
     {
-        if (getCount(OptId.get(RL)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(RL) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(RL));
         PGNUtil.addReplaceProcessor(new PGNUtil.ReplaceLossProcessor(Pattern.compile(regex, Pattern.DOTALL)));
     }
@@ -1169,12 +944,6 @@ public class CLOptions
                 "as any of <oid,oid2,...> for replacement")
     private void replaceOpening(String opening)
     {
-        if (getCount(OptId.get(RO)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(RO) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(RO));
         PGNUtil.addReplaceProcessor(new PGNUtil.ReplaceOpeningProcessor(opening));
     }
@@ -1187,12 +956,6 @@ public class CLOptions
             "found")
     private void duplicates(int plies)
     {
-        if (getCount(OptId.get(D)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(D) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(D));
         PGNUtil.DuplicateGameHandler handler = new PGNUtil.DuplicateGameHandler(plies);
         PGNUtil.setHandler(handler);
@@ -1204,12 +967,6 @@ public class CLOptions
                 "or more game numbers in which duplicates are found")
     private void duplicateOpenings(boolean d)
     {
-        if (getCount(OptId.get(DO)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(DO) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(DO));
         
         PGNUtil.DuplicateOpeningHandler handler = new PGNUtil.DuplicateOpeningHandler();
@@ -1222,12 +979,6 @@ public class CLOptions
                 "each line of output contains one set of two or more game numbers in which duplicates are found")
     private void duplicatePostOpenings(int plies)
     {
-        if (getCount(OptId.get(DM)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(DM) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(DM));
         PGNUtil.DuplicateMoveHandler handler = new PGNUtil.DuplicateMoveHandler(plies);
         PGNUtil.setHandler(handler);
@@ -1241,12 +992,6 @@ public class CLOptions
                 "input source)")
     private void events(boolean e)
     {
-        if (getCount(OptId.get(E)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(E) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(E));
         Tallier events = Events.getInstance();
         PGNUtil.setHandler(new PGNUtil.TallyHandler(events));
@@ -1260,12 +1005,6 @@ public class CLOptions
         "information about each non-sequential round found")
     private void eventErrors(boolean e)
     {
-        if (getCount(OptId.get(CSR)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(CSR) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(CSR));
         Tallier events = Events.getEventErrorInstance();
         PGNUtil.setHandler(new PGNUtil.TallyHandler(events));
@@ -1279,12 +1018,6 @@ public class CLOptions
             "'eco,' 'oid,' 'count,' 'wwins,' 'bwins,' 'draws,' 'wwinpct,' 'bwinpct,' 'diff,' 'diffpct,' 'drawpct'")
     private void openings(boolean o)
     {
-        if (getCount(OptId.get(O)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(O) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(O));
         // The rest is handled in CLOptionResolver.
     }
@@ -1295,12 +1028,6 @@ public class CLOptions
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each ECO code")
     private void ecoOpenings(boolean o)
     {
-        if (getCount(OptId.get(ECO)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(ECO) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(ECO));
 
         // delay tree initialization in case "-ef" is set
@@ -1312,12 +1039,6 @@ public class CLOptions
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each Scid ECO code")
     private void ScidEcoOpenings(boolean o)
     {
-        if (getCount(OptId.get(SECO)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(SECO) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(SECO));
         Tallier os = EcoStats.getInstance(EcoTree.FileType.SCIDDB, false);
         PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
@@ -1329,12 +1050,6 @@ public class CLOptions
                     "matching openings transpositionally")
     private void XEcoOpenings(boolean o)
     {
-        if (getCount(OptId.get(XE)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(XE) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(XE));
 
         // delay tree initialization in case "-ef" is set
@@ -1347,12 +1062,6 @@ public class CLOptions
                     "matching openings transpositionally")
     private void XScidEcoOpenings(boolean o)
     {
-        if (getCount(OptId.get(XSECO)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(XSECO) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(XSECO));
         Tallier os = EcoStats.getInstance(EcoTree.FileType.SCIDDB, true);
         PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
@@ -1363,12 +1072,6 @@ public class CLOptions
         usage = "in combination with '" + O + "' option, print only openings that appear in at least <min> games")
     private void minOpeningCount(int cmin)
     {
-        if (getCount(OptId.get(CMIN)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(CMIN) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(CMIN));
         OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MinGamesProcessor(cmin));
     }
@@ -1378,12 +1081,6 @@ public class CLOptions
                 "between white and black is at most <max> percent")
     private void hiWinDiff(double max)
     {
-        if (getCount(OptId.get(HWD)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(HWD) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(HWD));
         OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MaxWinDiffProcessor(max));
     }
@@ -1393,12 +1090,6 @@ public class CLOptions
                 "between white and black is at least <min> percent")
     private void loWinDiff(double min)
     {
-        if (getCount(OptId.get(LWD)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(LWD) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(LWD));
         OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MinWinDiffProcessor(min));
     }
@@ -1408,12 +1099,6 @@ public class CLOptions
                 "at most <max> percent")
     private void maxDraw(double max)
     {
-        if (getCount(OptId.get(HDRAW)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(HDRAW) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(HDRAW));
         OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MaxDrawProcessor(max));
     }
@@ -1423,12 +1108,6 @@ public class CLOptions
                 "at least <min> percent")
     private void minDraw(double min)
     {
-        if (getCount(OptId.get(LDRAW)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(LDRAW) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(LDRAW));
         OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MinDrawProcessor(min));
     }
@@ -1440,12 +1119,6 @@ public class CLOptions
                 "'player,' 'wins,' 'losses,' 'draws,' 'noresults,' 'count,' 'winpct'")
     private void playerResults(boolean e)
     {
-        if (getCount(OptId.get(P)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(P) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(P));
         
         Tallier pr = PlayerResults.getInstance();
@@ -1465,12 +1138,6 @@ public class CLOptions
                 "player. For other available selectors, please see the README file.")
     private void selectors(String spec)
     {
-        if (getCount(OptId.get(S)) > 0)
-        {
-            System.err.println("Option '" + OptId.get(S) + "' cannot be set more than once!");
-            System.exit(-1);
-        }
-        
         countOption(OptId.get(S));
 
         String tokens[] = spec.split(",\\W*");

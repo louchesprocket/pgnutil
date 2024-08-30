@@ -801,7 +801,7 @@ public class PGNUtil
         {
             parser.parseArgument(args);
             if (CLOptions.help) throw new CmdLineException("");
-            CLOptionResolver.resolveOpts(CLOptions.getSetOpts());
+            CLOptionResolver.resolveOpts(CLOptions.getOptMap());
             
             if (pgnFileList.isEmpty())
                 pgnFileList.add(new PgnFile(new BufferedReader(new InputStreamReader(System.in))));
