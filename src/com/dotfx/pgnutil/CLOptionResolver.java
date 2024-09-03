@@ -74,7 +74,7 @@ public class CLOptionResolver
             {
                 StringJoiner sj = new StringJoiner(",' '", "'", "'");
                 for (OptId opt : setIntersects) sj.add(opt.toString());
-                System.err.println("Only one of " + sj + " may be set at a time.");
+                System.err.println("Only one of " + sj + " may be set at a time!");
                 System.exit(-1);
             }
         }
@@ -89,7 +89,7 @@ public class CLOptionResolver
             {
                 if (setOpts.get(opt) > 1)
                 {
-                    System.err.println("Option '" + opt + "' may only be set once.");
+                    System.err.println("Option '" + opt + "' may only be set once!");
                     System.exit(-1);
                 }
             }
@@ -136,7 +136,7 @@ public class CLOptionResolver
         {
             if (CLOptions.getCount(OptId.MATCHPLAYER) > 2)
             {
-                System.err.println("Option '" + OptId.MATCHPLAYER + "' may not be set more than twice.");
+                System.err.println("Option '" + OptId.MATCHPLAYER + "' may not be set more than twice!");
                 System.exit(-1);
             }
         }
@@ -206,12 +206,9 @@ public class CLOptionResolver
         @Override
         public void handleIfAny(Map<OptId,Integer> setOpts, Set<OptId> ifAnyIntersects)
         {
-            for (int i = 0; i < PGNUtil.outputSelectors.length; i++)
-            {
-                if (PGNUtil.outputSelectors[i].getValue() == OutputSelector.Value.CBPLAYERS)
-                    PGNUtil.outputSelectors[i].
-                            setOutputHandler(new OutputSelector.ClockBelowPlayersOutputHandler(clock));
-            }
+            Arrays.stream(PGNUtil.outputSelectors).filter(selector ->
+                    selector.getValue() == OutputSelector.Value.CBPLAYERS).forEach(selector ->
+                    selector.setOutputHandler(new OutputSelector.ClockBelowPlayersOutputHandler(clock)));
         }
     }
 
@@ -239,7 +236,7 @@ public class CLOptionResolver
             this.handler = handler;
         }
 
-        private final void handle(final Map<OptId,Integer> setOpts)
+        private void handle(final Map<OptId, Integer> setOpts)
         {
             Set<OptId> intersects = setOpts.keySet().stream().filter(checkOpts::contains).collect(Collectors.toSet());
             if (intersects.isEmpty()) return;
@@ -250,42 +247,63 @@ public class CLOptionResolver
 
             if (setOpts.keySet().stream().noneMatch(ifNoneOf::contains)) handler.handleIfNone(setOpts);
         }
+
+        @Override
+        public final boolean equals(Object other)
+        {
+            ConditionSet that = (ConditionSet)other;
+
+            return that != null && checkOpts.equals(that.checkOpts) && ifAnyOf.equals(that.ifAnyOf) &&
+                    ifNoneOf.equals(that.ifNoneOf);
+        }
+
+        @Override
+        public final int hashCode()
+        {
+            return ConditionSet.class.hashCode() ^ checkOpts.hashCode() ^ ifAnyOf.hashCode() ^ ifNoneOf.hashCode();
+        }
     }
 
-    private static final List<ConditionSet> conditionList = new ArrayList<>();
+    private static final Set<ConditionSet> condSetSet = new HashSet<>();
 
     public static void addCondition(OptId checkOpts[], OptId ifAnyOf[], OptId ifNoneOf[], OptHandler handler)
     {
-        if (conditionList.stream().anyMatch(cond -> Arrays.deepEquals(checkOpts, cond.checkOpts.toArray()))) return;
-        conditionList.add(new ConditionSet(checkOpts, ifAnyOf, ifNoneOf, handler));
+        condSetSet.add(new ConditionSet(checkOpts, ifAnyOf, ifNoneOf, handler));
     }
 
     public static void resolveOpts(final Map<OptId,Integer> setOpts)
     {
-        final OptId topLevelOpts[] = new OptId[] {OptId.DUPLICATES, OptId.DUPLICATEMOVES, OptId.DUPLICATEOPENINGS,
-                OptId.OPENINGS, OptId.EVENTS, OptId.PLAYERRESULTS, OptId.CHECKSEQUENTIALROUNDS};
+        final OptId topLevelOpts[] = new OptId[] {OptId.get(CLOptions.D), OptId.get(CLOptions.DM),
+                OptId.get(CLOptions.DO), OptId.get(CLOptions.O), OptId.get(CLOptions.E), OptId.get(CLOptions.P),
+                OptId.get(CLOptions.CSR)};
 
-        final OptId ecoOpts[] = new OptId[] {OptId.STDECO, OptId.SCIDECO, OptId.XSTDECO, OptId.XSCIDECO};
+        // sub-options under "-o"
+        final OptId ecoOpts[] = new OptId[] {OptId.get(CLOptions.ECO), OptId.get(CLOptions.SECO),
+                OptId.get(CLOptions.XECO), OptId.get(CLOptions.XSECO)};
 
-        final OptId matchOpeningOpts[] =
-                new OptId[] {OptId.MATCHOPENING, OptId.NOTMATCHOPENING, OptId.OPENINGFILE, OptId.NOTOPENINGFILE};
+        final OptId matchOpeningOpts[] = new OptId[] {OptId.get(CLOptions.MO), OptId.get(CLOptions.NMO),
+                OptId.get(CLOptions.OF), OptId.get(CLOptions.NOF)};
 
-        final OptId matchPositionOpts[] =
-                new OptId[] {OptId.MATCHPOSITION, OptId.POSITIONFILE, OptId.MATCHFEN, OptId.FENFILE};
+        final OptId matchPositionOpts[] = new OptId[] {OptId.get(CLOptions.MPOS), OptId.get(CLOptions.POSF),
+                OptId.get(CLOptions.MFEN), OptId.get(CLOptions.FF)};
 
-        final OptId SingletonOpts[] =
-                new OptId[] {OptId.MATCHPOSITION, OptId.POSITIONFILE, OptId.MATCHFEN, OptId.FENFILE, OptId.PRINTPOS,
-                OptId.GAMENUM, OptId.GAMENUMFILE, OptId.MATCHWINNER, OptId.MATCHLOSER, OptId.TIMEFAULT, OptId.LOWELO,
-                OptId.HIELO, OptId.LOWELODIFF, OptId.HIELODIFF, OptId.CLOCKBELOW, OptId.CLOCKNOTBELOW, OptId.ELOFILE,
-                OptId.MATCHOPENING, OptId.NOTMATCHOPENING, OptId.OPENINGFILE, OptId.NOTOPENINGFILE, OptId.ECOFILE,
-                OptId.MATCHECO, OptId.MATCHECODESC, OptId.MATCHSCIDECO, OptId.MATCHSCIDECODESC, OptId.MATCHTRANSECO,
-                OptId.MATCHTRANSECODESC, OptId.MATCHTRANSSCIDECO, OptId.MATCHTRANSSCIDECODESC, OptId.ANYPLAYERFILE,
-                OptId.PLAYERFILE, OptId.NOTPLAYERFILE, OptId.TIMECONTROL, OptId.LOPLYCOUNT, OptId.HIPLYCOUNT,
-                OptId.BOOKMARKER, OptId.LOOOBCOUNT, OptId.HIOOBCOUNT, OptId.REPLACE, OptId.REPLACEWINNER,
-                OptId.REPLACELOSER, OptId.REPLACEOPENING, OptId.DUPLICATES, OptId.DUPLICATEMOVES,
-                OptId.DUPLICATEOPENINGS, OptId.EVENTS, OptId.CHECKSEQUENTIALROUNDS, OptId.OPENINGS, OptId.STDECO,
-                OptId.SCIDECO, OptId.XSTDECO, OptId.XSCIDECO, OptId.MINGAMECOUNT, OptId.LOWINDIFF, OptId.HIWINDIFF,
-                OptId.MAXDRAW, OptId.MINDRAW, OptId.PLAYERRESULTS, OptId.SELECTORS};
+        final OptId SingletonOpts[] = new OptId[] {OptId.get(CLOptions.MPOS), OptId.get(CLOptions.POSF),
+                OptId.get(CLOptions.MFEN), OptId.get(CLOptions.FF), OptId.get(CLOptions.PP),
+                OptId.get(CLOptions.GN), OptId.get(CLOptions.GNF), OptId.get(CLOptions.MW), OptId.get(CLOptions.ML),
+                OptId.get(CLOptions.TF), OptId.get(CLOptions.LELO), OptId.get(CLOptions.HELO), OptId.get(CLOptions.LED),
+                OptId.get(CLOptions.HED), OptId.get(CLOptions.CB), OptId.get(CLOptions.CNB), OptId.get(CLOptions.ELO),
+                OptId.get(CLOptions.MO), OptId.get(CLOptions.NMO), OptId.get(CLOptions.OF), OptId.get(CLOptions.NOF),
+                OptId.get(CLOptions.EF), OptId.get(CLOptions.ME), OptId.get(CLOptions.MED), OptId.get(CLOptions.MSE),
+                OptId.get(CLOptions.MSED), OptId.get(CLOptions.MXE), OptId.get(CLOptions.MXED),
+                OptId.get(CLOptions.MXSE), OptId.get(CLOptions.MXSED), OptId.get(CLOptions.APF),
+                OptId.get(CLOptions.PF), OptId.get(CLOptions.NPF), OptId.get(CLOptions.TC), OptId.get(CLOptions.LPC),
+                OptId.get(CLOptions.HPC), OptId.get(CLOptions.BM), OptId.get(CLOptions.LOOB), OptId.get(CLOptions.HOOB),
+                OptId.get(CLOptions.R), OptId.get(CLOptions.RW), OptId.get(CLOptions.RL), OptId.get(CLOptions.RO),
+                OptId.get(CLOptions.D), OptId.get(CLOptions.DM), OptId.get(CLOptions.DO), OptId.get(CLOptions.E),
+                OptId.get(CLOptions.CSR), OptId.get(CLOptions.O), OptId.get(CLOptions.ECO), OptId.get(CLOptions.SECO),
+                OptId.get(CLOptions.XECO), OptId.get(CLOptions.XSECO), OptId.get(CLOptions.CMIN),
+                OptId.get(CLOptions.LWD), OptId.get(CLOptions.HWD), OptId.get(CLOptions.HDRAW),
+                OptId.get(CLOptions.LDRAW), OptId.get(CLOptions.P), OptId.get(CLOptions.S)};
 
         new ConditionSet(topLevelOpts, null, null, new MutexHandler()).handle(setOpts);
         new ConditionSet(ecoOpts, null, null, new MutexHandler()).handle(setOpts);
@@ -293,13 +311,13 @@ public class CLOptionResolver
         new ConditionSet(matchPositionOpts, null, null, new MutexHandler()).handle(setOpts);
         new ConditionSet(SingletonOpts, null, null, new SingletonHandler()).handle(setOpts);
 
-        new ConditionSet(new OptId[] {OptId.OPENINGS}, null, ecoOpts,
+        new ConditionSet(new OptId[] {OptId.get(CLOptions.O)}, null, ecoOpts,
                 new OpeningsHandler()).handle(setOpts);
 
-        new ConditionSet(new OptId[] {OptId.SELECTORS}, null, topLevelOpts,
+        new ConditionSet(new OptId[] {OptId.get(CLOptions.S)}, null, topLevelOpts,
                 new DefaultSelectorsHandler()).handle(setOpts);
 
         // anything else requiring delayed initialization
-        for (ConditionSet cs : conditionList) cs.handle(setOpts);
+        for (ConditionSet cs : condSetSet) cs.handle(setOpts);
     }
 }

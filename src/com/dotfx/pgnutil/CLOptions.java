@@ -109,7 +109,7 @@ public class CLOptions
     public static final String V = "-v";
     public static final String VD = "-vd";
     public static final String VG = "-vg";
-    public static final String XE = "-xeco"; // transpositional ECO output for "-o"
+    public static final String XECO = "-xeco"; // transpositional ECO output for "-o"
     public static final String XSECO = "-xseco"; // transpositional SCID ECO output for "-o"
     
     public enum OptId
@@ -117,14 +117,12 @@ public class CLOptions
         ANYPLAYERFILE(APF),
         AQUARIUM(AQ),
         BOOKMARKER(BM),
-        MINGAMECOUNT(CMIN),
         CHECKSEQUENTIALROUNDS(CSR),
         CLOCKBELOW(CB),
         CLOCKNOTBELOW(CNB),
         DUPLICATES(D),
         DUPLICATEMOVES(DM),
         DUPLICATEOPENINGS(DO),
-        STDECO(ECO),
         ECOFILE(EF),
         ELOFILE(ELO),
         EVENTS(E),
@@ -160,6 +158,7 @@ public class CLOptions
         MATCHWINNER(MW),
         MAXDRAW(HDRAW),
         MINDRAW(LDRAW),
+        MINGAMECOUNT(CMIN),
         NOTMATCH(NM),
         NOTMATCHOPENING(NMO),
         NOTMATCHTAG(NMT),
@@ -179,10 +178,11 @@ public class CLOptions
         REPLACEWINNER(RW),
         SCIDECO(SECO),
         SELECTORS(S),
+        STDECO(ECO),
         TIMECONTROL(TC),
         TIMEFAULT(TF),
         VALUEDELIM(VD),
-        XSTDECO(XE),
+        XSTDECO(XECO),
         XSCIDECO(XSECO);
         
         private static final Map<String,OptId> sigMap = new HashMap<>();
@@ -1045,15 +1045,15 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
 
-    @Option(name = XE, depends = {O}, aliases = "-trans_eco_stats",
+    @Option(name = XECO, depends = {O}, aliases = "-trans_eco_stats",
             usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each ECO code, " +
                     "matching openings transpositionally")
     private void XEcoOpenings(boolean o)
     {
-        countOption(OptId.get(XE));
+        countOption(OptId.get(XECO));
 
         // delay tree initialization in case "-ef" is set
-        CLOptionResolver.addCondition(new OptId[] {OptId.get(XE)}, null, null,
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(XECO)}, null, null,
                 new CLOptionResolver.StdEcoHandler(true));
     }
 
