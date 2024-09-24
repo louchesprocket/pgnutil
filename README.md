@@ -65,7 +65,7 @@ uses the "-posf" (position-file) option to search for a list of positions contai
 
 The "-mfen" (match FEN) option may be used to search for positions from a FEN string:
 
-``pgutil -mfen 'rnb1kb1r/ppq2ppp/3p4/2pPp3/8/2B2Q2/PPP2PPP/2KR1BNR w kq e6 0 9' -i mygames.pgn``
+``pgnutil -mfen 'rnb1kb1r/ppq2ppp/3p4/2pPp3/8/2B2Q2/PPP2PPP/2KR1BNR w kq e6 0 9' -i mygames.pgn``
 
 And its corresponding multi-position search option is "-ff" (FEN-file):
 
