@@ -51,9 +51,27 @@ If we want to perform any of these queries on a list of player names (instead of
 
 will output every drawn game from the file mygames.pgn wherein both players are listed in the file myplayers.txt.  The latter is a simple text file listing player names, one per line.
 
-Position searches are performed with the "-mpos" (match position) option, where the parameter is in Standard Algebraic Notation. For example:
+#### Position Search
+
+Position searches may be performed with the "-mpos" (match position) option, where the parameter is in Standard Algebraic Notation. For example:
 
 ``pgnutil -mpos '1.d4 Nf6 2.c4 c5' -i mygames.pgn``
+
+Alternatively,
+
+``pgnutil -posf sanfile.txt -i mygames.pgn``
+
+uses the "-posf" (position-file) option to search for a list of positions contained in sanfile.txt.
+
+The "-mfen" (match FEN) option may be used to search for positions from a FEN string:
+
+``pgutil -mfen 'rnb1kb1r/ppq2ppp/3p4/2pPp3/8/2B2Q2/PPP2PPP/2KR1BNR w kq e6 0 9' -i mygames.pgn``
+
+And its corresponding multi-position search option is "-ff" (FEN-file):
+
+``pgnutil -ff fenfile.txt -i mygames.pgn``
+
+#### ECO Search
 
 Searches for ECO codes may, of course, be performed with the <nobr>"-mt"</nobr> option if the games in question have that tag. A more general way to perform ECO searches is with the <nobr>"-me"</nobr> (match ECO) option. For example:
 

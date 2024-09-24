@@ -1019,10 +1019,10 @@ public final class PgnGame
 
         for (Move move : moves)
         {
-            if (board.move(move).positionEquals(pos)) return true;
-            
             if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount)
                 return false;
+
+            if (board.move(move).positionEquals(pos)) return true;
         }
         
         return false;
@@ -1036,9 +1036,9 @@ public final class PgnGame
 
         for (PgnGame.Move move : getMoves())
         {
-            board.move(move);
             if (board.getWhitePieceCount() < minWhitePieces || board.getBlackPieceCount() < minBlackPieces) break;
             if (positionSet.contains(looseBoard)) return true;
+            board.move(move);
         }
 
         return false;
