@@ -2066,6 +2066,7 @@ C25|Vienna Gambit, with Max Lange Defense: Steinitz Gambit, Sörensen Defense|e4
 C27|Vienna Game: Stanley Variation, Monster Declined|e4 e5 Nc3 Nf6 Bc4 Nxe4 Qh5 Nd6 Bb3 Be7|d79f8b01c8a19dba
 C29|Vienna Game: Vienna Gambit, Breyer Variation|e4 e5 Nc3 Nf6 f4 d5 fxe5 Nxe4 Nf3 Be7|6c25151bb2f78970
 C29|Vienna Game: Vienna Gambit, Bardeleben Variation|e4 e5 Nc3 Nf6 f4 d5 fxe5 Nxe4 Qf3 f5|24dd39ab5839e6c8
+A06|Zukertort Opening: Tennison Gambit, Brigg's Trap|e4 d5 Nf3 dxe4 Ng5 Nf6 Nc3 Bf5 Qe2 Qd4|b7626416214ef3bc
 B01|Scandinavian Defense: Bronstein Variation|e4 d5 exd5 Qxd5 Nc3 Qd6 d4 Nf6 Nf3 a6|e7d0f00d8ea633f0
 B01|Scandinavian Defense: Anderssen Counterattack, Collijn Variation|e4 d5 exd5 Qxd5 Nc3 Qa5 d4 e5 Nf3 Bg4|98a94ba64f5c2b10
 B01|Scandinavian Defense: Classical Variation|e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 Bf5|160db76293dadb53
@@ -2964,6 +2965,7 @@ E75|King's Indian Defense: Averbakh Variation, Main Line|d4 Nf6 c4 g6 Nc3 Bg7 e4
 D05|Rubinstein Opening: Bogoljubow Defense|d4 Nf6 Nf3 e6 e3 c5 Bd3 d5 b3 Nc6 O-O Bd6 Bb2 O-O|d82c732f464cb4de
 D05|Rubinstein Opening: Classical Defense|d4 Nf6 Nf3 e6 e3 c5 Bd3 d5 b3 Nc6 O-O Be7 Bb2 O-O|022cd8a30ccbf810
 A29|English Opening: King's English Variation, Four Knights Variation, Fianchetto Line|c4 e5 g3 Nf6 Bg2 d5 cxd5 Nxd5 Nf3 Nc6 d3 Be7 O-O O-O|d63b448790d8ea34
+A29|English Opening: King's English Variation, Four Knights Variation, Fianchetto Line, Delayed .. Nc6|c4 e5 Nc3 Nf6 g3 Bb4 Bg2 O-O Nf3 Re8 O-O e4 Nd4 Nc6|a80e54e6bc757046
 A14|English Opening: Agincourt Defense, Keres Defense|c4 e6 Nf3 d5 g3 Nf6 Bg2 Be7 O-O c5 cxd5 Nxd5 Nc3 Nc6|9c47733a058ca3ac
 C32|King's Gambit Declined: Falkbeer Countergambit, Charousek Variation|e4 e5 f4 d5 exd5 e4 d3 Nf6 dxe4 Nxe4 Qe2 Qxd5 Nd2 f5 g4|9fe41482aaeef40d
 C25|Vienna Gambit, with Max Lange Defense: Hamppe-Allgaier Gambit, Thorold Variation|e4 e5 f4 exf4 Nf3 Nc6 Nc3 g5 h4 g4 Ng5 h6 Nxf7 Kxf7 d4|d2ac08dc98b6eb25
