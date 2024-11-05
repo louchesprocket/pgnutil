@@ -706,6 +706,7 @@ D00|Blackmar-Diemer Gambit: Fritz Attack|d4 d5 e4 dxe4 Bc4|d2c4a78b0df5a8af
 D00|Blackmar-Diemer Gambit: Blackmar Gambit|d4 d5 e4 dxe4 f3|ce8908cc308a11de
 D01|Rapport-Jobava System, with e6|d4 d5 Nc3 e6 Bf4|24199b26a0ba5cc5
 D01|Rapport-Jobava System|d4 d5 Nc3 Nf6 Bf4|e31b2fb5f91789f9
+A43|Benoni Defense: Benoni-Indian Defense, Kingside Move Order|d4 c5 d5 Nf6 Nf3|16c4bae4dbdc2f37
 A43|Benoni Defense: Benoni-Staunton Gambit|d4 c5 d5 f5 e4|c9040126769c0a15
 A43|Queen's Pawn Game: Liedmann Gambit|d4 c5 c4 cxd4 e3|77864be8c39ae8a9
 A43|Benoni Defense: Zilbermints-Benoni Gambit|d4 c5 Nf3 cxd4 b4|38dd4e3ef046c859
@@ -728,7 +729,6 @@ E61|King's Indian Defense|d4 Nf6 c4 g6 Nc3|a2e552f085f1e8d2
 A46|Indian Defense: London System|d4 Nf6 Nf3 e6 Bf4|c0d4227ac3feeeb4
 A46|Torre Attack: Classical Defense|d4 Nf6 Nf3 e6 Bg5|69248cd09e0b7746
 A46|Yusupov-Rubinstein System|d4 Nf6 Nf3 e6 e3|d0cb1b2d9e067f95
-A43|Benoni Defense: Benoni-Indian Defense, Kingside Move Order|d4 Nf6 Nf3 c5 d5|16c4bae4dbdc2f37
 A48|London System|d4 Nf6 Nf3 g6 Bf4|2b1fa7531b8334f1
 A48|Torre Attack: Fianchetto Defense|d4 Nf6 Nf3 g6 Bg5|fdf67f7d6f426eaf
 E60|King's Indian Defense: Normal Variation, King's Knight Variation|d4 Nf6 Nf3 g6 c4|afedcee2b17b2c66
@@ -1100,6 +1100,7 @@ A15|English Opening: Anglo-Indian Defense, Romanishin Variation|c4 e6 Nf3 Nf6 g3
 A17|English Opening: Anglo-Indian Defense, Queen's Indian Formation|c4 e6 Nc3 Nf6 Nf3 b6|12250d9010709a38
 A18|English Opening: Mikenas-Carls Variation|c4 e6 Nc3 Nf6 e4 Nc6|6c1f326a051e12e0
 A19|English Opening: Mikenas-Carls, Sicilian|c4 e6 Nc3 Nf6 e4 c5|cf0631ccb763af51
+A35|English Opening: Symmetrical Variation|c4 c5 Nc3 Nf6 Nf3 e5|973d0644fb212844
 A15|English Opening: Anglo-Indian Defense, Scandinavian Defense, Exchange Variation|c4 Nf6 Nf3 d5 cxd5 Nxd5|255857f98f38c352
 A35|English Opening: Symmetrical Variation, Four Knights Variation|c4 Nf6 Nf3 c5 Nc3 Nc6|891c00d9c98909e8
 A15|English Opening: Anglo-Indian Defense, Grünfeld Formation|c4 Nf6 Nf3 g6 g3 d5|2f08464bb9489707
@@ -2097,6 +2098,7 @@ B37|Sicilian Defense: Accelerated Dragon, Maróczy Bind|e4 c5 Nf3 Nc6 d4 cxd4 Nx
 B33|Sicilian Defense: Lasker-Pelikan Variation|e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 e5|04c3b650d89458f7
 B30|Sicilian Defense: Closed, Anti-Sveshnikov Variation, with d6|e4 c5 Nf3 Nc6 Nc3 e5 Bc4 Be7 d3 d6|fd748df486593ba1
 B30|Sicilian Defense: Closed, Anti-Sveshnikov Variation, with Nf6|e4 c5 Nf3 Nc6 Nc3 e5 Bc4 Be7 d3 Nf6|f4ffe8140f021ad0
+B22|Sicilian Defense: Delayed Alapin Variation|e4 c5 Nf3 e6 c3 d5 exd5 Qxd5 d4 Nf6|0999030d1bc1373b
 B40|Sicilian Defense: Alapin Variation, Sherzer Variation|e4 c5 Nf3 e6 c3 Nf6 e5 Nd5 d4 Nc6|dff25454c3998f56
 B47|Sicilian Defense: Taimanov Variation, Bastrikov Variation|e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nc3 Qc7|d76af624f4905387
 B46|Sicilian Defense: Taimanov Variation|e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nc3 a6|851d51ac5338c197
@@ -2210,9 +2212,12 @@ A26|English Opening: King's English Variation, Closed System, Full Symmetry|c4 e
 A28|English Opening: King's English Variation, Four Knights Variation, Quiet Line|c4 e5 Nc3 Nf6 Nf3 Nc6 e3 Bb4 Qc2 Bxc3|aa561491ad6ee7ad
 A40|English Defense: Hartlaub Gambit Accepted|c4 e6 d4 b6 Nc3 Bb7 e4 f5 exf5 Nf6|e9c9038f26e108c8
 A33|English Opening: Symmetrical Variation, Anti-Benoni Variation, Spielmann Defense|c4 e6 Nf3 Nf6 Nc3 c5 d4 cxd4 Nxd4 Nc6|4ad37ea7947ed13c
+D41|Queen's Gambit Declined: Semi-Tarrasch Defense|c4 c5 Nf3 Nf6 Nc3 Nc6 g3 d5 d4 e6|9149fd49c71899a1
+A34|English Opening: Symmetrical Variation|c4 c5 Nf3 Nf6 Nc3 Nc6 g3 d5 d4 cxd4|2e2cc882952bb3fe
 A37|English Opening: Symmetrical Variation, Botvinnik System Reversed, with Nf3|c4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 Nf3 e5|27f5cbfc1b97fcb5
 A36|English Opening: Symmetrical Variation, Botvinnik System Reversed, with e3|c4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 e3 e5|ac46dc7000dd4933
 A38|English Opening: Symmetrical Variation, Full Symmetry Line|c4 Nf6 Nf3 c5 Nc3 Nc6 g3 g6 Bg2 Bg7|0768f00d0143cb43
+A17|English Opening: Anglo-Indian Defense|c4 Nf6 Nc3 d5 cxd5 Nxd5 Nf3 c5 e3 e6|e43cf3abcdd3bd99
 A16|English Opening: Anglo-Indian Defense, Anglo-Grünfeld Variation|c4 Nf6 Nc3 d5 cxd5 Nxd5 g3 g6 Bg2 Nb6|2f4a37dccd091f92
 A16|English Opening: Anglo-Indian Defense, Anglo-Grünfeld Variation|c4 Nf6 Nc3 d5 cxd5 Nxd5 g3 g6 Bg2 Nxc3|2c517a58946de785
 A34|English Opening: Symmetrical Variation, Rubinstein Variation|c4 Nf6 Nc3 c5 g3 d5 cxd5 Nxd5 Bg2 Nc7|241b2b76c3527ae3
@@ -2647,6 +2652,7 @@ A29|English Opening: King's English Variation, Four Knights Variation, Fianchett
 A13|English Opening: Agincourt Defense, Tarrasch Defense|c4 e6 Nf3 d5 g3 Nf6 Bg2 c5 b3 Nc6 O-O Be7|c851176736357844
 A33|English Opening: Symmetrical Variation, Anti-Benoni Variation, Geller Variation|c4 e6 Nf3 Nf6 Nc3 c5 d4 Nc6 g3 cxd4 Nxd4 Qb6|cee16231bf4099b1
 A30|English Opening: Symmetrical Variation, Hedgehog Defense|c4 e6 Nf3 Nf6 Nc3 c5 g3 b6 Bg2 Bb7 O-O Be7|d3e40de6a6b317a4
+A34|English Opening: Symmetrical Variation, Rubinstein Variation|c4 c5 Nf3 Nf6 Nc3 d5 cxd5 Nxd5 g3 Nc6 Bg2 Nc7|07469586b0b76faa
 A16|English Opening: Anglo-Grünfeld Defense, Korchnoi Variation|c4 Nf6 Nc3 d5 cxd5 Nxd5 Nf3 g6 g3 Bg7 Bg2 e5|c2fe46681a2f53fe
 C30|King's Gambit Declined: Classical, Réti Variation|e4 e5 f4 Bc5 Nf3 d6 c3 f5 fxe5 dxe5 d4 exd4 Bc4|87b945ad93c36d9c
 C33|King's Gambit Accepted: Bishop's Gambit, McDonnell Attack|e4 e5 f4 exf4 Bc4 Qh4 Kf1 g5 Nc3 Bg7 d4 Ne7 g3|e6808b321122fc59
@@ -2730,6 +2736,7 @@ B72|Sicilian Defense: Dragon Variation, Classical Variation|e4 c5 Nf3 d6 d4 cxd4
 B52|Sicilian Defense: Moscow Variation, Haag Gambit|e4 c5 Nf3 d6 Bb5 Bd7 Bxd7 Qxd7 O-O Nc6 c3 Nf6 d4|b2351665a95aa9de
 B24|Sicilian Defense: Closed, Smyslov Variation|e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 d3 e6 Be3 Nd4 Nce2|42f15d6ac663d85c
 B12|Caro-Kann Defense: Advance Variation, Van der Wiel Attack|e4 c6 d4 d5 e5 Bf5 Nc3 e6 g4 Bg6 Nge2 c5 h4|2543adb0b4f26d1f
+B18|Caro-Kann Defense: Martian Gambit|e4 c6 d4 d5 Nd2 dxe4 Nxe4 Bf5 Ng5 Bg6 N1f3 h6 Ne6|dfca5c30e96ff6fc
 B03|Alekhine Defense: Four Pawns Attack, Main Line|e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 f4 dxe5 fxe5 Nc6 Be3|8cb11e33c885808c
 B04|Alekhine Defense: Modern Variation, Keres Variation|e4 Nf6 e5 Nd5 d4 d6 Nf3 g6 Bc4 Nb6 Bb3 Bg7 a4|54eb0db711005845
 B02|Alekhine Defense: Hunt Variation, Matsukevich Gambit|e4 Nf6 e5 Nd5 c4 Nb6 c5 Nd5 Nc3 Nxc3 dxc3 d6 Bg5|64f6b542f1a0abdc
@@ -3323,6 +3330,7 @@ B17|Caro-Kann Defense: Karpov Variation, Modern Main Line|e4 c6 d4 d5 Nd2 dxe4 N
 D34|Tarrasch Defense: Classical Variation, Réti Variation|d4 d5 c4 e6 Nc3 c5 cxd5 exd5 Nf3 Nc6 g3 Nf6 Bg2 Be7 O-O O-O dxc5 Bxc5 Na4|2f4ea758467c1bc7
 D57|Queen's Gambit Declined: Lasker Defense, Main Line|d4 d5 c4 e6 Nc3 Be7 Nf3 Nf6 Bg5 h6 Bh4 O-O e3 Ne4 Bxe7 Qxe7 cxd5 Nxc3 bxc3|95adfebf56dadd29
 D40|Queen's Gambit Declined: Semi-Tarrasch Defense, Levenfish Variation|d4 d5 c4 e6 Nc3 Nf6 Nf3 c5 e3 Nc6 Bd3 Bd6 O-O O-O Qe2 Qe7 dxc5 Bxc5 e4|33b7e6ac6476466a
+D46|Semi-Slav Defense: Chigorin Defense|d4 d5 c4 c6 Nf3 e6 e3 Nf6 Nc3 Bd6 Bd3 dxc4 Bxc4 b5 Bd3 Nbd7 O-O O-O Qc2|dc5750a434c03700
 D44|Semi-Slav Defense: Botvinnik Variation, Ekstrom Variation|d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 dxc4 e4 b5 e5 h6 Bh4 g5 exf6 gxh4 Ne5|be9bbefdc4ded304
 D48|Semi-Slav Defense: Meran Variation, Reynolds' Variation|d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e3 Nbd7 Bd3 dxc4 Bxc4 b5 Bd3 a6 e4 c5 d5|63900dd6e0f82c31
 D45|Semi-Slav Defense: Stoltz Variation, Center Variation, Mikhalchishin Line|d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e3 Nbd7 Qc2 Bd6 e4 dxe4 Nxe4 Nxe4 Qxe4 e5 dxe5|e41fe2160a88c850
@@ -3406,6 +3414,7 @@ D67|Queen's Gambit Declined: Orthodox Defense, Main Line|d4 d5 c4 e6 Nc3 Nf6 Bg5
 D67|Queen's Gambit Declined: Orthodox Defense, Alekhine Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7 Rc1 c6 Bd3 dxc4 Bxc4 Nd5 Bxe7 Qxe7 Ne4|039ebbec6cca1379
 D41|Queen's Gambit Declined: Semi-Tarrasch Defense, Kmoch Variation|d4 d5 c4 e6 Nc3 Nf6 Nf3 c5 cxd5 Nxd5 e4 Nxc3 bxc3 cxd4 cxd4 Bb4 Bd2 Bxd2 Qxd2 O-O Bb5|1bba3c4b3acea9fc
 D44|Semi-Slav Defense: Botvinnik Variation, Lilienthal Variation|d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 dxc4 e4 b5 e5 h6 Bh4 g5 Nxg5 hxg5 Bxg5 Nbd7 g3|d94bd4a8ff4111af
+D46|Semi-Slav Defense: Chigorin Defense|d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7 Bd3 dxc4 Bxc4 b5 Bd3 Bd6 O-O Bb7 a3 O-O Qc2|5bbec6fa57f4d917
 D49|Semi-Slav Defense: Meran Variation, Blumenfeld Variation|d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7 Bd3 dxc4 Bxc4 b5 Bd3 a6 e4 c5 e5 cxd4 Nxb5|290bec5c30005813
 D44|Semi-Slav Defense: Botvinnik Variation, Szabo Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 c6 Bg5 dxc4 e4 b5 e5 h6 Bh4 g5 Nxg5 hxg5 Bxg5 Nbd7 Qf3|488a6fc501d9a659
 D55|Queen's Gambit Declined: Anti-Tartakower Variation, Petrosian Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 h6 Bxf6 Bxf6 e3 O-O Rc1 c6 Bd3 Nd7 O-O dxc4 Bxc4|cae4d34d481883f2

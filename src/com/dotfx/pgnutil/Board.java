@@ -226,9 +226,7 @@ public class Board implements Comparable<Board>
     private static final int blackQCastleSquares[] = new int[] {58, 59, 60};
     private static final Color[] COLORS = new Color[] {Color.WHITE, Color.BLACK};
     private static final int[] NMOVES = new int[] {6, 15, 17, 10, -6, -15, -17, -10};
-    
-    private final Piece position[];
-    private short ply; // zero at initial position
+
     private boolean whiteCanCastleQ;
     private boolean whiteCanCastleK;
     private boolean blackCanCastleQ;
@@ -237,8 +235,10 @@ public class Board implements Comparable<Board>
     private byte blackKingLoc;
     private byte epCandidate; // location of the capture square; -1 if none
     private short halfMoveClock; // ply of last capture or pawn move
-    private byte whitePieceCount = 16;
-    private byte blackPieceCount = 16;
+    short ply; // zero at initial position
+    byte whitePieceCount = 16;
+    byte blackPieceCount = 16;
+    final Piece position[];
     
     public Board(boolean initialPosition)
     {
@@ -1549,7 +1549,8 @@ public class Board implements Comparable<Board>
 //            blackPieceCount != that.blackPieceCount)
 //            return false;
         
-        return (ply & 1) == (that.ply & 1) && Arrays.equals(position, that.position);
+        return (ply & 1) == (that.ply & 1) && (whitePieceCount == that.whitePieceCount) &&
+                (blackPieceCount == that.blackPieceCount) && Arrays.equals(position, that.position);
     }
     
     public final PositionId positionId()

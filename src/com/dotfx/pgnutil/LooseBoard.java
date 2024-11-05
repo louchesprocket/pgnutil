@@ -53,8 +53,8 @@ public class LooseBoard implements Comparable<LooseBoard>
         int plyDiff = (board.getPly() & 1) - (that.getPly() & 1); // parity check
         if (plyDiff != 0) return plyDiff;
 
-        Board.Piece[] position = board.getPosition();
-        Board.Piece[] thatPosition = that.getPosition();
+        Board.Piece[] position = board.position;
+        Board.Piece[] thatPosition = that.board.position;
 
         for (int i = 0; i < position.length; i++)
         {
@@ -76,14 +76,21 @@ public class LooseBoard implements Comparable<LooseBoard>
     @Override
     public final boolean equals(Object other)
     {
-        try { return compareTo((LooseBoard)other) == 0; }
+        try
+        {
+            Board that = ((LooseBoard)other).board;
+
+            return (board.ply & 1) == (that.ply & 1) && /*(board.whitePieceCount == that.whitePieceCount) &&
+                    (board.blackPieceCount == that.blackPieceCount) &&*/ Arrays.equals(board.position, that.position);
+        }
+
         catch (ClassCastException e) { return false; }
     }
 
     @Override
     public final int hashCode()
     {
-        return LooseBoard.class.hashCode() ^ Arrays.hashCode(board.getPosition()) ^
-                Integer.hashCode(board.getPly() & 1);
+        return LooseBoard.class.hashCode() ^ Arrays.hashCode(board.position) ^
+                Integer.hashCode(board.ply & 1);
     }
 }
