@@ -287,7 +287,7 @@ public class CLOptionResolver
         final OptId matchPositionOpts[] = new OptId[] {OptId.get(CLOptions.MPOS), OptId.get(CLOptions.POSF),
                 OptId.get(CLOptions.MFEN), OptId.get(CLOptions.FF)};
 
-        final OptId SingletonOpts[] = new OptId[] {OptId.get(CLOptions.MPOS), OptId.get(CLOptions.POSF),
+        final OptId singletonOpts[] = new OptId[] {OptId.get(CLOptions.MPOS), OptId.get(CLOptions.POSF),
                 OptId.get(CLOptions.MFEN), OptId.get(CLOptions.FF), OptId.get(CLOptions.PP),
                 OptId.get(CLOptions.GN), OptId.get(CLOptions.GNF), OptId.get(CLOptions.MW), OptId.get(CLOptions.ML),
                 OptId.get(CLOptions.TF), OptId.get(CLOptions.LELO), OptId.get(CLOptions.HELO), OptId.get(CLOptions.LED),
@@ -309,7 +309,7 @@ public class CLOptionResolver
         new ConditionSet(ecoOpts, null, null, new MutexHandler()).handle(setOpts);
         new ConditionSet(matchOpeningOpts, null, null, new MutexHandler()).handle(setOpts);
         new ConditionSet(matchPositionOpts, null, null, new MutexHandler()).handle(setOpts);
-        new ConditionSet(SingletonOpts, null, null, new SingletonHandler()).handle(setOpts);
+        new ConditionSet(singletonOpts, null, null, new SingletonHandler()).handle(setOpts);
 
         new ConditionSet(new OptId[] {OptId.get(CLOptions.O)}, null, ecoOpts,
                 new OpeningsHandler()).handle(setOpts);

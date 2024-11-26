@@ -2151,6 +2151,7 @@ D50|Queen's Gambit Declined: Pseudo-Tarrasch Variation, Canal Variation|d4 d5 c4
 D51|Queen's Gambit Declined: Modern Variation, Knight Defense|d4 d5 c4 e6 Nc3 Nf6 Bg5 Nbd7 e3 c6|9d1718be2a614c5a
 D51|Queen's Gambit Declined: Manhattan Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 Nbd7 e3 Bb4|d4e8a409ec5cc1a1
 D06|Queen's Gambit Declined: Austrian Defense, Haberditz Variation|d4 d5 c4 c5 cxd5 Nf6 e4 Nxe4 dxc5 Qa5|c95d929437927de8
+D11|Slav Defense: Modern Line|d4 d5 c4 c6 Nf3 Nf6 g3 dxc4 Bg2 g6|092d2ba5699515cc
 D30|Semi-Slav Defense: Quiet Variation|d4 d5 c4 c6 Nf3 Nf6 e3 e6 Nbd2 Nbd7|6f9131d004075d59
 D44|Semi-Slav Defense Accepted|d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 dxc4|9cdbf87dd553dcd3
 D17|Slav Defense: Czech Variation|d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4 Bf5|64cfbc9257293a00
@@ -2700,7 +2701,7 @@ B01|Scandinavian Defense: Grünfeld Variation|e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3
 C10|French Defense: Rubinstein Variation, Kasparov Attack|e4 e6 d4 d5 Nd2 dxe4 Nxe4 Nd7 Nf3 Ngf6 Nxf6 Nxf6 c3|7fb36e25eebd4dde
 C19|French Defense: Winawer Variation, Advance Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 a4|9753889994080674
 C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Nf3|79883f780d036587
-C19|French Defense: Winawer Variation, Poisoned Pawn Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Qg4|e2405043c2880881
+C19|French Defense: Winawer Variation, Advance Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Qg4|e2405043c2880881
 C17|French Defense: Winawer Variation, Advance Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 cxd4 axb4 dxc3 Nf3|bc3af63684a6b6b9
 C15|French Defense: Winawer Variation, Fingerslip Variation, Main Line|e4 e6 d4 d5 Nc3 Bb4 Bd2 dxe4 Qg4 Nf6 Qxg7 Rg8 Qh6|162f9d08e18d08cd
 C10|French Defense: Rubinstein Variation, Capablanca Line|e4 e6 d4 d5 Nc3 dxe4 Nxe4 Nd7 Nf3 Ngf6 Nxf6 Nxf6 Ne5|a976dc995c8608a1
@@ -2861,6 +2862,9 @@ C49|Four Knights Game: Spanish Variation, Gunsberg Counterattack|e4 e5 Nf3 Nf6 N
 C49|Four Knights Game: Spanish Variation, Symmetrical Variation, Tarrasch Variation|e4 e5 Nf3 Nf6 Nc3 Nc6 Bb5 Bb4 O-O O-O d3 d6 Bg5 Be6|43da24acece85132
 C40|Latvian Gambit: Behting Variation|e4 e5 Nf3 f5 Bc4 fxe4 Nxe5 Qg5 Nf7 Qxg2 Rf1 d5 Nxh8 Nf6|4a21f075bd69be6d
 B01|Scandinavian Defense: Schiller-Pytel Variation, Modern Variation|e4 d5 exd5 Qxd5 Nc3 Qd6 d4 Nf6 Bc4 c6 Nge2 Bf5 Bf4 Qb4|e123380f68d128ca
+C19|French Defense: Winawer Variation, Warsaw Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Qg4 O-O|813185a08adb27fc
+C19|French Defense: Winawer Variation, Poisoned Pawn Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Qg4 Qc7|550835d0473d2f10
+C19|French Defense: Winawer Variation, Eingorn Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Qg4 Kf8|fd4e37a79b65892b
 C12|French Defense: MacCutcheon Variation, Bogoljubow Variation|e4 e6 d4 d5 Nc3 Nf6 Bg5 Bb4 exd5 Qxd5 Bxf6 gxf6 Qd2 Qa5|5e569e86a1d1d8d7
 C13|French Defense: Alekhine-Chatard Attack, Albin-Chatard Gambit|e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Nfd7 h4 Bxg5 hxg5 Qxg5|b039e2c26d412026
 C11|French Defense: Classical Variation, Burn Variation, Main Line|e4 e6 d4 d5 Nc3 Nf6 Bg5 dxe4 Nxe4 Be7 Bxf6 Bxf6 Nf3 O-O|d545c17303af6674
