@@ -1203,6 +1203,7 @@ C44|Latvian Gambit: Clam Gambit|e4 e5 Nf3 Nc6 d3 f5 exf5|8dda9abc8d476d77
 C47|Four Knights Game: Scotch Variation|e4 e5 Nf3 Nc6 Nc3 Nf6 d4|9e2e7118e8305399
 C47|Four Knights Game: Gunsberg Variation|e4 e5 Nf3 Nc6 Nc3 Nf6 a3|41947f06309ee260
 C48|Four Knights Game: Spanish Variation|e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5|03a5b753836e0ddf
+C47|Four Knights Game: Glek System|e4 e5 Nf3 Nc6 Nc3 Nf6 g3|de5c3bb74bdad38a
 C47|Four Knights Game: Halloween Gambit|e4 e5 Nf3 Nc6 Nc3 Nf6 Nxe5|658d9b25b82cc73f
 C41|Philidor Defense: Bird Gambit|e4 e5 Nf3 d6 d4 exd4 c3|ed736ecffd159b74
 C41|Philidor Defense: Morphy Gambit|e4 e5 Nf3 d6 d4 exd4 Bc4|c76257e933859b63
@@ -1258,7 +1259,7 @@ B07|Pirc Defense: Sveshnikov System|e4 d6 d4 Nf6 Nc3 g6 g3|f7f2c7d58dba578a
 B09|Pirc Defense: Austrian Attack|e4 d6 d4 Nf6 Nc3 g6 f4|4d156e86abe0a66c
 B20|Sicilian Defense: Kronberger Variation, Nemeth Gambit|e4 c5 Na3 Nc6 d4 cxd4 Bc4|01da598dc93fcd8b
 B20|Sicilian Defense: Big Clamp Formation|e4 c5 d3 Nc6 c3 d6 f4|debe9b461e54a3a8
-B21|Sicilian Defense: Smith-Morra Gambit, Danish Variation|e4 c5 d4 cxd4 c3 dxc3 Nf3|2957174ee68c6b5d
+B21|Sicilian Defense: Smith-Morra Gambit Accepted, Danish Variation|e4 c5 d4 cxd4 c3 dxc3 Nf3|2957174ee68c6b5d
 B21|Sicilian Defense: Smith-Morra Gambit Declined, Dubois Variation|e4 c5 d4 cxd4 c3 d3 c4|e38b67f8d69ca665
 B21|Sicilian Defense: Morphy Gambit, Andreaschek Gambit|e4 c5 d4 cxd4 Nf3 e5 c3|19dfd2d2c142fc5d
 B32|Sicilian Defense: Open|e4 c5 Nf3 Nc6 d4 cxd4 Nxd4|654392775c794b8b
@@ -3265,7 +3266,7 @@ C48|Four Knights Game: Spanish Variation, Bardeleben Variation|e4 e5 Nf3 Nc6 Nc3
 C48|Four Knights Game: Spanish Variation, Rubinstein Variation, Maróczy Variation|e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 Nd4 Be2 Nxf3 Bxf3 Bc5 O-O O-O d3 d6 Na4 Bb6|95a5fcf3d93b419d
 C42|Petrov's Defense: Classical Attack, Marshall Variation, Chinese Gambit|e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4 d5 Bd3 Bd6 O-O O-O c4 c6 Re1 Bg4|1db4f496a12a9ad0
 C11|French Defense: Steinitz Variation, Brodsky-Jones Variation|e4 e6 d4 d5 Nc3 Nf6 e5 Nfd7 f4 c5 dxc5 Nc6 a3 Bxc5 Qg4 O-O Nf3 f6|c63806694c9c82cd
-B21|Sicilian Defense: Smith-Morra Gambit, Chicago Defense|e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Bc4 e6 Nf3 d6 O-O a6 Qe2 b5 Bb3 Ra7|f67134e016977abe
+B21|Sicilian Defense: Smith-Morra Gambit Accepted, Chicago Defense|e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Bc4 e6 Nf3 d6 O-O a6 Qe2 b5 Bb3 Ra7|f67134e016977abe
 B22|Sicilian Defense: Alapin Variation, Barmen Defense, Endgame Variation|e4 c5 c3 d5 exd5 Qxd5 d4 cxd4 cxd4 Nc6 Nf3 Bg4 Nc3 Bxf3 gxf3 Qxd4 Qxd4 Nxd4|98e434d5ea7d6038
 B74|Sicilian Defense: Dragon Variation, Classical Variation, Alekhine Line|e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 Nc3 Bg7 Be3 Nf6 Be2 O-O O-O d6 Nb3 a5|67fc70ae0da5a734
 B64|Sicilian Defense: Richter-Rauzer Variation, Classical Variation|e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 d6 Bg5 e6 Qd2 Be7 O-O-O O-O f4 e5|03f49f8216d1a8a7
