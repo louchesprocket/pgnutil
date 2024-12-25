@@ -521,6 +521,7 @@ C31|King's Gambit Declined: Falkbeer Countergambit, Hinrichsen Gambit|e4 e5 f4 d
 C31|King's Gambit Declined: Falkbeer Countergambit, Blackburne Attack|e4 e5 f4 d5 Nf3|c17658a64d51b35b
 C31|King's Gambit Declined: Falkbeer Countergambit Accepted|e4 e5 f4 d5 exd5|8ae4597bde237ede
 C31|King's Gambit Declined: Falkbeer Countergambit, Milner-Barry Variation|e4 e5 f4 d5 Nc3|028f3efd786f32e5
+C30|King's Gambit Declined: Classical Variation, Walthoffen Attack|e4 e5 f4 Bc5 Qh5|713a4f65cbe39c67
 C30|King's Gambit Declined: Keene's Defense|e4 e5 f4 Qh4 g3|3da48f435866ae86
 C33|King's Gambit Accepted: Gaga Gambit|e4 e5 f4 exf4 g3|6d436a6b41b51298
 C33|King's Gambit Accepted: Stamma Gambit|e4 e5 f4 exf4 h4|bf35f5d97f489c7b
@@ -2699,6 +2700,7 @@ C40|Latvian Gambit Accepted: Bronstein Gambit|e4 e5 Nf3 f5 Nxe5 Qf6 d4 d6 Nc4 fx
 C27|Vienna Game: Stanley Variation, Alekhine Variation|e4 e5 Nc3 Nf6 Bc4 Nxe4 Qh5 Nd6 Bb3 Be7 Nf3 Nc6 Nxe5|a02331452348ea3e
 B01|Scandinavian Defense: Anderssen Counterattack, Orthodox Attack|e4 d5 exd5 Qxd5 Nc3 Qa5 d4 e5 dxe5 Nc6 Nf3 Bb4 Bd2|400613e99d0dc265
 B01|Scandinavian Defense: Grünfeld Variation|e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 Bf5 Ne5 c6 g4|dd9b1565e5ad4f7e
+C02|French Defense: Advance Variation, Milner-Barry Gambit, Hector Variation|e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 Bd3 cxd4 O-O|1a2f5ddad9fad997
 C10|French Defense: Rubinstein Variation, Kasparov Attack|e4 e6 d4 d5 Nd2 dxe4 Nxe4 Nd7 Nf3 Ngf6 Nxf6 Nxf6 c3|7fb36e25eebd4dde
 C19|French Defense: Winawer Variation, Advance Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 a4|9753889994080674
 C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Nf3|79883f780d036587
@@ -3005,6 +3007,7 @@ C41|Philidor Defense: Lion Variation, Forcing Line|e4 e5 Nf3 d6 d4 Nf6 Nc3 Nbd7 
 C42|Petrov's Defense: Classical Attack, Jaenisch Variation|e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4 d5 Bd3 Nc6 O-O Be7 c4|8496ff8fd3b70353
 C42|Petrov's Defense: Classical Attack, Chigorin Variation|e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4 d5 Bd3 Be7 O-O Nc6 Re1|d8e814542ca87bf7
 C29|Vienna Game: Vienna Gambit, Wurzburger Trap|e4 e5 Nc3 Nf6 f4 d5 fxe5 Nxe4 d3 Qh4 g3 Nxg3 Nf3 Qh5 Nxd5|471859424d151069
+C02|French Defense: Advance Variation, Milner-Barry Gambit, Main Line|e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 Bd3 cxd4 cxd4 Bd7 O-O|5a3b0c263b6ee32e
 C06|French Defense: Tarrasch Variation, Closed Variation, Main Line|e4 e6 d4 d5 Nd2 Nf6 e5 Nfd7 Bd3 c5 c3 Nc6 Ne2 cxd4 cxd4|369fd91fb170672c
 A08|King's Indian Attack: Sicilian Variation|e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5 g3 Nc6 Bg2 Be7 O-O O-O Re1|9119ae6987ccc30b
 B22|Sicilian Defense: Alapin Variation, Barmen Defense, Milner-Barry Attack|e4 c5 c3 d5 exd5 Qxd5 d4 Nc6 Nf3 cxd4 cxd4 e5 Nc3 Bb4 Be2|6fb33825cfe08fd8
