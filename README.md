@@ -227,8 +227,8 @@ The opening-statistics function has its own set of output selectors:
 * 	wwinpct: white wins, expressed as a percentage of all games having a result
 * 	bwins: the number of black wins for this opening
 * 	bwinpct: black wins, expressed as a percentage of all games having a result
-* 	diff: the ference in wins between white and black
-* 	diffpct: the different in wins between white and black, expressed as a percentage of all games having a result
+* 	diff: the difference in wins between white and black
+* 	diffpct: the difference in wins between white and black, expressed as a percentage of all games having a result
 * 	draws: the number of draws for this opening
 * 	drawpct: the number of draws for this opening expressed as a percentage of all games having a result
 
