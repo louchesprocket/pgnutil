@@ -79,11 +79,11 @@ Searches for ECO codes may, of course, be performed with the <nobr>"-mt"</nobr> 
 
 will return every game in which the ECO openings A42 or A43 were played, ignoring any "ECO" tags. Note that ECO codes for this option are matched for the entire game, not just the "opening" as defined under [Openings](#openings), below. Other ECO-related matching options are:
 
-* -med: match ECO description
+* -med: match ECO description, searching by move sequence
 * -mxe: match ECO code, searching positions transpositionally
 * -mxed: match ECO description, searching positions transpositionally
-* -mse: match Scid ECO code
-* -msed: match Scid ECO description
+* -mse: match Scid ECO code, searching by move sequence
+* -msed: match Scid ECO description, searching by move sequence
 * -mxse: match Scid ECO code, searching positions transpositionally
 * -mxsed: match Scid ECO description, searching positions transpositionally
 
@@ -164,9 +164,9 @@ There are also several output selectors relating to ECO codes:
 * 	xstdecodesc: output the standard description of the opening, matching positions transpositionally
 * 	scidecodesc: output the Scid description of the opening, matching move sequences
 * 	xscidecodesc: output the Scid description of the opening, matching positions transpositionally
-* 	stdecomoves: output the game moves that match the line defining the standard ECO code
+* 	stdecomoves: output the game moves that match the line defining the standard ECO code, matching move sequences
 * 	xstdecomoves: output the game moves that match the line defining the standard ECO code, matching positions transpositionally
-* 	scidecomoves: output the game moves that match the line defining the Scid ECO code
+* 	scidecomoves: output the game moves that match the line defining the Scid ECO code, matching move sequences
 * 	xscidecomoves: output the game moves that match the line defining the Scid ECO code, matching positions transpositionally
 
 Note that any of the transpositional selectors ("xstdeco," "xscideco," "xstdecodesc," "xscidecodesc," "xstdecomoves," and "xscidecomoves") may return more than one result per game.
