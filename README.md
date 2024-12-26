@@ -230,7 +230,7 @@ The opening-statistics function has its own set of output selectors:
 * 	diff: the difference in wins between white and black
 * 	diffpct: the difference in wins between white and black, expressed as a percentage of all games having a result
 * 	draws: the number of draws for this opening
-* 	drawpct: the number of draws for this opening expressed as a percentage of all games having a result
+* 	drawpct: the number of draws for this opening, expressed as a percentage of all games having a result
 
 In addition, any of the [ECO-related output selectors](#eco-related_output_selectors) may be used in this context, but will apply only to the opening moves of the game.
 
