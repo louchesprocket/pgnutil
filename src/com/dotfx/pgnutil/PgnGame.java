@@ -79,7 +79,7 @@ public final class PgnGame
     /**
      * One per ply.
      */
-    public static final class Move
+    public static final class Move implements Comparable<Move>
     {
         private final Color color;
         private final short number; // not ply
@@ -144,6 +144,25 @@ public final class PgnGame
             
             return sb.toString();
         }
+
+        @Override
+        public int compareTo(Move other)
+        {
+            if (number == other.number)
+            {
+                if (color == other.color) return 0;
+                if (color == Color.WHITE) return -1;
+                return 1;
+            }
+
+            return number - other.number;
+        }
+
+        @Override
+        public boolean equals(Object other)
+        {
+            return compareTo((Move)other) == 0;
+        }
     }
     
     static
@@ -163,11 +182,11 @@ public final class PgnGame
     private final String origText;
 
     // cached values for internal use
-    private List<Move> openingMoveList;
-    private String openingString;
+    private transient List<Move> openingMoveList;
+    private transient String openingString;
 
-    private Clock lowClockWhite, lowClockBlack;
-    private final Map<EcoTree.FileType,TreeNodeSet> xEcoCacheMap; // transposed ECO TreeNodeSets
+    private transient Clock lowClockWhite, lowClockBlack;
+    private transient final Map<EcoTree.FileType,TreeNodeSet> xEcoCacheMap; // transposed ECO TreeNodeSets
     
     public PgnGame(int number, CaseInsensitiveMap<String,String> tagPairs, List<String> gameComments, List<Move> moves,
                    String origText)
@@ -502,6 +521,18 @@ public final class PgnGame
 
     /**
      *
+     * @param plies
+     * @return hash of player names plus moves
+     */
+    public HashCode getPostOpeningHash(int plies)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getWhite()).append('\0').append(getBlack()).append(getPostOpeningString(plies));
+        return HASHFUNC.hashBytes(sb.toString().getBytes());
+    }
+
+    /**
+     *
      * @return hash of game moves
      */
     public HashCode getMoveHash(int plies)
@@ -509,6 +540,16 @@ public final class PgnGame
         StringBuilder sb = new StringBuilder();
         appendMoves(sb, plies);
         return HASHFUNC.hashBytes(sb.toString().getBytes());
+    }
+
+    /**
+     *
+     * @param plies
+     * @return hash of moves (only)
+     */
+    public HashCode getPostOpeningMoveHash(int plies)
+    {
+        return HASHFUNC.hashBytes(getPostOpeningString(plies).getBytes());
     }
 
     private void appendMoves(StringBuilder sb, int plies)
@@ -609,22 +650,7 @@ public final class PgnGame
      */
     public Move getFirstOobMove()
     {
-        int plyCount = moves.size();
-        Move firstCommentMove = null;
-        
-        for (Move move : moves)
-        {
-            if (!move.getComments().isEmpty())
-            {
-                // Presence of oobMarker means that book moves include the present move.  Otherwise, the first move
-                // with a comment is the first out-of-book move.
-
-                if (move.hasComment(bookMarker) && plyCount > move.getPly()) return moves.get(move.getPly());
-                if (firstCommentMove == null) firstCommentMove = move;
-            }
-        }
-        
-        return firstCommentMove;
+        return moves.get(getOpeningMoveList().get(openingMoveList.size() - 1).getPly());
     }
 
     /**
@@ -633,111 +659,58 @@ public final class PgnGame
      */
     public Move getLastBookMove()
     {
-        Move firstCommentMove = null;
-
-        for (Move move : moves)
-        {
-            if (!move.getComments().isEmpty())
-            {
-                // Presence of oobMarker means that book moves include the present move.  Otherwise, the first move
-                // with a comment is the first out-of-book move.
-
-                if (move.hasComment(bookMarker)) return move;
-                if (firstCommentMove == null) firstCommentMove = move;
-            }
-        }
-
-        // no comments found, so assume whole game is in book
-        if (firstCommentMove == null) return moves.get(moves.size() - 1);
-
-        // comment found, but no oob marker
-        int firstCommentPly = firstCommentMove.getPly();
-        return firstCommentPly <= 1 ? null : moves.get(firstCommentPly - 2);
+        return getOpeningMoveList().get(openingMoveList.size() - 1);
     }
     
     public Move getNextMove(Move move)
     {
-        if (move.getPly() >= moves.size()) return null;
-        return moves.get(move.getPly());
+        int ply = move.getPly();
+        if (ply >= moves.size()) return null;
+        return moves.get(ply);
     }
-    
-    public String getPostOpeningString(Pattern oobMarker)
+
+    /**
+     *
+     * @param plies number of half-moves past the opening to include
+     * @return numbered move list up to plies half-moves after the opening
+     */
+    public String getPostOpeningString(int plies)
     {
-        StringBuilder sb = new StringBuilder(1024);
+        StringBuilder sb = new StringBuilder(1024).append(getOpeningString());
         Move move = getFirstOobMove();
+        int postOpeningPly = 0;
         
         while (move != null)
         {
-            if (move.getColor().equals(Color.WHITE))
-                sb.append(move.getNumber()).append(".");
-
+            if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
             sb.append(move.getMove()).append(" ");
+            if (++postOpeningPly == plies) break;
             move = getNextMove(move);
         }
         
         return sb.toString().trim();
     }
-    
-    public Board getOpeningPosition(Pattern oobMarker) throws IllegalMoveException
-    {
-        Board board = new Board(true);
-        int plyCount = moves.size();
-        int firstComment = -1;
-        int lastBookMove = -1;
-        
-        for (int i = 0; i < plyCount; i++)
-        {
-            Move move = moves.get(i);
-            
-            if (!move.getComments().isEmpty())
-            {
-                // Presence of oobMarker means that book moves include the
-                // present move.  Otherwise, the first move with a comment is
-                // the first out-of-book move.
-                
-                if (firstComment == -1) firstComment = i;
-                
-                if (move.hasComment(oobMarker))
-                {
-                    lastBookMove = i;
-                    break;
-                }
-            }
-        }
-        
-        if (lastBookMove < 0)
-        {
-            lastBookMove = firstComment - 1;
-            if (lastBookMove < 0 && firstComment < 0) lastBookMove = plyCount;
-        }
-        
-        for (int i = 0; i <= lastBookMove; i++) board.move(moves.get(i).getMoveOnly());
-        return board;
-    }
-    
+
     public Board getOpeningPosition() throws IllegalMoveException
     {
         return getOpeningPosition(bookMarker);
     }
     
-    public PositionId getOpid(Pattern oobMarker) throws IllegalMoveException
+    public Board getOpeningPosition(Pattern oobMarker) throws IllegalMoveException
     {
-        return getOpeningPosition(oobMarker).positionId();
+        Board board = new Board(true);
+        for (Move move : getOpeningMoveList(oobMarker)) board.move(move.getMoveOnly());
+        return board;
     }
     
     public PositionId getOpid() throws IllegalMoveException
     {
-        return getOpeningPosition(bookMarker).positionId();
-    }
-    
-    public String getOpeningFen(Pattern oobMarker) throws IllegalMoveException
-    {
-        return getOpeningPosition(oobMarker).toFen();
+        return getOpeningPosition().positionId();
     }
     
     public String getOpeningFen() throws IllegalMoveException
     {
-        return getOpeningPosition(bookMarker).toFen();
+        return getOpeningPosition().toFen();
     }
 
     /**
@@ -747,33 +720,19 @@ public final class PgnGame
     public String getFullOpeningString()
     {
         StringBuilder sb = new StringBuilder(1024);
-        boolean hasOobMarker = false;
-        int firstCommentIdx = -1;
         
-        for (Move move : moves)
+        for (Move move : getOpeningMoveList())
         {
-            if (!move.getComments().isEmpty())
-            {
-                // Presence of oobMarker means that book moves include the present move.  Otherwise, the first move
-                // with a comment is the first out-of-book move.
-                
-                if (firstCommentIdx == -1) firstCommentIdx = sb.length(); 
-                
-                if (move.hasComment(bookMarker))
-                {
-                    if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
-                    sb.append(move.getMove());
-                    hasOobMarker = true;
-                    break;
-                }
-            }
-            
             if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
             sb.append(move.getMove()).append(" ");
         }
-        
-        if (!hasOobMarker && firstCommentIdx > -1) sb.setLength(firstCommentIdx);
+
         return sb.toString().trim();
+    }
+
+    public List<Move> getOpeningMoveList()
+    {
+        return getOpeningMoveList(bookMarker);
     }
 
     /**
@@ -781,7 +740,7 @@ public final class PgnGame
      *
      * @return
      */
-    public List<Move> getOpeningMoveList()
+    public List<Move> getOpeningMoveList(Pattern oobMarker)
     {
         if (openingMoveList != null) return openingMoveList;
 
@@ -799,7 +758,7 @@ public final class PgnGame
 
                 if (firstCommentIdx == -1) firstCommentIdx = i;
 
-                if (move.hasComment(bookMarker))
+                if (move.hasComment(oobMarker))
                 {
                     oobIdx = i;
                     break;
@@ -824,32 +783,13 @@ public final class PgnGame
         if (openingString != null) return openingString;
 
         StringBuilder sb = new StringBuilder(1024);
-        boolean hasOobMarker = false;
-        int firstCommentIdx = -1;
         
-        for (Move move : moves)
+        for (Move move : getOpeningMoveList())
         {
-            if (!move.getComments().isEmpty())
-            {
-                // Presence of oobMarker means that book moves include the present move.  Otherwise, the first move
-                // with a comment is the first out-of-book move.
-                
-                if (firstCommentIdx == -1) firstCommentIdx = sb.length(); 
-                
-                if (move.hasComment(bookMarker))
-                {
-                    if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
-                    sb.append(move.getMoveOnly());
-                    hasOobMarker = true;
-                    break;
-                }
-            }
-            
             if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
             sb.append(move.getMoveOnly()).append(" ");
         }
-        
-        if (!hasOobMarker && firstCommentIdx > -1) sb.setLength(firstCommentIdx);
+
         openingString = sb.toString().trim();
         return openingString;
     }

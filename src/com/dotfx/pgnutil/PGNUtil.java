@@ -652,8 +652,8 @@ public class PGNUtil
         
         DuplicateHandler()
         {
-            gameMap = new HashMap(100000);
-            duplicates = new HashSet();
+            gameMap = new HashMap<>(100000);
+            duplicates = new HashSet<>();
         }
         
         final void handle(HashCode hash)
@@ -683,6 +683,7 @@ public class PGNUtil
         private final int plies;
 
         public DuplicateGameHandler(int plies) { this.plies = plies; }
+
         @Override public void handle() throws InvalidSelectorException
         {
             super.handle(game.getHash(plies));
@@ -694,6 +695,7 @@ public class PGNUtil
         private final int plies;
 
         public DuplicateMoveHandler(int plies) { this.plies = plies; }
+
         @Override public void handle() throws InvalidSelectorException
         {
             super.handle(game.getMoveHash(plies));
@@ -705,6 +707,30 @@ public class PGNUtil
         @Override public void handle() throws InvalidSelectorException
         {
             super.handle(game.getPlayerOpeningHash());
+        }
+    }
+
+    static final class DuplicatePostOpeningHandler extends DuplicateHandler
+    {
+        private final int plies;
+
+        public DuplicatePostOpeningHandler(int plies) { this.plies = plies; }
+
+        @Override public void handle() throws InvalidSelectorException
+        {
+            super.handle(game.getPostOpeningHash(plies));
+        }
+    }
+
+    static final class DuplicatePostOpeningMoveHandler extends DuplicateHandler
+    {
+        private final int plies;
+
+        public DuplicatePostOpeningMoveHandler(int plies) { this.plies = plies; }
+
+        @Override public void handle() throws InvalidSelectorException
+        {
+            super.handle(game.getPostOpeningMoveHash(plies));
         }
     }
     

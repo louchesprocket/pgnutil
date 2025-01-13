@@ -274,8 +274,8 @@ public class CLOptionResolver
     public static void resolveOpts(final Map<OptId,Integer> setOpts)
     {
         final OptId topLevelOpts[] = new OptId[] {OptId.get(CLOptions.D), OptId.get(CLOptions.DM),
-                OptId.get(CLOptions.DO), OptId.get(CLOptions.O), OptId.get(CLOptions.E), OptId.get(CLOptions.P),
-                OptId.get(CLOptions.CSR)};
+                OptId.get(CLOptions.DO), OptId.get(CLOptions.DOOB), OptId.get(CLOptions.DOOBM), OptId.get(CLOptions.O),
+                OptId.get(CLOptions.E), OptId.get(CLOptions.P), OptId.get(CLOptions.CSR)};
 
         // sub-options under "-o"
         final OptId ecoOpts[] = new OptId[] {OptId.get(CLOptions.ECO), OptId.get(CLOptions.SECO),
@@ -299,11 +299,12 @@ public class CLOptionResolver
                 OptId.get(CLOptions.PF), OptId.get(CLOptions.NPF), OptId.get(CLOptions.TC), OptId.get(CLOptions.LPC),
                 OptId.get(CLOptions.HPC), OptId.get(CLOptions.BM), OptId.get(CLOptions.LOOB), OptId.get(CLOptions.HOOB),
                 OptId.get(CLOptions.R), OptId.get(CLOptions.RW), OptId.get(CLOptions.RL), OptId.get(CLOptions.RO),
-                OptId.get(CLOptions.D), OptId.get(CLOptions.DM), OptId.get(CLOptions.DO), OptId.get(CLOptions.E),
-                OptId.get(CLOptions.CSR), OptId.get(CLOptions.O), OptId.get(CLOptions.ECO), OptId.get(CLOptions.SECO),
-                OptId.get(CLOptions.XECO), OptId.get(CLOptions.XSECO), OptId.get(CLOptions.CMIN),
-                OptId.get(CLOptions.LWD), OptId.get(CLOptions.HWD), OptId.get(CLOptions.HDRAW),
-                OptId.get(CLOptions.LDRAW), OptId.get(CLOptions.P), OptId.get(CLOptions.S)};
+                OptId.get(CLOptions.D), OptId.get(CLOptions.DM), OptId.get(CLOptions.DO), OptId.get(CLOptions.DOOB),
+                OptId.get(CLOptions.DOOBM), OptId.get(CLOptions.E), OptId.get(CLOptions.CSR), OptId.get(CLOptions.O),
+                OptId.get(CLOptions.ECO), OptId.get(CLOptions.SECO), OptId.get(CLOptions.XECO),
+                OptId.get(CLOptions.XSECO), OptId.get(CLOptions.CMIN), OptId.get(CLOptions.LWD),
+                OptId.get(CLOptions.HWD), OptId.get(CLOptions.HDRAW), OptId.get(CLOptions.LDRAW),
+                OptId.get(CLOptions.P), OptId.get(CLOptions.S)};
 
         new ConditionSet(topLevelOpts, null, null, new MutexHandler()).handle(setOpts);
         new ConditionSet(ecoOpts, null, null, new MutexHandler()).handle(setOpts);

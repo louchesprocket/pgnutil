@@ -24,6 +24,7 @@
 
 package com.dotfx.pgnutil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ public class AquariumVars
     private String emt; // elapsed time for this move
     private String eval; // position evaluation
     private String meval; // similar to emt? plus egtb hits. E.g., "15s|TB:3m"
+    private String expectedResponse;
     private final Map<String,String> otherVars;
     
     public AquariumVars(PgnGame.Move move)
@@ -114,6 +116,14 @@ public class AquariumVars
                 
                 catch (InvalidClockException e) {} // best effort
             }
+
+            // assumes expectedResponse appears in a block of its own
+            if (pos == 0 && ((pos = comment.indexOf("(")) >= 0))
+            {
+                int i;
+                for (i = ++pos; i < commentLen; i++) if (comment.charAt(i) == ')') break;
+                expectedResponse = comment.substring(pos, i);
+            }
         }
     }
     
@@ -122,6 +132,7 @@ public class AquariumVars
     public String getEmt() { return emt; }
     public String getEval() { return eval; }
     public String getMeval() { return meval; }
+    public String getExpectedResponse() { return expectedResponse; }
     public String get(String tag) { return otherVars.get(tag); }
     
     public String getTbHits()

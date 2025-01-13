@@ -48,6 +48,8 @@ public class CLOptions
     public static final String D = "-d";
     public static final String DM = "-dm";
     public static final String DO = "-do";
+    public static final String DOOB = "-doob";
+    public static final String DOOBM = "-doobm";
     public static final String E = "-e";
     public static final String ECO = "-eco"; // ECO output for "-o"
     public static final String EF = "-ef"; // specify standard ECO file
@@ -123,6 +125,8 @@ public class CLOptions
         DUPLICATES(D),
         DUPLICATEMOVES(DM),
         DUPLICATEOPENINGS(DO),
+        DUPLICATEOOB(DOOB),
+        DUPLICATEOOBMOVES(DOOBM),
         ECOFILE(EF),
         ELOFILE(ELO),
         EVENTS(E),
@@ -981,6 +985,31 @@ public class CLOptions
     {
         countOption(OptId.get(DM));
         PGNUtil.DuplicateMoveHandler handler = new PGNUtil.DuplicateMoveHandler(plies);
+        PGNUtil.setHandler(handler);
+        PGNUtil.setExitProcessor(new PGNUtil.DuplicateExitProcessor(handler));
+    }
+
+    @Option(name = DOOB, forbids = {S}, aliases = "-duplicate_oob", metaVar = "<plies>",
+            usage = "list games containing identical players and move lists up to <plies> half-moves after the " +
+                    "opening; each line of output contains one set of two or more game numbers in which duplicates " +
+                    "are found")
+    private void duplicateOob(int plies)
+    {
+        countOption(OptId.get(DOOB));
+
+        PGNUtil.DuplicatePostOpeningHandler handler = new PGNUtil.DuplicatePostOpeningHandler(plies);
+        PGNUtil.setHandler(handler);
+        PGNUtil.setExitProcessor(new PGNUtil.DuplicateExitProcessor(handler));
+    }
+
+    @Option(name = DOOBM, forbids = {S}, aliases = "-duplicate_oob_moves", metaVar = "<plies>",
+            usage = "list games containing identical move lists up to <plies> half-moves after the opening; each " +
+                    "line of output contains one set of two or more game numbers in which duplicates are found")
+    private void duplicateOobMoves(int plies)
+    {
+        countOption(OptId.get(DOOBM));
+
+        PGNUtil.DuplicatePostOpeningMoveHandler handler = new PGNUtil.DuplicatePostOpeningMoveHandler(plies);
         PGNUtil.setHandler(handler);
         PGNUtil.setExitProcessor(new PGNUtil.DuplicateExitProcessor(handler));
     }
