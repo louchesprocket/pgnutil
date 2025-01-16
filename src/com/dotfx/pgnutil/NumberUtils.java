@@ -39,8 +39,7 @@ import java.util.Arrays;
         if (input.length > 16) hex = trimLeadingZeroes(input);
         else hex = input;
         
-        if (hex.length > 16)
-            throw new IllegalArgumentException("input too long (max 16 hex digits)");
+        if (hex.length > 16) throw new IllegalArgumentException("input too long (max 16 hex digits)");
         
         long ret = 0;
         
@@ -51,9 +50,7 @@ import java.util.Arrays;
             b -= 48;
             if (b > 9) b -= 7;
             if (b > 15) b -= 32;
-
-            if (b < 0 || b > 15)
-                throw new IllegalArgumentException("illegal hex value: " + hex[i]);
+            if (b < 0 || b > 15) throw new IllegalArgumentException("illegal hex value: " + hex[i]);
             
             ret |= b & 0x000000000000000FL;
             
@@ -72,9 +69,6 @@ import java.util.Arrays;
     {
         long v = input & 0xFFFFFFFFFFFFFFFFL;
         byte[] result = new byte[16];
-        byte[] ret;
-        
-        Arrays.fill(result, 0, result.length, (byte)0);
 
         for (int i = 0; i < result.length; i++)
         {
@@ -84,14 +78,10 @@ import java.util.Arrays;
             q += 48;
             
             result[i] = (byte)(q & 0xFF);
-            
             v <<= 4;
         }
-        
-        if (trimLeadingZeroes) ret = trimLeadingZeroes(result);
-        else ret = result;
 
-        return new String(ret);
+        return new String(trimLeadingZeroes ? trimLeadingZeroes(result) : result);
     }
     
     public static String longToHex(long input)
@@ -111,9 +101,7 @@ import java.util.Arrays;
         }
 
         byte[] ret = new byte[length];
-
-        for (int i = 0; i < length; i++) ret[i] = input[i + skip];
-        
+        System.arraycopy(input, skip, ret, 0, length);
         return ret;
     }
 
@@ -130,7 +118,7 @@ import java.util.Arrays;
         int diff = 4 - intBytes.length;
         if (diff < 0) diff = 0;
 
-        for (int i = 3; i >= diff; i--) input[i] = intBytes[i - diff];
+        System.arraycopy(intBytes, 0, input, diff, 4 - diff);
         for (int i = 0; i < diff; i++) input[i] = 0x00;
         
         ByteBuffer bb = ByteBuffer.wrap(input);

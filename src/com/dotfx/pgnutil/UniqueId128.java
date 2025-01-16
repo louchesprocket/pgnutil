@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Mark Chen.
+ * Copyright 2019 Mark Chen <chen@dotfx.com>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,38 +24,50 @@
 
 package com.dotfx.pgnutil;
 
-/**
- * Represents a unique list of moves (implies unique position). Truncates hashes to 64 bits for convenience in
- * external handling.
- *
- * @author Mark Chen
- */
-public final class MoveListId extends UniqueId128
+import net.openhft.hashing.LongTupleHashFunction;
+
+public class UniqueId128 implements Comparable<UniqueId128>
 {
-    public MoveListId(byte[] b) { super(b); }
-    public MoveListId(long value) { super(value); }
-    public MoveListId(String s) { this(s.getBytes()); }
-    
-    public static MoveListId fromHexString(String s)
+    public static final long HASHSEED = 0x6a830fe67ba5892cL;
+    private static final LongTupleHashFunction hashFunc = LongTupleHashFunction.xx128(HASHSEED);
+    private final long[] value = new long[2];
+
+    public UniqueId128(byte[] b) { hashFunc.hashBytes(b, value); }
+    public UniqueId128(long value) { this.value[0] = value; }
+
+    public long[] getValue() { return value; }
+
+    @Override
+    public String toString()
     {
-        return new MoveListId(NumberUtils.hexToLong(s));
+        return NumberUtils.longToHex(value[0], false) +
+                NumberUtils.longToHex(value[1], false);
     }
-    
-    @Override
-    public int hashCode() { return MoveListId.class.hashCode() ^ Long.hashCode(getValue()[0]); }
 
     @Override
-    public String toString() { return NumberUtils.longToHex(getValue()[0], false); }
+    public int hashCode()
+    {
+        return UniqueId128.class.hashCode() ^ Long.hashCode(value[0]) ^ Long.hashCode(value[1]);
+    }
 
     @Override
-    public boolean equals(Object other) { return getValue()[0] == ((UniqueId128)other).getValue()[0]; }
+    public boolean equals(Object other)
+    {
+        return value[0] == ((UniqueId128)other).value[0] && value[1] == ((UniqueId128)other).value[1];
+    }
 
     @Override
     public int compareTo(UniqueId128 other)
     {
-        long diff0 = getValue()[0] - other.getValue()[0];
+        long diff0 = value[0] - other.value[0];
+
         if (diff0 > 0) return 1;
         if (diff0 < 0) return -1;
+
+        long diff1 = value[1] - other.value[1];
+
+        if (diff1 > 0) return 1;
+        if (diff1 < 0) return -1;
         return 0;
     }
 }

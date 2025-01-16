@@ -296,7 +296,7 @@ public class CLOptions
             
         for (String s : splitCommaSeparated(openingsSt))
         {
-            try { openingSet.add(MoveListId.fromString(s)); }
+            try { openingSet.add(MoveListId.fromHexString(s)); }
 
             catch (IllegalArgumentException e)
             {

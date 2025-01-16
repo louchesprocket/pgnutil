@@ -27,16 +27,22 @@ package com.dotfx.pgnutil;
 import com.cedarsoftware.util.CaseInsensitiveMap;
 import com.dotfx.pgnutil.eco.EcoTree;
 import com.dotfx.pgnutil.eco.TreeNodeSet;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
+//import com.google.common.hash.HashCode;
+//import com.google.common.hash.HashFunction;
+//import com.google.common.hash.Hashing;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringJoiner;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -45,8 +51,6 @@ import java.util.stream.Collectors;
 public final class PgnGame
 {
     public static final String ROUND_TAG;
-    public static final int HASHSEED = 0xa348ccf1;
-    private static final HashFunction HASHFUNC;
     private static final int BUFSIZE = 1024;
     private static final int COMMENT_BUFSIZE = 1024;
     private static Pattern bookMarker;
@@ -167,7 +171,6 @@ public final class PgnGame
     
     static
     {
-        HASHFUNC = Hashing.murmur3_128(HASHSEED);
         ROUND_TAG = "Round";
 
         // Aquarium: "[Black|White] out of book"
@@ -511,12 +514,12 @@ public final class PgnGame
      *
      * @return hash of player names and game half-moves up to <plies>
      */
-    public HashCode getHash(int plies)
+    public UniqueId128 getHash(int plies)
     {
         StringBuilder sb = new StringBuilder();
         sb.append(getWhite()).append('\0').append(getBlack());
         appendMoves(sb, plies);
-        return HASHFUNC.hashBytes(sb.toString().getBytes());
+        return new UniqueId128(sb.toString().getBytes());
     }
 
     /**
@@ -524,22 +527,22 @@ public final class PgnGame
      * @param plies
      * @return hash of player names plus moves
      */
-    public HashCode getPostOpeningHash(int plies)
+    public UniqueId128 getPostOpeningHash(int plies)
     {
         StringBuilder sb = new StringBuilder();
         sb.append(getWhite()).append('\0').append(getBlack()).append(getPostOpeningString(plies));
-        return HASHFUNC.hashBytes(sb.toString().getBytes());
+        return new UniqueId128(sb.toString().getBytes());
     }
 
     /**
      *
      * @return hash of game moves
      */
-    public HashCode getMoveHash(int plies)
+    public UniqueId128 getMoveHash(int plies)
     {
         StringBuilder sb = new StringBuilder();
         appendMoves(sb, plies);
-        return HASHFUNC.hashBytes(sb.toString().getBytes());
+        return new UniqueId128(sb.toString().getBytes());
     }
 
     /**
@@ -547,9 +550,9 @@ public final class PgnGame
      * @param plies
      * @return hash of moves (only)
      */
-    public HashCode getPostOpeningMoveHash(int plies)
+    public UniqueId128 getPostOpeningMoveHash(int plies)
     {
-        return HASHFUNC.hashBytes(getPostOpeningString(plies).getBytes());
+        return new UniqueId128(getPostOpeningString(plies).getBytes());
     }
 
     private void appendMoves(StringBuilder sb, int plies)
@@ -797,11 +800,11 @@ public final class PgnGame
     public MoveListId openingId(Pattern oobMarker) { return new MoveListId(getOpeningString()); }
     public MoveListId openingId() { return openingId(bookMarker); }
     
-    public HashCode getPlayerOpeningHash()
+    public UniqueId128 getPlayerOpeningHash()
     {
         StringBuilder sb = new StringBuilder();
         sb.append(getWhite()).append('\0').append(getBlack()).append('\0').append(getOpeningString());
-        return HASHFUNC.hashBytes(sb.toString().getBytes());
+        return new UniqueId128(sb.toString().getBytes());
     }
 
     // Aquarium only

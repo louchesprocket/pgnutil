@@ -26,7 +26,6 @@ package com.dotfx.pgnutil;
 
 import com.dotfx.pgnutil.eco.EcoTree;
 import com.dotfx.pgnutil.eco.TreeNodeSet;
-import com.google.common.hash.HashCode;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -43,7 +42,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.stream.Collectors;
 
 //import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -598,7 +596,7 @@ public class PGNUtil
             
             for (String token : s.split(",\\W*"))
             {
-                try { replaceOpeningSet.add(MoveListId.fromString(token)); }
+                try { replaceOpeningSet.add(MoveListId.fromHexString(token)); }
                 
                 catch (IllegalArgumentException e)
                 {
@@ -647,8 +645,8 @@ public class PGNUtil
     
     static abstract class DuplicateHandler implements GameHandler
     {
-        private final Map<HashCode,SortedSet<Integer>> gameMap;
-        private final Set<HashCode> duplicates;
+        private final Map<UniqueId128,SortedSet<Integer>> gameMap;
+        private final Set<UniqueId128> duplicates;
         
         DuplicateHandler()
         {
@@ -656,7 +654,7 @@ public class PGNUtil
             duplicates = new HashSet<>();
         }
         
-        final void handle(HashCode hash)
+        final void handle(UniqueId128 hash)
         {
             SortedSet<Integer> gameIdxes = gameMap.get(hash);
             if (gameIdxes != null) duplicates.add(hash);
@@ -673,7 +671,7 @@ public class PGNUtil
         final SortedSet<SortedSet<Integer>> getDuplicates()
         {
             SortedSet<SortedSet<Integer>> ret = new TreeSet<>(Comparator.comparingInt(SortedSet::first));
-            for (HashCode duplicate : duplicates) ret.add(gameMap.get(duplicate));
+            for (UniqueId128 duplicate : duplicates) ret.add(gameMap.get(duplicate));
             return ret;
         }
     }
