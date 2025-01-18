@@ -173,13 +173,25 @@ Note that any of the transpositional selectors ("xstdeco," "xscideco," "xstdecod
 
 ### Special Output Options
 
-The "special" output options include "-d" (duplicates), "-dm" (duplicate moves), "-do" (duplicate [openings](#openings)), "-e" (events), "-csr" (check sequential rounds), "-o" ([opening](#openings) statistics), and "-p" (player statistics). Any of these may be combined with any [matching](#matching) and [replacing](#replacing) options (see above).
+The "special" output options include "-d" (duplicates), "-dm" (duplicate moves), "-do" (duplicate [openings](#openings)), "-doob" (duplicate out-of-book), "-doobm" (duplicate out-of-book moves), "-e" (events), "-csr" (check sequential rounds), "-o" ([opening](#openings) statistics), and "-p" (player statistics). Any of these may be combined with any [matching](#matching) and [replacing](#replacing) options (see above).
 
-To find duplicate games (defined as games with the same players and same move list) in the file mygames.pgn:
+#### Duplicates
 
-``pgnutil -d -i mygames.pgn``
+To find duplicate games (defined as games with identical players and move lists) in the file mygames.pgn:
 
-The previous command will print a comma-separated list of game numbers (indexed from the first game of the PGN file), with each set of duplicates on a separate line.  For example, the output:
+``pgnutil -d 100 -i mygames.pgn``
+
+The parameter to the "-d" option indicates how many half-moves deep into the game the comparison should be made (or "0" for the entire game). In this example, games with identical players and move lists up to the end of the fiftieth move will be returned, *plus games with identical move lists that ended before the fiftieth move*. If it is desired to return only games that match up to the full length given by the parameter, then the command may be paired with the "-lpc" (low ply count) option:
+
+``pgnutil -d 100 -lpc 100 -i mygames.pgn``
+
+The "-dm" option works analogously to "-d," but compares only move lists (not players).
+
+The "-do" option is for engine games. It takes no parameter, and outputs games that contain the same [opening](#openings) and same players.
+
+The options "-doob" and "-doobm" are also for engine games, and work analogously to "-d" and "-dm," respectively, except that the parameter applies to post-opening half-moves rather than half-moves from the start of the game.
+
+The "-d" option and its analogs will print a comma-separated list of game numbers (indexed from the first game of the PGN file), with each set of duplicates on a separate line.  For example, the output:
 
 > 1616,1617<br>
 > 1622,1623,1710
@@ -192,6 +204,7 @@ To output games 1616-1623 and game 1710:
 
 ``pgnutil -gn 1616-1623,1710 -i mygames.pgn``
 
+#### Events, Players, and Rounds
 
 To list each event from the file mygames.pgn, along with the games that belong to it:
 
@@ -201,11 +214,9 @@ To list each player from the file mygames.pgn, along with win/loss/draw statisti
 
 ``pgnutil -p -i mygames.pgn``
 
-The "-do" option is for engine tournaments. It works analogously to the "-d" option, and outputs games that contain the same [opening](#openings) and same players.
-
 The "-csr" option checks for non-sequential round numbers within events. Note that assignment of round numbers is dependent on the tournament format, so this option is only useful with respect to tournaments where each game is assigned a unique round number (e.g., Aquarium matches, but not Banksia matches).
 
-### Openings
+#### Openings
 
 Pgnutil's definition of an "opening" pertains specifically to chess engines; it is the list of a game's book moves that occur prior to the first engine-generated move.
 

@@ -529,9 +529,7 @@ public final class PgnGame
      */
     public UniqueId128 getPostOpeningHash(int plies)
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getWhite()).append('\0').append(getBlack()).append(getPostOpeningString(plies));
-        return new UniqueId128(sb.toString().getBytes());
+        return new UniqueId128((getWhite() + '\0' + getBlack() + getPostOpeningString(plies)).getBytes());
     }
 
     /**
