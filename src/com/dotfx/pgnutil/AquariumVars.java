@@ -24,6 +24,8 @@
 
 package com.dotfx.pgnutil;
 
+import com.cedarsoftware.util.StringUtilities;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,79 +52,80 @@ public class AquariumVars
         {
             int varNameStartIdx, pos = 0, varNameEndIdx;
             int commentLen = comment.length();
-            
-            while ((varNameStartIdx = comment.indexOf("[%", pos)) >= 0)
+
+            while ((varNameStartIdx = comment.indexOf("[%", pos)) >= 0 ||
+                    (varNameStartIdx = comment.indexOf("(", pos)) >= 0)
             {
                 int i;
-                String oneVarName;
-                int varValStartIdx, varValEndIdx;
-                
-                varNameStartIdx += 2;
-                
-                for (i = varNameStartIdx + 1; i < commentLen; i++)
+
+                if (comment.charAt(varNameStartIdx) == '[')
                 {
-                    char oneChar = comment.charAt(i);
-                    if (oneChar == ' ' || oneChar == '\t') break; 
-                }
-                
-                varNameEndIdx = i;
-                oneVarName = comment.substring(varNameStartIdx, varNameEndIdx);
-                
-                for (i = varNameEndIdx; i < commentLen; i++)
-                {
-                    char oneChar = comment.charAt(i);
-                    if (oneChar != ' ' && oneChar != '\t') break;
-                }
-                
-                varValStartIdx = i;
-                
-                for (i = varValStartIdx + 1; i < commentLen; i++)
-                {
-                    char oneChar = comment.charAt(i);
-                    if (oneChar == ']') break; 
-                }
-                
-                varValEndIdx = i;
-                pos = varValEndIdx + 1;
-                
-                try
-                {
-                    switch (oneVarName)
+                    String oneVarName;
+                    int varValStartIdx, varValEndIdx;
+
+                    varNameStartIdx += 2;
+
+                    for (i = varNameStartIdx + 1; i < commentLen; i++)
                     {
-                        case "clk":
-                            clk = new Clock(comment.substring(varValStartIdx, varValEndIdx));
-                            break;
-
-                        case "clko":
-                            clko = new Clock(comment.substring(varValStartIdx, varValEndIdx));
-                            break;
-
-                        case "emt":
-                            emt = comment.substring(varValStartIdx, varValEndIdx);
-                            break;
-
-                        case "eval":
-                            eval = comment.substring(varValStartIdx, varValEndIdx);
-                            break;
-
-                        case "meval":
-                            meval = comment.substring(varValStartIdx, varValEndIdx);
-                            break;
-
-                        default:
-                            otherVars.put(oneVarName, comment.substring(varValStartIdx, varValEndIdx));
+                        char oneChar = comment.charAt(i);
+                        if (oneChar == ' ' || oneChar == '\t') break;
                     }
-                }
-                
-                catch (InvalidClockException e) {} // best effort
-            }
 
-            // assumes expectedResponse appears in a block of its own
-            if (pos == 0 && ((pos = comment.indexOf("(")) >= 0))
-            {
-                int i;
-                for (i = ++pos; i < commentLen; i++) if (comment.charAt(i) == ')') break;
-                expectedResponse = comment.substring(pos, i);
+                    varNameEndIdx = i;
+                    oneVarName = comment.substring(varNameStartIdx, varNameEndIdx);
+
+                    for (i = varNameEndIdx; i < commentLen; i++)
+                    {
+                        char oneChar = comment.charAt(i);
+                        if (oneChar != ' ' && oneChar != '\t') break;
+                    }
+
+                    varValStartIdx = i;
+
+                    for (i = varValStartIdx + 1; i < commentLen; i++)
+                    {
+                        char oneChar = comment.charAt(i);
+                        if (oneChar == ']') break;
+                    }
+
+                    varValEndIdx = i;
+                    pos = varValEndIdx + 1;
+
+                    try
+                    {
+                        switch (oneVarName)
+                        {
+                            case "clk":
+                                clk = new Clock(comment.substring(varValStartIdx, varValEndIdx));
+                                break;
+
+                            case "clko":
+                                clko = new Clock(comment.substring(varValStartIdx, varValEndIdx));
+                                break;
+
+                            case "emt":
+                                emt = comment.substring(varValStartIdx, varValEndIdx);
+                                break;
+
+                            case "eval":
+                                eval = comment.substring(varValStartIdx, varValEndIdx);
+                                break;
+
+                            case "meval":
+                                meval = comment.substring(varValStartIdx, varValEndIdx);
+                                break;
+
+                            default:
+                                otherVars.put(oneVarName, comment.substring(varValStartIdx, varValEndIdx));
+                        }
+                    } catch (InvalidClockException e) {} // best effort
+                }
+
+                else // "("
+                {
+                    for (pos = ++varNameStartIdx; pos < commentLen; pos++) if (comment.charAt(pos) == ')') break;
+                    expectedResponse = comment.substring(varNameStartIdx, pos);
+                }
             }
         }
     }

@@ -166,6 +166,30 @@ public class OpeningStatsOutputSelector
         public void configTallier(OpeningStats os) {}
     }
 
+    private static final class DisagreeOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        {
+            sb.append(Formats.PERCENT.format(opening.getDisagreePct()));
+        }
+
+        @Override
+        public void configTallier(OpeningStats os) {}
+    }
+
+    private static final class AvgPliesOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        {
+            sb.append(Formats.DECIMAL.format(opening.getAvgPlies()));
+        }
+
+        @Override
+        public void configTallier(OpeningStats os) {}
+    }
+
     private static final class EcoOutputHandler implements OutputHandler
     {
         private final EcoTree.FileType type;
@@ -275,6 +299,8 @@ public class OpeningStatsOutputSelector
         DRAWS(OutputSelector.Value.DRAWS, new DrawsOutputHandler()), // also applies to player results
         WWINPCT(OutputSelector.Value.WWINPCT, new WhiteWinPctOutputHandler()),
         WWINS(OutputSelector.Value.WWINS, new WhiteWinsOutputHandler()),
+        DISAGREEPCT(OutputSelector.Value.DISAGREEPCT, new DisagreeOutputHandler()),
+        AVGPLIES(OutputSelector.Value.AVGPLIES, new AvgPliesOutputHandler()),
 
         STDECO(OutputSelector.Value.STDECO, new EcoOutputHandler(EcoTree.FileType.STD)),
         STDECODESC(OutputSelector.Value.STDECODESC, new EcoDescOutputHandler(EcoTree.FileType.STD)),

@@ -118,7 +118,7 @@ public final class TreeNode implements Comparable<TreeNode>
     {
         TreeNode ret = this;
         TreeNode next = ret;
-        List<PgnGame.Move> moveList = game.getMoves();
+        List<PgnGame.Move> moveList = game.getMoveList();
 
         for (int i = 0; i < moveList.size(); i++)
         {
@@ -134,7 +134,7 @@ public final class TreeNode implements Comparable<TreeNode>
     {
         TreeNode ret = this;
         TreeNode next = ret;
-        List<PgnGame.Move> moveList = game.getMoves();
+        List<PgnGame.Move> moveList = game.getMoveList();
 
         for (int i = 0; i < moveList.size() && i < maxDepth; i++)
         {
@@ -155,7 +155,7 @@ public final class TreeNode implements Comparable<TreeNode>
 
     public TreeNode getBottomDefinedNode(PgnGame game)
     {
-        return getBottomDefinedNode(game.getMoves());
+        return getBottomDefinedNode(game.getMoveList());
     }
 
     public TreeNode getBottomDefinedNode(List<PgnGame.Move> moveList)

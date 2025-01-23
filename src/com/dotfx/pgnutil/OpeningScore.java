@@ -34,6 +34,8 @@ public class OpeningScore
     private int blackWins;
     private int draws;
     private int noResult;
+    private long totalOobPlies;
+    private long totalDisagree;
 
     OpeningScore() {}
 
@@ -41,22 +43,36 @@ public class OpeningScore
     public void incBlackWin() { blackWins++; }
     public void incDraw() { draws++; }
     public void incNoResult() { noResult++; }
+    public void addOobPlies(int plies) { totalOobPlies += plies; }
+    public void addDisagree(int plies) { totalDisagree += plies; }
     public int getWhiteWins() { return whiteWins; }
     public int getBlackWins() { return blackWins; }
     public int getDraws() { return draws; }
     public int getNoResults() { return noResult; }
+    public long getTotalOobPlies() { return totalOobPlies; }
+    public long getTotalDisagree() { return totalDisagree; }
     public int getGameCount() { return whiteWins + blackWins + draws; }
     public double getWhiteWinPct()
     {
         return (double)whiteWins / (whiteWins + blackWins + draws);
     }
-    public double getBlackWinPct()
-    {
-        return (double)blackWins / (whiteWins + blackWins + draws);
-    }
+    public double getBlackWinPct() { return (double)blackWins / (whiteWins + blackWins + draws); }
     public double getDrawPct()
     {
         return (double)draws / (whiteWins + blackWins + draws);
+    }
+
+    public double getDisagreePct()
+    {
+        // subtract the last move of every game with a result from the denominator
+        long denominator = totalOobPlies - (whiteWins + blackWins + draws);
+        return denominator < 1 ? 0 : (double)totalDisagree / denominator;
+    }
+
+    public double getAvgPlies()
+    {
+        long denominator = whiteWins + blackWins + draws; // only count games with a result
+        return denominator < 1 ? 0 : (double)totalOobPlies / denominator;
     }
 
     @Override
@@ -69,6 +85,8 @@ public class OpeningScore
             "white: " + Formats.PERCENT.format(whiteWinPct) + CLOptions.outputDelim +
             "black: " + Formats.PERCENT.format(blackWinPct) + CLOptions.outputDelim +
             "diff: " + Formats.PERCENT.format(whiteWinPct - blackWinPct) + CLOptions.outputDelim +
-            "draw: " + Formats.PERCENT.format(getDrawPct());
+            "draw: " + Formats.PERCENT.format(getDrawPct()) + CLOptions.outputDelim +
+            "avg. plies: " + Formats.DECIMAL.format(getAvgPlies()) + CLOptions.outputDelim +
+            "disagree: " + Formats.PERCENT.format(getDisagreePct());
     }
 }

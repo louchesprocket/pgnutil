@@ -71,7 +71,7 @@ public final class OutputSelector
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            for (PgnGame.Move move : game.getMoves())
+            for (PgnGame.Move move : game.getMoveList())
             {
                 if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
                 sb.append(move.getMove()).append(" ");
@@ -86,7 +86,7 @@ public final class OutputSelector
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            for (PgnGame.Move move : game.getMoves())
+            for (PgnGame.Move move : game.getMoveList())
             {
                 if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
                 sb.append(move.getMove());
@@ -374,7 +374,7 @@ public final class OutputSelector
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            sb.append(game.getMoves().size());
+            sb.append(game.getMoveList().size());
         }
     }
 
@@ -414,6 +414,15 @@ public final class OutputSelector
         }
     }
 
+    private static final class DisagreePctOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(Formats.PERCENT.format(game.getDisagreeRatio()));
+        }
+    }
+
     public static enum Value
     {
         // standard seven tags
@@ -441,7 +450,9 @@ public final class OutputSelector
         
         // special
 
+        AVGPLIES("avgplies", null),
         CBPLAYERS("cbplayers", null), // Aquarium only. Handler set in CLOptionResolver.ClockBelowHandler
+        DISAGREEPCT("disagreepct", new DisagreePctOutputHandler()),
         GAMENO("gameno", new GameNumOutputHandler()),
         LOWCLOCK("lowclock", new LowClockOutputHandler()), // Aquarium only
         LOWCLOCKBLACK("lowclockblack", new LowClockBlackOutputHandler()), // Aquarium only

@@ -136,6 +136,9 @@ public class OpeningStats implements Tallier
     private static OpeningStats instance;
     
     private final Map<MoveListId,Opening> openingsMap;
+    private boolean trackPlies;
+    private boolean trackDisagree;
+
     private EcoTree ecoTree;
     private EcoTree scidEcoTree;
     private boolean useXStdEco;
@@ -169,6 +172,15 @@ public class OpeningStats implements Tallier
 
                 if (OpeningStats.selectors[i].getValue() == OpeningStatsOutputSelector.Value.OPENINGMOVES)
                     saveOpeningMoves = true;
+
+                else if (OpeningStats.selectors[i].getValue() == OpeningStatsOutputSelector.Value.DISAGREEPCT)
+                {
+                    trackDisagree = true;
+                    trackPlies = true;
+                }
+
+                else if (OpeningStats.selectors[i].getValue() == OpeningStatsOutputSelector.Value.AVGPLIES)
+                    trackPlies = true;
             }
         }
     }
@@ -219,8 +231,14 @@ public class OpeningStats implements Tallier
             case WHITEWIN: opening.incWhiteWin(); break;
             case BLACKWIN: opening.incBlackWin(); break;
             case DRAW: opening.incDraw(); break;
-            default: opening.incNoResult();
+
+            default:
+                opening.incNoResult();
+                return; // don't count other stats
         }
+
+        if (trackDisagree) opening.addDisagree(game.getDisagreeCount());
+        if (trackPlies) opening.addOobPlies(game.getPostOpeningPlyCount());
     }
 
     @Override

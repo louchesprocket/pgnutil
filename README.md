@@ -144,6 +144,7 @@ There are several "special" selectors recognized by the "-s" option.  For exampl
 * 	cbplayers: for Aquarium games only, and in conjunction with the "-cb" option (see [Time (Aquarium Only)](#time-aquarium-only), below), causes pgnutil to output the names of players whose clocks fell below the indicated time threshold
 * 	lowclockwhite: for Aquarium games only, causes pgnutil to output the lowest clock value for the white player (see [Time (Aquarium Only)](#time-aquarium-only), below)
 * 	lowclockblack: for Aquarium games only, causes pgnutil to output the lowest clock value for the black player (see [Time (Aquarium Only)](#time-aquarium-only), below)
+*   disagreepct: for engine games wherein the u.i. annotates expected responses, output the percentage of moves that disagree with an opponent's expectation
 * 	textsize: causes pgnutil to output the size (in characters) of the original game text
 
 Thus, the command:
@@ -242,6 +243,8 @@ The opening-statistics function has its own set of output selectors:
 * 	diffpct: the difference in wins between white and black, expressed as a percentage of all games having a result
 * 	draws: the number of draws for this opening
 * 	drawpct: the number of draws for this opening, expressed as a percentage of all games having a result
+*   avgplies: the average number of half-moves for this opening, counting every game with a result
+*   disagreepct: the percentage of all moves that disagree with an opponent's expectation, counting every game with a result; applies to engine games wherein expected responses have been annotated by the u.i.
 
 In addition, any of the [ECO-related output selectors](#eco-related_output_selectors) may be used in this context, but will apply only to the opening moves of the game.
 

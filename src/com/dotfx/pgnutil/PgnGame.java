@@ -555,7 +555,7 @@ public final class PgnGame
 
     private void appendMoves(StringBuilder sb, int plies)
     {
-        List<Move> moveList = getMoves();
+        List<Move> moveList = getMoveList();
 
         if (plies < 1) for (Move move : moveList) sb.append(move.getMove());
 
@@ -570,7 +570,7 @@ public final class PgnGame
     public Set<String> getKeySet() { return tagPairs.keySet(); }
     public String getValue(String key) { return tagPairs.get(key); }
     public List<String> getGameComments() { return gameComments; }
-    public List<Move> getMoves() { return moves; }
+    public List<Move> getMoveList() { return moves; }
     public int getPlyCount() { return moves.size(); }
     public String getOrigText() { return origText; }
     public boolean contains(CharSequence s) { return origText.contains(s); }
@@ -627,7 +627,7 @@ public final class PgnGame
     
     public Move getMove(int number, Color color)
     {
-        return getMoves().get(number * 2 - (color.equals(Color.WHITE) ? 2 : 1));
+        return getMoveList().get(number * 2 - (color.equals(Color.WHITE) ? 2 : 1));
     }
     
     
@@ -690,6 +690,11 @@ public final class PgnGame
         }
         
         return sb.toString().trim();
+    }
+
+    public int getPostOpeningPlyCount()
+    {
+        return getMoveList().size() - getOpeningMoveList().size();
     }
 
     public Board getOpeningPosition() throws IllegalMoveException
@@ -805,10 +810,26 @@ public final class PgnGame
         return new UniqueId128(sb.toString().getBytes());
     }
 
+    public int getDisagreeCount()
+    {
+        int disagreeCount = 0;
+        int limit = getPostOpeningPlyCount() - 1; // don't count last move
+
+        for (int i = getOpeningMoveList().size(); i < limit; i++)
+            if (getMoveList().get(i).getAquariumVars().getExpectedResponse() != null) disagreeCount++;
+
+        return disagreeCount;
+    }
+
+    public float getDisagreeRatio()
+    {
+        return ((float)getDisagreeCount()) / (getPostOpeningPlyCount() - 1);
+    }
+
     // Aquarium only
     private void getLowClocks()
     {
-        for (PgnGame.Move move : getMoves())
+        for (PgnGame.Move move : getMoveList())
         {
             Clock moveClock = move.getAquariumVars().getClk();
 
@@ -886,7 +907,7 @@ public final class PgnGame
             Clock lastClko = null;
             Color color = null;
             
-            for (Move move : getMoves())
+            for (Move move : getMoveList())
             {
                 if (color != null && !move.getColor().equals(color)) continue;
                 
@@ -975,7 +996,7 @@ public final class PgnGame
         LooseBoard looseBoard = new LooseBoard(new Board(true));
         Board board = looseBoard.getBoard();
 
-        for (PgnGame.Move move : getMoves())
+        for (PgnGame.Move move : getMoveList())
         {
             if (board.getWhitePieceCount() < minWhitePieces || board.getBlackPieceCount() < minBlackPieces) break;
             if (positionSet.contains(looseBoard)) return true;
@@ -1055,8 +1076,8 @@ public final class PgnGame
         if (thisBlack != null)
             if (!thisBlack.equals(otherBlack)) return false;
         
-        List<Move> thisMoves = getMoves();
-        List<Move> otherMoves = otherGame.getMoves();
+        List<Move> thisMoves = getMoveList();
+        List<Move> otherMoves = otherGame.getMoveList();
         
         if (thisMoves.size() != otherMoves.size()) return false;
         
@@ -1090,7 +1111,7 @@ public final class PgnGame
             }
         }
         
-        for (Move move : getMoves()) { sb.append(move).append("\n"); }
+        for (Move move : getMoveList()) { sb.append(move).append("\n"); }
         sb.append(getValue("Result"));
         
         return sb.toString();

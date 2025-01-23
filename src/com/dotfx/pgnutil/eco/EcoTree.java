@@ -132,7 +132,7 @@ public final class EcoTree
     
     public TreeNodeSet getDeepestTranspositionSet(PgnGame game) throws IllegalMoveException
     {
-        try { return getDeepestTranspositionSet(game.getMoves()); }
+        try { return getDeepestTranspositionSet(game.getMoveList()); }
 
         catch (IllegalMoveException | NullPointerException | StringIndexOutOfBoundsException e)
         {
