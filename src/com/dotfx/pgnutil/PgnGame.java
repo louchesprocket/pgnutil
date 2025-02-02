@@ -264,11 +264,13 @@ public final class PgnGame
         CaseInsensitiveMap<String,String> tagpairs = new CaseInsensitiveMap<>();
         List<PgnGame.Move> moves = new ArrayList<>();
         List<String> gameComments = new ArrayList<>();
-        
+
         while (true) // parse tag pairs
         {
             next = eatWhiteSpace(reader);
-            if (next == -1) return null; // normal eof condition
+
+            if (next == -1) return null;
+            if (next == 0xFEFF) continue; // Unicode byte-order mark
             if (next != '[') break;
 
             // tag
@@ -330,8 +332,7 @@ public final class PgnGame
             tagpairs.put(tag, value);
         }
 
-        while (next == '{' || next == ';') 
-            next = processComment(reader, next, gameComments); 
+        while (next == '{' || next == ';') next = processComment(reader, next, gameComments);
         
         if (next == -1) throw new PGNException("eof while parsing"); // empty move list
         buf[0] = (char)next;

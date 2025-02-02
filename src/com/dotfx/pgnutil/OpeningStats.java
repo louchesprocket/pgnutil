@@ -231,10 +231,7 @@ public class OpeningStats implements Tallier
             case WHITEWIN: opening.incWhiteWin(); break;
             case BLACKWIN: opening.incBlackWin(); break;
             case DRAW: opening.incDraw(); break;
-
-            default:
-                opening.incNoResult();
-                return; // don't count other stats
+            default: opening.incNoResult();
         }
 
         if (trackDisagree) opening.addDisagree(game.getDisagreeCount());

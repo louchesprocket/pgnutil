@@ -64,14 +64,14 @@ public class OpeningScore
 
     public double getDisagreePct()
     {
-        // subtract the last move of every game with a result from the denominator
-        long denominator = totalOobPlies - (whiteWins + blackWins + draws);
+        // subtract the last move of every game from the denominator, since we don't know if it was disagreed
+        long denominator = totalOobPlies - (whiteWins + blackWins + draws + noResult);
         return denominator < 1 ? 0 : (double)totalDisagree / denominator;
     }
 
     public double getAvgPlies()
     {
-        long denominator = whiteWins + blackWins + draws; // only count games with a result
+        long denominator = whiteWins + blackWins + draws + noResult;
         return denominator < 1 ? 0 : (double)totalOobPlies / denominator;
     }
 
