@@ -369,7 +369,7 @@ B12|Caro-Kann Defense: Massachusetts Defense|e4 c6 d4 f5|42cad25130f08848f0d105f
 B10|Caro-Kann Defense: Accelerated Panov Attack, Open Variation|e4 c6 c4 e5|7a8af46ef84bdd543b24847075425463
 B10|Caro-Kann Defense: Accelerated Panov Attack|e4 c6 c4 d5|7c191db7fc5f4e661222fd5545777583
 B10|Caro-Kann Defense|e4 c6 Nc3 d5|3ecbb95adcf15051b89676f003aefdb7
-B00|Guatemala Defense|e4 b6 d4 Ba6|497a1eca6fbe1c9ad500baf64f674204
+B00|Owen Defense: Guatemala Defense|e4 b6 d4 Ba6|497a1eca6fbe1c9ad500baf64f674204
 B00|Ware Defense: Snagglepuss Defense|e4 a5 d4 Nc6|c3918210167d0b313f84ef9ed915a8d4
 B00|St. George Defense: Zilbermints Gambit|e4 a6 d4 e5|095b8d50507bf3d4ee6adb5e618add1f
 B02|Alekhine Defense: Mokele Mbembe|e4 Nf6 e5 Ne4|36c29ac18bb59e99b4f6e49d46bb397e
@@ -1363,6 +1363,7 @@ E21|Nimzo-Indian Defense: Three Knights Variation|d4 Nf6 c4 e6 Nc3 Bb4 Nf3|a193a
 E20|Nimzo-Indian Defense: Romanishin Variation|d4 Nf6 c4 e6 Nc3 Bb4 g3|2b741a49c75201679233386d0b4489eb
 E20|Nimzo-Indian Defense: Kmoch Variation|d4 Nf6 c4 e6 Nc3 Bb4 f3|4244d9dc549ac33c9e0331b7a54cdea6
 E40|Nimzo-Indian Defense: Rubinstein System|d4 Nf6 c4 e6 Nc3 Bb4 e3|44e9a25c3c76d8a9ab1c1fa027a1a60f
+E20|Nimzo-Indian Defense: Dilworth Gambit|d4 Nf6 c4 e6 Nc3 Bb4 e4|6228e1a1812acc600da97301d2d8083e
 A53|Old Indian Defense: Janowski Variation, Fianchetto Variation|d4 Nf6 c4 d6 Nc3 Bf5 g3|03ec583002b8d43c4e9d225c792f7ebd
 A53|Old Indian Defense: Janowski Variation, Main Line|d4 Nf6 c4 d6 Nc3 Bf5 f3|70457636472830146f184e0a06ee1e87
 A53|Old Indian Defense: Janowski Variation, Grinberg Gambit|d4 Nf6 c4 d6 Nc3 Bf5 e4|572a2d82e68e00681091ab10d7600711
