@@ -2926,6 +2926,7 @@ D94|Grünfeld Defense: Flohr Defense|d4 d5 c4 c6 Nc3 Nf6 e3 g6 Nf3 Bg7 Bd3 O-O O
 D94|Grünfeld Defense: Smyslov Defense|d4 d5 c4 c6 Nc3 Nf6 e3 g6 Nf3 Bg7 Bd3 O-O O-O Bg4|028d6886d9807d30a180aa03fac5abde
 D27|Queen's Gambit Accepted: Furman Variation|d4 d5 c4 dxc4 Nf3 Nf6 e3 e6 Bxc4 c5 O-O a6 dxc5 Bxc5|6530163d4bbe68a66d9d835dfdb14899
 D28|Queen's Gambit Accepted: Classical Defense, Alekhine System|d4 d5 c4 dxc4 Nf3 Nf6 e3 e6 Bxc4 c5 O-O a6 Qe2 b5|ea434334d114f9798c3ab153a3194277
+D05|Rubinstein Opening: Semi-Slav Defense|d4 d5 Nf3 Nf6 e3 e6 Bd3 Bd6 O-O O-O b3 Nbd7 Bb2 c6|b77e2592f831b7fd1dcda9732709d20b
 D00|Blackmar-Diemer Gambit Accepted: Gunderam Defense, Stader Variation|d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 Bf5 Ne5 e6 g4 Be4|836122ca1af95f1c71a02ea6861c9263
 D37|Queen's Gambit Declined: Harrwitz Attack, Main Line|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bf4 O-O e3 c5 dxc5 Bxc5|8b64e923285603bc1b0fdabf031efd6f
 D63|Queen's Gambit Declined: Orthodox Defense, Main Line|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1 c6|8b99d4c390f19667263d09b3e1165737
@@ -3040,6 +3041,7 @@ D52|Queen's Gambit Declined: Cambridge Springs Defense, Bogoljubow Variation|d4 
 D19|Slav Defense: Czech Variation, Dutch Variation|d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4 Bf5 e3 e6 Bxc4 Bb4 O-O|7314335058d71cc63e74e9d676b41d42
 D17|Slav Defense: Czech Variation, Wiesbaden Variation, Sharp Line|d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4 Bf5 Ne5 e6 f3 Bb4 e4|b3bf53741b71099717a7a8453f450955
 D45|Semi-Slav Defense: Stoltz Variation|d4 d5 Nf3 Nf6 c4 c6 e3 e6 Nc3 Nbd7 Qc2 Bd6 b3 O-O Bb2|35b3a959577d226aa20a287447bd8fdb
+D05|Rubinstein Opening: Semi-Slav Defense|d4 d5 Nf3 Nf6 e3 e6 Bd3 Bd6 O-O O-O b3 Nbd7 Bb2 c6 Nbd2|00d7a950e596cda244b6c68867f7234d
 D00|Blackmar-Diemer Gambit: von Popiel Gambit, Zilbermints Variation|d4 d5 e4 dxe4 Nc3 Nf6 Bg5 Bf5 Bxf6 exf6 g4 Bg6 Qe2 Bb4 Qb5|7d7b460ee4ceabd4a08c3caf73961948
 D00|Blackmar-Diemer Gambit Accepted: Teichmann Defense, Classical Variation|d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 Bg4 h3 Bxf3 Qxf3 c6 Be3|a65929567d6a0a086188cd7710c629f6
 D00|Blackmar-Diemer Gambit Accepted: Teichmann Defense, Ciesielski Variation|d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 Bg4 h3 Bxf3 Qxf3 c6 Qf2|9592c6519c9ca94ebc4ac92c65f07687
