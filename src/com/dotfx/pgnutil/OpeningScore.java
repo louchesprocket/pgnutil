@@ -85,6 +85,6 @@ public class OpeningScore
             "white: " + Formats.PERCENT.format(whiteWinPct) + CLOptions.outputDelim +
             "black: " + Formats.PERCENT.format(blackWinPct) + CLOptions.outputDelim +
             "diff: " + Formats.PERCENT.format(whiteWinPct - blackWinPct) + CLOptions.outputDelim +
-            "draw: " + Formats.PERCENT.format(getDrawPct()) + CLOptions.outputDelim;
+            "draw: " + Formats.PERCENT.format(getDrawPct());
     }
 }
