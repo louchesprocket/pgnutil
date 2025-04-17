@@ -929,6 +929,7 @@ C03|French Defense: Tarrasch Variation, Modern System|e4 e6 d4 d5 Nd2 a6|ebb759d
 C03|French Defense: Tarrasch Variation, Morozevich Variation|e4 e6 d4 d5 Nd2 Be7|4c1cdaee951d60dca300537e43d6780a
 C03|French Defense: Tarrasch Variation, Haberditz Variation|e4 e6 d4 d5 Nd2 f5|8ea7fd4d1d951a339b5fcec3a06b9455
 C05|French Defense: Tarrasch Variation, Closed Variation|e4 e6 d4 d5 Nd2 Nf6|6694a241fe1758ea6f7c574b8d9abdd9
+C10|French Defense: Marshall Gambit|e4 e6 d4 d5 Nc3 c5|f34bc17e174e5b1216ad8675fe1228fd
 C15|French Defense: Winawer Variation|e4 e6 d4 d5 Nc3 Bb4|ef682d44949c601e33bba2c422f3a525
 C10|French Defense: Rubinstein Variation|e4 e6 d4 d5 Nc3 dxe4|8f19dc52dd937396992ff005e7b86345
 C11|French Defense: Classical Variation|e4 e6 d4 d5 Nc3 Nf6|3c39769e545802a3e73aa3f3c774bc50
@@ -968,7 +969,6 @@ B28|Sicilian Defense: O'Kelly Variation, Venice System, Barcza Line|e4 c5 Nf3 a6
 B28|Sicilian Defense: O'Kelly Variation, Maróczy Bind, Paulsen Line|e4 c5 Nf3 a6 c4 e6|62aa32381e9c82b346f88f448f064ed9
 B28|Sicilian Defense: O'Kelly Variation, Maróczy Bind, Robatsch Line|e4 c5 Nf3 a6 c4 d6|c301a1c9ff2ea825bf330833a001ea5e
 B24|Sicilian Defense: Closed|e4 c5 Nc3 Nc6 g3 g6|ebe2691d26deed68d9e19381929f4cea
-C10|Sicilian Defense: Marshall Gambit|e4 c5 Nc3 e6 d4 d5|f34bc17e174e5b1216ad8675fe1228fd
 B23|Sicilian Defense: Closed, Korchnoi Defense|e4 c5 Nc3 e6 g3 d5|435f6fc87f681b8a006cc801bdbd9030
 B12|Caro-Kann Defense: Advance Variation, Botvinnik-Carls Defense|e4 c6 d4 d5 e5 c5|7b44f8cf380fe8bc3d2ce9825c97b124
 B12|Caro-Kann Defense: Edinburgh Variation|e4 c6 d4 d5 Nd2 Qb6|d3f3ddc560d90f9faaf424c5eac3d8ed
@@ -1899,6 +1899,7 @@ A83|Dutch Defense: Staunton Gambit, Lasker Variation|d4 f5 e4 fxe4 Nc3 Nf6 Bg5 g
 D08|Queen's Gambit Declined: Albin Countergambit, Modern Line|d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 Nbd2|e4f70640237e6d6c53bcf70766862a27
 D09|Queen's Gambit Declined: Albin Countergambit, Fianchetto Variation|d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 g3|e07029bbba4d49c77326e4876ca0f499
 D30|Queen's Gambit Declined: Tarrasch Defense, Pseudo-Tarrasch Bishop Attack|d4 d5 c4 e6 Nf3 c5 cxd5 exd5 Bg5|971d39621c8239182e6fe8a9b89afec4
+D24|Queen's Gambit Accepted|d4 d5 c4 e6 Nf3 Nf6 Nc3 dxc4 e4|b2b571b44b8fc5030d813787404ca7be
 D32|Tarrasch Defense: Two Knights Variation|d4 d5 c4 e6 Nc3 c5 cxd5 exd5 Nf3|1bb348a0730a86f711609a2fc6cc765b
 D32|Tarrasch Defense: Marshall Gambit|d4 d5 c4 e6 Nc3 c5 cxd5 exd5 e4|67e36d30f308bc10fac3d9c78e654ecc
 D31|Semi-Slav Defense: Noteboom Variation, Anti-Noteboom Variation|d4 d5 c4 e6 Nc3 c6 Nf3 dxc4 Bg5|b64bbdddc8f42a584cbaadc17199771e
