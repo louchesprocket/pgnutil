@@ -645,7 +645,7 @@ public class PGNUtil
     
     static abstract class DuplicateHandler implements GameHandler
     {
-        private final Map<UniqueId128,SortedSet<Integer>> gameMap;
+        private final Map<UniqueId128,SortedSet<PgnGame.Locator>> gameMap;
         private final Set<UniqueId128> duplicates;
         
         DuplicateHandler()
@@ -656,7 +656,7 @@ public class PGNUtil
         
         final void handle(UniqueId128 hash)
         {
-            SortedSet<Integer> gameIdxes = gameMap.get(hash);
+            SortedSet<PgnGame.Locator> gameIdxes = gameMap.get(hash);
             if (gameIdxes != null) duplicates.add(hash);
 
             else
@@ -665,12 +665,12 @@ public class PGNUtil
                 gameMap.put(hash, gameIdxes);
             }
 
-            gameIdxes.add((int)game.getNumber());
+            gameIdxes.add(game.getLocator());
         }
         
-        final SortedSet<SortedSet<Integer>> getDuplicates()
+        final SortedSet<SortedSet<PgnGame.Locator>> getDuplicates()
         {
-            SortedSet<SortedSet<Integer>> ret = new TreeSet<>(Comparator.comparingInt(SortedSet::first));
+            SortedSet<SortedSet<PgnGame.Locator>> ret = new TreeSet<>(Comparator.comparing(SortedSet::first));
             for (UniqueId128 duplicate : duplicates) ret.add(gameMap.get(duplicate));
             return ret;
         }
@@ -761,11 +761,21 @@ public class PGNUtil
         
         @Override public void process()
         {
-            for (SortedSet<Integer> list : printer.getDuplicates())
+            for (SortedSet<PgnGame.Locator> list : printer.getDuplicates())
             {
-                Iterator<Integer> iter = list.iterator();
-                System.out.print(iter.next());
-                while (iter.hasNext()) System.out.print(CLOptions.valueDelim + iter.next());
+                Iterator<PgnGame.Locator> iter = list.iterator();
+
+                if (pgnFileList.size() > 1)
+                {
+                    System.out.print(iter.next());
+                    while (iter.hasNext()) System.out.print(CLOptions.valueDelim + iter.next());
+                }
+
+                else
+                {
+                    System.out.print(iter.next().getGameNo());
+                    while (iter.hasNext()) System.out.print(CLOptions.valueDelim + iter.next().getGameNo());
+                }
                 System.out.print("\n");
             }
         }

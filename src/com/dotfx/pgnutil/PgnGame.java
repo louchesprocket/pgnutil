@@ -34,14 +34,7 @@ import com.dotfx.pgnutil.eco.TreeNodeSet;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringJoiner;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -168,6 +161,34 @@ public final class PgnGame
             return compareTo((Move)other) == 0;
         }
     }
+
+    public static class Locator implements Comparable<Locator>
+    {
+        private final String fileName;
+        private final int gameNo;
+
+        private Locator(String fileName, int gameNo)
+        {
+            this.fileName = fileName;
+            this.gameNo = gameNo;
+        }
+
+        public int getGameNo() { return gameNo; }
+
+        @Override
+        public String toString() { return (fileName.isEmpty() ? "" : fileName + ":") + gameNo; }
+
+        @Override
+        public int compareTo(Locator other)
+        {
+            int comp;
+            if ((comp = fileName.compareTo(other.fileName)) == 0) return gameNo - other.gameNo;
+            return comp;
+        }
+
+        @Override
+        public boolean equals(Object other) { return compareTo((Locator)other) == 0; }
+    }
     
     static
     {
@@ -196,7 +217,7 @@ public final class PgnGame
                    List<Move> moves, String origText)
         throws PGNException
     {
-        this.fileName = fileName;
+        this.fileName = fileName == null ? "" : fileName;
         this.number = number;
         this.tagPairs = tagPairs;
         this.gameComments = gameComments;
@@ -569,6 +590,7 @@ public final class PgnGame
 
     public String getFileName() { return fileName; }
     public int getNumber() { return number; }
+    public Locator getLocator() { return new Locator(fileName, number); }
     public Set<String> getKeySet() { return tagPairs.keySet(); }
     public String getValue(String key) { return tagPairs.get(key); }
     public List<String> getGameComments() { return gameComments; }
