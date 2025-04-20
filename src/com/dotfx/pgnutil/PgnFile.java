@@ -39,16 +39,21 @@ public class PgnFile
 {
     public static final int COPY_BUF_INIT_SIZE = 32768;
     private final CopyReader reader;
+    private final String fileName;
     private int gameCounter;
     
     public PgnFile(String file) throws FileNotFoundException, IOException
     {
+        fileName = file;
+
         reader = new CopyReader(new BufferedReader(new FileReader(file)),
             COPY_BUF_INIT_SIZE);
     }
     
     public PgnFile(InputStream is) throws IOException
     {
+        fileName = null;
+
         reader = new CopyReader(new BufferedReader(new InputStreamReader(is)),
             COPY_BUF_INIT_SIZE);
     }
@@ -60,14 +65,15 @@ public class PgnFile
      * @param reader Reader containing PGN-formatted text
      * @throws IOException 
      */
-    public PgnFile(BufferedReader reader) throws IOException
+    public PgnFile(String fileName, BufferedReader reader) throws IOException
     {
+        this.fileName = fileName;
         this.reader = new CopyReader(reader, COPY_BUF_INIT_SIZE);
     }
     
     public PgnGame nextGame() throws IOException, PGNException
     {
-        PgnGame ret = PgnGame.parseNext(gameCounter + 1, reader);
+        PgnGame ret = PgnGame.parseNext(fileName, gameCounter + 1, reader);
         if (ret != null) gameCounter++;
         return ret;
     }

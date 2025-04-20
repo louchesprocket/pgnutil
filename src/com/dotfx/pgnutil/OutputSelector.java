@@ -342,6 +342,15 @@ public final class OutputSelector
         }
     }
 
+    private static final class FileNameOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getFileName());
+        }
+    }
+
     private static final class GameNumOutputHandler implements OutputHandler
     {
         @Override
@@ -453,6 +462,7 @@ public final class OutputSelector
         AVGPLIES("avgplies", null),
         CBPLAYERS("cbplayers", null), // Aquarium only. Handler set in CLOptionResolver.ClockBelowHandler
         DISAGREEPCT("disagreepct", new DisagreePctOutputHandler()),
+        FILENAME("filename", new FileNameOutputHandler()),
         GAMENO("gameno", new GameNumOutputHandler()),
         LOWCLOCK("lowclock", new LowClockOutputHandler()), // Aquarium only
         LOWCLOCKBLACK("lowclockblack", new LowClockBlackOutputHandler()), // Aquarium only

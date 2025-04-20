@@ -1204,7 +1204,7 @@ public class CLOptions
     {
         countOption(OptId.get(I));
         
-        try { PGNUtil.addInputFile(new PgnFile(new BufferedReader(new FileReader(f)))); }
+        try { PGNUtil.addInputFile(new PgnFile(f.getName(), new BufferedReader(new FileReader(f)))); }
         
         catch (FileNotFoundException e)
         {

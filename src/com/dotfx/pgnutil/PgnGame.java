@@ -177,7 +177,8 @@ public final class PgnGame
         // Banksia: "End of opening"
         bookMarker = Pattern.compile("(out\\s+of\\s+book)|(^End\\s+of\\s+opening)", Pattern.DOTALL);
     }
-    
+
+    private final String fileName;
     private final int number;
     private final CaseInsensitiveMap<String,String> tagPairs;
     private final List<String> gameComments;
@@ -191,10 +192,11 @@ public final class PgnGame
     private transient Clock lowClockWhite, lowClockBlack;
     private transient final Map<EcoTree.FileType,TreeNodeSet> xEcoCacheMap; // transposed ECO TreeNodeSets
     
-    public PgnGame(int number, CaseInsensitiveMap<String,String> tagPairs, List<String> gameComments, List<Move> moves,
-                   String origText)
+    public PgnGame(String fileName, int number, CaseInsensitiveMap<String,String> tagPairs, List<String> gameComments,
+                   List<Move> moves, String origText)
         throws PGNException
-    { 
+    {
+        this.fileName = fileName;
         this.number = number;
         this.tagPairs = tagPairs;
         this.gameComments = gameComments;
@@ -255,7 +257,7 @@ public final class PgnGame
         return moveList;
     }
     
-    public static PgnGame parseNext(int number, CopyReader reader)
+    public static PgnGame parseNext(String fileName, int number, CopyReader reader)
         throws IOException, PGNException
     {
         ArrayList<String> moveComments = new ArrayList<>();
@@ -374,7 +376,7 @@ public final class PgnGame
                         throw new PGNException("invalid termination marker " +
                             "at game " + number);
 
-                    return new PgnGame(number, tagpairs, gameComments, moves, reader.getCopy());
+                    return new PgnGame(fileName, number, tagpairs, gameComments, moves, reader.getCopy());
 
                 case '/':
                     if (j != 2)
@@ -391,16 +393,14 @@ public final class PgnGame
                         throw new PGNException("invalid termination marker " +
                             "at game " + number);
 
-                    return new PgnGame(number, tagpairs, gameComments, moves,
-                        reader.getCopy());
+                    return new PgnGame(fileName, number, tagpairs, gameComments, moves, reader.getCopy());
 
                 case '*':
                     if (!"*".equals(tagpairs.get("Result")))
                         throw new PGNException("invalid termination marker " +
                             "at game " + number);
 
-                    return new PgnGame(number, tagpairs, gameComments, moves,
-                        reader.getCopy());
+                    return new PgnGame(fileName, number, tagpairs, gameComments, moves, reader.getCopy());
             }
             
 //            movenum = new Integer(new String(buf, 0, i - 1 == 0 ? 1 : i - 1));
@@ -566,7 +566,8 @@ public final class PgnGame
             for (int i = 0; i < limit; i++) sb.append(moveList.get(i).getMove());
         }
     }
-    
+
+    public String getFileName() { return fileName; }
     public int getNumber() { return number; }
     public Set<String> getKeySet() { return tagPairs.keySet(); }
     public String getValue(String key) { return tagPairs.get(key); }
@@ -1014,7 +1015,7 @@ public final class PgnGame
             new CopyReader(new StringReader(replacee.matcher(origText).replaceAll(replacement)),
                     PgnFile.COPY_BUF_INIT_SIZE);
         
-        return parseNext(getNumber(), reader);
+        return parseNext(getFileName(), getNumber(), reader);
     }
 
     TreeNodeSet getXEcoNodeSet(EcoTree.FileType type) throws IllegalMoveException

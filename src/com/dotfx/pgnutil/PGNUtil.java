@@ -793,7 +793,7 @@ public class PGNUtil
         }
     }
     
-    public static final String VERSION = "1.2.1";
+    public static final String VERSION = "1.2.2";
 
     private static PgnGame game;
     private static final List<PgnFile> pgnFileList = new ArrayList<>();
@@ -828,7 +828,7 @@ public class PGNUtil
             CLOptionResolver.resolveOpts(CLOptions.getOptMap());
             
             if (pgnFileList.isEmpty())
-                pgnFileList.add(new PgnFile(new BufferedReader(new InputStreamReader(System.in))));
+                pgnFileList.add(new PgnFile(null, new BufferedReader(new InputStreamReader(System.in))));
             
             if (handler == null) handler = new DefaultGameHandler();
             handler.init();
