@@ -29,17 +29,8 @@ import com.dotfx.pgnutil.eco.TreeNodeSet;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -764,19 +755,44 @@ public class PGNUtil
             for (SortedSet<PgnGame.Locator> list : printer.getDuplicates())
             {
                 Iterator<PgnGame.Locator> iter = list.iterator();
+                PgnGame.Locator currentLocator = iter.next();
 
-                if (pgnFileList.size() > 1)
+                if (pgnFileList.size() > 1) // include file names in output
                 {
-                    System.out.print(iter.next());
-                    while (iter.hasNext()) System.out.print(CLOptions.valueDelim + iter.next());
+                    String prevFile = currentLocator.getFileName();
+
+                    StringJoiner joiner =
+                            new StringJoiner(CLOptions.valueDelim, prevFile + "[",
+                                    "]").add(String.valueOf(currentLocator.getGameNo()));
+
+                    while (iter.hasNext())
+                    {
+                        currentLocator = iter.next();
+
+                        if (!prevFile.equals(currentLocator.getFileName()))
+                        {
+                            System.out.print(joiner);
+
+                            joiner = new StringJoiner(CLOptions.valueDelim, CLOptions.valueDelim +
+                                    currentLocator.getFileName() + "[",
+                                    "]").add(String.valueOf(currentLocator.getGameNo()));
+
+                            prevFile = currentLocator.getFileName();
+                        }
+
+                        else joiner.add(String.valueOf(currentLocator.getGameNo()));
+                    }
+
+                    System.out.print(joiner);
                 }
 
                 else
                 {
-                    System.out.print(iter.next().getGameNo());
+                    System.out.print(currentLocator.getGameNo());
                     while (iter.hasNext()) System.out.print(CLOptions.valueDelim + iter.next().getGameNo());
                 }
-                System.out.print("\n");
+
+                System.out.print(System.lineSeparator());
             }
         }
     }

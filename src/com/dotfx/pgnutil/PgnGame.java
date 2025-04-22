@@ -173,6 +173,7 @@ public final class PgnGame
             this.gameNo = gameNo;
         }
 
+        public String getFileName() { return fileName; }
         public int getGameNo() { return gameNo; }
 
         @Override
@@ -182,8 +183,7 @@ public final class PgnGame
         public int compareTo(Locator other)
         {
             int comp;
-            if ((comp = fileName.compareTo(other.fileName)) == 0) return gameNo - other.gameNo;
-            return comp;
+            return ((comp = fileName.compareTo(other.fileName)) == 0) ? gameNo - other.gameNo : comp;
         }
 
         @Override
