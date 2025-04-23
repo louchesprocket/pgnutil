@@ -125,6 +125,21 @@ public class CLOptionResolver
         }
     }
 
+    public static class GameNumHandler implements OptHandler
+    {
+        public void handleIfAny(Map<OptId,Integer> setOpts, Set<OptId> ifAnyIntersects)
+        {
+            if (CLOptions.getCount(OptId.INPUTFILE) > 1)
+            {
+                System.err.println("Option '" +
+                        (setOpts.containsKey(OptId.GAMENUM) ? OptId.GAMENUM : OptId.GAMENUMFILE) +
+                        "' is only valid with a single input file!");
+
+                System.exit(-1);
+            }
+        }
+    }
+
     public static class PlayerHandler implements OptHandler
     {
         private final Pattern playerPattern;

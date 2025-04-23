@@ -320,13 +320,19 @@ public class CLOptions
     
     // matchers
 
-    @Option(name = GN, aliases = "-game_num", metaVar = "<range1,range2,...>",
+    @Option(name = GN, aliases = "-game_num", metaVar = "<range1,range2,...>", forbids = {GNF},
         usage = "output games whose ordinal position in the input source is contained in <range1,range2,...>")
     private void setGameNum(String gameno)
     {
         countOption(OptId.get(GN));
 
-        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchGameNumProcessor(gameno)); }
+        try
+        {
+            PGNUtil.addMatchProcessor(new PGNUtil.MatchGameNumProcessor(gameno));
+
+            CLOptionResolver.addCondition(new OptId[] {OptId.get(GN)}, new OptId[] {OptId.INPUTFILE}, null,
+                    new CLOptionResolver.GameNumHandler());
+        }
         
         catch (NumberFormatException e)
         {
@@ -335,13 +341,19 @@ public class CLOptions
         }
     }
 
-    @Option(name = GNF, aliases = "-game_num_file", metaVar = "<file>",
+    @Option(name = GNF, aliases = "-game_num_file", metaVar = "<file>", forbids = {GN},
             usage = "output games whose ordinal positions in the input source are listed in <file>")
     private void setGameFile(File gnf)
     {
         countOption(OptId.get(GNF));
 
-        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchGameNumProcessor(readFully(gnf))); }
+        try
+        {
+            PGNUtil.addMatchProcessor(new PGNUtil.MatchGameNumProcessor(readFully(gnf)));
+
+            CLOptionResolver.addCondition(new OptId[] {OptId.get(GNF)}, new OptId[] {OptId.INPUTFILE}, null,
+                    new CLOptionResolver.GameNumHandler());
+        }
 
         catch (NumberFormatException e)
         {
