@@ -991,7 +991,7 @@ public class Board implements Comparable<Board>
      * @return example: "Ngf6+"
      * @throws IllegalMoveException 
      */
-    public final String normalize(String san) throws IllegalMoveException
+    public final String normalize(String san, boolean showCheck) throws IllegalMoveException
     {
         Color color = (ply ^ 1) > ply ? Color.WHITE : Color.BLACK;
         PieceType promoteTo = null;
@@ -1010,14 +1010,14 @@ public class Board implements Comparable<Board>
         
         if (san.equalsIgnoreCase("O-O"))
         {
-            if (color == Color.WHITE) return coordToSan(4, 6, promoteTo);
-            else return coordToSan(60, 62, null);
+            if (color == Color.WHITE) return coordToSan(4, 6, promoteTo, showCheck);
+            else return coordToSan(60, 62, null, showCheck);
         }
         
         if (san.equalsIgnoreCase("O-O-O"))
         {
-            if (color == Color.WHITE) return coordToSan(4, 2, promoteTo);
-            else return coordToSan(60, 58, promoteTo);
+            if (color == Color.WHITE) return coordToSan(4, 2, promoteTo, showCheck);
+            else return coordToSan(60, 58, promoteTo, showCheck);
         }
         
         if (Character.isUpperCase(lastChar)) // promotion
@@ -1040,7 +1040,7 @@ public class Board implements Comparable<Board>
                 
                 if (piece != null && piece.getType() == PieceType.PAWN &&
                     piece.getColor() == color && moveTest(i, endSquare))
-                    return coordToSan(i, endSquare, promoteTo);
+                    return coordToSan(i, endSquare, promoteTo, showCheck);
             }
         
             throw new IllegalMoveException("illegal move: '" + san +
@@ -1063,7 +1063,7 @@ public class Board implements Comparable<Board>
             
             if (disambigLen == 2)
                 return coordToSan(Square.get(disambig).getLocation(), endSquare,
-                    promoteTo);
+                    promoteTo, showCheck);
             
             char disambigChar = disambig.charAt(0);
             
@@ -1077,7 +1077,7 @@ public class Board implements Comparable<Board>
 
                     if (piece != null && piece.getType() == pieceType && piece.getColor() == color &&
                             moveTest(i, endSquare))
-                        return coordToSan(i, endSquare, promoteTo);
+                        return coordToSan(i, endSquare, promoteTo, showCheck);
                 }
             }
             
@@ -1091,7 +1091,7 @@ public class Board implements Comparable<Board>
 
                     if (piece != null && piece.getType() == pieceType &&
                         piece.getColor() == color && moveTest(i, endSquare))
-                        return coordToSan(i, endSquare, promoteTo);
+                        return coordToSan(i, endSquare, promoteTo, showCheck);
                 }
             }
         
@@ -1104,13 +1104,13 @@ public class Board implements Comparable<Board>
             
             if (piece != null && piece.getType() == pieceType &&
                 piece.getColor() == color && moveTest(i, endSquare))
-                return coordToSan(i, endSquare, promoteTo);
+                return coordToSan(i, endSquare, promoteTo, showCheck);
         }
         
         throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
     }
     
-    public final String coordToSan(int start, int end, PieceType promoteTo)
+    public final String coordToSan(int start, int end, PieceType promoteTo, boolean showCheck)
         throws IllegalMoveException
     {
         Color moveColor = (ply ^ 1) > ply ? Color.WHITE : Color.BLACK;
@@ -1151,7 +1151,7 @@ public class Board implements Comparable<Board>
             int endRank = end/8;
             
             if (endRank == 0 || endRank == 7)
-                ret.append("=").append(promoteTo).append(getCheckSymbol(otherColor));
+                ret.append("=").append(promoteTo).append(showCheck ? getCheckSymbol(otherColor) : "");
             
             return ret.toString();
         }
@@ -1161,13 +1161,13 @@ public class Board implements Comparable<Board>
             if ((start == 4 && end == 6) || (start == 60 && end == 62))
             {
                 move(start, end, null);
-                return "O-O" + getCheckSymbol(otherColor);
+                return "O-O" + (showCheck ? getCheckSymbol(otherColor) : "");
             }
             
             if ((start == 4 && end == 2) || (start == 60 && end == 58))
             {
                 move(start, end, null);
-                return "O-O-O" + getCheckSymbol(otherColor);
+                return "O-O-O" + (showCheck ? getCheckSymbol(otherColor) : "");
             }
             
             move(start, end, null);
@@ -1179,12 +1179,12 @@ public class Board implements Comparable<Board>
         boolean disambigRank = false;
         boolean disambigFile = false;
         int candidateCount = 0;
-        int candidates[] = new int[10]; // max number of same piece types
+        int candidates[] = new int[10]; // max number of same piece type
         
         for (int i = 0; i < 64; i++)
         {
             if (position[i] != null && position[i].getColor() == moveColor &&
-                position[i].getType() == pieceType && canMove(i, end))
+                position[i].getType() == pieceType && moveTest(i, end))
                 candidates[candidateCount++] = i;
         }
         
@@ -1237,7 +1237,9 @@ public class Board implements Comparable<Board>
         }
         
         move(start, end, null);
-        return ret.append(captureSt).append(Square.get(end)).append(getCheckSymbol(otherColor)).toString();
+
+        return ret.append(captureSt).append(Square.get(end)).append(showCheck ? getCheckSymbol(otherColor) : "")
+                .toString();
     }
     
     /**
@@ -1245,13 +1247,13 @@ public class Board implements Comparable<Board>
      * @param move example: "e2e4"
      * @return 
      */
-    public final String coordToSan(String move) throws IllegalMoveException
+    public final String coordToSan(String move, boolean showCheck) throws IllegalMoveException
     {
         int start = Square.get(move.substring(0, 2)).getLocation();
         int end = Square.get(move.substring(2, 4)).getLocation();
         
         PieceType promoteTo = move.length() > 4 ? PieceType.get(move.substring(4, 5)) : null; // ?
-        return coordToSan(start, end, promoteTo);
+        return coordToSan(start, end, promoteTo, showCheck);
     }
     
     /**

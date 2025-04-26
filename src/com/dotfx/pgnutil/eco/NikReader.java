@@ -36,7 +36,7 @@ public class NikReader extends TreeReader
                 String parts[] = line.split("\"");
                 String rawMoves[] = parts[17].trim().split("\\s+");
 
-                for (String move : rawMoves) moveList.add(board.coordToSan(move));
+                for (String move : rawMoves) moveList.add(board.coordToSan(move, false));
 
                 topNode.addNodes(moveList, parts[3], parts[7], this);
             }

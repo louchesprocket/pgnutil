@@ -1,5 +1,6 @@
 package com.dotfx.pgnutil.eco;
 
+import com.dotfx.pgnutil.Board;
 import com.dotfx.pgnutil.IllegalMoveException;
 import com.dotfx.pgnutil.PgnGame;
 
@@ -7,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LichessReader extends TreeReader
 {
@@ -26,12 +29,16 @@ public class LichessReader extends TreeReader
             while ((line = dbReader.readLine()) != null)
             {
                 if (line.startsWith("eco")) continue;
+                List<String> moveList = new ArrayList<>();
+                Board board = new Board(true);
                 String parts[] = line.split("\\t");
 
                 try
                 {
-                    topNode.addNodes(PgnGame.parseMoveString(parts[2].trim()), parts[0].trim(), parts[1].trim(),
-                            this);
+                    for (String move : PgnGame.parseMoveString(parts[2].trim()))
+                        moveList.add(board.normalize(move, false));
+
+                    topNode.addNodes(moveList, parts[0].trim(), parts[1].trim(), this);
                 }
 
                 catch (Exception e)
