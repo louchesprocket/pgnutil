@@ -92,7 +92,7 @@ public final class TreeNode implements Comparable<TreeNode>
     public String getCode()
     {
         TreeNode node = this;
-        while (node != null && node.code.length() == 0) node = node.parent;
+        while (node != null && node.code.isEmpty()) node = node.parent;
         return node == null ? "" : node.code;
     }
 
@@ -120,9 +120,9 @@ public final class TreeNode implements Comparable<TreeNode>
         TreeNode next = ret;
         List<PgnGame.Move> moveList = game.getMoveList();
 
-        for (int i = 0; i < moveList.size(); i++)
+        for (PgnGame.Move move : moveList)
         {
-            next = next.branchTo(moveList.get(i).getMoveOnly());
+            next = next.branchTo(move.getMoveOnly());
             if (next == null) break;
             ret = next;
         }
@@ -149,7 +149,7 @@ public final class TreeNode implements Comparable<TreeNode>
     public TreeNode getDefinedNode()
     {
         TreeNode node = this;
-        while (node.code.length() == 0 && node.desc.length() == 0) node = node.getParent();
+        while (node.code.isEmpty() && node.desc.isEmpty()) node = node.getParent();
         return node;
     }
 
@@ -170,7 +170,7 @@ public final class TreeNode implements Comparable<TreeNode>
             ret = next;
         }
 
-        while (ret.code.length() == 0 && ret.desc.length() == 0) ret = ret.getParent();
+        while (ret.code.isEmpty() && ret.desc.isEmpty()) ret = ret.getParent();
         return ret;
     }
 
@@ -248,15 +248,15 @@ public final class TreeNode implements Comparable<TreeNode>
      * @param desc
      * @return
      */
-    TreeNode addNodes(List<String> moveList, String code, String desc, TreeReader handler) throws IllegalMoveException
+    TreeNode addNodes(List<String> moveList, String code, String desc) throws IllegalMoveException
     {
         TreeNode leaf = this;
         int size = moveList.size();
 
         for (int i = 0; i < size; i++)
         {
-            if (i == size - 1) leaf = leaf.addNode(moveList.get(i), code, desc, handler);
-            else leaf = leaf.addNode(moveList.get(i), null, null, handler);
+            if (i == size - 1) leaf = leaf.addNode(moveList.get(i), code, desc);
+            else leaf = leaf.addNode(moveList.get(i), null, null);
         }
 
         return leaf;
@@ -270,7 +270,7 @@ public final class TreeNode implements Comparable<TreeNode>
      * @param desc
      * @return
      */
-    TreeNode addNode(String moveSt, String code, String desc, TreeReader handler) throws IllegalMoveException
+    TreeNode addNode(String moveSt, String code, String desc) throws IllegalMoveException
     {
         String moveOnly = PgnGame.Move.getMoveOnly(moveSt);
         TreeNode branch = branchTo(moveOnly);
@@ -279,14 +279,12 @@ public final class TreeNode implements Comparable<TreeNode>
         {
             branch = new TreeNode(this, ply + 1, moveSt, code, desc);
             branchMap.put(moveOnly, branch);
-            handler.handleNewNode(branch);
         }
 
-        else if (code != null && code.length() > 0)
+        else if (code != null && !code.isEmpty())
         {
             branch.setSpecCode(code);
             branch.setSpecDesc(desc);
-            handler.handleNewNode(branch);
         }
 
         return branch;

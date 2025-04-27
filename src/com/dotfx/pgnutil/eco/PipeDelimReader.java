@@ -45,7 +45,7 @@ public class PipeDelimReader extends TreeReader
                     moveList.add(move.substring(start));
                 }
 
-                topNode.addNodes(moveList, parts[0], parts[1], this);
+                topNode.addNodes(moveList, parts[0], parts[1]);
             }
         }
     }

@@ -85,7 +85,7 @@ public final class EcoTree
 
             catch (IOException | IllegalMoveException e)
             {
-                System.err.println("error while reading ECO file " + pathOverride == null ? path : pathOverride);
+                System.err.println("error while reading ECO file " + (pathOverride == null ? path : pathOverride));
                 System.exit(-1);
             }
 
@@ -281,6 +281,8 @@ public final class EcoTree
         {
             Set<TreeNode> transposed = posMap.get(posSt);
             if (transposed.size() < 2) continue;
+            System.out.println("COUNT: " + transposed.size());
+
             transCount++;
             
             for (TreeNode node : transposed)
@@ -359,17 +361,15 @@ public final class EcoTree
                         append(StdReader.LINE_DELIM);
 
                 List<TreeNode> path = node.getPath();
-                Board board = new Board(true);
 
                 for (TreeNode subPathNode : path)
                 {
-                    board.move(subPathNode.getMove());
                     sb.append(subPathNode.getMove()).append(StdReader.MOVE_DELIM);
                 }
 
                 sb.setLength(sb.length() - 1);
                 sb.append(StdReader.LINE_DELIM);
-                sb.append(board.positionId());
+                sb.append(node.getPositionId());
 
                 sb.append("\n");
                 writer.write(sb.toString());
@@ -471,17 +471,14 @@ public final class EcoTree
     
 //    public static void main(String args[]) throws Exception
 //    {
-////        long start = System.currentTimeMillis();
-//////        EcoTree tree1 = new EcoTree(Type.SCID);
-//////        EcoTree tree1 = getScidInstance();
-//////        tree1.printTranspositions();
-////
+//        long start = System.currentTimeMillis();
+//
 //        EcoTree tree1 = new EcoTree(FileType.LICHESS);
-////        tree1.printTree();
+//////        tree1.printTree();
 //        tree1.writeTree(new File("test.out"));
 //        EcoTree tree2 = new EcoTree(FileType.STD);
 //        printDiff(tree1, tree2, true);
-////////        tree1.printTranspositions();
+////        tree1.printTranspositions();
 //        System.out.println("tree 1 nodes: " + tree1.positionCount());
 //        System.out.println("tree 2 nodes: " + tree2.positionCount());
 ////
@@ -498,6 +495,6 @@ public final class EcoTree
 ////
 //////        System.out.println("NODE COUNT: " + tree1.positionCount());
 //////        printDiff(tree1, tree2);
-////        System.out.println("ELAPSED: " + (System.currentTimeMillis() - start) + "ms");
+//        System.out.println("ELAPSED: " + (System.currentTimeMillis() - start) + "ms");
 //    }
 }

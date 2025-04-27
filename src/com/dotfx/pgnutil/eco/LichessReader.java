@@ -38,7 +38,9 @@ public class LichessReader extends TreeReader
                     for (String move : PgnGame.parseMoveString(parts[2].trim()))
                         moveList.add(board.normalize(move, false));
 
-                    topNode.addNodes(moveList, parts[0].trim(), parts[1].trim(), this);
+                    TreeNode newNode = topNode.addNodes(moveList, parts[0].trim(), parts[1].trim());
+                    newNode.setPositionId(board.positionId().toString());
+                    handleNewNode(newNode);
                 }
 
                 catch (Exception e)

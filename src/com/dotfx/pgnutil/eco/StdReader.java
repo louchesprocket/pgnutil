@@ -74,27 +74,15 @@ final class StdReader extends TreeReader
 
                 for (int i = 0; i < moves.length; i++) // for each move
                 {
-                    if (i == moves.length - 1) node = node.addNode(moves[i], parts[0], parts[1], this);
-                    else node = node.addNode(moves[i], "", "", this);
+                    if (i == moves.length - 1) node = node.addNode(moves[i], parts[0], parts[1]);
+                    else node = node.addNode(moves[i], "", "");
                 }
 
-                Set<TreeNode> nodeSet = positionMap.get(parts[3]);
-
-                if (nodeSet == null)
-                {
-                    nodeSet = new HashSet<>();
-                    positionMap.put(parts[3], nodeSet);
-                }
-
+                Set<TreeNode> nodeSet = positionMap.computeIfAbsent(parts[3], k -> new HashSet<>());
                 nodeSet.add(node);
+                if (node.getPly() > deepestPly) deepestPly = node.getPly();
                 node.setPositionId(parts[3]);
             }
         }
-    }
-
-    @Override
-    void handleNewNode(TreeNode node)
-    {
-        if (node.getPly() > deepestPly) deepestPly = node.getPly();
     }
 }

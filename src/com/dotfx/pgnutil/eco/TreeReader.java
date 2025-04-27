@@ -43,29 +43,15 @@ abstract class TreeReader
     abstract void readTree(InputStream in, TreeNode topNode) throws IOException, IllegalMoveException;
 
     /**
-     * Callback from TreeNode.addNode(). Adds position hash to maps. This is not needed with the StdReader because the
-     * input file contains hashes.
+     * Adds position hash to maps. This is not needed with the StdReader because the input file contains hashes.
      *
      * @param node
      * @throws IllegalMoveException
      */
     void handleNewNode(TreeNode node) throws IllegalMoveException
     {
-        if (node.getSpecCode().length() == 0 && node.getSpecDesc().length() == 0) return;
-
-        Board board = new Board(true);
-        board.move(node.getPath());
-        String posSt = board.positionId().toString();
-        Set<TreeNode> nodeSet = positionMap.get(posSt);
-
-        if (nodeSet == null)
-        {
-            nodeSet = new HashSet<>();
-            positionMap.put(posSt, nodeSet);
-        }
-
-        nodeSet.add(node);
-        node.setPositionId(posSt);
+        if (node.getSpecCode().isEmpty() && node.getSpecDesc().isEmpty()) return;
+        positionMap.computeIfAbsent(node.getPositionId(), k -> new HashSet<>()).add(node);
         if (node.getPly() > deepestPly) deepestPly = node.getPly();
     }
 }

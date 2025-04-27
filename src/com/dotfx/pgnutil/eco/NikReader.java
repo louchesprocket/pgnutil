@@ -38,7 +38,7 @@ public class NikReader extends TreeReader
 
                 for (String move : rawMoves) moveList.add(board.coordToSan(move, false));
 
-                topNode.addNodes(moveList, parts[3], parts[7], this);
+                topNode.addNodes(moveList, parts[3], parts[7]);
             }
         }
     }
