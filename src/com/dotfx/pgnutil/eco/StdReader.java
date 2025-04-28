@@ -25,6 +25,7 @@
 package com.dotfx.pgnutil.eco;
 
 import com.dotfx.pgnutil.IllegalMoveException;
+import com.dotfx.pgnutil.PositionId;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -71,6 +72,7 @@ final class StdReader extends TreeReader
                 TreeNode node = topNode;
                 String parts[] = line.split(lineDelim);
                 String moves[] = parts[2].split(moveDelim);
+                PositionId positionId = new PositionId(parts[3]);
 
                 for (int i = 0; i < moves.length; i++) // for each move
                 {
@@ -78,10 +80,9 @@ final class StdReader extends TreeReader
                     else node = node.addNode(moves[i], "", "");
                 }
 
-                Set<TreeNode> nodeSet = positionMap.computeIfAbsent(parts[3], k -> new HashSet<>());
-                nodeSet.add(node);
+                node.setPositionId(positionId);
+                positionMap.computeIfAbsent(positionId,k -> new HashSet<>()).add(node);
                 if (node.getPly() > deepestPly) deepestPly = node.getPly();
-                node.setPositionId(parts[3]);
             }
         }
     }

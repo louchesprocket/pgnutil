@@ -20,8 +20,8 @@
 
 package com.dotfx.pgnutil.eco;
 
-import com.dotfx.pgnutil.Board;
 import com.dotfx.pgnutil.IllegalMoveException;
+import com.dotfx.pgnutil.PositionId;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,12 +32,12 @@ import java.util.Set;
 
 abstract class TreeReader
 {
-    final Map<String,Set<TreeNode>> positionMap;
+    final Map<PositionId,Set<TreeNode>> positionMap;
     int deepestPly;
 
     TreeReader() { positionMap = new HashMap<>(5000); }
 
-    Map<String,Set<TreeNode>> getPositionMap() { return positionMap; }
+    Map<PositionId,Set<TreeNode>> getPositionMap() { return positionMap; }
     int getDeepestPly() { return deepestPly; }
 
     abstract void readTree(InputStream in, TreeNode topNode) throws IOException, IllegalMoveException;

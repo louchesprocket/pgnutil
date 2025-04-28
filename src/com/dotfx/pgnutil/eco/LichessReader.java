@@ -39,7 +39,7 @@ public class LichessReader extends TreeReader
                         moveList.add(board.normalize(move, false));
 
                     TreeNode newNode = topNode.addNodes(moveList, parts[0].trim(), parts[1].trim());
-                    newNode.setPositionId(board.positionId().toString());
+                    newNode.setPositionId(board.positionId());
                     handleNewNode(newNode);
                 }
 

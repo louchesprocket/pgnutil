@@ -150,7 +150,7 @@ public final class EcoTree
      */
     public TreeNodeSet getDeepestTranspositionSet(List<PgnGame.Move> moveList) throws IllegalMoveException
     {
-        Map<String,Set<TreeNode>> posMap = reader.getPositionMap();
+        Map<PositionId,Set<TreeNode>> posMap = reader.getPositionMap();
         Board board = new Board(true);
         Set<TreeNode> deepest = null;
 
@@ -160,7 +160,7 @@ public final class EcoTree
 
             try
             {
-                Set<TreeNode> nodeSet = posMap.get(board.move(move).positionId().toString());
+                Set<TreeNode> nodeSet = posMap.get(board.move(move).positionId());
                 if (nodeSet != null) deepest = nodeSet;
             }
 
@@ -274,12 +274,12 @@ public final class EcoTree
     
     private void printTranspositions()
     {
-        Map<String,Set<TreeNode>> posMap = reader.getPositionMap();
+        Map<PositionId,Set<TreeNode>> posMap = reader.getPositionMap();
         int transCount = 0;
         
-        for (String posSt : posMap.keySet())
+        for (PositionId posId : posMap.keySet())
         {
-            Set<TreeNode> transposed = posMap.get(posSt);
+            Set<TreeNode> transposed = posMap.get(posId);
             if (transposed.size() < 2) continue;
             System.out.println("COUNT: " + transposed.size());
 
@@ -469,32 +469,32 @@ public final class EcoTree
         System.out.println("DIFF: " + treeDiff.size());
     }
     
-//    public static void main(String args[]) throws Exception
-//    {
-//        long start = System.currentTimeMillis();
-//
-//        EcoTree tree1 = new EcoTree(FileType.LICHESS);
-//////        tree1.printTree();
+    public static void main(String args[]) throws Exception
+    {
+        long start = System.currentTimeMillis();
+
+        EcoTree tree1 = new EcoTree(FileType.STD);
+////        tree1.printTree();
 //        tree1.writeTree(new File("test.out"));
 //        EcoTree tree2 = new EcoTree(FileType.STD);
 //        printDiff(tree1, tree2, true);
-////        tree1.printTranspositions();
+        tree1.printTranspositions();
 //        System.out.println("tree 1 nodes: " + tree1.positionCount());
 //        System.out.println("tree 2 nodes: " + tree2.positionCount());
+//
+////        Board board = new Board(true).move("Nf3").move("e5").move("e4").move("Nc6").move("Bb5");
+//
+////        List<TreeNode> nodeList = tree1.get("1. d4 Nf6 2. c4 e6 3. Nf3 c5 4. d5 exd5 5. cxd5 d6 6. Nc3 g6 7. e4 Bg7 " +
+////                "8. Be2 O-O 9. O-O a6 10. a4").getPath();
+//////        List<TreeNode> nodeList = tree1.get("1.d4 e6 2. Nf3").getPath();
 ////
-//////        Board board = new Board(true).move("Nf3").move("e5").move("e4").move("Nc6").move("Bb5");
-////
-//////        List<TreeNode> nodeList = tree1.get("1. d4 Nf6 2. c4 e6 3. Nf3 c5 4. d5 exd5 5. cxd5 d6 6. Nc3 g6 7. e4 Bg7 " +
-//////                "8. Be2 O-O 9. O-O a6 10. a4").getPath();
-////////        List<TreeNode> nodeList = tree1.get("1.d4 e6 2. Nf3").getPath();
-//////
-//////        System.out.println("===== len: " + nodeList.size());
-//////        TreeNode bottom = nodeList.get(nodeList.size() - 1);
-//////        System.out.println("===== code: " + bottom.getCode());
-//////        System.out.println("===== desc: " + bottom.getDesc());
-////
-//////        System.out.println("NODE COUNT: " + tree1.positionCount());
-//////        printDiff(tree1, tree2);
-//        System.out.println("ELAPSED: " + (System.currentTimeMillis() - start) + "ms");
-//    }
+////        System.out.println("===== len: " + nodeList.size());
+////        TreeNode bottom = nodeList.get(nodeList.size() - 1);
+////        System.out.println("===== code: " + bottom.getCode());
+////        System.out.println("===== desc: " + bottom.getDesc());
+//
+////        System.out.println("NODE COUNT: " + tree1.positionCount());
+////        printDiff(tree1, tree2);
+        System.out.println("ELAPSED: " + (System.currentTimeMillis() - start) + "ms");
+    }
 }

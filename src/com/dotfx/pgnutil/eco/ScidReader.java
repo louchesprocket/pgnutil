@@ -60,7 +60,7 @@ class ScidReader extends TreeReader
                 }
 
                 TreeNode newNode = topNode.addNodes(moveList, parts[0].trim(), parts[1].trim());
-                newNode.setPositionId(board.positionId().toString());
+                newNode.setPositionId(board.positionId());
                 handleNewNode(newNode);
             }
         }

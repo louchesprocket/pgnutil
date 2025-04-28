@@ -22,6 +22,7 @@ package com.dotfx.pgnutil.eco;
 
 import com.dotfx.pgnutil.IllegalMoveException;
 import com.dotfx.pgnutil.PgnGame;
+import com.dotfx.pgnutil.PositionId;
 
 import java.util.*;
 
@@ -31,7 +32,7 @@ public final class TreeNode implements Comparable<TreeNode>
     private final String moveSt;
     private String code;
     private String desc;
-    private String positionIdSt;
+    private PositionId positionId;
     private final TreeNode parent;
     private final Map<String,TreeNode> branchMap; // children indexed by move text
 
@@ -66,8 +67,8 @@ public final class TreeNode implements Comparable<TreeNode>
     private void setSpecDesc(String desc) {
         this.desc = desc == null ? "" : desc;
     }
-    public String getPositionId() { return positionIdSt; }
-    void setPositionId(String st) { positionIdSt = st; }
+    public PositionId getPositionId() { return positionId; }
+    void setPositionId(PositionId positionId) { this.positionId = positionId; }
     private TreeNode branchTo(String moveTxt) {
         return branchMap.get(moveTxt);
     }

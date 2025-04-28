@@ -32,6 +32,7 @@ package com.dotfx.pgnutil;
 public final class PositionId extends UniqueId128
 {
     public PositionId(byte[] b) { super(b); }
+    public PositionId(String s) { super(UniqueId128.fromString(s).getValue()); }
 
     @Override
     public int hashCode()

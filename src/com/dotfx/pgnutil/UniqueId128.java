@@ -32,10 +32,28 @@ public class UniqueId128 implements Comparable<UniqueId128>
     private static final LongTupleHashFunction hashFunc = LongTupleHashFunction.xx128(HASHSEED);
     private final long[] value = new long[2];
 
+    private UniqueId128(long v1, long v2)
+    {
+        this.value[0] = v1;
+        this.value[1] = v2;
+    }
+
     public UniqueId128(byte[] b) { hashFunc.hashBytes(b, value); }
     public UniqueId128(long value) { this.value[0] = value; }
 
+    public UniqueId128(long[] value)
+    {
+        this.value[0] = value[0];
+        this.value[1] = value[1];
+    }
+
     public long[] getValue() { return value; }
+
+    public static UniqueId128 fromString(String s)
+    {
+        return new UniqueId128(NumberUtils.hexToLong(s.substring(0,16)),
+                NumberUtils.hexToLong(s.substring(16,32)));
+    }
 
     @Override
     public String toString()

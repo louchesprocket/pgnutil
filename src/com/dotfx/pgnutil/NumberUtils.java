@@ -127,7 +127,8 @@ import java.util.Arrays;
 
 //    public static void main(String[] args)
 //    {
-//        System.out.println((byte)0xff);
-//        System.out.println(bytesToInt(new byte[] {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff}));
+////        System.out.println((byte)0xff);
+////        System.out.println(bytesToInt(new byte[] {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff}));
+//        System.out.println(longToHex(hexToLong(longToHex(0x0123456789abcdeL, false)), false));
 //    }
 }
