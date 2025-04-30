@@ -155,10 +155,10 @@ public class OpeningStats implements Tallier
     /**
      * Output selectors must be initialized here so that the tallier knows what to do.
      *
-     * @throws InvalidSelectorException
+     * @throws SelectorException
      */
     @Override
-    public void init(OutputSelector selectors[]) throws InvalidSelectorException
+    public void init(OutputSelector selectors[]) throws SelectorException
     {
         if (selectors == null || selectors.length == 0) ecoTree = EcoTree.FileType.STD.getEcoTree();
 
@@ -216,8 +216,12 @@ public class OpeningStats implements Tallier
         {
             List<PgnGame.Move> openingMoveList = game.getOpeningMoveList();
             if (openingMoveList.isEmpty()) return; // no book moves
-            TreeNode ecoNode = ecoTree != null ? ecoTree.getDeepestDefined(openingMoveList) : null;
-            TreeNode scidNode = scidEcoTree != null ? scidEcoTree.getDeepestDefined(openingMoveList) : null;
+
+            TreeNode ecoNode =
+                    ecoTree != null ? ecoTree.getDeepestDefined(openingMoveList) : null;
+
+            TreeNode scidNode =
+                    scidEcoTree != null ? scidEcoTree.getDeepestDefined(openingMoveList) : null;
 
             opening = new Opening(saveOpeningMoves ? game.getFullOpeningString() : null, openingId, ecoNode, scidNode,
                 useXStdEco ? ecoTree.getDeepestTranspositionSet(openingMoveList) : null,

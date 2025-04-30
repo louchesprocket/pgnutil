@@ -36,7 +36,7 @@ public final class OutputSelector
 {
     public interface OutputHandler
     {
-        void appendOutput(PgnGame game, StringBuilder sb) throws InvalidSelectorException;
+        void appendOutput(PgnGame game, StringBuilder sb) throws SelectorException;
     }
 
     private final class DefaultOutputHandler implements OutputHandler
@@ -282,7 +282,7 @@ public final class OutputSelector
         private EcoMovesOutputHandler(EcoTree.FileType type) { this.type = type; }
 
         @Override
-        public void appendOutput(PgnGame game, StringBuilder sb)
+        public void appendOutput(PgnGame game, StringBuilder sb) throws SelectorException
         {
             sb.append(new TreeNodeSet(type.getEcoTree().getDeepestDefined(game)).getMoveString());
         }
@@ -569,7 +569,7 @@ public final class OutputSelector
     public void setOutputHandler(OutputHandler handler) { this.handler = handler; }
     public Value getValue() { return value; }
 
-    public void appendOutput(PgnGame game, StringBuilder sb) throws InvalidSelectorException
+    public void appendOutput(PgnGame game, StringBuilder sb) throws SelectorException
     {
         handler.appendOutput(game, sb);
     }

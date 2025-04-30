@@ -28,7 +28,8 @@ package com.dotfx.pgnutil;
  *
  * @author Mark Chen
  */
-public class InvalidSelectorException extends Exception
+public class SelectorException extends Exception
 {
-    public InvalidSelectorException(String m) { super(m); }
+    public SelectorException(String m) { super(m); }
+    public SelectorException(Throwable t) { super(t); }
 }

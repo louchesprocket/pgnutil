@@ -31,4 +31,5 @@ package com.dotfx.pgnutil;
 public class PGNException extends Exception
 {
     public PGNException(String msg) { super(msg); }
+    public PGNException(Throwable t) { super(t); }
 }

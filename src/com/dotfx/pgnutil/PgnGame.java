@@ -90,10 +90,14 @@ public final class PgnGame
             this.move = move;
             this.comments = new ArrayList<>();
             
-            for (String comment : comments)
-                this.comments.add(comment.replaceAll("[\n\r]", " "));
+            for (String comment : comments) this.comments.add(comment.replaceAll("[\n\r]", " "));
         }
-        
+
+        public Move normalize(Board board, boolean showCheck) throws IllegalMoveException
+        {
+            return new Move(color, number, board.normalize(move, showCheck), comments);
+        }
+
         public Color getColor() { return color; }
         public int getNumber() { return number; }
         public String getMove() { return move; }
@@ -287,6 +291,7 @@ public final class PgnGame
         CaseInsensitiveMap<String,String> tagpairs = new CaseInsensitiveMap<>();
         List<PgnGame.Move> moves = new ArrayList<>();
         List<String> gameComments = new ArrayList<>();
+        Board board = CLOptions.normalizeSan ? new Board(true) : null;
 
         while (true) // parse tag pairs
         {
@@ -473,11 +478,18 @@ public final class PgnGame
             
             if (next == -1) throw new PGNException("unexpected eof");
             buf[0] = (char)next;
-            
-            PgnGame.Move move = new PgnGame.Move((i & 1) == 0 ? Color.BLACK : Color.WHITE,
-                (short)Math.round((float)i / (float)2), moveStr, moveComments);
-            
-            moves.add(move);
+
+            try
+            {
+                PgnGame.Move move = new PgnGame.Move((i & 1) == 0 ? Color.BLACK : Color.WHITE,
+                        (short)Math.round((float)i / (float)2), board != null ?
+                        board.normalize(moveStr, true) : moveStr, moveComments);
+
+                moves.add(move);
+            }
+
+            catch (IllegalMoveException e) { throw new PGNException(e); }
+
             moveComments = new ArrayList<>();
         }
     }
@@ -923,7 +935,7 @@ public final class PgnGame
         boolean official = false;
         
         try { timeCtrlSt = get(OutputSelector.TIMECONTROL); }
-        catch (InvalidSelectorException e) {} // shouldn't happen
+        catch (SelectorException e) {} // shouldn't happen
         
         if (timeCtrlSt == null || timeCtrlSt.equals("?")) // try to infer
         {
@@ -1053,12 +1065,12 @@ public final class PgnGame
         return nodeSet;
     }
     
-    public String get(OutputSelector selector) throws InvalidSelectorException
+    public String get(OutputSelector selector) throws SelectorException
     {
         return get(new OutputSelector[] {selector});
     }
 
-    public String get(OutputSelector selectors[]) throws InvalidSelectorException
+    public String get(OutputSelector selectors[]) throws SelectorException
     {
         StringBuilder ret = new StringBuilder();
 

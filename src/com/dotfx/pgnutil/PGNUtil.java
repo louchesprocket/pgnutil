@@ -97,7 +97,7 @@ public class PGNUtil
                 return tagPattern.matcher(value).find();
             }
             
-            catch (InvalidSelectorException e) { return false; }
+            catch (SelectorException e) { return false; }
         }
     }
     
@@ -120,7 +120,7 @@ public class PGNUtil
                 return !tagPattern.matcher(value).find();
             }
             
-            catch (InvalidSelectorException e) { return false; }
+            catch (SelectorException e) { return false; }
         }
     }
     
@@ -607,13 +607,14 @@ public class PGNUtil
     
     interface GameHandler
     {
-        default void init() throws InvalidSelectorException {}
-        void handle() throws InvalidSelectorException, IllegalMoveException;
+        default void init() throws SelectorException
+        {}
+        void handle() throws SelectorException, IllegalMoveException;
     }
     
     private static final class DefaultGameHandler implements GameHandler
     {
-        @Override public void handle() throws InvalidSelectorException
+        @Override public void handle() throws SelectorException
         {
             System.out.print(game.getOrigText());
         }
@@ -628,7 +629,7 @@ public class PGNUtil
             this.selectors = selectors;
         }
         
-        @Override public void handle() throws InvalidSelectorException
+        @Override public void handle() throws SelectorException
         {
             System.out.println(game.get(selectors));
         }
@@ -673,7 +674,7 @@ public class PGNUtil
 
         public DuplicateGameHandler(int plies) { this.plies = plies; }
 
-        @Override public void handle() throws InvalidSelectorException
+        @Override public void handle() throws SelectorException
         {
             super.handle(game.getHash(plies));
         }
@@ -685,7 +686,7 @@ public class PGNUtil
 
         public DuplicateMoveHandler(int plies) { this.plies = plies; }
 
-        @Override public void handle() throws InvalidSelectorException
+        @Override public void handle() throws SelectorException
         {
             super.handle(game.getMoveHash(plies));
         }
@@ -693,7 +694,7 @@ public class PGNUtil
     
     static final class DuplicateOpeningHandler extends DuplicateHandler
     {
-        @Override public void handle() throws InvalidSelectorException
+        @Override public void handle() throws SelectorException
         {
             super.handle(game.getPlayerOpeningHash());
         }
@@ -705,7 +706,7 @@ public class PGNUtil
 
         public DuplicatePostOpeningHandler(int plies) { this.plies = plies; }
 
-        @Override public void handle() throws InvalidSelectorException
+        @Override public void handle() throws SelectorException
         {
             super.handle(game.getPostOpeningHash(plies));
         }
@@ -717,7 +718,7 @@ public class PGNUtil
 
         public DuplicatePostOpeningMoveHandler(int plies) { this.plies = plies; }
 
-        @Override public void handle() throws InvalidSelectorException
+        @Override public void handle() throws SelectorException
         {
             super.handle(game.getPostOpeningMoveHash(plies));
         }
@@ -728,7 +729,8 @@ public class PGNUtil
         private final Tallier tallier;
         
         TallyHandler(Tallier tallier) { this.tallier = tallier; }
-        @Override public void init() throws InvalidSelectorException { tallier.init(outputSelectors); }
+        @Override public void init() throws SelectorException
+        { tallier.init(outputSelectors); }
         @Override public void handle() throws IllegalMoveException { tallier.tally(game); }
     }
     
@@ -811,7 +813,7 @@ public class PGNUtil
                 while (iter.hasNext()) System.out.println(iter.next());
             }
             
-            catch (InvalidSelectorException e)
+            catch (SelectorException e)
             {
                 System.err.println("Exception: " + e.getMessage());
                 System.exit(-1);
@@ -873,7 +875,7 @@ public class PGNUtil
             System.exit(-1);
         }
         
-        catch (InvalidSelectorException e)
+        catch (SelectorException e)
         {
             System.err.println("invalid selector: " + e.getLocalizedMessage());
             System.exit(-1);
@@ -910,7 +912,7 @@ public class PGNUtil
             exitProcessor.process();
         }
 
-        catch (InvalidSelectorException | IllegalMoveException | PGNException e)
+        catch (SelectorException | IllegalMoveException | PGNException e)
         {
             System.err.println(e.getLocalizedMessage());
             System.exit(-1);

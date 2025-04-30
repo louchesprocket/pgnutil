@@ -123,7 +123,7 @@ public class PlayerResults implements Tallier
     }
 
     @Override
-    public void init(OutputSelector selectors[]) throws InvalidSelectorException
+    public void init(OutputSelector selectors[]) throws SelectorException
     {
         if (selectors != null && selectors.length > 0)
         {

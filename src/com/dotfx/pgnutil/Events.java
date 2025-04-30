@@ -40,7 +40,7 @@ public class Events implements Tallier
     private interface IteratorFactory
     {
         java.util.Iterator getIterator(Map<String,List<GameInfo>> eventMap, EventsOutputSelector selectors[])
-                throws InvalidSelectorException;
+                throws SelectorException;
     }
 
     private static class EventIteratorFactory implements IteratorFactory
@@ -56,7 +56,7 @@ public class Events implements Tallier
     {
         @Override
         public java.util.Iterator getIterator(Map<String,List<GameInfo>> eventMap, EventsOutputSelector selectors[])
-                throws InvalidSelectorException
+                throws SelectorException
         {
             return new RoundErrorIterator(eventMap, selectors);
         }
@@ -120,13 +120,13 @@ public class Events implements Tallier
         private String next;
 
         private RoundErrorIterator(Map<String,List<GameInfo>> eventMap, EventsOutputSelector selectors[])
-                throws InvalidSelectorException
+                throws SelectorException
         {
             this.eventMap = eventMap;
             eventNameIterator = eventMap.keySet().iterator();
 
             if (selectors != null && selectors.length > 0)
-                throw new InvalidSelectorException("output selectors are not allowed for this function");
+                throw new SelectorException("output selectors are not allowed for this function");
         }
 
         private void genNext()
@@ -211,7 +211,7 @@ public class Events implements Tallier
     }
 
     @Override
-    public void init(OutputSelector selectors[]) throws InvalidSelectorException
+    public void init(OutputSelector selectors[]) throws SelectorException
     {
         if (selectors != null && selectors.length > 0)
         {
@@ -239,19 +239,12 @@ public class Events implements Tallier
     public void tally(PgnGame game)
     {
         String event = game.getValue("Event");
-        List<GameInfo> eventGames = eventMap.get(event);
-
-        if (eventGames == null)
-        {
-            eventGames = new ArrayList();
-            eventMap.put(event, eventGames);
-        }
-
+        List<GameInfo> eventGames = eventMap.computeIfAbsent(event, k -> new ArrayList<>());
         eventGames.add(new GameInfo(game.getNumber(), game.getNormalizedRound(), game.getTimeCtrl()));
     }
 
     @Override
-    public java.util.Iterator<String> getOutputIterator() throws InvalidSelectorException
+    public java.util.Iterator<String> getOutputIterator() throws SelectorException
     {
         return iteratorFactory.getIterator(eventMap, selectors);
     }

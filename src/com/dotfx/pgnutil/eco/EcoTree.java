@@ -119,8 +119,17 @@ public final class EcoTree
     }
     
     public TreeNode getDeepestNode(PgnGame game) { return topNode.getBottomNode(game); }
-    public TreeNode getDeepestDefined(PgnGame game) { return topNode.getBottomDefinedNode(game); }
-    public TreeNode getDeepestDefined(List<PgnGame.Move> moveList) { return topNode.getBottomDefinedNode(moveList); }
+
+    public TreeNode getDeepestDefined(PgnGame game)
+    {
+        return topNode.getBottomDefinedNode(game);
+    }
+
+    public TreeNode getDeepestDefined(List<PgnGame.Move> moveList)
+    {
+        return topNode.getBottomDefinedNode(moveList);
+    }
+
     public TreeNode get(PgnGame game, int maxDepth) { return topNode.getBottomNode(game, maxDepth); }
     
     /**

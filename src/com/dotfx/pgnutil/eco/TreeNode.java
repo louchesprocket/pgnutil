@@ -20,6 +20,7 @@
 
 package com.dotfx.pgnutil.eco;
 
+import com.dotfx.pgnutil.Board;
 import com.dotfx.pgnutil.IllegalMoveException;
 import com.dotfx.pgnutil.PgnGame;
 import com.dotfx.pgnutil.PositionId;
@@ -107,7 +108,7 @@ public final class TreeNode implements Comparable<TreeNode>
     public String getDesc()
     {
         TreeNode node = this;
-        while (node != null && node.desc.length() == 0) node = node.parent;
+        while (node != null && node.desc.isEmpty()) node = node.parent;
         return node == null ? "" : node.desc;
     }
 
@@ -171,7 +172,7 @@ public final class TreeNode implements Comparable<TreeNode>
             ret = next;
         }
 
-        while (ret.code.isEmpty() && ret.desc.isEmpty()) ret = ret.getParent();
+        while (ret.code.isEmpty() && ret.desc.isEmpty() && ret.parent != null) ret = ret.getParent();
         return ret;
     }
 

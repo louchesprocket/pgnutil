@@ -181,12 +181,12 @@ public class EcoStatsOutputSelector
     private final Value value;
     private final OutputHandler handler;
 
-    public EcoStatsOutputSelector(OutputSelector selector) throws InvalidSelectorException
+    public EcoStatsOutputSelector(OutputSelector selector) throws SelectorException
     {
         value = Value.get(selector.getValue());
 
         if (value == null)
-            throw new InvalidSelectorException("output selector '" + selector + "' is invalid in this context");
+            throw new SelectorException("output selector '" + selector + "' is invalid in this context");
 
         handler = value.getOutputHandler();
     }

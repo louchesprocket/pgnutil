@@ -108,12 +108,12 @@ public class EventsOutputSelector
     private final Value value;
     private final OutputHandler handler;
 
-    public EventsOutputSelector(OutputSelector selector) throws InvalidSelectorException
+    public EventsOutputSelector(OutputSelector selector) throws SelectorException
     {
         value = Value.get(selector.getValue());
 
         if (value == null)
-            throw new InvalidSelectorException("output selector '" + selector + "' is invalid in this context");
+            throw new SelectorException("output selector '" + selector + "' is invalid in this context");
 
         handler = value.getOutputHandler();
     }

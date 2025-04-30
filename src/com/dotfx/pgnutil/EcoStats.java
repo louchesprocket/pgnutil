@@ -39,12 +39,11 @@ public class EcoStats implements Tallier
 {
     private class Iterator implements java.util.Iterator<String>
     {
-        private final List<TreeNodeSet> selectedOpenings;
         private final java.util.Iterator<TreeNodeSet> iterator;
         
         private Iterator()
         {
-            selectedOpenings = new ArrayList<>();
+            List<TreeNodeSet> selectedOpenings = new ArrayList<>();
             
             nextOpening:
             for (TreeNodeSet treeNodeSet : openingsMap.keySet())
@@ -92,7 +91,7 @@ public class EcoStats implements Tallier
     
     private final TreeMap<TreeNodeSet,OpeningScore> openingsMap;
     private final EcoTree ecoTree;
-    private boolean transpose;
+    private final boolean transpose;
 
     private EcoStats(EcoTree.FileType type, boolean transpose)
     {
@@ -108,12 +107,12 @@ public class EcoStats implements Tallier
     }
     
     @Override
-    public void init(OutputSelector selectors[]) throws InvalidSelectorException
+    public void init(OutputSelector selectors[]) throws SelectorException
     {
         if (selectors != null && selectors.length > 0)
         {
-            this.selectors = new EcoStatsOutputSelector[selectors.length];
-            for (int i = 0; i < selectors.length; i++) this.selectors[i] = new EcoStatsOutputSelector(selectors[i]);
+            EcoStats.selectors = new EcoStatsOutputSelector[selectors.length];
+            for (int i = 0; i < selectors.length; i++) EcoStats.selectors[i] = new EcoStatsOutputSelector(selectors[i]);
         }
     }
 
@@ -123,13 +122,7 @@ public class EcoStats implements Tallier
         TreeNodeSet treeNodeSet = transpose ? ecoTree.getDeepestTranspositionSet(game.getOpeningMoveList()) :
                 new TreeNodeSet(ecoTree.getDeepestDefined(game.getOpeningMoveList()));
 
-        OpeningScore os = openingsMap.get(treeNodeSet);
-
-        if (os == null)
-        {
-            os = new OpeningScore();
-            openingsMap.put(treeNodeSet, os);
-        }
+        OpeningScore os = openingsMap.computeIfAbsent(treeNodeSet, k -> new OpeningScore());
 
         switch (game.getResult())
         {
