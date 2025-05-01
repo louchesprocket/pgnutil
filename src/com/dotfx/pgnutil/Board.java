@@ -883,7 +883,7 @@ public class Board implements Comparable<Board>
             else if (color == Color.BLACK && canMove(60, 62) && !isMovingIntoCheck(60, 62))
                 return move(60, 62, null);
 
-            throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
+            throw new IllegalMoveException(getMoveErrorMsg(san, ply));
         }
         
         if (san.equalsIgnoreCase("O-O-O"))
@@ -894,7 +894,7 @@ public class Board implements Comparable<Board>
             else if (color == Color.BLACK && canMove(60, 58) &&
                 !isMovingIntoCheck(60, 58)) return move(60, 58, promoteTo);
         
-            throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
+            throw new IllegalMoveException(getMoveErrorMsg(san, ply));
         }
         
         if (Character.isUpperCase(lastChar)) // promotion
@@ -921,7 +921,7 @@ public class Board implements Comparable<Board>
                     return move(i, endSquare, promoteTo);
             }
         
-            throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
+            throw new IllegalMoveException(getMoveErrorMsg(san, ply));
         }
         
         String sanStart = san.substring(0, len - 2); // destination chopped off
@@ -969,7 +969,7 @@ public class Board implements Comparable<Board>
                 }
             }
         
-            throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
+            throw new IllegalMoveException(getMoveErrorMsg(san, ply));
         }
         
         for (int i = 0; i < 64; i++)
@@ -982,7 +982,7 @@ public class Board implements Comparable<Board>
                 return move(i, endSquare, promoteTo);
         }
         
-        throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
+        throw new IllegalMoveException(getMoveErrorMsg(san, ply));
     }
     
     /**
@@ -1043,8 +1043,7 @@ public class Board implements Comparable<Board>
                     return coordToSan(i, endSquare, promoteTo, showCheck);
             }
         
-            throw new IllegalMoveException("illegal move: '" + san +
-                "' at ply " + (ply + 1));
+            throw new IllegalMoveException(getMoveErrorMsg(san, ply));
         }
         
         String sanStart = san.substring(0, len - 2); // destination chopped off
@@ -1095,7 +1094,7 @@ public class Board implements Comparable<Board>
                 }
             }
         
-            throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
+            throw new IllegalMoveException(getMoveErrorMsg(san, ply));
         }
         
         for (int i = 0; i < 64; i++)
@@ -1107,7 +1106,7 @@ public class Board implements Comparable<Board>
                 return coordToSan(i, endSquare, promoteTo, showCheck);
         }
         
-        throw new IllegalMoveException("illegal move: '" + san + "' at ply " + (ply + 1));
+        throw new IllegalMoveException(getMoveErrorMsg(san, ply));
     }
     
     public final String coordToSan(int start, int end, PieceType promoteTo, boolean showCheck)
@@ -1568,6 +1567,17 @@ public class Board implements Comparable<Board>
         buf[64] = (byte)(ply & 1);
         
         return new PositionId(buf);
+    }
+
+    /**
+     *
+     * @param san the offending move
+     * @param ply internal (zero-based) ply number
+     * @return
+     */
+    private static String getMoveErrorMsg(String san, int ply)
+    {
+        return "illegal move '" + ((ply + 2) / 2) + "." + ((ply & 1) == 1 ? ".." : "") + san + "'";
     }
     
     public final int getWhitePieceCount() { return whitePieceCount; }

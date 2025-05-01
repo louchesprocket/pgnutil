@@ -834,6 +834,7 @@ public class PGNUtil
     static OutputSelector outputSelectors[];
     
     private static long gamesRead = 0L;
+    private static long pliesRead = 0L;
     private static long charsRead = 0L;
 
     static void addInputFile(PgnFile f) { pgnFileList.add(f); }
@@ -903,6 +904,7 @@ public class PGNUtil
                         if (!processor.processGame()) break;
 
                     handler.handle();
+                    pliesRead += game.getPlyCount();
                 }
                 
                 gamesRead += pgn.getGamesRead();
@@ -925,7 +927,7 @@ public class PGNUtil
         }
         
         if (CLOptions.performance)
-            System.err.println("processed " + gamesRead + " games (" + charsRead + " chars) in " +
-                (System.currentTimeMillis() - startTime) + "ms");
+            System.err.println("processed " + gamesRead + " games (" + pliesRead + " half-moves, " + charsRead +
+                    " chars) in " + (System.currentTimeMillis() - startTime) + "ms");
     }
 }

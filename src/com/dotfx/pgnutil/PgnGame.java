@@ -388,43 +388,35 @@ public final class PgnGame
             switch (buf[j - 1])
             {
                 case '-':
-                    if (j != 2)
-                        throw new PGNException("invalid termination marker " +
-                            "at game " + number);
+                    if (j != 2) throw new PGNException("invalid termination marker at game " + number);
 
                     next = reader.readFully(buf, 2, 1);
                     if (next == -1) throw new PGNException("eof while parsing");
 
                     if ((buf[0] != '0' && buf[0] != '1') ||
                         (buf[2] != '0' && buf[2] != '1') ||
-                        (buf[0] == buf[2]) ||
-                        !new String(buf, 0, 3).equals(tagpairs.get("Result")))
+                        (buf[0] == buf[2]) || !new String(buf, 0, 3).equals(tagpairs.get("Result")))
                         throw new PGNException("invalid termination marker " +
                             "at game " + number);
 
                     return new PgnGame(fileName, number, tagpairs, gameComments, moves, reader.getCopy());
 
                 case '/':
-                    if (j != 2)
-                        throw new PGNException("invalid termination marker " +
-                            "at game " + number);
+                    if (j != 2) throw new PGNException("invalid termination marker at game " + number);
 
                     next = reader.readFully(buf, 2, 5);
                     if (next == -1) throw new PGNException("EOF while parsing");
 
                     String terminator = new String(buf, 0, 7);
 
-                    if (!terminator.equals("1/2-1/2") ||
-                        !terminator.equals(tagpairs.get("Result")))
-                        throw new PGNException("invalid termination marker " +
-                            "at game " + number);
+                    if (!terminator.equals("1/2-1/2") || !terminator.equals(tagpairs.get("Result")))
+                        throw new PGNException("invalid termination marker at game " + number);
 
                     return new PgnGame(fileName, number, tagpairs, gameComments, moves, reader.getCopy());
 
                 case '*':
                     if (!"*".equals(tagpairs.get("Result")))
-                        throw new PGNException("invalid termination marker " +
-                            "at game " + number);
+                        throw new PGNException("invalid termination marker at game " + number);
 
                     return new PgnGame(fileName, number, tagpairs, gameComments, moves, reader.getCopy());
             }
@@ -481,16 +473,17 @@ public final class PgnGame
 
             try
             {
-                PgnGame.Move move = new PgnGame.Move((i & 1) == 0 ? Color.BLACK : Color.WHITE,
-                        (short)Math.round((float)i / (float)2), board != null ?
-                        board.normalize(moveStr, true) : moveStr, moveComments);
+                moves.add(new PgnGame.Move((i & 1) == 0 ? Color.BLACK : Color.WHITE, (short)((i + 1) / 2),
+                        board != null ? board.normalize(moveStr, true) : moveStr, moveComments));
 
-                moves.add(move);
+                moveComments = new ArrayList<>();
             }
 
-            catch (IllegalMoveException e) { throw new PGNException(e); }
-
-            moveComments = new ArrayList<>();
+            catch (IllegalMoveException e)
+            {
+                throw new PGNException("PGN error in " + (fileName == null ? "" : "file " + fileName + ", ") +
+                        "game #" + number + ": " + e.getMessage());
+            }
         }
     }
     

@@ -32,4 +32,5 @@ public class PGNException extends Exception
 {
     public PGNException(String msg) { super(msg); }
     public PGNException(Throwable t) { super(t); }
+    public PGNException(String msg, Throwable t) { super(msg, t); }
 }

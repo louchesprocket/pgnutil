@@ -478,32 +478,32 @@ public final class EcoTree
         System.out.println("DIFF: " + treeDiff.size());
     }
     
-    public static void main(String args[]) throws Exception
-    {
-        long start = System.currentTimeMillis();
-
-        EcoTree tree1 = new EcoTree(FileType.STD);
-////        tree1.printTree();
-//        tree1.writeTree(new File("test.out"));
-//        EcoTree tree2 = new EcoTree(FileType.STD);
-//        printDiff(tree1, tree2, true);
-        tree1.printTranspositions();
-//        System.out.println("tree 1 nodes: " + tree1.positionCount());
-//        System.out.println("tree 2 nodes: " + tree2.positionCount());
+//    public static void main(String args[]) throws Exception
+//    {
+//        long start = System.currentTimeMillis();
 //
-////        Board board = new Board(true).move("Nf3").move("e5").move("e4").move("Nc6").move("Bb5");
-//
-////        List<TreeNode> nodeList = tree1.get("1. d4 Nf6 2. c4 e6 3. Nf3 c5 4. d5 exd5 5. cxd5 d6 6. Nc3 g6 7. e4 Bg7 " +
-////                "8. Be2 O-O 9. O-O a6 10. a4").getPath();
-//////        List<TreeNode> nodeList = tree1.get("1.d4 e6 2. Nf3").getPath();
+//        EcoTree tree1 = new EcoTree(FileType.STD);
+//////        tree1.printTree();
+////        tree1.writeTree(new File("test.out"));
+////        EcoTree tree2 = new EcoTree(FileType.STD);
+////        printDiff(tree1, tree2, true);
+//        tree1.printTranspositions();
+////        System.out.println("tree 1 nodes: " + tree1.positionCount());
+////        System.out.println("tree 2 nodes: " + tree2.positionCount());
 ////
-////        System.out.println("===== len: " + nodeList.size());
-////        TreeNode bottom = nodeList.get(nodeList.size() - 1);
-////        System.out.println("===== code: " + bottom.getCode());
-////        System.out.println("===== desc: " + bottom.getDesc());
-//
-////        System.out.println("NODE COUNT: " + tree1.positionCount());
-////        printDiff(tree1, tree2);
-        System.out.println("ELAPSED: " + (System.currentTimeMillis() - start) + "ms");
-    }
+//////        Board board = new Board(true).move("Nf3").move("e5").move("e4").move("Nc6").move("Bb5");
+////
+//////        List<TreeNode> nodeList = tree1.get("1. d4 Nf6 2. c4 e6 3. Nf3 c5 4. d5 exd5 5. cxd5 d6 6. Nc3 g6 7. e4 Bg7 " +
+//////                "8. Be2 O-O 9. O-O a6 10. a4").getPath();
+////////        List<TreeNode> nodeList = tree1.get("1.d4 e6 2. Nf3").getPath();
+//////
+//////        System.out.println("===== len: " + nodeList.size());
+//////        TreeNode bottom = nodeList.get(nodeList.size() - 1);
+//////        System.out.println("===== code: " + bottom.getCode());
+//////        System.out.println("===== desc: " + bottom.getDesc());
+////
+//////        System.out.println("NODE COUNT: " + tree1.positionCount());
+//////        printDiff(tree1, tree2);
+//        System.out.println("ELAPSED: " + (System.currentTimeMillis() - start) + "ms");
+//    }
 }
