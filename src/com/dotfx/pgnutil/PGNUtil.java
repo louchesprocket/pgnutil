@@ -897,6 +897,8 @@ public class PGNUtil
                 nextGame:
                 while ((game = pgn.nextGame()) != null)
                 {
+                    pliesRead += game.getPlyCount();
+
                     for (GameProcessor processor : matchProcessors)
                         if (!processor.processGame()) continue nextGame;
 
@@ -904,7 +906,6 @@ public class PGNUtil
                         if (!processor.processGame()) break;
 
                     handler.handle();
-                    pliesRead += game.getPlyCount();
                 }
                 
                 gamesRead += pgn.getGamesRead();
@@ -927,7 +928,7 @@ public class PGNUtil
         }
         
         if (CLOptions.performance)
-            System.err.println("processed " + gamesRead + " games (" + pliesRead + " half-moves, " + charsRead +
+            System.err.println("\nprocessed " + gamesRead + " games (" + pliesRead + " half-moves, " + charsRead +
                     " chars) in " + (System.currentTimeMillis() - startTime) + "ms");
     }
 }
