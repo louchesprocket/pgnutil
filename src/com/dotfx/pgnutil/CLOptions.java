@@ -87,7 +87,6 @@ public class CLOptions
     public static final String MXED = "-mxed"; // match ECO description transpositionally
     public static final String MXSE = "-mxse"; // match SCID ECO transpositionally
     public static final String MXSED = "-mxsed"; // match SCID ECO description transpositionally
-    public static final String N = "-n";
     public static final String NM = "-nm";
     public static final String NMO = "-nmo";
     public static final String NMT = "-nmt";
@@ -1207,12 +1206,9 @@ public class CLOptions
     static boolean performance = false;
 
     @Option(name = VG, aliases = "-validate_games",
-        usage = "throw an exception for any game that contains move-sequence errors")
+        usage = "reports incorrect game moves and canonicalizes internal SAN representation; entails a performance " +
+                "penalty")
     static boolean validateGames = false;
-
-    @Option(name = N, aliases = "-normalize_san",
-            usage = "correct SAN before processing, where possible")
-    static boolean normalizeSan = false;
 
     @Option(name = I, aliases = "-inputfile", metaVar = "<filename>",
             usage = "input PGN file (may be specified more than once); if this option is not present, pgnutil reads " +

@@ -228,31 +228,6 @@ public final class PgnGame
         this.moves = moves;
         this.origText = origText;
         xEcoCacheMap = new HashMap<>();
-        
-        if (!CLOptions.validateGames) return;
-        int lastMoveNumber = 0;
-
-        for (int i = 0; i < moves.size(); i++)
-        {
-            Move move = moves.get(i);
-            Color moveColor = move.getColor();
-            int moveNumber = move.getNumber();
-            int plyParity = i % 2;
-            
-            if (plyParity == 0)
-            {
-                if (moveColor != Color.WHITE || moveNumber != lastMoveNumber + 1)
-                    throw new PGNException("move sequence error at game " + number + ", ply " + (i + 1));
-            }
-            
-            else
-            {
-                if (moveColor != Color.BLACK || moveNumber != lastMoveNumber)
-                    throw new PGNException("move sequence error at game " + number + ", ply " + (i + 1));
-            }
-            
-            lastMoveNumber = move.getNumber();
-        }
     }
 
     public static void setBookMarker(String regex) { bookMarker = Pattern.compile(regex, Pattern.DOTALL); }
@@ -291,7 +266,7 @@ public final class PgnGame
         CaseInsensitiveMap<String,String> tagpairs = new CaseInsensitiveMap<>();
         List<PgnGame.Move> moves = new ArrayList<>();
         List<String> gameComments = new ArrayList<>();
-        Board board = CLOptions.normalizeSan ? new Board(true) : null;
+        Board board = CLOptions.validateGames ? new Board(true) : null;
 
         while (true) // parse tag pairs
         {
@@ -371,7 +346,7 @@ public final class PgnGame
             {
                 try { next = reader.readFully(buf, j, 1); }
 
-                catch (IndexOutOfBoundsException e)
+                catch (IndexOutOfBoundsException e) // reallocate
                 {
                     buf = Arrays.copyOf(buf, buf.length * 2);
                     next = reader.readFully(buf, j, 1);
@@ -420,8 +395,6 @@ public final class PgnGame
 
                     return new PgnGame(fileName, number, tagpairs, gameComments, moves, reader.getCopy());
             }
-            
-//            movenum = new Integer(new String(buf, 0, i - 1 == 0 ? 1 : i - 1));
             
             if (next == '.')
             {
