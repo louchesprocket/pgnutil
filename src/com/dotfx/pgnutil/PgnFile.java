@@ -73,7 +73,7 @@ public class PgnFile
     
     public PgnGame nextGame() throws IOException, PGNException
     {
-        PgnGame ret = PgnGame.parseNext(fileName, gameCounter + 1, reader);
+        PgnGame ret = PgnGame.gameParser.parseNext(fileName, gameCounter + 1, reader);
         if (ret != null) gameCounter++;
         return ret;
     }

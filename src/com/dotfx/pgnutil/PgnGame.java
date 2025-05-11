@@ -27,9 +27,6 @@ package com.dotfx.pgnutil;
 import com.cedarsoftware.util.CaseInsensitiveMap;
 import com.dotfx.pgnutil.eco.EcoTree;
 import com.dotfx.pgnutil.eco.TreeNodeSet;
-//import com.google.common.hash.HashCode;
-//import com.google.common.hash.HashFunction;
-//import com.google.common.hash.Hashing;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -44,8 +41,9 @@ import java.util.regex.Pattern;
 public final class PgnGame
 {
     public static final String ROUND_TAG;
-    private static final int BUFSIZE = 1024;
     private static final int COMMENT_BUFSIZE = 1024;
+
+    public static final Parser gameParser;
     private static Pattern bookMarker;
 
     public enum Result
@@ -193,10 +191,68 @@ public final class PgnGame
         @Override
         public boolean equals(Object other) { return compareTo((Locator)other) == 0; }
     }
+
+    public interface Parser
+    {
+        int BUFSIZE = 1024;
+
+        PgnGame parseNext(String fileName, int number, CopyReader reader) throws IOException, PGNException;
+
+        static int eatWhiteSpace(Reader reader) throws IOException
+        {
+            int next;
+
+            do
+            {
+                next = reader.read();
+                if (next == -1) break;
+            }
+            while (Character.isWhitespace(next));
+//        while (next == '\u0020' || next == '\t');
+
+            return next;
+        }
+
+        /**
+         *
+         * @param reader
+         * @param commentStart the character that began the comment
+         * @param commentList list to which the comment string will be appended
+         * @return first non-whitespace character after the end of the comment, or
+         *         -1 on eof
+         * @throws IOException
+         */
+        static int processComment(CopyReader reader, int commentStart, List<String> commentList)
+                throws IOException
+        {
+            int i, next;
+            char buf[] = new char[COMMENT_BUFSIZE];
+
+            for (i = 0;; i++) // one character per loop iteration
+            {
+                try { next = reader.readFully(buf, i, 1); }
+
+                catch (IndexOutOfBoundsException e)
+                {
+                    buf = Arrays.copyOf(buf, buf.length + COMMENT_BUFSIZE);
+                    next = reader.readFully(buf, i, 1);
+                }
+
+                if (next == -1) return -1; // eof not okay here
+                if (buf[i] == '}' && commentStart == '{') break;
+
+                if ((buf[i] == '\n' || buf[i] == '\r') && commentStart == ';') break;
+            }
+
+            commentList.add(new String(buf, 0, i));
+            return eatWhiteSpace(reader);
+        }
+    }
     
     static
     {
         ROUND_TAG = "Round";
+        gameParser = CLOptions.validateGames ? new GameValidator() : new DefaultGameParser();
 
         // Aquarium: "[Black|White] out of book"
         // Banksia: "End of opening"
@@ -255,259 +311,6 @@ public final class PgnGame
         }
 
         return moveList;
-    }
-    
-    public static PgnGame parseNext(String fileName, int number, CopyReader reader)
-        throws IOException, PGNException
-    {
-        ArrayList<String> moveComments = new ArrayList<>();
-        char buf[] = new char[BUFSIZE];
-        int next, i, j;
-        CaseInsensitiveMap<String,String> tagpairs = new CaseInsensitiveMap<>();
-        List<PgnGame.Move> moves = new ArrayList<>();
-        List<String> gameComments = new ArrayList<>();
-        Board board = CLOptions.validateGames ? new Board(true) : null;
-
-        while (true) // parse tag pairs
-        {
-            next = eatWhiteSpace(reader);
-
-            if (next == -1) return null;
-            if (next == 0xFEFF) continue; // Unicode byte-order mark
-            if (next != '[') break;
-
-            // tag
-            for (i = 0;; i++)
-            {
-                try { next = reader.readFully(buf, i, 1); }
-
-                catch (IndexOutOfBoundsException e)
-                {
-                    buf = Arrays.copyOf(buf, buf.length * 2);
-                    next = reader.readFully(buf, i, 1);
-                }
-                
-                if (next == -1) throw new PGNException("eof while parsing");
-                if (Character.isWhitespace(buf[i])) break;
-            }
-
-            String tag = new String(buf, 0, i);
-            next = eatWhiteSpace(reader);
-
-            if (next != '"') throw new PGNException("unquoted value");
-
-            // value
-            for (i = 0;; i++)
-            {
-                boolean escaped = false;
-                
-                try { next = reader.readFully(buf, i, 1); }
-
-                catch (IndexOutOfBoundsException e)
-                {
-                    buf = Arrays.copyOf(buf, buf.length * 2);
-                    next = reader.readFully(buf, i, 1);
-                }
-                
-                if (next == -1) throw new PGNException("eof while parsing.");
-
-                if (buf[i] == '\\') // PGN escape character
-                {
-                    try { next = reader.readFully(buf, i, 1); }
-
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        buf = Arrays.copyOf(buf, buf.length * 2);
-                        next = reader.readFully(buf, i, 1);
-                    }
-                    
-                    if (next == -1) throw new PGNException("eof while parsing.");
-                    escaped = true;
-                }
-
-                if (buf[i] == '"' && !escaped) break;
-            }
-
-            String value = new String(buf, 0, i);
-            next = eatWhiteSpace(reader);
-            if (next != ']') throw new PGNException("missing ']'");
-
-            tagpairs.put(tag, value);
-        }
-
-        while (next == '{' || next == ';') next = processComment(reader, next, gameComments);
-        
-        if (next == -1) throw new PGNException("eof while parsing"); // empty move list
-        buf[0] = (char)next;
-        
-        for (i = 1;; i++) // parse each ply
-        {
-            for (j = 1; Character.isDigit(buf[j - 1]); j++) // move number
-            {
-                try { next = reader.readFully(buf, j, 1); }
-
-                catch (IndexOutOfBoundsException e) // reallocate
-                {
-                    buf = Arrays.copyOf(buf, buf.length * 2);
-                    next = reader.readFully(buf, j, 1);
-                }
-                
-                if (next == -1) throw new PGNException("eof while parsing");
-                next = buf[j];
-            }
-            
-            if (Character.isWhitespace(buf[j - 1])) next = eatWhiteSpace(reader);
-            if (next == -1) throw new PGNException("eof while parsing game " + number);
-            
-            // termination markers
-            switch (buf[j - 1])
-            {
-                case '-':
-                    if (j != 2) throw new PGNException("invalid termination marker at game " + number);
-
-                    next = reader.readFully(buf, 2, 1);
-                    if (next == -1) throw new PGNException("eof while parsing");
-
-                    if ((buf[0] != '0' && buf[0] != '1') ||
-                        (buf[2] != '0' && buf[2] != '1') ||
-                        (buf[0] == buf[2]) || !new String(buf, 0, 3).equals(tagpairs.get("Result")))
-                        throw new PGNException("invalid termination marker " +
-                            "at game " + number);
-
-                    return new PgnGame(fileName, number, tagpairs, gameComments, moves, reader.getCopy());
-
-                case '/':
-                    if (j != 2) throw new PGNException("invalid termination marker at game " + number);
-
-                    next = reader.readFully(buf, 2, 5);
-                    if (next == -1) throw new PGNException("EOF while parsing");
-
-                    String terminator = new String(buf, 0, 7);
-
-                    if (!terminator.equals("1/2-1/2") || !terminator.equals(tagpairs.get("Result")))
-                        throw new PGNException("invalid termination marker at game " + number);
-
-                    return new PgnGame(fileName, number, tagpairs, gameComments, moves, reader.getCopy());
-
-                case '*':
-                    if (!"*".equals(tagpairs.get("Result")))
-                        throw new PGNException("invalid termination marker at game " + number);
-
-                    return new PgnGame(fileName, number, tagpairs, gameComments, moves, reader.getCopy());
-            }
-            
-            if (next == '.')
-            {
-                do { next = reader.read(); } while (next == '.');
-                if (Character.isWhitespace(next)) next = eatWhiteSpace(reader);
-                if (next == -1) throw new PGNException("eof while parsing");
-            }
-            
-            buf[0] = (char)next;
-            
-            // get the move
-            for (j = 1;; j++)
-            {
-                try { next = reader.readFully(buf, j, 1); }
-
-                catch (IndexOutOfBoundsException e)
-                {
-                    buf = Arrays.copyOf(buf, buf.length * 2);
-                    next = reader.readFully(buf, j, 1);
-                }
-                
-                if (next == -1) throw new PGNException("empty move");
-                
-                if (Character.isWhitespace(buf[j]))
-                {
-                    next = eatWhiteSpace(reader);
-                    break;
-                }
-                
-                if (buf[j] == '{')
-                {
-                    next = '{';
-                    break;
-                }
-                
-                if (buf[j] == ';')
-                {
-                    next = ';';
-                    break;
-                }
-            }
-            
-            String moveStr = new String(buf, 0, j);
-        
-            while (next == '{' || next == ';') next = processComment(reader, next, moveComments);
-            
-            if (next == -1) throw new PGNException("unexpected eof");
-            buf[0] = (char)next;
-
-            try
-            {
-                moves.add(new PgnGame.Move((i & 1) == 0 ? Color.BLACK : Color.WHITE, (short)((i + 1) / 2),
-                        board != null ? board.normalize(moveStr, true) : moveStr, moveComments));
-
-                moveComments = new ArrayList<>();
-            }
-
-            catch (IllegalMoveException e)
-            {
-                throw new PGNException("PGN error in " + (fileName == null ? "" : "file " + fileName + ", ") +
-                        "game #" + number + ": " + e.getMessage());
-            }
-        }
-    }
-    
-    /**
-     * 
-     * @param reader
-     * @param commentStart the character that began the comment
-     * @param commentList list to which the comment string will be appended
-     * @return first non-whitespace character after the end of the comment, or
-     *         -1 on eof
-     * @throws IOException 
-     */
-    private static int processComment(CopyReader reader, int commentStart, List<String> commentList)
-        throws IOException
-    {
-        int i, next;
-        char buf[] = new char[COMMENT_BUFSIZE];
-        
-        for (i = 0;; i++) // one character per loop iteration
-        {
-            try { next = reader.readFully(buf, i, 1); }
-            
-            catch (IndexOutOfBoundsException e)
-            {
-                buf = Arrays.copyOf(buf, buf.length + COMMENT_BUFSIZE);
-                next = reader.readFully(buf, i, 1);
-            }
-            
-            if (next == -1) return -1; // eof not okay here
-            if (buf[i] == '}' && commentStart == '{') break;
-
-            if ((buf[i] == '\n' || buf[i] == '\r') && commentStart == ';') break;
-        }
-
-        commentList.add(new String(buf, 0, i));
-        return eatWhiteSpace(reader);
-    }
-    
-    private static int eatWhiteSpace(Reader reader) throws IOException
-    {
-        int next;
-        
-        do
-        {
-            next = reader.read();
-            if (next == -1) break;
-        }
-        while (Character.isWhitespace(next));
-//        while (next == '\u0020' || next == '\t');
-        
-        return next;
     }
 
     /**
@@ -1015,7 +818,7 @@ public final class PgnGame
             new CopyReader(new StringReader(replacee.matcher(origText).replaceAll(replacement)),
                     PgnFile.COPY_BUF_INIT_SIZE);
         
-        return parseNext(getFileName(), getNumber(), reader);
+        return gameParser.parseNext(getFileName(), getNumber(), reader);
     }
 
     TreeNodeSet getXEcoNodeSet(EcoTree.FileType type) throws IllegalMoveException
