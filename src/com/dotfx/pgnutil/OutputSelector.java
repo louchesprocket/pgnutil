@@ -73,7 +73,7 @@ public final class OutputSelector
         {
             for (PgnGame.Move move : game.getMoveList())
             {
-                if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
+                if (move.isWhite()) sb.append(move.getNumber()).append(".");
                 sb.append(move.getMove()).append(" ");
             }
 
@@ -88,7 +88,7 @@ public final class OutputSelector
         {
             for (PgnGame.Move move : game.getMoveList())
             {
-                if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
+                if (move.getColor() == Color.WHITE) sb.append(move.getNumber()).append(".");
                 sb.append(move.getMove());
                 for (String comment : move.getComments()) sb.append(" {").append(comment).append("}");
                 sb.append(" ");

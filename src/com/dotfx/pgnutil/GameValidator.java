@@ -220,9 +220,7 @@ public class GameValidator implements PgnGame.Parser
 
             try
             {
-                moves.add(new PgnGame.Move((i & 1) == 0 ? Color.BLACK : Color.WHITE, (short)((i + 1) / 2),
-                        board.normalize(moveStr, true), moveComments));
-
+                moves.add(new PgnGame.Move((short)i, board.normalize(moveStr, true), moveComments));
                 moveComments = new ArrayList<>();
             }
 

@@ -76,28 +76,23 @@ public final class PgnGame
      */
     public static final class Move implements Comparable<Move>
     {
-        private final Color color;
-        private final short number; // not ply
+        private final short ply; // 1-based
         private final String move;
         private final List<String> comments;
         
-        public Move(Color color, short number, String move, List<String> comments)
+        public Move(short ply, String move, List<String> comments)
         {
-            this.color = color;
-            this.number = number;
+            this.ply = ply;
             this.move = move;
             this.comments = new ArrayList<>();
             
             for (String comment : comments) this.comments.add(comment.replaceAll("[\n\r]", " "));
         }
 
-        public Move normalize(Board board, boolean showCheck) throws IllegalMoveException
-        {
-            return new Move(color, number, board.normalize(move, showCheck), comments);
-        }
-
-        public Color getColor() { return color; }
-        public int getNumber() { return number; }
+        public Color getColor() { return (ply & 1) == 0 ? Color.BLACK : Color.WHITE; }
+        public boolean isWhite() { return (ply & 1) == 1; }
+        public int getNumber() { return (ply + 1) >>> 1; }
+        public int getPly() { return ply; }
         public String getMove() { return move; }
         public List<String> getComments() { return comments; }
         public AquariumVars getAquariumVars() { return new AquariumVars(this); }
@@ -116,17 +111,9 @@ public final class PgnGame
             return move.substring(0, end);
         }
         
-        public int getPly()
-        {
-            if (color == Color.WHITE) return (number - 1) * 2 + 1;
-            return number * 2;
-        }
-        
         public boolean hasComment(Pattern regex)
         {
-            for (String comment : comments)
-                if (regex.matcher(comment).find()) return true;
-            
+            for (String comment : comments) if (regex.matcher(comment).find()) return true;
             return false;
         }
         
@@ -135,9 +122,7 @@ public final class PgnGame
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.append(number).append(".");
-            if (color.equals(Color.BLACK)) sb.append("..");
-            sb.append(" ").append(move);
+            sb.append(getNumber()).append((ply & 1) == 0 ? "..." : ".").append(move);
             if (!comments.isEmpty()) sb.append(" ");
             for (String comment : comments) sb.append("{").append(comment).append("}");
             
@@ -145,17 +130,7 @@ public final class PgnGame
         }
 
         @Override
-        public int compareTo(Move other)
-        {
-            if (number == other.number)
-            {
-                if (color == other.color) return 0;
-                if (color == Color.WHITE) return -1;
-                return 1;
-            }
-
-            return number - other.number;
-        }
+        public int compareTo(Move other) { return ply - other.ply; }
 
         @Override
         public boolean equals(Object other)
@@ -488,7 +463,7 @@ public final class PgnGame
         
         while (move != null)
         {
-            if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
+            if (move.isWhite()) sb.append(move.getNumber()).append(".");
             sb.append(move.getMove()).append(" ");
             if (++postOpeningPly == plies) break;
             move = getNextMove(move);
@@ -534,7 +509,7 @@ public final class PgnGame
         
         for (Move move : getOpeningMoveList())
         {
-            if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
+            if (move.isWhite()) sb.append(move.getNumber()).append(".");
             sb.append(move.getMove()).append(" ");
         }
 
@@ -597,7 +572,7 @@ public final class PgnGame
         
         for (Move move : getOpeningMoveList())
         {
-            if (move.getColor().equals(Color.WHITE)) sb.append(move.getNumber()).append(".");
+            if (move.isWhite()) sb.append(move.getNumber()).append(".");
             sb.append(move.getMoveOnly()).append(" ");
         }
 
@@ -638,7 +613,7 @@ public final class PgnGame
         {
             Clock moveClock = move.getAquariumVars().getClk();
 
-            if (move.getColor() == Color.WHITE)
+            if (move.isWhite())
             {
                 if (moveClock != null && (lowClockWhite == null || moveClock.compareTo(lowClockWhite) < 0))
                     lowClockWhite = moveClock;

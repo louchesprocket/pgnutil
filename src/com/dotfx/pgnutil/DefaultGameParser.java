@@ -215,9 +215,7 @@ public class DefaultGameParser implements PgnGame.Parser
             if (next == -1) throw new PGNException("unexpected eof");
             buf[0] = (char)next;
 
-            moves.add(new PgnGame.Move((i & 1) == 0 ? Color.BLACK : Color.WHITE, (short)((i + 1) / 2),
-                    moveStr, moveComments));
-
+            moves.add(new PgnGame.Move((short)i, moveStr, moveComments));
             moveComments = new ArrayList<>();
         }
     }
