@@ -482,12 +482,12 @@ public final class EcoTree
 //    {
 //        long start = System.currentTimeMillis();
 //
-//        EcoTree tree1 = new EcoTree(FileType.STD);
+//        EcoTree tree1 = new EcoTree(FileType.LICHESS);
 //////        tree1.printTree();
-////        tree1.writeTree(new File("test.out"));
-////        EcoTree tree2 = new EcoTree(FileType.STD);
-////        printDiff(tree1, tree2, true);
-//        tree1.printTranspositions();
+//        tree1.writeTree(new File("test.out"));
+//        EcoTree tree2 = new EcoTree(FileType.STD);
+//        printDiff(tree1, tree2, true);
+////        tree1.printTranspositions();
 ////        System.out.println("tree 1 nodes: " + tree1.positionCount());
 ////        System.out.println("tree 2 nodes: " + tree2.positionCount());
 ////

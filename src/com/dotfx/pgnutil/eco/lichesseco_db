@@ -3194,6 +3194,7 @@ C92|Ruy Lopez: Closed|e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O 
 C82|Ruy Lopez: Open|e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 c3|01bb37b2c4825e9cf59567b4671d2b7a
 C80|Ruy Lopez: Open, Bernstein Variation|e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 Nbd2|11027e670d8aa0326e546b873ef91ed1
 C81|Ruy Lopez: Open, Howell Attack|e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4 d4 b5 Bb3 d5 dxe5 Be6 Qe2|b5d3c5007953775c329da24432ee91a7
+C86|Ruy Lopez: Closed, Worrall Attack, Castling Line|e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 Qe2 Be7 O-O b5 Bb3 O-O c3 d5 d3|b7406af33c34733fae39ed8a47ba167d
 C67|Ruy Lopez: Berlin Defense, Pillsbury Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Be7 Qe2 Nd6 Bxc6 bxc6 dxe5 Nb7 b3|a5759a4bc08b7cad9ecfe60b9d686331
 C67|Ruy Lopez: Berlin Defense, Zukertort Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Be7 Qe2 Nd6 Bxc6 bxc6 dxe5 Nb7 c4|4ae2df413d9571cf9e90d418a195f7e1
 C67|Ruy Lopez: Berlin Defense, Winawer Attack|e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Be7 Qe2 Nd6 Bxc6 bxc6 dxe5 Nb7 Nd4|4e9c24370dea9daff921624a8060b15f
