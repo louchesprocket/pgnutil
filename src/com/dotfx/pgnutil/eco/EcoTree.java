@@ -29,12 +29,7 @@ import com.dotfx.pgnutil.IllegalMoveException;
 import com.dotfx.pgnutil.PgnGame;
 import com.dotfx.pgnutil.PositionId;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -96,12 +91,12 @@ public final class EcoTree
     private final TreeNode topNode;
     private final TreeReader reader;
 
-    private EcoTree(FileType fileType) throws IOException, IllegalMoveException
+    public EcoTree(FileType fileType) throws IOException, IllegalMoveException
     {
         this(fileType, null);
     }
     
-    private EcoTree(FileType fileType, File pathOverride) throws IOException, IllegalMoveException
+    public EcoTree(FileType fileType, File pathOverride) throws IOException, IllegalMoveException
     {
         topNode = new TreeNode(null, 0, null, "", "");
         reader = fileType.getReader();
@@ -344,46 +339,50 @@ public final class EcoTree
     /**
      * Writes standard format (read by StdReader).
      *
+     * @param writer
+     * @throws IOException
+     * @throws IllegalMoveException
+     */
+    public void writeTree(Writer writer) throws IOException
+    {
+        List<TreeNode> children = topNode.getChildren();
+
+        while (!children.isEmpty())
+        {
+            TreeNode node = children.get(0);
+            children.addAll(node.getChildren());
+            children.remove(node);
+
+            if (node.getSpecCode().isEmpty() && node.getSpecDesc().isEmpty()) continue;
+
+            // At this point, we have a path ending with either a code or a description (presumably both).
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(node.getCode()).append(StdReader.LINE_DELIM).append(node.getDesc()).append(StdReader.LINE_DELIM);
+
+            List<TreeNode> path = node.getPath();
+
+            for (TreeNode subPathNode : path) sb.append(subPathNode.getMove()).append(StdReader.MOVE_DELIM);
+
+            sb.setLength(sb.length() - 1);
+            sb.append(StdReader.LINE_DELIM);
+            sb.append(node.getPositionId());
+
+            sb.append("\n");
+            writer.write(sb.toString());
+        }
+    }
+
+    /**
+     * Writes standard format (read by StdReader).
+     *
      * @param outFile
      * @throws IOException
      * @throws IllegalMoveException
      */
-    private void writeTree(File outFile) throws IOException, IllegalMoveException
+    private void writeTree(File outFile) throws IOException
     {
-        List<TreeNode> children = topNode.getChildren();
-
-        try (Writer writer = new FileWriter(outFile, false))
-        {
-            while (!children.isEmpty())
-            {
-                TreeNode node = children.get(0);
-                children.addAll(node.getChildren());
-                children.remove(node);
-
-                if (node.getSpecCode().isEmpty() && node.getSpecDesc().isEmpty()) continue;
-
-                // At this point, we have a path ending with either a code or a description (presumably both).
-
-                StringBuilder sb = new StringBuilder();
-
-                sb.append(node.getCode()).append(StdReader.LINE_DELIM).append(node.getDesc()).
-                        append(StdReader.LINE_DELIM);
-
-                List<TreeNode> path = node.getPath();
-
-                for (TreeNode subPathNode : path)
-                {
-                    sb.append(subPathNode.getMove()).append(StdReader.MOVE_DELIM);
-                }
-
-                sb.setLength(sb.length() - 1);
-                sb.append(StdReader.LINE_DELIM);
-                sb.append(node.getPositionId());
-
-                sb.append("\n");
-                writer.write(sb.toString());
-            }
-        }
+        try (Writer writer = new FileWriter(outFile, false)) { writeTree(writer); }
     }
     
     private void printTree() throws IllegalMoveException
@@ -412,70 +411,70 @@ public final class EcoTree
         }
     }
 
-    public static void printDiff(EcoTree tree1, EcoTree tree2, boolean checkDesc)
+    public static void printDiff(PrintStream ps, EcoTree tree1, EcoTree tree2, boolean checkDesc)
     {
-        System.out.println("missing nodes in tree 1 =====");
+        ps.println("missing nodes in tree 1 =====");
 
         for (TreeNode node : tree1.findExtraNodes(tree2))
         {
-            System.out.print(node.getCode() + "|");
-            System.out.print(node.getDesc() + "|");
+            ps.print(node.getCode() + "|");
+            ps.print(node.getDesc() + "|");
             List<TreeNode> nodePath = node.getPath();
 
             for (TreeNode pathNode : nodePath)
             {
                 int ply = pathNode.getPly();
-                if (ply != 1) System.out.print(" ");
-                if ((ply & 1) == 1) System.out.print(((ply + 1)/2) + ".");
-                System.out.print(pathNode.getMove());
+                if (ply != 1) ps.print(" ");
+                if ((ply & 1) == 1) ps.print(((ply + 1)/2) + ".");
+                ps.print(pathNode.getMove());
             }
 
-            System.out.println();
+            ps.println();
         }
 
-        System.out.println("missing nodes in tree 2 =====");
+        ps.println("missing nodes in tree 2 =====");
 
         for (TreeNode node : tree2.findExtraNodes(tree1))
         {
-            System.out.print(node.getCode() + "|");
-            System.out.print(node.getDesc() + "|");
+            ps.print(node.getCode() + "|");
+            ps.print(node.getDesc() + "|");
             List<TreeNode> nodePath = node.getPath();
 
             for (TreeNode pathNode : nodePath)
             {
                 int ply = pathNode.getPly();
-                if (ply != 1) System.out.print(" ");
-                if ((ply & 1) == 1) System.out.print(((ply + 1)/2) + ".");
-                System.out.print(pathNode.getMove());
+                if (ply != 1) ps.print(" ");
+                if ((ply & 1) == 1) ps.print(((ply + 1)/2) + ".");
+                ps.print(pathNode.getMove());
             }
 
-            System.out.println();
+            ps.println();
         }
 
         List<TreeNode> treeDiff = tree1.codeDescDiff(tree2, checkDesc);
-        System.out.println("code or description differences =====");
+        ps.println("code or description differences =====");
 
         // Prints tree2 code, tree1 code, moves
         for (TreeNode tree2Node : treeDiff)
         {
             List<TreeNode> tree2Path = tree2Node.getPath();
-            System.out.print(tree1.getTop().getBottomNode(tree2Path).getStdCode() + "|" + tree2Node.getStdCode() + "|");
+            ps.print(tree1.getTop().getBottomNode(tree2Path).getStdCode() + "|" + tree2Node.getStdCode() + "|");
 
             if (checkDesc)
-                System.out.print(tree1.getTop().getBottomNode(tree2Path).getDesc() + "|" + tree2Node.getDesc() + "|");
+                ps.print(tree1.getTop().getBottomNode(tree2Path).getDesc() + "|" + tree2Node.getDesc() + "|");
 
             for (TreeNode pathNode : tree2Path)
             {
                 int ply = pathNode.getPly();
-                if (ply != 1) System.out.print(" ");
-                if ((ply & 1) == 1) System.out.print(((ply + 1)/2) + ".");
-                System.out.print(pathNode.getMove());
+                if (ply != 1) ps.print(" ");
+                if ((ply & 1) == 1) ps.print(((ply + 1)/2) + ".");
+                ps.print(pathNode.getMove());
             }
 
-            System.out.print("\n");
+            ps.print("\n");
         }
 
-        System.out.println("DIFF: " + treeDiff.size());
+        ps.println("DIFF: " + treeDiff.size());
     }
     
 //    public static void main(String args[]) throws Exception
@@ -483,10 +482,6 @@ public final class EcoTree
 //        long start = System.currentTimeMillis();
 //
 //        EcoTree tree1 = new EcoTree(FileType.LICHESS);
-//////        tree1.printTree();
-//        tree1.writeTree(new File("test.out"));
-//        EcoTree tree2 = new EcoTree(FileType.STD);
-//        printDiff(tree1, tree2, true);
 ////        tree1.printTranspositions();
 ////        System.out.println("tree 1 nodes: " + tree1.positionCount());
 ////        System.out.println("tree 2 nodes: " + tree2.positionCount());
@@ -501,9 +496,6 @@ public final class EcoTree
 //////        TreeNode bottom = nodeList.get(nodeList.size() - 1);
 //////        System.out.println("===== code: " + bottom.getCode());
 //////        System.out.println("===== desc: " + bottom.getDesc());
-////
-//////        System.out.println("NODE COUNT: " + tree1.positionCount());
-//////        printDiff(tree1, tree2);
 //        System.out.println("ELAPSED: " + (System.currentTimeMillis() - start) + "ms");
 //    }
 }

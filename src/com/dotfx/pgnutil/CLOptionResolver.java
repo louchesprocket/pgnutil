@@ -23,6 +23,7 @@ package com.dotfx.pgnutil;
 import com.dotfx.pgnutil.CLOptions.OptId;
 import com.dotfx.pgnutil.eco.EcoTree;
 
+import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -45,12 +46,6 @@ public class CLOptionResolver
         @Override
         public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
         {
-            if (setOpts.size() > 1)
-            {
-                System.err.println("Option '" + OptId.PRINTPOS + "' cannot be used with other options.");
-                System.exit(-1);
-            }
-
             try
             {
                 System.out.println(new Board(true).goTo(PgnGame.parseMoveString(moveSt)));
@@ -60,6 +55,45 @@ public class CLOptionResolver
             catch (IllegalMoveException e)
             {
                 System.err.println("illegal move: " + e.getLocalizedMessage());
+                System.exit(-1);
+            }
+        }
+    }
+
+    public static class MakeDbHandler implements OptHandler
+    {
+        private final EcoTree.FileType type;
+        private final File inFile;
+
+        public MakeDbHandler(EcoTree.FileType type, File inFile)
+        {
+            this.type = type;
+            this.inFile = inFile;
+        }
+
+        @Override
+        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
+        {
+            try
+            {
+                EcoTree newTree = new EcoTree(type,inFile);
+                try (Writer writer = new FileWriter(FileDescriptor.out)) { newTree.writeTree(writer); }
+
+                EcoTree.printDiff(System.err, newTree, type == EcoTree.FileType.LICHESS ?
+                        EcoTree.FileType.STD.getEcoTree() : EcoTree.FileType.SCIDDB.getEcoTree(), true);
+
+                System.exit(0);
+            }
+
+            catch (IllegalMoveException e)
+            {
+                System.err.println("illegal move: " + e.getMessage());
+                System.exit(-1);
+            }
+
+            catch (IOException | RuntimeException e)
+            {
+                System.err.println("error reading file " + inFile);
                 System.exit(-1);
             }
         }
@@ -92,6 +126,19 @@ public class CLOptionResolver
                     System.err.println("Option '" + opt + "' may only be set once!");
                     System.exit(-1);
                 }
+            }
+        }
+    }
+
+    private static class UtilHandler implements OptHandler
+    {
+        @Override
+        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
+        {
+            if (setOpts.size() > 1)
+            {
+                System.err.println("Option '" + setIntersects.iterator().next() + "' must stand alone!");
+                System.exit(-1);
             }
         }
     }
@@ -321,11 +368,15 @@ public class CLOptionResolver
                 OptId.get(CLOptions.HWD), OptId.get(CLOptions.HDRAW), OptId.get(CLOptions.LDRAW),
                 OptId.get(CLOptions.P), OptId.get(CLOptions.S)};
 
+        final OptId utilOpts[] = new OptId[] {OptId.get(CLOptions.MKDB), OptId.get(CLOptions.MKDBS),
+                OptId.get(CLOptions.PP)};
+
         new ConditionSet(topLevelOpts, null, null, new MutexHandler()).handle(setOpts);
         new ConditionSet(ecoOpts, null, null, new MutexHandler()).handle(setOpts);
         new ConditionSet(matchOpeningOpts, null, null, new MutexHandler()).handle(setOpts);
         new ConditionSet(matchPositionOpts, null, null, new MutexHandler()).handle(setOpts);
         new ConditionSet(singletonOpts, null, null, new SingletonHandler()).handle(setOpts);
+        new ConditionSet(utilOpts, null, null, new UtilHandler()).handle(setOpts);
 
         new ConditionSet(new OptId[] {OptId.get(CLOptions.O)}, null, ecoOpts,
                 new OpeningsHandler()).handle(setOpts);

@@ -75,6 +75,8 @@ public class CLOptions
     public static final String ME = "-me"; // match ECO
     public static final String MED = "-med"; // match ECO desription
     public static final String MFEN = "-mfen"; // match FEN
+    public static final String MKDB = "-mkdb";
+    public static final String MKDBS = "-mkdbs";
     public static final String ML = "-ml";
     public static final String MO = "-mo";
     public static final String MP = "-mp";
@@ -144,6 +146,8 @@ public class CLOptions
         LOWELO(LELO),
         LOWELODIFF(LED),
         LOWINDIFF(LWD),
+        MAKEDB(MKDB),
+        MAKEDBSCID(MKDBS),
         MATCH(M),
         MATCHECO(ME),
         MATCHECODESC(MED),
@@ -314,8 +318,30 @@ public class CLOptions
             usage = "output a board representation following the <move_list>")
     private void printPosition(String moveSt)
     {
+        countOption(OptId.get(PP));
+
         CLOptionResolver.addCondition(new OptId[] {OptId.PRINTPOS}, null, null,
                 new CLOptionResolver.PrintPositionHandler(moveSt));
+    }
+
+    @Option(name = MKDB, aliases = "-make_db", metaVar = "<input_file>", hidden = true,
+            usage = "output an ECO file using Lichess-formatted <input_file> as input")
+    private void makeDb(File f)
+    {
+        countOption(OptId.get(MKDB));
+
+        CLOptionResolver.addCondition(new OptId[] {OptId.MAKEDB}, null, null,
+                new CLOptionResolver.MakeDbHandler(EcoTree.FileType.LICHESS, f));
+    }
+
+    @Option(name = MKDBS, aliases = "-make_db_scid", metaVar = "<input_file>", hidden = true,
+            usage = "output an ECO file using SCID-formatted <input_file> as input")
+    private void makeDbS(File f)
+    {
+        countOption(OptId.get(MKDBS));
+
+        CLOptionResolver.addCondition(new OptId[] {OptId.MAKEDBSCID}, null, null,
+                new CLOptionResolver.MakeDbHandler(EcoTree.FileType.SCID, f));
     }
     
     // matchers
