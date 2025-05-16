@@ -46,6 +46,8 @@ public class CLOptions
     public static final String CMIN = "-cmin";
     public static final String CSR = "-csr";
     public static final String D = "-d";
+    public static final String DDB = "-ddb"; // util ECO diff
+    public static final String DDBS = "-ddbs"; // util SCID ECO diff
     public static final String DM = "-dm";
     public static final String DO = "-do";
     public static final String DOOB = "-doob";
@@ -75,8 +77,8 @@ public class CLOptions
     public static final String ME = "-me"; // match ECO
     public static final String MED = "-med"; // match ECO desription
     public static final String MFEN = "-mfen"; // match FEN
-    public static final String MKDB = "-mkdb";
-    public static final String MKDBS = "-mkdbs";
+    public static final String MKDB = "-mkdb"; // util make ECO d.b.
+    public static final String MKDBS = "-mkdbs"; // util make SCID ECO d.b.
     public static final String ML = "-ml";
     public static final String MO = "-mo";
     public static final String MP = "-mp";
@@ -124,6 +126,8 @@ public class CLOptions
         CHECKSEQUENTIALROUNDS(CSR),
         CLOCKBELOW(CB),
         CLOCKNOTBELOW(CNB),
+        DIFFDB(DDB),
+        DIFFDBS(DDBS),
         DUPLICATES(D),
         DUPLICATEMOVES(DM),
         DUPLICATEOPENINGS(DO),
@@ -342,6 +346,26 @@ public class CLOptions
 
         CLOptionResolver.addCondition(new OptId[] {OptId.MAKEDBSCID}, null, null,
                 new CLOptionResolver.MakeDbHandler(EcoTree.FileType.SCID, f));
+    }
+
+    @Option(name = DDB, aliases = "-diff_db", metaVar = "<input_file>", hidden = true,
+            usage = "report differences between Lichess-formatted <input_file> and internal ECO d.b.")
+    private void diffDb(File f)
+    {
+        countOption(OptId.get(DDB));
+
+        CLOptionResolver.addCondition(new OptId[] {OptId.DIFFDB}, null, null,
+                new CLOptionResolver.DbDiffHandler(EcoTree.FileType.LICHESS, f));
+    }
+
+    @Option(name = DDBS, aliases = "-diff_db_scid", metaVar = "<input_file>", hidden = true,
+            usage = "report differences between SCID-formatted <input_file> and internal SCID ECO d.b.")
+    private void diffDbS(File f)
+    {
+        countOption(OptId.get(DDBS));
+
+        CLOptionResolver.addCondition(new OptId[] {OptId.DIFFDBS}, null, null,
+                new CLOptionResolver.DbDiffHandler(EcoTree.FileType.SCID, f));
     }
     
     // matchers

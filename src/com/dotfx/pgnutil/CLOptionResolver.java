@@ -76,10 +76,45 @@ public class CLOptionResolver
         {
             try
             {
-                EcoTree newTree = new EcoTree(type,inFile);
+                EcoTree newTree = new EcoTree(type, inFile);
                 try (Writer writer = new FileWriter(FileDescriptor.out)) { newTree.writeTree(writer); }
 
-                EcoTree.printDiff(System.err, newTree, type == EcoTree.FileType.LICHESS ?
+                System.exit(0);
+            }
+
+            catch (IllegalMoveException e)
+            {
+                System.err.println("illegal move: " + e.getMessage());
+                System.exit(-1);
+            }
+
+            catch (IOException | RuntimeException e)
+            {
+                System.err.println("error reading file " + inFile);
+                System.exit(-1);
+            }
+        }
+    }
+
+    public static class DbDiffHandler implements OptHandler
+    {
+        private final EcoTree.FileType type;
+        private final File inFile;
+
+        public DbDiffHandler(EcoTree.FileType type, File inFile)
+        {
+            this.type = type;
+            this.inFile = inFile;
+        }
+
+        @Override
+        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
+        {
+            try
+            {
+                EcoTree newTree = new EcoTree(type, inFile);
+
+                EcoTree.printDiff(System.out, newTree, type == EcoTree.FileType.LICHESS ?
                         EcoTree.FileType.STD.getEcoTree() : EcoTree.FileType.SCIDDB.getEcoTree(), true);
 
                 System.exit(0);
@@ -369,7 +404,7 @@ public class CLOptionResolver
                 OptId.get(CLOptions.P), OptId.get(CLOptions.S)};
 
         final OptId utilOpts[] = new OptId[] {OptId.get(CLOptions.MKDB), OptId.get(CLOptions.MKDBS),
-                OptId.get(CLOptions.PP)};
+                OptId.get(CLOptions.DDB), OptId.get(CLOptions.DDBS), OptId.get(CLOptions.PP)};
 
         new ConditionSet(topLevelOpts, null, null, new MutexHandler()).handle(setOpts);
         new ConditionSet(ecoOpts, null, null, new MutexHandler()).handle(setOpts);
