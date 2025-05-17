@@ -734,7 +734,7 @@ A48|London System|d4 Nf6 Nf3 g6 Bf4|332808556bbbc5fb080c404db4709da9
 A48|Torre Attack: Fianchetto Defense|d4 Nf6 Nf3 g6 Bg5|00ec5761636a7644f4c5dddc72b044a1
 E60|King's Indian Defense: Normal Variation, King's Knight Variation|d4 Nf6 Nf3 g6 c4|89e7232a5039a0bcca47a64070c9ebfe
 A49|Indian Defense: Przepiorka Variation|d4 Nf6 Nf3 g6 g3|ccae9bcc47e13c8f0315604c0026a048
-A45|Indian Defense: Gedult Attack, Gedult Attack|d4 Nf6 f3 d5 g4|68097f5e7d754f984bbf07ae62db883e
+A45|Indian Defense: Gedult Attack|d4 Nf6 f3 d5 g4|68097f5e7d754f984bbf07ae62db883e
 A45|Indian Defense: Paleface Attack, Blackmar-Diemer Gambit Deferred|d4 Nf6 f3 d5 e4|565b4dc972067e12a09041bd45d928ca
 A45|Queen's Pawn Game: Veresov, Richter Attack|d4 Nf6 f3 d5 Nc3|f3e7687b40719f2bbdd52b10b0b3ef34
 A45|Amazon Attack: Siberian Attack|d4 Nf6 Nc3 d5 Qd3|04ac3ca2330951dcbd6d95eda26a1443
@@ -929,6 +929,7 @@ C03|French Defense: Tarrasch Variation, Modern System|e4 e6 d4 d5 Nd2 a6|ebb759d
 C03|French Defense: Tarrasch Variation, Morozevich Variation|e4 e6 d4 d5 Nd2 Be7|4c1cdaee951d60dca300537e43d6780a
 C03|French Defense: Tarrasch Variation, Haberditz Variation|e4 e6 d4 d5 Nd2 f5|8ea7fd4d1d951a339b5fcec3a06b9455
 C05|French Defense: Tarrasch Variation, Closed Variation|e4 e6 d4 d5 Nd2 Nf6|6694a241fe1758ea6f7c574b8d9abdd9
+C10|French Defense: Hecht-Reefschläger Variation|e4 e6 d4 d5 Nc3 Nc6|f8b4ffd22ad724bb1bc66ab75a2e1755
 C10|French Defense: Marshall Gambit|e4 e6 d4 d5 Nc3 c5|f34bc17e174e5b1216ad8675fe1228fd
 C15|French Defense: Winawer Variation|e4 e6 d4 d5 Nc3 Bb4|ef682d44949c601e33bba2c422f3a525
 C10|French Defense: Rubinstein Variation|e4 e6 d4 d5 Nc3 dxe4|8f19dc52dd937396992ff005e7b86345
@@ -1241,7 +1242,6 @@ C01|French Defense: Exchange Variation|e4 e6 d4 d5 exd5 exd5 Nf3|1987f458aef82f4
 C01|French Defense: Exchange Variation|e4 e6 d4 d5 exd5 exd5 Nc3|9f86fc77647f5f2ff42bcf3d49dae90f
 C07|French Defense: Tarrasch Variation, Open System, Süchting Line|e4 e6 d4 d5 Nd2 c5 c3|ea6a3d279f0a7305b9014f01f6b725e7
 C07|French Defense: Tarrasch Variation, Open System, Euwe-Keres Line|e4 e6 d4 d5 Nd2 c5 Ngf3|20cfae84318052a47f029f5ab286b6fa
-C10|French Defense: Classical Variation, Svenonius Variation|e4 e6 d4 d5 Nc3 Nc6 exd5|84daf5446b46ffef05d3cf52d76c0154
 C16|French Defense: Winawer Variation, Advance Variation|e4 e6 d4 d5 Nc3 Bb4 e5|a11a2cc88ad16cc38e26b69462520043
 C15|French Defense: Winawer Variation, Fingerslip Variation|e4 e6 d4 d5 Nc3 Bb4 Bd2|43222933200dbe9efaffd52ee63771a4
 C15|French Defense: Winawer Variation, Alekhine-Maróczy Gambit|e4 e6 d4 d5 Nc3 Bb4 Ne2|a40bd9c6739751481f61bf4e5f967fb4
