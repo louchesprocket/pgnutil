@@ -376,13 +376,12 @@ public final class EcoTree
     /**
      * Writes standard format (read by StdReader).
      *
-     * @param outFile
      * @throws IOException
      * @throws IllegalMoveException
      */
-    private void writeTree(File outFile) throws IOException
+    public void writeTree() throws IOException
     {
-        try (Writer writer = new FileWriter(outFile, false)) { writeTree(writer); }
+        try (Writer writer = new FileWriter(FileDescriptor.out)) { writeTree(writer); }
     }
     
     private void printTree() throws IllegalMoveException
@@ -409,6 +408,11 @@ public final class EcoTree
             children.addAll(node.getChildren());
             children.remove(node);
         }
+    }
+
+    public static void printDiff(EcoTree tree1, EcoTree tree2, boolean checkDesc)
+    {
+        printDiff(System.out, tree1, tree2, checkDesc);
     }
 
     public static void printDiff(PrintStream ps, EcoTree tree1, EcoTree tree2, boolean checkDesc)

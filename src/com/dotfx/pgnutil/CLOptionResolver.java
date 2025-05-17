@@ -76,9 +76,7 @@ public class CLOptionResolver
         {
             try
             {
-                EcoTree newTree = new EcoTree(type, inFile);
-                try (Writer writer = new FileWriter(FileDescriptor.out)) { newTree.writeTree(writer); }
-
+                new EcoTree(type, inFile).writeTree();
                 System.exit(0);
             }
 
@@ -112,9 +110,7 @@ public class CLOptionResolver
         {
             try
             {
-                EcoTree newTree = new EcoTree(type, inFile);
-
-                EcoTree.printDiff(System.out, newTree, type == EcoTree.FileType.LICHESS ?
+                EcoTree.printDiff(new EcoTree(type, inFile), type == EcoTree.FileType.LICHESS ?
                         EcoTree.FileType.STD.getEcoTree() : EcoTree.FileType.SCIDDB.getEcoTree(), true);
 
                 System.exit(0);
