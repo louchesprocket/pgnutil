@@ -2621,6 +2621,7 @@ E30|Nimzo-Indian Defense: Leningrad Variation, Averbakh Gambit|d4 Nf6 c4 e6 Nc3 
 E32|Nimzo-Indian Defense: Classical Variation, Vitolins-Adorjan Gambit|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 O-O a3 Bxc3 Qxc3 b5|cdfe7fa0e157178e68778be3a5952a1a
 E32|Nimzo-Indian Defense: Classical Variation, Keres Defense|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 O-O a3 Bxc3 Qxc3 b6|036cc40dc94ee1bd82443c2c6e7772c2
 E36|Nimzo-Indian Defense: Classical Variation, Noa Variation, Botvinnik Variation|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 d5 a3 Bxc3 Qxc3 Nc6|40114511f2909a474b136f663eb0fc19
+E36|Nimzo-Indian Defense: Classical Variation, Romanishin Gambit|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 d5 a3 Bxc3 Qxc3 c5|71638b7486612fb78616ef7cb7049755
 E36|Nimzo-Indian Defense: Classical Variation, Noa Variation, Main Line|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 d5 a3 Bxc3 Qxc3 Ne4|0f93524b1a631a70aed39827eee74f3d
 E26|Nimzo-Indian Defense: Sämisch Variation, O'Kelly Variation|d4 Nf6 c4 e6 Nc3 Bb4 a3 Bxc3 bxc3 c5 e3 b6|acc5967d6bc2f79a101ed02366b96191
 E53|Nimzo-Indian Defense: Normal Variation, Gligoric System|d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Bd3 d5 Nf3 c5|ebf891ad6082330b2de217e7a010b432
@@ -2936,7 +2937,9 @@ D58|Queen's Gambit Declined: Tartakower Defense|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 
 E18|Queen's Indian Defense: Classical Variation, Traditional Variation, Nimzowitsch Line|d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O O-O Nc3 d5|4622f420652624c00773f7da197293bd
 E18|Queen's Indian Defense: Classical Variation, Tiviakov Defense|d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O O-O Nc3 Na6|7cb1db86ac640e4bbab2ecab3b8bf6f1
 E12|Queen's Indian Defense: Kasparov Variation, Botvinnik Attack|d4 Nf6 c4 e6 Nf3 b6 Nc3 Bb7 Bg5 h6 Bh4 g5 Bg3 Nh5|6b2eb67d8be2f8f31fa21068b09b2309
+E37|Nimzo-Indian Defense: Classical Variation, Modern Variation|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 d5 a3 Bxc3 Qxc3 Ne4 Qc2 c5|721d8bffac5c3fd075047223f24dc846
 E34|Nimzo-Indian Defense: Classical Variation, Belyavsky Gambit|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 d5 cxd5 Qxd5 Nf3 Qf5 Qd1 e5|78293be82693d271c8c9fb0ebb92c80c
+E39|Nimzo-Indian Defense: Classical Variation, Berlin Variation, Macieja System|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 c5 dxc5 O-O a3 Bxc5 Nf3 b6|2b636c40357da5cbc5e9a981e8f9b649
 E23|Nimzo-Indian Defense: Spielmann Variation, Stahlberg Variation|d4 Nf6 c4 e6 Nc3 Bb4 Qb3 c5 dxc5 Nc6 Nf3 Ne4 Bd2 Nxc5|6bb3687e485f7e0e6cf914389f740541
 E23|Nimzo-Indian Defense: Spielmann Variation, Carlsbad Variation|d4 Nf6 c4 e6 Nc3 Bb4 Qb3 c5 dxc5 Nc6 Nf3 Ne4 Bd2 Nxd2|273c60a83db4cabf8a1580c2ddcd230b
 E51|Nimzo-Indian Defense: Ragozin Variation|d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Bd3 d5 Nf3 Nc6 O-O dxc4|5c199e2a2be5b2f7e619a4c1afd2ee70
@@ -3061,7 +3064,6 @@ E17|Queen's Indian Defense: Classical Variation, Taimanov Gambit|d4 Nf6 c4 e6 Nf
 E08|Catalan Opening: Closed|d4 Nf6 c4 e6 g3 d5 Bg2 Be7 Nf3 O-O O-O Nbd7 Qc2 c6 b3|f7b5a378680bdbdfc6d684a9667fcb99
 E07|Catalan Opening: Closed, Botvinnik Variation|d4 Nf6 c4 e6 g3 d5 Bg2 Be7 Nf3 O-O O-O Nbd7 Nc3 c6 Qd3|490d8acd8c54442e297f4dc851ecdcde
 E11|Bogo-Indian Defense: Retreat Variation|d4 Nf6 c4 e6 g3 Bb4 Bd2 Be7 Bg2 d5 Nf3 O-O Qc2 c6 O-O|80c96b55abeab481bcbefeb432e79fc4
-E39|Nimzo-Indian Defense: Classical Variation, Berlin Variation, Macieja System|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 c5 dxc5 O-O a3 Bxc5 Nf3 b6 Bf4|e67011ba4fede3f17ec855dfde4f58ae
 E43|Nimzo-Indian Defense: St. Petersburg Variation|d4 Nf6 c4 e6 Nc3 Bb4 Nf3 Bxc3 bxc3 b6 e3 Bb7 Bd3 O-O O-O|58ea2f7f3b6a99570014f3ffcb8a6d95
 E25|Nimzo-Indian Defense: Sämisch Variation, Keres Variation|d4 Nf6 c4 e6 Nc3 Bb4 f3 d5 a3 Bxc3 bxc3 c5 cxd5 Nxd5 dxc5|3f7d2badb3e60bb3900ab94e8c1d236f
 E54|Nimzo-Indian Defense: Normal Variation, Gligoric System, Exchange Variation|d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Bd3 d5 Nf3 c5 O-O dxc4 Bxc4|6ae45099c96ffc6ffc174449d6257a6a
