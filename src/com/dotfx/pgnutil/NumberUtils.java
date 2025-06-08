@@ -30,7 +30,8 @@ import java.util.Arrays;
 /**
  *
  * @author Mark Chen
- */public class NumberUtils
+ */
+public class NumberUtils
 {
     public static long hexToLong(byte[] input)
     {

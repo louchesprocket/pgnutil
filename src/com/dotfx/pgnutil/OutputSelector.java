@@ -48,6 +48,15 @@ public final class OutputSelector
         }
     }
 
+    private static final class OrigTextOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getOrigText());
+        }
+    }
+
     private static final class TagsOutputHandler implements OutputHandler
     {
         @Override
@@ -459,6 +468,7 @@ public final class OutputSelector
         
         // special
 
+        ORIGTEXT("text", new OrigTextOutputHandler()),
         AVGPLIES("avgplies", null),
         CBPLAYERS("cbplayers", null), // Aquarium only. Handler set in CLOptionResolver.ClockBelowHandler
         DISAGREEPCT("disagreepct", new DisagreePctOutputHandler()),

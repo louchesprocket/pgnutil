@@ -42,22 +42,6 @@ public class PgnFile
     private final String fileName;
     private int gameCounter;
     
-    public PgnFile(String file) throws FileNotFoundException, IOException
-    {
-        fileName = file;
-
-        reader = new CopyReader(new BufferedReader(new FileReader(file)),
-            COPY_BUF_INIT_SIZE);
-    }
-    
-    public PgnFile(InputStream is) throws IOException
-    {
-        fileName = null;
-
-        reader = new CopyReader(new BufferedReader(new InputStreamReader(is)),
-            COPY_BUF_INIT_SIZE);
-    }
-    
     /**
      * This constructor uses the exact Reader supplied by the caller (except for wrapping it in a CopyReader so that
      * the original game text can be retrieved).
