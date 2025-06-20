@@ -2449,6 +2449,7 @@ A48|Queen's Pawn Game: Barry Attack, Grünfeld Variation|d4 Nf6 Nf3 g6 Nc3 d5 Bf
 D01|Richter-Veresov Attack: Malich Gambit|d4 Nf6 Nc3 d5 Bg5 c5 Bxf6 gxf6 e4 dxe4 d5|0832c601eb2b4e280f6b6f409ff72c2f
 A29|English Opening: King's English Variation, Four Knights Variation, Fianchetto Line|c4 e5 g3 Nf6 Bg2 d5 cxd5 Nxd5 Nf3 Nc6 d3|7656d2effcb28493f4610f5af244247b
 A26|English Opening: King's English Variation, Botvinnik System|c4 e5 Nc3 Nc6 g3 g6 Bg2 Bg7 d3 d6 e4|14b81f35ffc038568ab1d0050f5a050e
+A29|English Opening: King's English Variation, Four Knights Variation, Fianchetto Line, with .. d6|c4 e5 Nc3 Nf6 Nf3 Nc6 g3 Bc5 d3 d6 Bg2|112827677ade8dca12064a66019d687a
 A00|Polish Opening: Rooks Swap Line|b4 e6 Bb2 Nf6 b5 a6 a4 axb5 axb5 Rxa1 Bxa1|b6f8073c5e2835587c905d24f18f3c47
 A00|Polish Opening: King's Indian Variation, Sokolsky Attack|b4 Nf6 Bb2 g6 c4 Bg7 e3 d6 Nf3 O-O d4|f6bd022144b05b83d96c19bcb95d5a9f
 A00|Amar Opening: Paris Gambit, Gent Gambit|Nh3 d5 g3 e5 f4 Bxh3 Bxh3 exf4 O-O fxg3 hxg3|a00a840b810495d9f7ec9ab8be0aca78
@@ -2660,6 +2661,9 @@ A25|English Opening: King's English Variation, Bremen-Hort Variation|c4 e5 Nc3 N
 A25|English Opening: Closed, Taimanov Variation|c4 e5 Nc3 Nc6 g3 g6 Bg2 Bg7 e3 d6 Nge2 Nh6|f4bbfaab4865a8eee9afe71a36b74481
 A29|English Opening: King's English Variation, Four Knights Variation, Fianchetto Line, with Nb6|c4 e5 Nc3 Nf6 Nf3 Nc6 g3 d5 cxd5 Nxd5 Bg2 Nb6|f96435387b05ea3353c9d1963876c366
 A29|English Opening: King's English Variation, Four Knights Variation, Fianchetto Line, with Bc5|c4 e5 Nc3 Nf6 Nf3 Nc6 g3 d5 cxd5 Nxd5 Bg2 Bc5|b00c8427386ceef04600b932d8e0fefa
+A29|English Opening: King's English Variation, Four Knights Variation, Fianchetto Line, with .. d6, a6|c4 e5 Nc3 Nf6 Nf3 Nc6 g3 Bc5 d3 d6 Bg2 a6|9e3e2b4a0f60a7318cb180f759a2731c
+A29|English Opening: King's English Variation, Four Knights Variation, Fianchetto Line, with .. d6, h6|c4 e5 Nc3 Nf6 Nf3 Nc6 g3 Bc5 d3 d6 Bg2 h6|91a2e053504926f69e7e97e3ff045fe1
+A29|English Opening: King's English Variation, Four Knights Variation, Fianchetto Line, with .. d6, Be7|c4 e5 Nc3 Nf6 g3 Nc6 Bg2 d6 d3 Be7 Nf3 O-O|359db721a5436be888adff1a4e2b9715
 A13|English Opening: Agincourt Defense, Tarrasch Defense|c4 e6 Nf3 d5 g3 Nf6 Bg2 c5 b3 Nc6 O-O Be7|9975a5ccd73e5994e797a7660b3b0b64
 A33|English Opening: Symmetrical Variation, Anti-Benoni Variation, Geller Variation|c4 e6 Nf3 Nf6 Nc3 c5 d4 Nc6 g3 cxd4 Nxd4 Qb6|4c333f1fbad1e6eeab452bafaaca152e
 A30|English Opening: Symmetrical Variation, Hedgehog Defense|c4 e6 Nf3 Nf6 Nc3 c5 g3 b6 Bg2 Bb7 O-O Be7|71be96ace08870a5b88f9afb5c7a87c5
@@ -2821,11 +2825,13 @@ E92|King's Indian Defense: Orthodox Variation, Gligoric-Taimanov System|d4 Nf6 c
 E92|King's Indian Defense: Petrosian Variation|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 d5|bf06ea06c4bcd8b7af044c347187c84d
 E92|King's Indian Defense: Exchange Variation|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 dxe5|3367f318d2b926ff6dee8e28cf3096f4
 E72|King's Indian Defense: Pomar System|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 g3 O-O Bg2 e5 Nge2|0daf0ce12cd84b271a749fb30fd3f5e6
+A65|Benoni Defense: King's Pawn Line, with Bg5|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Bg5 c5 d5|87fac020adb56cc3c84b59d5d1ecdbae
 E87|King's Indian Defense: Sämisch Variation, Closed Variation|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 e5 d5|8f555aec1b993bc4eadbb119801274f8
 E74|King's Indian Defense: Averbakh Variation, Benoni Defense, Advance Variation|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be2 O-O Bg5 c5 d5|839da9d01cbe915e6bf2ed72f653e55b
 E74|King's Indian Defense: Averbakh Variation, Benoni Defense, Exchange Variation|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be2 O-O Bg5 c5 dxc5|223f32fbe0e5cf871f3d79b3c046ac8f
 E76|King's Indian Defense: Four Pawns Attack, Dynamic Attack|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f4 O-O Nf3 c5 d5|6a79019dbb9cbf2989fe46fe7014ddef
 E78|King's Indian Defense: Four Pawns Attack, Fluid Attack|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f4 O-O Nf3 c5 Be2|ad299555e9a9333d6a629883a34faf5e
+A29|English Opening: King's English Variation, Four Knights Variation, Fianchetto Line, with .. d6|c4 e5 Nc3 Nf6 Nf3 Nc6 g3 Bc5 d3 d6 Bg2 O-O O-O|095a8340a930dd535ea38155f3fc3899
 A28|English Opening: King's English Variation, Four Knights Variation, Quiet Line|c4 e5 Nc3 Nf6 Nf3 Nc6 e3 Bb4 Qc2 O-O Nd5 Re8 Qf5|be9a567c3090e098f6404a33ce9982de
 A38|English Opening: Symmetrical Variation, Double Fianchetto|c4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 Nf3 Nf6 O-O O-O b3|093c065883a3705470c2d4fc0f44fb70
 A39|English Opening: Symmetrical Variation, Mecking Variation|c4 Nf6 Nf3 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 O-O O-O d4|32c174b3466d27e00856340ed20fd798
@@ -2955,6 +2961,7 @@ E52|Nimzo-Indian Defense: Normal Variation, Schlechter Defense|d4 Nf6 c4 e6 Nc3 
 E43|Nimzo-Indian Defense: St. Petersburg Variation|d4 Nf6 c4 e6 Nc3 Bb4 e3 b6 Bd3 Bb7 Nf3 O-O O-O c5|4763440b98018b173d41bbf598b5321a
 E43|Nimzo-Indian Defense: St. Petersburg Variation|d4 Nf6 c4 e6 Nc3 Bb4 e3 Ne4 Qc2 f5 Nf3 b6 Bd3 Bb7|98dc01503d1d8a3023ee41d5b1583bc9
 E94|King's Indian Defense: Orthodox Variation, Positional Defense|d4 Nf6 c4 d6 Nc3 Nbd7 e4 e5 Nf3 g6 Be2 Bg7 O-O O-O|0151c451ae16c487cdae8b6bf2f710e0
+A65|Benoni Defense: King's Pawn Line|d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 f3 Bg7|a6a009f8d00fbbaf5c58d30cb0e07b10
 D76|Neo-Grünfeld Defense: Delayed Exchange Variation|d4 Nf6 c4 g6 Nf3 Bg7 g3 O-O Bg2 d5 cxd5 Nxd5 O-O Nb6|aa4207e9ae95a94a775d9cfd0d039921
 E62|King's Indian Defense: Fianchetto Variation, Uhlmann-Szabo System|d4 Nf6 c4 g6 Nf3 Bg7 g3 O-O Bg2 d6 O-O Nc6 Nc3 e5|fbca2fc63ce798d3686265efbb2cd0e0
 E63|King's Indian Defense: Fianchetto Variation, Panno Variation|d4 Nf6 c4 g6 Nf3 Bg7 g3 O-O Bg2 d6 O-O Nc6 Nc3 a6|1832ff665024fa880e6d40a9a6ecfc23
@@ -3070,6 +3077,9 @@ E11|Bogo-Indian Defense: Retreat Variation|d4 Nf6 c4 e6 g3 Bb4 Bd2 Be7 Bg2 d5 Nf
 E43|Nimzo-Indian Defense: St. Petersburg Variation|d4 Nf6 c4 e6 Nc3 Bb4 Nf3 Bxc3 bxc3 b6 e3 Bb7 Bd3 O-O O-O|58ea2f7f3b6a99570014f3ffcb8a6d95
 E25|Nimzo-Indian Defense: Sämisch Variation, Keres Variation|d4 Nf6 c4 e6 Nc3 Bb4 f3 d5 a3 Bxc3 bxc3 c5 cxd5 Nxd5 dxc5|3f7d2badb3e60bb3900ab94e8c1d236f
 E54|Nimzo-Indian Defense: Normal Variation, Gligoric System, Exchange Variation|d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Bd3 d5 Nf3 c5 O-O dxc4 Bxc4|6ae45099c96ffc6ffc174449d6257a6a
+A65|Benoni Defense: King's Pawn Line, with Be3|d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 f3 Bg7 Be3|42d88999cf56ad3c147bf62a7e607a5a
+A65|Benoni Defense: King's Pawn Line, with Bg5|d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 f3 Bg7 Bg5|bd79ad740e485772cb70f7221fb8de88
+A65|Benoni Defense: King's Pawn Line, with Nge2|d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 f3 Bg7 Nge2|b1ec623295675e3031b6bf998b97283e
 A66|Benoni Defense: Mikenas Variation|d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 f4 Bg7 e5|8e52785625d97b273b6f484d192cc603
 A67|Benoni Defense: Taimanov Variation|d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 f4 Bg7 Bb5|312701938c06cd8f08fd97dcac946787
 A58|Benko Gambit: Fianchetto Variation|d4 Nf6 c4 c5 d5 b5 cxb5 a6 bxa6 Bxa6 Nc3 d6 Nf3 g6 g3|aa34e5fc22860b55dc9a2c1c91d4257d
@@ -3248,6 +3258,7 @@ A58|Benko Gambit Accepted: Fianchetto Variation|d4 Nf6 c4 c5 d5 b5 cxb5 a6 bxa6 
 A59|Benko Gambit Accepted: Yugoslav|d4 Nf6 c4 c5 d5 b5 cxb5 a6 bxa6 g6 Nc3 Bxa6 e4 Bxf1 Kxf1 d6 Nge2|448fdac2fc1a7f70703cac42c17fe9c5
 A59|Benko Gambit|d4 Nf6 c4 c5 d5 b5 cxb5 a6 bxa6 g6 Nc3 Bxa6 e4 Bxf1 Kxf1 d6 g3|82346cd3566194ce242819e2775129f0
 E69|King's Indian Defense: Fianchetto Variation, Classical Main Line|d4 Nf6 c4 g6 Nf3 Bg7 g3 O-O Bg2 d6 O-O Nbd7 Nc3 e5 e4 c6 h3|19d6a8b6d313e16b8237eb24e42b9830
+A65|Benoni Defense: King's Pawn Line|d4 Nf6 c4 g6 f3 c5 d5 d6 e4 Bg7 Nc3 e6 Be3 O-O Qd2 exd5 cxd5|b86b457bba673392ce627434b7c7b204
 D99|Grünfeld Defense: Russian Variation, Smyslov Variation|d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Qb3 dxc4 Qxc4 O-O e4 Bg4 Be3 Nfd7 Qb3|5050d3b75b84c62de17d0d9342e8ea79
 E97|King's Indian Defense: Orthodox Variation, Korchnoi Attack|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6 d5 Ne7 Bd2|a7735db0b390c9e07eff464ddca56797
 E97|King's Indian Defense: Orthodox Variation, Bayonet Attack|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6 d5 Ne7 b4|0f5d5b2f30c996840521e7436d5b4e54
