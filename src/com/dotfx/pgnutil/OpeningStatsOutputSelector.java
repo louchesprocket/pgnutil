@@ -31,7 +31,7 @@ public class OpeningStatsOutputSelector
     interface OutputHandler
     {
         void appendOutput(OpeningStats.Opening opening, StringBuilder sb);
-        void configTallier(OpeningStats os);
+        default void configTallier(OpeningStats os) {}
     }
 
     private static final class OpeningStOutputHandler implements OutputHandler
@@ -43,7 +43,7 @@ public class OpeningStatsOutputSelector
         }
 
         @Override
-        public void configTallier(OpeningStats os) {}
+        public void configTallier(OpeningStats os) { os.setSaveOpeningMoves(true); }
     }
 
     private static final class OidOutputHandler implements OutputHandler
@@ -53,9 +53,6 @@ public class OpeningStatsOutputSelector
         {
             sb.append(opening.getId());
         }
-
-        @Override
-        public void configTallier(OpeningStats os) {}
     }
 
     private static final class BlackWinPctOutputHandler implements OutputHandler
@@ -65,9 +62,6 @@ public class OpeningStatsOutputSelector
         {
             sb.append(Formats.PERCENT.format(opening.getBlackWinPct()));
         }
-
-        @Override
-        public void configTallier(OpeningStats os) {}
     }
 
     private static final class BlackWinsOutputHandler implements OutputHandler
@@ -77,9 +71,6 @@ public class OpeningStatsOutputSelector
         {
             sb.append(opening.getBlackWins());
         }
-
-        @Override
-        public void configTallier(OpeningStats os) {}
     }
 
     private static final class CountOutputHandler implements OutputHandler
@@ -89,9 +80,6 @@ public class OpeningStatsOutputSelector
         {
             sb.append(opening.getGameCount());
         }
-
-        @Override
-        public void configTallier(OpeningStats os) {}
     }
 
     private static final class DiffOutputHandler implements OutputHandler
@@ -101,9 +89,6 @@ public class OpeningStatsOutputSelector
         {
             sb.append(opening.getWhiteWins() - opening.getBlackWins());
         }
-
-        @Override
-        public void configTallier(OpeningStats os) {}
     }
 
     private static final class DiffPctOutputHandler implements OutputHandler
@@ -113,9 +98,6 @@ public class OpeningStatsOutputSelector
         {
             sb.append(Formats.PERCENT.format(opening.getWhiteWinPct() - opening.getBlackWinPct()));
         }
-
-        @Override
-        public void configTallier(OpeningStats os) {}
     }
 
     private static final class DrawPctOutputHandler implements OutputHandler
@@ -125,9 +107,6 @@ public class OpeningStatsOutputSelector
         {
             sb.append(Formats.PERCENT.format(opening.getDrawPct()));
         }
-
-        @Override
-        public void configTallier(OpeningStats os) {}
     }
 
     private static final class DrawsOutputHandler implements OutputHandler
@@ -137,9 +116,6 @@ public class OpeningStatsOutputSelector
         {
             sb.append(opening.getDraws());
         }
-
-        @Override
-        public void configTallier(OpeningStats os) {}
     }
 
     private static final class WhiteWinPctOutputHandler implements OutputHandler
@@ -149,9 +125,6 @@ public class OpeningStatsOutputSelector
         {
             sb.append(Formats.PERCENT.format(opening.getWhiteWinPct()));
         }
-
-        @Override
-        public void configTallier(OpeningStats os) {}
     }
 
     private static final class WhiteWinsOutputHandler implements OutputHandler
@@ -161,9 +134,6 @@ public class OpeningStatsOutputSelector
         {
             sb.append(opening.getWhiteWins());
         }
-
-        @Override
-        public void configTallier(OpeningStats os) {}
     }
 
     private static final class DisagreeOutputHandler implements OutputHandler
@@ -175,7 +145,11 @@ public class OpeningStatsOutputSelector
         }
 
         @Override
-        public void configTallier(OpeningStats os) {}
+        public void configTallier(OpeningStats os)
+        {
+            os.setTrackDisagree(true);
+            os.setTrackPlies(true);
+        }
     }
 
     private static final class AvgPliesOutputHandler implements OutputHandler
@@ -183,11 +157,11 @@ public class OpeningStatsOutputSelector
         @Override
         public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
         {
-            sb.append(Formats.DECIMAL.format(opening.getAvgPlies()));
+            sb.append(Formats.DECIMAL.format(opening.getAvgOobPlies()));
         }
 
         @Override
-        public void configTallier(OpeningStats os) {}
+        public void configTallier(OpeningStats os) { os.setTrackPlies(true); }
     }
 
     private static final class EcoOutputHandler implements OutputHandler

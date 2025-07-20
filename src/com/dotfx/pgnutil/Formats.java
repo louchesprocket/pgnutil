@@ -38,13 +38,13 @@ public class Formats
     static
     {
         PERCENT = NumberFormat.getPercentInstance();
+        PERCENT.setMinimumIntegerDigits(1);
         PERCENT.setMinimumFractionDigits(1);
         PERCENT.setMaximumFractionDigits(1);
 
         DECIMAL = NumberFormat.getInstance();
-        DECIMAL.setMinimumIntegerDigits(0);
         DECIMAL.setMinimumIntegerDigits(1);
-        DECIMAL.setMinimumFractionDigits(3);
-        DECIMAL.setMaximumFractionDigits(3);
+        DECIMAL.setMinimumFractionDigits(1);
+        DECIMAL.setMaximumFractionDigits(1);
     }
 }

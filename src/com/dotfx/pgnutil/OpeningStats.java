@@ -86,12 +86,11 @@ public class OpeningStats implements Tallier
     
     private class Iterator implements java.util.Iterator<String>
     {
-        private final List<Opening> selectedOpenings;
         private final java.util.Iterator<Opening> iterator;
         
         private Iterator()
         {
-            selectedOpenings = new ArrayList<>();
+            List<Opening> selectedOpenings = new ArrayList<>();
             
             nextOpening:
             for (MoveListId oid : openingsMap.keySet())
@@ -132,12 +131,12 @@ public class OpeningStats implements Tallier
     }
 
     private static boolean saveOpeningMoves = false;
+    private static boolean trackPlies = false;
+    private static boolean trackDisagree = false;
     private static OpeningStatsOutputSelector selectors[];
     private static OpeningStats instance;
     
     private final Map<MoveListId,Opening> openingsMap;
-    private boolean trackPlies;
-    private boolean trackDisagree;
 
     private EcoTree ecoTree;
     private EcoTree scidEcoTree;
@@ -167,23 +166,13 @@ public class OpeningStats implements Tallier
             OpeningStats.selectors = new OpeningStatsOutputSelector[selectors.length];
 
             for (int i = 0; i < selectors.length; i++)
-            {
                 OpeningStats.selectors[i] = new OpeningStatsOutputSelector(selectors[i], this);
-
-                if (OpeningStats.selectors[i].getValue() == OpeningStatsOutputSelector.Value.OPENINGMOVES)
-                    saveOpeningMoves = true;
-
-                else if (OpeningStats.selectors[i].getValue() == OpeningStatsOutputSelector.Value.DISAGREEPCT)
-                {
-                    trackDisagree = true;
-                    trackPlies = true;
-                }
-
-                else if (OpeningStats.selectors[i].getValue() == OpeningStatsOutputSelector.Value.AVGPLIES)
-                    trackPlies = true;
-            }
         }
     }
+
+    public void setSaveOpeningMoves(boolean saveOpeningMoves) { OpeningStats.saveOpeningMoves = saveOpeningMoves;}
+    public void setTrackDisagree(boolean trackDisagree) { OpeningStats.trackDisagree = trackDisagree; }
+    public void setTrackPlies(boolean trackPlies) { OpeningStats.trackPlies = trackPlies; }
 
     public void setUseEco(EcoTree.FileType type)
     {

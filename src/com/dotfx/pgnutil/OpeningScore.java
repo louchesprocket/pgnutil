@@ -69,7 +69,7 @@ public class OpeningScore
         return denominator < 1 ? 0 : (double)totalDisagree / denominator;
     }
 
-    public double getAvgPlies()
+    public double getAvgOobPlies()
     {
         long denominator = whiteWins + blackWins + draws + noResult;
         return denominator < 1 ? 0 : (double)totalOobPlies / denominator;
