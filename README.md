@@ -310,6 +310,8 @@ If we further wish to know the lowest clock value for each player in these games
 
 ## Known Issues
 
+When running pgnutil under recent Java versions, the Zero-Allocation Hashing library is currently producing warning messages due to a deprecated a.p.i. A fix for this will be incorporated as soon as Zero-Allocation Hashing makes one available.
+
 Pgnutil is victim to the PGN specification's greatest infirmity: lack of standardized move notation.  PGN files are allowed to list moves in any way at all.  This means, for example, that "Bb2," "c1-b2," and "B-QN2" are all valid notation.  Pgnutil makes no effort to normalize moves (as this would entail a large performance penalty), so all move comparisons, such as the "-mo" and "-ro" options, as well as duplicate finding and opening statistics, assume that notation throughout the input file is consistent.  The various ECO-code and position-finding options require that the input file be in Standard Algebraic Notation.
 
 PGN files often violate the PGN specification. Where it can, pgnutil refrains from complaining about such errors (for example, it does not demand a correct Seven Tag Roster).  Certain problems, however, will cause an error to be reported.  Kingbase, for instance, uses the backslash ("\\") character in some event names.  Since the PGN specification defines this as an escape character, it may cause certain tag-value pairs to be unterminated, resulting in an exception.
