@@ -312,11 +312,15 @@ public class OpeningStatsOutputSelector
             return sigMap.get(signifier);
         }
 
-        public OutputHandler getOutputHandler() { return outputHandler; }
+        public void configTallier(OpeningStats os) { outputHandler.configTallier(os); }
+
+        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        {
+            outputHandler.appendOutput(opening, sb);
+        }
     }
 
     private final Value value;
-    private final OutputHandler handler;
 
     public OpeningStatsOutputSelector(OutputSelector selector, OpeningStats os) throws SelectorException
     {
@@ -325,13 +329,13 @@ public class OpeningStatsOutputSelector
         if (value == null)
             throw new SelectorException("output selector '" + selector + "' is invalid in this context");
 
-        handler = value.getOutputHandler();
-        handler.configTallier(os);
+        value.configTallier(os);
     }
 
     public Value getValue() { return value; }
+
     public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
     {
-        handler.appendOutput(opening, sb);
+        value.appendOutput(opening, sb);
     }
 }

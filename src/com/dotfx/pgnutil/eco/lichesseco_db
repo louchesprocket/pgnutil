@@ -2624,6 +2624,7 @@ E31|Nimzo-Indian Defense: Leningrad Variation, Benoni Defense|d4 Nf6 c4 e6 Nc3 B
 E30|Nimzo-Indian Defense: Leningrad Variation, Averbakh Gambit|d4 Nf6 c4 e6 Nc3 Bb4 Bg5 h6 Bh4 c5 d5 b5|d13dd93241615c1f3f9a409c60589d98
 E32|Nimzo-Indian Defense: Classical Variation, Vitolins-Adorjan Gambit|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 O-O a3 Bxc3 Qxc3 b5|cdfe7fa0e157178e68778be3a5952a1a
 E32|Nimzo-Indian Defense: Classical Variation, Keres Defense|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 O-O a3 Bxc3 Qxc3 b6|036cc40dc94ee1bd82443c2c6e7772c2
+E38|Nimzo-Indian Defense: Classical Variation, Berlin Variation|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 O-O e3 d5 Nf3 c5|a005ae992617eede553d265141b7acdc
 E36|Nimzo-Indian Defense: Classical Variation, Noa Variation, Botvinnik Variation|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 d5 a3 Bxc3 Qxc3 Nc6|40114511f2909a474b136f663eb0fc19
 E36|Nimzo-Indian Defense: Classical Variation, Romanishin Gambit|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 d5 a3 Bxc3 Qxc3 c5|71638b7486612fb78616ef7cb7049755
 E36|Nimzo-Indian Defense: Classical Variation, Noa Variation, Main Line|d4 Nf6 c4 e6 Nc3 Bb4 Qc2 d5 a3 Bxc3 Qxc3 Ne4|0f93524b1a631a70aed39827eee74f3d
@@ -3451,6 +3452,7 @@ D46|Semi-Slav Defense: Chigorin Defense|d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7 Bd3 d
 D49|Semi-Slav Defense: Meran Variation, Blumenfeld Variation|d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7 Bd3 dxc4 Bxc4 b5 Bd3 a6 e4 c5 e5 cxd4 Nxb5|d7c37f788063ea83fbfdb254de431b43
 D44|Semi-Slav Defense: Botvinnik Variation, Szabo Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 c6 Bg5 dxc4 e4 b5 e5 h6 Bh4 g5 Nxg5 hxg5 Bxg5 Nbd7 Qf3|e93167ed969afe1e2e96555cd1d19b20
 D55|Queen's Gambit Declined: Anti-Tartakower Variation, Petrosian Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 h6 Bxf6 Bxf6 e3 O-O Rc1 c6 Bd3 Nd7 O-O dxc4 Bxc4|b993938ad9a93d40b9e801c23ab856c7
+E59|Nimzo-Indian Defense: Normal Variation, Bernstein Defense|d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Bd3 d5 a3 Bxc3 bxc3 dxc4 Bxc4 c5 Nf3 Nc6 O-O Qc7 Qc2|b64e11bdcf22c8fd434d6a51c24b5454
 A79|Benoni Defense: Classical Variation, Czerniak Defense|d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 Nf3 Bg7 Be2 O-O O-O Re8 Nd2 Na6 f3|0040819b6bfbf77d3fcb03dd723c188c
 A59|Benko Gambit Accepted: King Walk Variation|d4 Nf6 c4 c5 d5 b5 cxb5 a6 bxa6 g6 Nc3 Bxa6 Nf3 d6 e4 Bxf1 Kxf1 Bg7 g3 O-O Kg2|ec6b35c667cf315d23313bb7c8fe5c39
 D88|Grünfeld Defense: Exchange Variation, Spassky Variation|d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 e4 Nxc3 bxc3 Bg7 Bc4 c5 Ne2 Nc6 Be3 O-O O-O cxd4 cxd4|3feb23865b75a1a2fd91a87512c27657
