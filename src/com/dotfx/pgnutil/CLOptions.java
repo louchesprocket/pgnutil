@@ -1084,7 +1084,7 @@ public class CLOptions
     private void events(boolean e)
     {
         countOption(OptId.get(E));
-        Tallier events = Events.getInstance();
+        Tallier events = EventsTallier.getInstance();
         PGNUtil.setHandler(new PGNUtil.TallyHandler(events));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(events));
     }
@@ -1097,7 +1097,7 @@ public class CLOptions
     private void eventErrors(boolean e)
     {
         countOption(OptId.get(CSR));
-        Tallier events = Events.getEventErrorInstance();
+        Tallier events = EventsTallier.getEventErrorInstance();
         PGNUtil.setHandler(new PGNUtil.TallyHandler(events));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(events));
     }
@@ -1131,7 +1131,7 @@ public class CLOptions
     private void ScidEcoOpenings(boolean o)
     {
         countOption(OptId.get(SECO));
-        Tallier os = EcoStats.getInstance(EcoTree.FileType.SCIDDB, false);
+        Tallier os = EcoStatsTallier.getInstance(EcoTree.FileType.SCIDDB, false);
         PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
@@ -1154,7 +1154,7 @@ public class CLOptions
     private void XScidEcoOpenings(boolean o)
     {
         countOption(OptId.get(XSECO));
-        Tallier os = EcoStats.getInstance(EcoTree.FileType.SCIDDB, true);
+        Tallier os = EcoStatsTallier.getInstance(EcoTree.FileType.SCIDDB, true);
         PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
     }
@@ -1212,7 +1212,7 @@ public class CLOptions
     {
         countOption(OptId.get(P));
         
-        Tallier pr = PlayerResults.getInstance();
+        Tallier pr = PlayerResultsTallier.getInstance();
         PGNUtil.setHandler(new PGNUtil.TallyHandler(pr));
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(pr));
     }

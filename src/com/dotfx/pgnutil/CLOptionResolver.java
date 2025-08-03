@@ -197,7 +197,7 @@ public class CLOptionResolver
         @Override
         public void handleIfNone(Map<OptId,Integer> setOpts)
         {
-            Tallier os = OpeningStats.getInstance();
+            Tallier os = OpeningStatsTallier.getInstance();
             PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
             PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
         }
@@ -284,7 +284,7 @@ public class CLOptionResolver
         @Override
         public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
         {
-            Tallier os = EcoStats.getInstance(EcoTree.FileType.STD, transpose);
+            Tallier os = EcoStatsTallier.getInstance(EcoTree.FileType.STD, transpose);
             PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
             PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
         }

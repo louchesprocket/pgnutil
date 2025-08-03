@@ -35,7 +35,7 @@ import java.util.TreeMap;
  *
  * @author Mark Chen <chen@dotfx.com>
  */
-public class EcoStats implements Tallier
+public class EcoStatsTallier implements Tallier
 {
     private class Iterator implements java.util.Iterator<String>
     {
@@ -87,22 +87,22 @@ public class EcoStats implements Tallier
     }
 
     private static EcoStatsOutputSelector selectors[];
-    private static EcoStats instance;
+    private static EcoStatsTallier instance;
     
     private final TreeMap<TreeNodeSet,OpeningScore> openingsMap;
     private final EcoTree ecoTree;
     private final boolean transpose;
 
-    private EcoStats(EcoTree.FileType type, boolean transpose)
+    private EcoStatsTallier(EcoTree.FileType type, boolean transpose)
     {
         openingsMap = new TreeMap<>();
         ecoTree = type.getEcoTree();
         this.transpose = transpose;
     }
 
-    public static EcoStats getInstance(EcoTree.FileType type, boolean transpose)
+    public static EcoStatsTallier getInstance(EcoTree.FileType type, boolean transpose)
     {
-        if (instance == null) instance = new EcoStats(type, transpose);
+        if (instance == null) instance = new EcoStatsTallier(type, transpose);
         return instance;
     }
     
@@ -111,8 +111,8 @@ public class EcoStats implements Tallier
     {
         if (selectors != null && selectors.length > 0)
         {
-            EcoStats.selectors = new EcoStatsOutputSelector[selectors.length];
-            for (int i = 0; i < selectors.length; i++) EcoStats.selectors[i] = new EcoStatsOutputSelector(selectors[i]);
+            EcoStatsTallier.selectors = new EcoStatsOutputSelector[selectors.length];
+            for (int i = 0; i < selectors.length; i++) EcoStatsTallier.selectors[i] = new EcoStatsOutputSelector(selectors[i]);
         }
     }
 

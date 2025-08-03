@@ -27,13 +27,13 @@ public class PlayerResultsOutputSelector
 {
     interface OutputHandler
     {
-        void appendOutput(String player, PlayerResults.Score score, StringBuilder sb);
+        void appendOutput(String player, PlayerResultsTallier.Score score, StringBuilder sb);
     }
 
     private static final class PlayerOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(String player, PlayerResults.Score score, StringBuilder sb)
+        public void appendOutput(String player, PlayerResultsTallier.Score score, StringBuilder sb)
         {
             sb.append(player);
         }
@@ -42,7 +42,7 @@ public class PlayerResultsOutputSelector
     private static final class WinsOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(String player, PlayerResults.Score score, StringBuilder sb)
+        public void appendOutput(String player, PlayerResultsTallier.Score score, StringBuilder sb)
         {
             sb.append(score.getWins());
         }
@@ -51,7 +51,7 @@ public class PlayerResultsOutputSelector
     private static final class LossesOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(String player, PlayerResults.Score score, StringBuilder sb)
+        public void appendOutput(String player, PlayerResultsTallier.Score score, StringBuilder sb)
         {
             sb.append(score.getLosses());
         }
@@ -60,7 +60,7 @@ public class PlayerResultsOutputSelector
     private static final class DrawsOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(String player, PlayerResults.Score score, StringBuilder sb)
+        public void appendOutput(String player, PlayerResultsTallier.Score score, StringBuilder sb)
         {
             sb.append(score.getDraws());
         }
@@ -69,7 +69,7 @@ public class PlayerResultsOutputSelector
     private static final class NoResultsOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(String player, PlayerResults.Score score, StringBuilder sb)
+        public void appendOutput(String player, PlayerResultsTallier.Score score, StringBuilder sb)
         {
             sb.append(score.getNoResults());
         }
@@ -78,7 +78,7 @@ public class PlayerResultsOutputSelector
     private static final class CountOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(String player, PlayerResults.Score score, StringBuilder sb)
+        public void appendOutput(String player, PlayerResultsTallier.Score score, StringBuilder sb)
         {
             sb.append(score.getGameCount());
         }
@@ -87,7 +87,7 @@ public class PlayerResultsOutputSelector
     private static final class WinPctOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(String player, PlayerResults.Score score, StringBuilder sb)
+        public void appendOutput(String player, PlayerResultsTallier.Score score, StringBuilder sb)
         {
             sb.append(Formats.PERCENT.format(score.getWinPct()));
         }
@@ -141,7 +141,7 @@ public class PlayerResultsOutputSelector
 
     public Value getValue() { return value; }
 
-    public void appendOutput(String player, PlayerResults.Score score, StringBuilder sb)
+    public void appendOutput(String player, PlayerResultsTallier.Score score, StringBuilder sb)
     {
         handler.appendOutput(player, score, sb);
     }

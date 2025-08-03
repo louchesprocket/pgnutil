@@ -35,7 +35,7 @@ import java.util.NoSuchElementException;
  *
  * @author Mark Chen <chen@dotfx.com>
  */
-public class Events implements Tallier
+public class EventsTallier implements Tallier
 {
     private interface IteratorFactory
     {
@@ -187,26 +187,26 @@ public class Events implements Tallier
         }
     }
 
-    private static Events instance;
+    private static EventsTallier instance;
     private final Map<String,List<GameInfo>> eventMap;
     private final IteratorFactory iteratorFactory;
     private EventsOutputSelector selectors[];
 
-    private Events(IteratorFactory iteratorFactory)
+    private EventsTallier(IteratorFactory iteratorFactory)
     {
         eventMap = new HashMap<>();
         this.iteratorFactory = iteratorFactory;
     }
 
-    public static Events getInstance()
+    public static EventsTallier getInstance()
     {
-        if (instance == null) instance = new Events(new EventIteratorFactory());
+        if (instance == null) instance = new EventsTallier(new EventIteratorFactory());
         return instance;
     }
 
-    public static Events getEventErrorInstance()
+    public static EventsTallier getEventErrorInstance()
     {
-        if (instance == null) instance = new Events(new ErrorCheckIteratorFactory());
+        if (instance == null) instance = new EventsTallier(new ErrorCheckIteratorFactory());
         return instance;
     }
 

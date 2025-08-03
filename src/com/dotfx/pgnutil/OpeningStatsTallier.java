@@ -35,7 +35,7 @@ import java.util.Map;
  * 
  * This class is not thread safe.
  */
-public class OpeningStats implements Tallier
+public class OpeningStatsTallier implements Tallier
 {
     public static class Opening extends OpeningScore
     {
@@ -134,7 +134,7 @@ public class OpeningStats implements Tallier
     private static boolean trackPlies = false;
     private static boolean trackDisagree = false;
     private static OpeningStatsOutputSelector selectors[];
-    private static OpeningStats instance;
+    private static OpeningStatsTallier instance;
     
     private final Map<MoveListId,Opening> openingsMap;
 
@@ -143,11 +143,11 @@ public class OpeningStats implements Tallier
     private boolean useXStdEco;
     private boolean useXScidEco;
 
-    private OpeningStats() { openingsMap = new HashMap<>(10000); }
+    private OpeningStatsTallier() { openingsMap = new HashMap<>(10000); }
 
-    public static OpeningStats getInstance()
+    public static OpeningStatsTallier getInstance()
     {
-        if (instance == null) instance = new OpeningStats();
+        if (instance == null) instance = new OpeningStatsTallier();
         return instance;
     }
 
@@ -163,16 +163,16 @@ public class OpeningStats implements Tallier
 
         else
         {
-            OpeningStats.selectors = new OpeningStatsOutputSelector[selectors.length];
+            OpeningStatsTallier.selectors = new OpeningStatsOutputSelector[selectors.length];
 
             for (int i = 0; i < selectors.length; i++)
-                OpeningStats.selectors[i] = new OpeningStatsOutputSelector(selectors[i], this);
+                OpeningStatsTallier.selectors[i] = new OpeningStatsOutputSelector(selectors[i], this);
         }
     }
 
-    public void setSaveOpeningMoves(boolean saveOpeningMoves) { OpeningStats.saveOpeningMoves = saveOpeningMoves;}
-    public void setTrackDisagree(boolean trackDisagree) { OpeningStats.trackDisagree = trackDisagree; }
-    public void setTrackPlies(boolean trackPlies) { OpeningStats.trackPlies = trackPlies; }
+    public void setSaveOpeningMoves(boolean saveOpeningMoves) { OpeningStatsTallier.saveOpeningMoves = saveOpeningMoves;}
+    public void setTrackDisagree(boolean trackDisagree) { OpeningStatsTallier.trackDisagree = trackDisagree; }
+    public void setTrackPlies(boolean trackPlies) { OpeningStatsTallier.trackPlies = trackPlies; }
 
     public void setUseEco(EcoTree.FileType type)
     {

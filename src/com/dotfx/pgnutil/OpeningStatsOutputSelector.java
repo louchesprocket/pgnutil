@@ -30,26 +30,26 @@ public class OpeningStatsOutputSelector
 {
     interface OutputHandler
     {
-        void appendOutput(OpeningStats.Opening opening, StringBuilder sb);
-        default void configTallier(OpeningStats os) {}
+        void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb);
+        default void configTallier(OpeningStatsTallier os) {}
     }
 
     private static final class OpeningStOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(opening.getOpeningSt());
         }
 
         @Override
-        public void configTallier(OpeningStats os) { os.setSaveOpeningMoves(true); }
+        public void configTallier(OpeningStatsTallier os) { os.setSaveOpeningMoves(true); }
     }
 
     private static final class OidOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(opening.getId());
         }
@@ -58,7 +58,7 @@ public class OpeningStatsOutputSelector
     private static final class BlackWinPctOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(Formats.PERCENT.format(opening.getBlackWinPct()));
         }
@@ -67,7 +67,7 @@ public class OpeningStatsOutputSelector
     private static final class BlackWinsOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(opening.getBlackWins());
         }
@@ -76,7 +76,7 @@ public class OpeningStatsOutputSelector
     private static final class CountOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(opening.getGameCount());
         }
@@ -85,7 +85,7 @@ public class OpeningStatsOutputSelector
     private static final class DiffOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(opening.getWhiteWins() - opening.getBlackWins());
         }
@@ -94,7 +94,7 @@ public class OpeningStatsOutputSelector
     private static final class DiffPctOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(Formats.PERCENT.format(opening.getWhiteWinPct() - opening.getBlackWinPct()));
         }
@@ -103,7 +103,7 @@ public class OpeningStatsOutputSelector
     private static final class DrawPctOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(Formats.PERCENT.format(opening.getDrawPct()));
         }
@@ -112,7 +112,7 @@ public class OpeningStatsOutputSelector
     private static final class DrawsOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(opening.getDraws());
         }
@@ -121,7 +121,7 @@ public class OpeningStatsOutputSelector
     private static final class WhiteWinPctOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(Formats.PERCENT.format(opening.getWhiteWinPct()));
         }
@@ -130,7 +130,7 @@ public class OpeningStatsOutputSelector
     private static final class WhiteWinsOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(opening.getWhiteWins());
         }
@@ -139,13 +139,13 @@ public class OpeningStatsOutputSelector
     private static final class DisagreeOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(Formats.PERCENT.format(opening.getDisagreePct()));
         }
 
         @Override
-        public void configTallier(OpeningStats os)
+        public void configTallier(OpeningStatsTallier os)
         {
             os.setTrackDisagree(true);
             os.setTrackPlies(true);
@@ -155,13 +155,13 @@ public class OpeningStatsOutputSelector
     private static final class AvgPliesOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(Formats.DECIMAL.format(opening.getAvgOobPlies()));
         }
 
         @Override
-        public void configTallier(OpeningStats os) { os.setTrackPlies(true); }
+        public void configTallier(OpeningStatsTallier os) { os.setTrackPlies(true); }
     }
 
     private static final class EcoOutputHandler implements OutputHandler
@@ -171,13 +171,13 @@ public class OpeningStatsOutputSelector
         EcoOutputHandler(EcoTree.FileType type) { this.type = type; }
 
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(opening.getEco(type).getCode());
         }
 
         @Override
-        public void configTallier(OpeningStats os) { os.setUseEco(type); }
+        public void configTallier(OpeningStatsTallier os) { os.setUseEco(type); }
     }
 
     private static final class EcoDescOutputHandler implements OutputHandler
@@ -187,13 +187,13 @@ public class OpeningStatsOutputSelector
         EcoDescOutputHandler(EcoTree.FileType type) { this.type = type; }
 
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(opening.getEco(type).getDesc());
         }
 
         @Override
-        public void configTallier(OpeningStats os) { os.setUseEco(type); }
+        public void configTallier(OpeningStatsTallier os) { os.setUseEco(type); }
     }
 
     private static final class EcoMovesOutputHandler implements OutputHandler
@@ -203,13 +203,13 @@ public class OpeningStatsOutputSelector
         EcoMovesOutputHandler(EcoTree.FileType type) { this.type = type; }
 
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(new TreeNodeSet(opening.getEco(type)).getMoveString());
         }
 
         @Override
-        public void configTallier(OpeningStats os) { os.setUseEco(type); }
+        public void configTallier(OpeningStatsTallier os) { os.setUseEco(type); }
     }
 
     private static final class XEcoOutputHandler implements OutputHandler
@@ -219,13 +219,13 @@ public class OpeningStatsOutputSelector
         private XEcoOutputHandler(EcoTree.FileType type) { this.type = type; }
 
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(opening.getXEcoSet(type));
         }
 
         @Override
-        public void configTallier(OpeningStats os) { os.setUseXEco(type); }
+        public void configTallier(OpeningStatsTallier os) { os.setUseXEco(type); }
     }
 
     private static final class XEcoDescOutputHandler implements OutputHandler
@@ -235,13 +235,13 @@ public class OpeningStatsOutputSelector
         private XEcoDescOutputHandler(EcoTree.FileType type) { this.type = type; }
 
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(opening.getXEcoSet(type).getDesc());
         }
 
         @Override
-        public void configTallier(OpeningStats os) { os.setUseXEco(type); }
+        public void configTallier(OpeningStatsTallier os) { os.setUseXEco(type); }
     }
 
     private static final class XEcoMovesOutputHandler implements OutputHandler
@@ -251,13 +251,13 @@ public class OpeningStatsOutputSelector
         private XEcoMovesOutputHandler(EcoTree.FileType type) { this.type = type; }
 
         @Override
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             sb.append(opening.getXEcoSet(type).getMoveString());
         }
 
         @Override
-        public void configTallier(OpeningStats os) { os.setUseXEco(type); }
+        public void configTallier(OpeningStatsTallier os) { os.setUseXEco(type); }
     }
 
     public enum Value
@@ -312,9 +312,9 @@ public class OpeningStatsOutputSelector
             return sigMap.get(signifier);
         }
 
-        public void configTallier(OpeningStats os) { outputHandler.configTallier(os); }
+        public void configTallier(OpeningStatsTallier os) { outputHandler.configTallier(os); }
 
-        public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+        public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
         {
             outputHandler.appendOutput(opening, sb);
         }
@@ -322,7 +322,7 @@ public class OpeningStatsOutputSelector
 
     private final Value value;
 
-    public OpeningStatsOutputSelector(OutputSelector selector, OpeningStats os) throws SelectorException
+    public OpeningStatsOutputSelector(OutputSelector selector, OpeningStatsTallier os) throws SelectorException
     {
         value = Value.get(selector.getValue());
 
@@ -334,7 +334,7 @@ public class OpeningStatsOutputSelector
 
     public Value getValue() { return value; }
 
-    public void appendOutput(OpeningStats.Opening opening, StringBuilder sb)
+    public void appendOutput(OpeningStatsTallier.Opening opening, StringBuilder sb)
     {
         value.appendOutput(opening, sb);
     }

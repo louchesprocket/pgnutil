@@ -32,7 +32,7 @@ import java.util.TreeMap;
  *
  * @author Mark Chen
  */
-public class PlayerResults implements Tallier
+public class PlayerResultsTallier implements Tallier
 {
     public static class Score
     {
@@ -106,19 +106,19 @@ public class PlayerResults implements Tallier
         }
     }
 
-    private static PlayerResults instance;
+    private static PlayerResultsTallier instance;
     private static PlayerResultsOutputSelector selectors[];
 
     private final Map<String,Score> resultsMap;
     
-    private PlayerResults()
+    private PlayerResultsTallier()
     {
         resultsMap = new TreeMap<>();
     }
 
-    public static PlayerResults getInstance()
+    public static PlayerResultsTallier getInstance()
     {
-        if (instance == null) instance = new PlayerResults();
+        if (instance == null) instance = new PlayerResultsTallier();
         return instance;
     }
 
