@@ -595,7 +595,7 @@ public class CLOptions
             System.err.println("illegal move in parameter '" + moveSt + "'");
             System.exit(-1);
         }
-        
+
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(Collections.singleton(board)));
     }
 

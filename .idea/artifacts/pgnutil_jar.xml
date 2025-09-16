@@ -4,7 +4,7 @@
     <root id="archive" name="pgnutil.jar">
       <element id="module-output" name="pgnutil" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/args4j-2.33.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/zero-allocation-hashing-0.15.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/hash4j-0.26.0.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

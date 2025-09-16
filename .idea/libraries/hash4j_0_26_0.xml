@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="lz4-1.3.0">
+  <library name="hash4j-0.26.0">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/lz4-1.3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hash4j-0.26.0.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
