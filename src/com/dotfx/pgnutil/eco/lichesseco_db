@@ -1675,6 +1675,7 @@ D85|Grünfeld Defense: Exchange Variation|d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5|1f801c98
 D90|Grünfeld Defense: Three Knights Variation|d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7|9fa57be81a12c21f3a2ff456ed0a0d74
 E70|King's Indian Defense: Normal Variation|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6|16bb94aa9b26c5d2fa56079e5e1ba982
 A47|Marienbad System|d4 Nf6 Nf3 b6 g3 Bb7 Bg2 c5|e4bd2b0c35e0761eab56772c3fec45ee
+A48|London System|d4 Nf6 Nf3 g6 Bf4 Bg7 e3 d6|b383519c16e3ce9a9527e7ea0c927c1b
 A48|Torre Attack: Fianchetto Defense, Euwe Variation|d4 Nf6 Nf3 g6 Bg5 Bg7 Nbd2 c5|e12a277210f9ffbab638c19d8d509f3f
 A48|Indian Defense: Colle System, King's Indian Variation|d4 Nf6 Nf3 g6 e3 Bg7 Bd3 d6|e09dc6e73ffad96a6a84fee37c0b7113
 A48|Queen's Pawn Game: Barry Attack|d4 Nf6 Nf3 g6 Nc3 d5 Bf4 Bg7|e81c0a9f84460f02d2d79550fade8993
@@ -1970,6 +1971,8 @@ A46|Torre Attack: Classical Defense, Petrosian Gambit|d4 Nf6 Nf3 e6 Bg5 c5 e3 b6
 D05|Queen's Pawn Game: Colle System, Traditional Colle|d4 Nf6 Nf3 e6 e3 c5 Bd3 d5 c3|bddec59fa71794e54fcc7e73a8ad0aaf
 D05|Rubinstein Opening|d4 Nf6 Nf3 e6 e3 c5 Bd3 d5 b3|b2ba2b3f16799b9e8a36a45d95244c44
 D02|London System: Poisoned Pawn Variation|d4 Nf6 Nf3 d5 Bf4 c5 e3 Qb6 Nc3|aa30f4eb81570eaa4adc6db1af8170c5
+A48|London System, with Bd3|d4 Nf6 Nf3 g6 Bf4 Bg7 e3 d6 Bd3|db3daeb5d49449db9668e8170b707d34
+A48|London System, with Be2|d4 Nf6 Nf3 g6 Bf4 Bg7 e3 d6 Be2|d32e95cea9a8f52d07f764f51128214b
 A48|Queen's Pawn Game: Barry Attack, Tarzan Attack|d4 Nf6 Nf3 g6 Nc3 d5 Bf4 Bg7 Qd2|9aa86831391ff51ef47d5a91bb0a7f25
 A45|Indian Defense: Gibbins-Weidenhagen Gambit, Stummer Gambit|d4 Nf6 g4 Nxg4 e4 d6 Be2 Nf6 Nc3|7867326ad1cb6ab3f7f126ee00318239
 A25|English Opening: King's English Variation, Hungarian Attack|c4 e5 Nc3 Nc6 g3 g6 Bg2 Bg7 Rb1|6506de1497fa918afcb74f0c93d2e99d
@@ -2215,6 +2218,7 @@ D83|Grünfeld Defense: Brinckmann Attack, Grünfeld Gambit|d4 Nf6 c4 g6 Nc3 d5 B
 E81|King's Indian Defense: Sämisch Variation, Normal Defense|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O|ff26344b8e3ae084ad000c08918d5f1a
 E76|King's Indian Defense: Four Pawns Attack, Modern Defense|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f4 Na6|77010ed8945b81c08ab85294f2ed7837
 A46|Queen's Pawn Game: Torre Attack, Breyer Variation|d4 Nf6 Nf3 e6 Bg5 d5 e3 c5 c3 Qb6|1c7c66cba3661f8310c3dfcbb27cb761
+A48|London System, with Be2|d4 Nf6 Nf3 g6 Bf4 Bg7 e3 d6 Be2 O-O|0cd5fc3f6f3c3099c417b28eda6aad63
 A48|Queen's Pawn Game: Torre Attack, Grünfeld Variation, Main Line|d4 Nf6 Nf3 g6 Bg5 Bg7 Nbd2 d5 e3 O-O|8f9a615f98db57ba25f5fa1d8748450b
 A29|English Opening: King's English Variation, Four Knights Variation, Fianchetto Line|c4 e5 g3 Nf6 Bg2 d5 cxd5 Nxd5 Nf3 Nc6|ab48502cc4b8dca13bae0b7bbc38a05e
 A25|English Opening: Closed, Taimanov Variation|c4 e5 Nc3 Nc6 g3 g6 Rb1 Nh6 Bg2 Bg7|6bded80a7ba283f62d04358a110bbc68
@@ -2444,6 +2448,7 @@ E73|King's Indian Defense: Semi-Averbakh System|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be2 O
 E77|King's Indian Defense: Four Pawns Attack|d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Be2 O-O f4|5abbde9344dd1d906caaed84bd96301b
 D30|Queen's Gambit Declined: Capablanca Variation|d4 Nf6 Nf3 e6 c4 d5 Bg5 c6 Nbd2 Nbd7 e3|16e8710f14701d22ad507549a2c7b4f7
 A47|Marienbad System: Berg Variation|d4 Nf6 Nf3 b6 g3 Bb7 Bg2 c5 c4 cxd4 Qxd4|1c400e8d9fa3ad12c9223bf571e625df
+A48|London System, with Be2|d4 Nf6 Nf3 g6 Bf4 Bg7 e3 d6 h3 c5 Be2|a297c6105749599efb817ba1d22d5d44
 D77|Neo-Grünfeld Defense: Classical Variation|d4 Nf6 Nf3 g6 g3 Bg7 Bg2 O-O O-O d5 c4|140a4ab5ca9e4dcee596977846db78d8
 A48|Queen's Pawn Game: Barry Attack, Grünfeld Variation|d4 Nf6 Nf3 g6 Nc3 d5 Bf4 Bg7 e3 O-O Be2|004e35deec4fea66b6b119c755cf677a
 D01|Richter-Veresov Attack: Malich Gambit|d4 Nf6 Nc3 d5 Bg5 c5 Bxf6 gxf6 e4 dxe4 d5|0832c601eb2b4e280f6b6f409ff72c2f
