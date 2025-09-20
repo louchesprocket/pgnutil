@@ -8,7 +8,7 @@ Pgnutil works as a Unix-style command-line filter that performs [matching/select
 
 ## Requirements
 
-Pgnutil requires Java 1.8 or higher.  It theoretically runs on any platform with a command line.
+Pgnutil requires Java 1.11 or higher.  It theoretically runs on any platform with a command line.
 
 
 ## Building
@@ -22,6 +22,7 @@ To build, open the project in IntelliJ Idea and select
 For a complete list of options:
 
 ``pgnutil -h``
+
 
 ### Matching
 Pgnutil's most basic matching option is "-m", which takes a regular expression as its parameter and matches against the entire text of each game in the file.  For example, the following search prints every game containing the word "forfeit" from the file mygames.pgn:
@@ -145,7 +146,9 @@ There are several "special" selectors recognized by the "-s" option.  For exampl
 * 	lowclockwhite: for Aquarium games only, causes pgnutil to output the lowest clock value for the white player (see [Time (Aquarium Only)](#time-aquarium-only), below)
 * 	lowclockblack: for Aquarium games only, causes pgnutil to output the lowest clock value for the black player (see [Time (Aquarium Only)](#time-aquarium-only), below)
 *   disagreepct: for engine games wherein the u.i. annotates expected responses, output the percentage of moves that disagree with an opponent's expectation
+*   text: causes pgnutil to output the original game text (which is the default output where no selectors are specified). Note that the game text will include embedded newline characters
 * 	textsize: causes pgnutil to output the size (in characters) of the original game text
+*   filename: causes pgnutil to output the name of the file wherein the corresponding game was found. This is particularly useful where multiple input files were specified
 
 Thus, the command:
 
@@ -309,8 +312,6 @@ If we further wish to know the lowest clock value for each player in these games
 
 
 ## Known Issues
-
-When running pgnutil under recent Java versions, the Zero-Allocation Hashing library is currently producing warning messages due to a deprecated a.p.i. A fix for this will be incorporated as soon as Zero-Allocation Hashing makes one available.
 
 Pgnutil is victim to the PGN specification's greatest infirmity: lack of standardized move notation.  PGN files are allowed to list moves in any way at all.  This means, for example, that "Bb2," "c1-b2," and "B-QN2" are all valid notation.  Pgnutil makes no effort to normalize moves (as this would entail a large performance penalty), so all move comparisons, such as the "-mo" and "-ro" options, as well as duplicate finding and opening statistics, assume that notation throughout the input file is consistent.  The various ECO-code and position-finding options require that the input file be in Standard Algebraic Notation.
 
