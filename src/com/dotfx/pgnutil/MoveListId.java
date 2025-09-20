@@ -42,18 +42,18 @@ public final class MoveListId extends UniqueId128
     }
     
     @Override
-    public int hashCode() { return MoveListId.class.hashCode() ^ Long.hashCode(getValue()[0]); }
+    public int hashCode() { return MoveListId.class.hashCode() ^ Long.hashCode(getLsb()); }
 
     @Override
-    public String toString() { return NumberUtils.longToHex(getValue()[0], false); }
+    public String toString() { return NumberUtils.longToHex(getLsb(), false); }
 
     @Override
-    public boolean equals(Object other) { return getValue()[0] == ((UniqueId128)other).getValue()[0]; }
+    public boolean equals(Object other) { return getLsb() == ((UniqueId128)other).getLsb(); }
 
     @Override
     public int compareTo(UniqueId128 other)
     {
-        long diff0 = getValue()[0] - other.getValue()[0];
+        long diff0 = getLsb() - other.getLsb();
         if (diff0 > 0) return 1;
         if (diff0 < 0) return -1;
         return 0;

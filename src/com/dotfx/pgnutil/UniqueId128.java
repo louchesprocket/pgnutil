@@ -32,34 +32,32 @@ public class UniqueId128 implements Comparable<UniqueId128>
 {
     public static final long HASHSEED = 0x6a830fe67ba5892cL;
 
-    // re-usable persistent instance
+    // re-usable, persistent instance
     private static final Hasher128 hasher = Hashing.xxh3_128(HASHSEED);
-
     private final HashValue128 value;
-
-    private UniqueId128(long leastSig, long mostSig) { value = new HashValue128(mostSig, leastSig); }
-    public UniqueId128(byte[] b) { value = hasher.hashBytesTo128Bits(b); }
-    public UniqueId128(long v1) { value = new HashValue128(0L, v1); }
 
     /**
      *
-     * @param value two-element array, lsb first
+     * @param input byte array to be hashed
      */
-    public UniqueId128(long[] value) { this.value = new HashValue128(value[1], value[0]); }
+    public UniqueId128(byte[] input) { value = hasher.hashBytesTo128Bits(input); }
 
-    public long[] getValue() { return new long[] { value.getLeastSignificantBits(), value.getMostSignificantBits()}; }
+    private UniqueId128(long leastSig, long mostSig) { value = new HashValue128(mostSig, leastSig); }
+    public UniqueId128(long v1) { value = new HashValue128(0L, v1); }
 
-    public static UniqueId128 fromString(String s)
+    public UniqueId128(String s)
     {
-        return new UniqueId128(NumberUtils.hexToLong(s.substring(0,16)),
-                NumberUtils.hexToLong(s.substring(16,32)));
+        this(NumberUtils.hexToLong(s.substring(16,32)), NumberUtils.hexToLong(s.substring(0,16)));
     }
+
+    public long getMsb() { return value.getMostSignificantBits(); }
+    public long getLsb() { return value.getLeastSignificantBits(); }
 
     @Override
     public String toString()
     {
-        return NumberUtils.longToHex(value.getLeastSignificantBits(), false) +
-                NumberUtils.longToHex(value.getMostSignificantBits(), false);
+        return NumberUtils.longToHex(value.getMostSignificantBits(), false) +
+                NumberUtils.longToHex(value.getLeastSignificantBits(), false);
     }
 
     @Override
@@ -92,10 +90,10 @@ public class UniqueId128 implements Comparable<UniqueId128>
 //        UniqueId128 hash0 = new UniqueId128("hello world".getBytes());
 //        System.out.println("from String: " + hash0);
 //
-//        UniqueId128 hash1 = new UniqueId128(hash0.getValue());
+//        UniqueId128 hash1 = new UniqueId128(hash0.getLsb(), hash0.getMsb());
 //        System.out.println("from value: " + hash1);
 //
-//        UniqueId128 hash2 = UniqueId128.fromString(hash1.toString());
+//        UniqueId128 hash2 = new UniqueId128(hash1.toString());
 //
 //        System.out.println(hash0.equals(hash1));
 //        System.out.println(hash1.equals(hash2));
