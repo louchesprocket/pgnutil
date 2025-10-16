@@ -26,6 +26,7 @@ import com.dotfx.pgnutil.eco.TreeNodeSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -80,13 +81,7 @@ public final class OutputSelector
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            for (PgnGame.Move move : game.getMoveList())
-            {
-                if (move.isWhite()) sb.append(move.getNumber()).append(".");
-                sb.append(move.getMove()).append(" ");
-            }
-
-            sb.deleteCharAt(sb.length() - 1);
+            sb.append(game.getMoveStringToPly(Integer.MAX_VALUE));
         }
     }
 
@@ -104,6 +99,21 @@ public final class OutputSelector
             }
 
             sb.deleteCharAt(sb.length() - 1);
+        }
+    }
+
+    /**
+     * Should only be used when matching a single position (otherwise, results may be ambiguous).
+     */
+    public static final class BranchOutputHandler implements OutputHandler
+    {
+        public BranchOutputHandler() {}
+
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            if (game.getPosMatchAtPly() != null) sb.append(game.getMoveStringToPly(game.getPosMatchAtPly() + 1));
+            else sb.append("");
         }
     }
 
@@ -469,6 +479,7 @@ public final class OutputSelector
         // special
 
         ORIGTEXT("text", new OrigTextOutputHandler()),
+        BRANCH("branch", null),
         AVGPLIES("avgplies", null),
         CBPLAYERS("cbplayers", null), // Aquarium only. Handler set in CLOptionResolver.ClockBelowHandler
         DISAGREEPCT("disagreepct", new DisagreePctOutputHandler()),

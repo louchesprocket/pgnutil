@@ -130,6 +130,9 @@ public class CLOptionResolver
         }
     }
 
+    /**
+     * For options that are disallowed from appearing with specific other options.
+     */
     private static class MutexHandler implements OptHandler
     {
         @Override
@@ -145,6 +148,9 @@ public class CLOptionResolver
         }
     }
 
+    /**
+     * For options that can only appear once, but may appear with other options.
+     */
     private static class SingletonHandler implements OptHandler
     {
         @Override
@@ -161,6 +167,9 @@ public class CLOptionResolver
         }
     }
 
+    /**
+     * For options that must stand alone.
+     */
     private static class UtilHandler implements OptHandler
     {
         @Override
@@ -215,6 +224,28 @@ public class CLOptionResolver
 
                 System.exit(-1);
             }
+        }
+    }
+
+    public static class PositionHandler implements OptHandler
+    {
+        public PositionHandler(Set<LooseBoard> positionSet)
+        {
+            PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(positionSet));
+        }
+
+        /**
+         * Should only be used when matching a single position (otherwise, results may be ambiguous).
+         *
+         * @param setOpts
+         * @param ifAnyIntersects
+         */
+        @Override
+        public void handleIfAny(Map<OptId,Integer> setOpts, Set<OptId> ifAnyIntersects)
+        {
+            for (OutputSelector os : Arrays.stream(PGNUtil.outputSelectors).filter(os ->
+                    os.getValue() == OutputSelector.Value.BRANCH).collect(Collectors.toList()))
+                os.setOutputHandler(new OutputSelector.BranchOutputHandler());
         }
     }
 
@@ -329,7 +360,7 @@ public class CLOptionResolver
             this.handler = handler;
         }
 
-        private void handle(final Map<OptId, Integer> setOpts)
+        private void handle(final Map<OptId,Integer> setOpts)
         {
             Set<OptId> intersects = setOpts.keySet().stream().filter(checkOpts::contains).collect(Collectors.toSet());
             if (intersects.isEmpty()) return;

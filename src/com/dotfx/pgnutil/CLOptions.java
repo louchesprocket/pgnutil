@@ -117,7 +117,7 @@ public class CLOptions
     public static final String VG = "-vg";
     public static final String XECO = "-xeco"; // transpositional ECO output for "-o"
     public static final String XSECO = "-xseco"; // transpositional SCID ECO output for "-o"
-    
+
     public enum OptId
     {
         ANYPLAYERFILE(APF),
@@ -196,10 +196,10 @@ public class CLOptions
         VALUEDELIM(VD),
         XSTDECO(XECO),
         XSCIDECO(XSECO);
-        
+
         private static final Map<String,OptId> sigMap = new HashMap<>();
         private final String signifier;
-        
+
         static
         {
             for (OptId v : OptId.values())
@@ -210,10 +210,10 @@ public class CLOptions
                 sigMap.put(v.toString(), v);
             }
         }
-        
+
         OptId(String signifier) { this.signifier = signifier; }
         @Override public String toString() { return signifier; }
-        
+
         public static OptId get(String signifier)
         {
             if (signifier == null) return null;
@@ -222,14 +222,14 @@ public class CLOptions
     }
 
     private static final Map<OptId,Integer> OPTMAP = new HashMap<>();
-    
+
     private void countOption(OptId opt)
     {
         Integer currentCount = OPTMAP.get(opt);
         if (currentCount == null) OPTMAP.put(opt, 1);
         else OPTMAP.put(opt, ++currentCount);
     }
-    
+
     public static int getCount(OptId opt)
     {
         Integer count = OPTMAP.get(opt);
@@ -239,8 +239,8 @@ public class CLOptions
     public static boolean isSet(OptId opt) { return getCount(opt) > 0; }
     public static Set<OptId> getSetOpts() { return OPTMAP.keySet(); }
     public static Map<OptId,Integer> getOptMap() { return OPTMAP; }
-    
-    private static Set<String> readLinesSet(File file)
+
+    public static Set<String> readLinesSet(File file)
     {
         Set<String> fileLineSet = new HashSet<>();
         String line;
@@ -264,7 +264,7 @@ public class CLOptions
 
         return fileLineSet;
     }
-    
+
     private static String readFully(File file)
     {
         CharArrayWriter writer = new CharArrayWriter();
@@ -273,16 +273,16 @@ public class CLOptions
         {
             char buf[] = new char[1024];
             int read;
-            
+
             while ((read = reader.read(buf, 0, buf.length)) >= 0) writer.write(buf, 0, read);
         }
-        
+
         catch (FileNotFoundException e)
         {
             System.err.println("File '" + file + "' not found.");
             System.exit(-1);
         }
-        
+
         catch (IOException e)
         {
             System.err.println("Error reading file '" + file + "'");
@@ -291,17 +291,17 @@ public class CLOptions
 
         return writer.toString();
     }
-    
+
     private static String[] splitCommaSeparated(String s)
     {
         return s.replaceAll("#.*", "").trim().replaceAll("\\W+", ",").
             replaceAll(",+", ",").split(",");
     }
-    
+
     private Set<MoveListId> getOpeningsSet(String openingsSt)
     {
         Set<MoveListId> openingSet = new HashSet<>();
-            
+
         for (String s : splitCommaSeparated(openingsSt))
         {
             try { openingSet.add(MoveListId.fromHexString(s)); }
@@ -312,7 +312,7 @@ public class CLOptions
                 System.exit(-1);
             }
         }
-        
+
         return openingSet;
     }
 
@@ -367,7 +367,7 @@ public class CLOptions
         CLOptionResolver.addCondition(new OptId[] {OptId.DIFFDBS}, null, null,
                 new CLOptionResolver.DbDiffHandler(EcoTree.FileType.SCID, f));
     }
-    
+
     // matchers
 
     @Option(name = GN, aliases = "-game_num", metaVar = "<range1,range2,...>", forbids = {GNF},
@@ -383,7 +383,7 @@ public class CLOptions
             CLOptionResolver.addCondition(new OptId[] {OptId.get(GN)}, new OptId[] {OptId.INPUTFILE}, null,
                     new CLOptionResolver.GameNumHandler());
         }
-        
+
         catch (NumberFormatException e)
         {
             System.err.println("exception: argument to '" + GN + "' option must contain only integers");
@@ -581,9 +581,13 @@ public class CLOptions
     {
         countOption(OptId.get(MPOS));
 
-        LooseBoard board = new LooseBoard(true);
-        try { board.goTo(PgnGame.parseMoveString(moveSt)); }
-        
+        try
+        {
+            CLOptionResolver.addCondition(new OptId[] {OptId.get(MPOS)}, new OptId[] {OptId.SELECTORS}, null,
+                    new CLOptionResolver.PositionHandler(Collections.singleton(
+                            new LooseBoard(true).goTo(PgnGame.parseMoveString(moveSt)))));
+        }
+
         catch (IllegalMoveException e)
         {
             System.err.println(e.getLocalizedMessage());
@@ -595,8 +599,6 @@ public class CLOptions
             System.err.println("illegal move in parameter '" + moveSt + "'");
             System.exit(-1);
         }
-
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(Collections.singleton(board)));
     }
 
     @Option(name = POSF, aliases = "-position_file", metaVar = "<file>",
@@ -634,8 +636,8 @@ public class CLOptions
 
         try
         {
-            PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(
-                    Collections.singleton(new LooseBoard(Board.fromFen(fen)))));
+            CLOptionResolver.addCondition(new OptId[] {OptId.get(MFEN)}, new OptId[] {OptId.SELECTORS}, null,
+                    new CLOptionResolver.PositionHandler(Collections.singleton(new LooseBoard(Board.fromFen(fen)))));
         }
 
         catch (InvalidFenException e)
@@ -652,15 +654,17 @@ public class CLOptions
         countOption(OptId.get(FF));
         Set<LooseBoard> positionSet = new HashSet<>();
 
-        try { for (String fen : readLinesSet(fenFile)) positionSet.add(new LooseBoard(Board.fromFen(fen))); }
+        try
+        {
+            for (String fen : readLinesSet(fenFile)) positionSet.add(new LooseBoard(Board.fromFen(fen)));
+            PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(positionSet));
+        }
 
         catch (InvalidFenException e)
         {
             System.err.println(e.getLocalizedMessage());
             System.exit(-1);
         }
-
-        PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(positionSet));
     }
 
     @Option(name = EF, aliases = "-eco_file", metaVar = "<file>",

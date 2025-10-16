@@ -244,6 +244,7 @@ public final class PgnGame
     // cached values for internal use
     private transient List<Move> openingMoveList;
     private transient String openingString;
+    private transient Integer posMatchAtPly;
 
     private transient Clock lowClockWhite, lowClockBlack;
     private transient final Map<EcoTree.FileType,TreeNodeSet> xEcoCacheMap; // transposed ECO TreeNodeSets
@@ -353,6 +354,7 @@ public final class PgnGame
     public List<Move> getMoveList() { return moves; }
     public int getPlyCount() { return moves.size(); }
     public String getOrigText() { return origText; }
+    public Integer getPosMatchAtPly() { return posMatchAtPly; }
     public boolean contains(CharSequence s) { return origText.contains(s); }
     
     // PGN seven-tag roster
@@ -582,6 +584,26 @@ public final class PgnGame
 
     public MoveListId openingId(Pattern oobMarker) { return new MoveListId(getOpeningString()); }
     public MoveListId openingId() { return openingId(bookMarker); }
+
+    /**
+     *
+     * @param ply one-indexed
+     * @return
+     */
+    public String getMoveStringToPly(int ply)
+    {
+        StringBuilder sb = new StringBuilder();
+        List<PgnGame.Move> moves = getMoveList().subList(0, Math.min(ply, getMoveList().size()));
+
+        for (Move move : moves) // up to ply after matched ply
+        {
+            if (move.isWhite()) sb.append(move.getNumber()).append(".");
+            sb.append(move.getMove()).append(" ");
+        }
+
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
+    }
     
     public UniqueId128 getPlayerOpeningHash()
     {
@@ -747,7 +769,11 @@ public final class PgnGame
         Board board = new Board(true);
 
         for (Move move : moves)
-            if (board.move(move).positionId().equals(pos)) return true;
+            if (board.move(move).positionId().equals(pos))
+            {
+                posMatchAtPly = move.getPly();
+                return true;
+            }
         
         return false;
     }
@@ -764,7 +790,11 @@ public final class PgnGame
             if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount)
                 return false;
 
-            if (board.move(move).positionEquals(pos)) return true;
+            if (board.move(move).positionEquals(pos))
+            {
+                posMatchAtPly = move.getPly();
+                return true;
+            }
         }
         
         return false;
@@ -779,7 +809,13 @@ public final class PgnGame
         for (PgnGame.Move move : getMoveList())
         {
             if (board.getWhitePieceCount() < minWhitePieces || board.getBlackPieceCount() < minBlackPieces) break;
-            if (positionSet.contains(looseBoard)) return true;
+
+            if (positionSet.contains(looseBoard))
+            {
+                posMatchAtPly = move.getPly() - 1;
+                return true;
+            }
+
             board.move(move);
         }
 
