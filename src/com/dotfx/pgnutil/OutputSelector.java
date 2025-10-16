@@ -107,8 +107,6 @@ public final class OutputSelector
      */
     public static final class BranchOutputHandler implements OutputHandler
     {
-        public BranchOutputHandler() {}
-
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
@@ -479,7 +477,7 @@ public final class OutputSelector
         // special
 
         ORIGTEXT("text", new OrigTextOutputHandler()),
-        BRANCH("branch", null),
+        BRANCH("branch", new BranchOutputHandler()),
         AVGPLIES("avgplies", null),
         CBPLAYERS("cbplayers", null), // Aquarium only. Handler set in CLOptionResolver.ClockBelowHandler
         DISAGREEPCT("disagreepct", new DisagreePctOutputHandler()),

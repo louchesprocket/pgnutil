@@ -595,7 +595,7 @@ public final class PgnGame
         StringBuilder sb = new StringBuilder();
         List<PgnGame.Move> moves = getMoveList().subList(0, Math.min(ply, getMoveList().size()));
 
-        for (Move move : moves) // up to ply after matched ply
+        for (Move move : moves)
         {
             if (move.isWhite()) sb.append(move.getNumber()).append(".");
             sb.append(move.getMove()).append(" ");

@@ -227,28 +227,6 @@ public class CLOptionResolver
         }
     }
 
-    public static class PositionHandler implements OptHandler
-    {
-        public PositionHandler(Set<LooseBoard> positionSet)
-        {
-            PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(positionSet));
-        }
-
-        /**
-         * Should only be used when matching a single position (otherwise, results may be ambiguous).
-         *
-         * @param setOpts
-         * @param ifAnyIntersects
-         */
-        @Override
-        public void handleIfAny(Map<OptId,Integer> setOpts, Set<OptId> ifAnyIntersects)
-        {
-            for (OutputSelector os : Arrays.stream(PGNUtil.outputSelectors).filter(os ->
-                    os.getValue() == OutputSelector.Value.BRANCH).collect(Collectors.toList()))
-                os.setOutputHandler(new OutputSelector.BranchOutputHandler());
-        }
-    }
-
     public static class PlayerHandler implements OptHandler
     {
         private final Pattern playerPattern;

@@ -131,6 +131,7 @@ Similarly, values within a field are, by default, separated by commas.  If a dif
 There are several "special" selectors recognized by the "-s" option.  For example:
 
 *	moves: causes pgnutil to output the game's move list
+*   branch: when a position-matching option is used ("-mpos" or "-mfen"), causes pgnutil to output the game's move list up to the half-move following the matched position
 * 	tags: causes pgnutil to output an alphabetized list of the game's header tags
 * 	decoratedmoves: causes pgnutil to output the game's move list and move comments
 * 	openingmoves: causes pgnutil to output the opening move list (see [Openings](#openings), below)

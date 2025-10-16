@@ -583,9 +583,8 @@ public class CLOptions
 
         try
         {
-            CLOptionResolver.addCondition(new OptId[] {OptId.get(MPOS)}, new OptId[] {OptId.SELECTORS}, null,
-                    new CLOptionResolver.PositionHandler(Collections.singleton(
-                            new LooseBoard(true).goTo(PgnGame.parseMoveString(moveSt)))));
+            PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(
+                    Collections.singleton(new LooseBoard(true).goTo(PgnGame.parseMoveString(moveSt)))));
         }
 
         catch (IllegalMoveException e)
@@ -636,8 +635,8 @@ public class CLOptions
 
         try
         {
-            CLOptionResolver.addCondition(new OptId[] {OptId.get(MFEN)}, new OptId[] {OptId.SELECTORS}, null,
-                    new CLOptionResolver.PositionHandler(Collections.singleton(new LooseBoard(Board.fromFen(fen)))));
+            PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(
+                    Collections.singleton(new LooseBoard(Board.fromFen(fen)))));
         }
 
         catch (InvalidFenException e)
