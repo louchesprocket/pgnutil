@@ -110,7 +110,7 @@ public final class OutputSelector
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            if (game.getPosMatchAtPly() != null) sb.append(game.getMoveStringToPly(game.getPosMatchAtPly() + 1));
+            if (game.getPosMatchAtPly() > 0) sb.append(game.getMoveStringToPly(game.getPosMatchAtPly() + 1));
             else sb.append("");
         }
     }

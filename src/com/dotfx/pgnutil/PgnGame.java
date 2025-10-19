@@ -244,7 +244,7 @@ public final class PgnGame
     // cached values for internal use
     private transient List<Move> openingMoveList;
     private transient String openingString;
-    private transient Integer posMatchAtPly;
+    private transient int posMatchAtPly;
 
     private transient Clock lowClockWhite, lowClockBlack;
     private transient final Map<EcoTree.FileType,TreeNodeSet> xEcoCacheMap; // transposed ECO TreeNodeSets
@@ -354,7 +354,7 @@ public final class PgnGame
     public List<Move> getMoveList() { return moves; }
     public int getPlyCount() { return moves.size(); }
     public String getOrigText() { return origText; }
-    public Integer getPosMatchAtPly() { return posMatchAtPly; }
+    public int getPosMatchAtPly() { return posMatchAtPly; }
     public boolean contains(CharSequence s) { return origText.contains(s); }
     
     // PGN seven-tag roster
