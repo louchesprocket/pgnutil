@@ -2106,6 +2106,7 @@ C15|French Defense: Winawer Variation, Alekhine Gambit Accepted|e4 e6 d4 d5 Nc3 
 C10|French Defense: Rubinstein Variation, Fort Knox Variation|e4 e6 d4 d5 Nc3 dxe4 Nxe4 Bd7 Nf3 Bc6|8ec947974da462a8bc7468502d7c21ff
 C13|French Defense: Classical Variation, Tartakower Variation|e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Ne4|cfcd29930d4db4179bc6973297de20eb
 C13|French Defense: Classical Variation, Vistaneckis Variation|e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Ng8|388d9b7a59dbb38be9d340769ae3a385
+C13|French Defense: Classical Variation|e4 e6 d4 d5 Nc3 Nf6 Bg5 dxe4 Nxe4 Be7|7ea0999173c447ba7f86b6e60802bad5
 B07|Pirc Defense: 150 Attack, Inner Doll Defense|e4 d6 d4 Nf6 Nc3 g6 Be3 c6 Qd2 Bg4|19548a347e809a83d66c6fe4d6b27ea0
 B09|Pirc Defense: Austrian Attack|e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 O-O|7dc119c8fd00b8af3778fee1a1eaa916
 B09|Pirc Defense: Austrian Attack, Dragon Formation|e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 c5|f2877629b81fe7f9eb10ff7216140cf4
