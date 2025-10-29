@@ -308,9 +308,14 @@ public class CLOptionResolver
         @Override
         public void handleIfAny(Map<OptId,Integer> setOpts, Set<OptId> ifAnyIntersects)
         {
-            Arrays.stream(PGNUtil.outputSelectors).filter(selector ->
-                    selector.getValue() == OutputSelector.Value.CBPLAYERS).forEach(selector ->
-                    selector.setOutputHandler(new OutputSelector.ClockBelowPlayersOutputHandler(clock)));
+            for (OutputSelector selector : PGNUtil.outputSelectors)
+            {
+                if (selector.getValue() == OutputSelector.Value.CBPLAYERS)
+                    selector.setOutputHandler(new OutputSelector.ClockBelowPlayersOutputHandler(clock));
+
+                if (selector.getValue() == OutputSelector.Value.CBCLOCKS)
+                    selector.setOutputHandler(new OutputSelector.ClockBelowClocksOutputHandler(clock));
+            }
         }
     }
 

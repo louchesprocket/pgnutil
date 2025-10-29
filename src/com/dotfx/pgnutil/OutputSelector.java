@@ -23,10 +23,7 @@ package com.dotfx.pgnutil;
 import com.dotfx.pgnutil.eco.EcoTree;
 import com.dotfx.pgnutil.eco.TreeNodeSet;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -246,6 +243,7 @@ public final class OutputSelector
         private final Clock clock;
 
         public ClockBelowPlayersOutputHandler(Clock clock) { this.clock = clock; }
+
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
@@ -262,6 +260,23 @@ public final class OutputSelector
                 if (whiteAdded) sb.append(CLOptions.valueDelim);
                 sb.append(game.getBlack());
             }
+        }
+    }
+
+    // Aquarium only
+    static final class ClockBelowClocksOutputHandler implements OutputHandler
+    {
+        private final Clock clock;
+
+        public ClockBelowClocksOutputHandler(Clock clock) { this.clock = clock; }
+
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            StringJoiner sj = new StringJoiner(CLOptions.valueDelim);
+            if (game.getLowClockWhite().compareTo(clock) < 0) sj.add(game.getLowClockWhite().toString());
+            if (game.getLowClockBlack().compareTo(clock) < 0) sj.add(game.getLowClockBlack().toString());
+            sb.append(sj);
         }
     }
 
@@ -479,6 +494,7 @@ public final class OutputSelector
         BRANCH("branch", new BranchOutputHandler()),
         AVGPLIES("avgplies", null),
         CBPLAYERS("cbplayers", null), // Aquarium only. Handler set in CLOptionResolver.ClockBelowHandler
+        CBCLOCKS("cbclocks", null), // Aquarium only. Handler set in CLOptionResolver.ClockBelowHandler
         DISAGREEPCT("disagreepct", new DisagreePctOutputHandler()),
         FILENAME("filename", new FileNameOutputHandler()),
         GAMENO("gameno", new GameNumOutputHandler()),
