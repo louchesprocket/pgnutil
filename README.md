@@ -144,6 +144,7 @@ There are several "special" selectors recognized by the "-s" option.  For exampl
 * 	gameno: causes pgnutil to output the game's ordinal position within the PGN file
 * 	plies: causes pgnutil to output the number of half-moves present in the game
 * 	cbplayers: for Aquarium games only, and in conjunction with the "-cb" option (see [Time (Aquarium Only)](#time-aquarium-only), below), causes pgnutil to output the names of players whose clocks fell below the indicated time threshold
+*   cbclocks: for Aquarium games only, and in conjunction with the "-cb" option (see [Time (Aquarium Only)](#time-aquarium-only), below), causes pgnutil to output the lowest clock value for each player that fell below the indicated time threshold
 * 	lowclockwhite: for Aquarium games only, causes pgnutil to output the lowest clock value for the white player (see [Time (Aquarium Only)](#time-aquarium-only), below)
 * 	lowclockblack: for Aquarium games only, causes pgnutil to output the lowest clock value for the black player (see [Time (Aquarium Only)](#time-aquarium-only), below)
 *   disagreepct: for engine games wherein the u.i. annotates expected responses, output the percentage of moves that disagree with an opponent's expectation

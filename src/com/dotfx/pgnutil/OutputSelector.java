@@ -247,19 +247,11 @@ public final class OutputSelector
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            boolean whiteAdded = false;
+            StringJoiner sj = new StringJoiner(CLOptions.valueDelim);
 
-            if (game.getLowClockWhite().compareTo(clock) < 0)
-            {
-                sb.append(game.getWhite());
-                whiteAdded = true;
-            }
-
-            if (game.getLowClockBlack().compareTo(clock) < 0)
-            {
-                if (whiteAdded) sb.append(CLOptions.valueDelim);
-                sb.append(game.getBlack());
-            }
+            if (game.getLowClockWhite().compareTo(clock) < 0) sj.add(game.getWhite());
+            if (game.getLowClockBlack().compareTo(clock) < 0) sj.add(game.getBlack());
+            sb.append(sj);
         }
     }
 
@@ -274,6 +266,7 @@ public final class OutputSelector
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
             StringJoiner sj = new StringJoiner(CLOptions.valueDelim);
+
             if (game.getLowClockWhite().compareTo(clock) < 0) sj.add(game.getLowClockWhite().toString());
             if (game.getLowClockBlack().compareTo(clock) < 0) sj.add(game.getLowClockBlack().toString());
             sb.append(sj);

@@ -313,7 +313,7 @@ public class CLOptionResolver
                 if (selector.getValue() == OutputSelector.Value.CBPLAYERS)
                     selector.setOutputHandler(new OutputSelector.ClockBelowPlayersOutputHandler(clock));
 
-                if (selector.getValue() == OutputSelector.Value.CBCLOCKS)
+                else if (selector.getValue() == OutputSelector.Value.CBCLOCKS)
                     selector.setOutputHandler(new OutputSelector.ClockBelowClocksOutputHandler(clock));
             }
         }
