@@ -143,10 +143,10 @@ There are several "special" selectors recognized by the "-s" option.  For exampl
 * 	opponentelo: when the "-mp" (match player) option is used, output the value of the "Elo" header for the opposing player
 * 	gameno: causes pgnutil to output the game's ordinal position within the PGN file
 * 	plies: causes pgnutil to output the number of half-moves present in the game
-* 	cbplayers: for Aquarium games only, and in conjunction with the "-cb" option (see [Time (Aquarium Only)](#time-aquarium-only), below), causes pgnutil to output the names of players whose clocks fell below the indicated time threshold
-*   cbclocks: for Aquarium games only, and in conjunction with the "-cb" option (see [Time (Aquarium Only)](#time-aquarium-only), below), causes pgnutil to output the lowest clock value for each player that fell below the indicated time threshold
-* 	lowclockwhite: for Aquarium games only, causes pgnutil to output the lowest clock value for the white player (see [Time (Aquarium Only)](#time-aquarium-only), below)
-* 	lowclockblack: for Aquarium games only, causes pgnutil to output the lowest clock value for the black player (see [Time (Aquarium Only)](#time-aquarium-only), below)
+* 	cbplayers: for engine games containing clock annotations, and in conjunction with the "-cb" option (see [Time](#time), below), causes pgnutil to output the names of players whose clocks fell below the indicated time threshold
+*   cbclocks: for engine games containing clock annotations, and in conjunction with the "-cb" option (see [Time](#time), below), causes pgnutil to output the lowest clock value for each player that fell below the indicated time threshold
+* 	lowclockwhite: for engine games containing clock annotations, causes pgnutil to output the lowest clock value for the white player (see [Time](#time), below)
+* 	lowclockblack: for engine games containing clock annotations, causes pgnutil to output the lowest clock value for the black player (see [Time](#time), below)
 *   disagreepct: for engine games wherein the u.i. annotates expected responses, output the percentage of moves that disagree with an opponent's expectation
 *   text: causes pgnutil to output the original game text (which is the default output where no selectors are specified). Note that the game text will include embedded newline characters
 * 	textsize: causes pgnutil to output the size (in characters) of the original game text
@@ -290,9 +290,9 @@ will search for games matching any of the openings from myopeningsfile, using "m
 
 If pgnutil fails to find the out-of-book marker for a game, it assumes that the first commented move is the first non-book move. This corresponds to Arena's behavior. Therefore, pgnutil's default behavior (without the "-bm" option) will correctly identify the out-of-book condition for Aquarium, Banksia, and Arena.
 
-### Time (Aquarium Only)
+### Time
 
-Several options and [output selectors](#output-selectors) make use of Aquarium's time annotations to allow filtering of games based on minimum clock conditions. These features are chiefly intended to assist with engines that have faulty time management, and are particularly useful in conjunction with Aquarium's "No flag loss" option in the engine-tournament interface. In games where this option was set, pgnutil can be used to search and report on conditions where a player's clock went negative.
+Several options and [output selectors](#output-selectors) make use of u.i. time annotations to allow filtering of games based on minimum clock conditions. These features are chiefly intended to assist with engines that have faulty time management, and are particularly useful in conjunction with, for example, Aquarium's "No flag loss" option in the engine-tournament interface. In games where this option was set, pgnutil can be used to search and report on conditions where a player's clock went negative.
 
 The clock-below ("-cb") option takes a parameter (formatted as either integer seconds or as "h:mm:ss") to select games where at least one player's clock fell below the indicated value. For example,
 
