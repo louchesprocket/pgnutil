@@ -456,6 +456,36 @@ public final class OutputSelector
         }
     }
 
+    private static final class HiEvalDiffHandler implements OutputHandler
+    {
+        private AquariumVars.Eval lastEval;
+        private int hiDiff;
+
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            for (PgnGame.Move move : game.getMoveList())
+            {
+                AquariumVars.Eval eval = move.getAquariumVars().getEval();
+                if (eval == null) continue;
+
+                if (lastEval == null)
+                {
+                    lastEval = eval;
+                    continue;
+                }
+
+                int diff = Math.abs(eval.compareTo(lastEval));
+                if (diff > hiDiff) hiDiff = diff;
+                lastEval = eval;
+            }
+
+            sb.append(hiDiff);
+            lastEval = null;
+            hiDiff = 0;
+        }
+    }
+
     public static enum Value
     {
         // standard seven tags
@@ -482,7 +512,6 @@ public final class OutputSelector
         WHITETYPE("whitetype", null),
         
         // special
-
         ORIGTEXT("text", new OrigTextOutputHandler()),
         BRANCH("branch", new BranchOutputHandler()),
         AVGPLIES("avgplies", null),
@@ -509,6 +538,7 @@ public final class OutputSelector
         OPPONENT("opponent", null), // handler set in CLOptionResolver.PlayerHandler
         OPPONENTELO("opponentelo", null), // handler set in CLOptionResolver.PlayerHandler
         PLAYERELO("playerelo", null),
+        HIEVALDIFF("hievaldiff", new HiEvalDiffHandler()),
         PLIES("plies", new PliesOutputHandler()),
         STDECO("stdeco", new EcoOutputHandler(EcoTree.FileType.STD)),
         STDECODESC("stdecodesc", new EcoDescOutputHandler(EcoTree.FileType.STD)),

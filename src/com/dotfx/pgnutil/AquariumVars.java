@@ -36,6 +36,34 @@ import java.util.Map;
  */
 public class AquariumVars
 {
+    public static class Eval implements Comparable<Eval>
+    {
+        private int eval; // in centipawns
+        private short depth;
+
+        public Eval(String st)
+        {
+            int comma = st.indexOf(',');
+
+            if (comma > -1)
+            {
+                try
+                {
+                    eval = Integer.parseInt(st.substring(0, comma));
+                    depth = Short.parseShort(st.substring(comma + 1));
+                }
+
+                catch (NumberFormatException | StringIndexOutOfBoundsException ignored) {}
+            }
+        }
+
+        public int getEval() { return eval; }
+        public short getDepth() { return depth; }
+
+        @Override
+        public int compareTo(Eval other) { return eval - other.eval; }
+    }
+
     private Clock clk; // my time remaining until time control after this move
     private Clock clko; // opponent's time remaining
     private String emt; // elapsed time for this move
@@ -84,8 +112,8 @@ public class AquariumVars
 
                     for (i = varValStartIdx + 1; i < commentLen; i++)
                     {
-                        char oneChar = comment.charAt(i);
-                        if (oneChar == ']') break;
+                        if (comment.charAt(i) == '\"') do i++; while (comment.charAt(i) != '\"');
+                        if (comment.charAt(i) == ']') break;
                     }
 
                     varValEndIdx = i;
@@ -133,7 +161,7 @@ public class AquariumVars
     public Clock getClk() { return clk; }
     public Clock getClko() { return clko; }
     public String getEmt() { return emt; }
-    public String getEval() { return eval; }
+    public Eval getEval() { return new Eval(eval); }
     public String getMeval() { return meval; }
     public String getExpectedResponse() { return expectedResponse; }
     public String get(String tag) { return otherVars.get(tag); }

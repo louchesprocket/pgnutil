@@ -231,6 +231,7 @@ public final class PgnGame
 
         // Aquarium: "[Black|White] out of book"
         // Banksia: "End of opening"
+        // Fritz: "last book move"
         bookMarker = Pattern.compile("(out\\s+of\\s+book)|(^End\\s+of\\s+opening)", Pattern.DOTALL);
     }
 

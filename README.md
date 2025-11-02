@@ -292,7 +292,7 @@ If pgnutil fails to find the out-of-book marker for a game, it assumes that the 
 
 ### Time
 
-Several options and [output selectors](#output-selectors) make use of u.i. time annotations to allow filtering of games based on minimum clock conditions. These features are chiefly intended to assist with engines that have faulty time management, and are particularly useful in conjunction with, for example, Aquarium's "No flag loss" option in the engine-tournament interface. In games where this option was set, pgnutil can be used to search and report on conditions where a player's clock went negative.
+Several options and [output selectors](#output-selectors) make use of u.i. time annotations (specifically, the "%clk" annotation) to allow filtering of games based on minimum clock conditions where such information is available. These features are chiefly intended to assist with engines that have faulty time management, and are particularly useful in conjunction with, for example, Aquarium's "No flag loss" option in the engine-tournament interface. In games where this option was set, pgnutil can be used to search and report on conditions where a player's clock went negative.
 
 The clock-below ("-cb") option takes a parameter (formatted as either integer seconds or as "h:mm:ss") to select games where at least one player's clock fell below the indicated value. For example,
 
