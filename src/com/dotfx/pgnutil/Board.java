@@ -32,10 +32,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * board representation using SAN
  *
  * @author Mark Chen <chen@dotfx.com>
  */
-public class Board implements Comparable<Board>
+public class Board<T extends Board<T>> implements Comparable<T>
 {
     public enum Square
     {
@@ -64,7 +65,7 @@ public class Board implements Comparable<Board>
             }
         }
         
-        public int getLocation() { return location; }
+        public final int getLocation() { return location; }
         public static Square get(int square) { return squares[square]; }
 
         public static Square get(String s) throws IllegalMoveException
@@ -208,9 +209,9 @@ public class Board implements Comparable<Board>
             }
         }
         
-        public PieceType getType() { return pieceType; }
-        public Color getColor() { return color; }
-        public byte toByte() { return (byte)code; }
+        public final PieceType getType() { return pieceType; }
+        public final Color getColor() { return color; }
+        public final byte toByte() { return (byte)code; }
         
         @Override
         public String toString()
@@ -1251,7 +1252,49 @@ public class Board implements Comparable<Board>
         int start = Square.get(move.substring(0, 2)).getLocation();
         int end = Square.get(move.substring(2, 4)).getLocation();
         
-        PieceType promoteTo = move.length() > 4 ? PieceType.get(move.substring(4, 5)) : null; // ?
+        PieceType promoteTo = move.length() > 4 ? PieceType.get(move.substring(4, 5)) : null;
+        return coordToSan(start, end, promoteTo, showCheck);
+    }
+
+    /**
+     *
+     * @param move example: "f2xe1Q"
+     * @return example: "fxe1=Q"
+     */
+    public final String longToSan(String move, boolean showCheck) throws IllegalMoveException
+    {
+        int start, end;
+        PieceType promoteTo = null;
+
+        switch (move.charAt(0))
+        {
+            case 'R':
+            case 'N':
+            case 'B':
+            case 'Q':
+            case 'K':
+                start = Square.get(move.substring(1, 3)).getLocation();
+                end = Square.get(move.substring(4, 6)).getLocation();
+                break;
+
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f':
+            case 'g':
+            case 'h':
+                start = Square.get(move.substring(0, 2)).getLocation();
+                end = Square.get(move.substring(3, 5)).getLocation();
+
+                int promoteIdx = move.indexOf('=');
+                if (promoteIdx > -1) promoteTo = PieceType.get(move.substring(promoteIdx + 1, promoteIdx + 2));
+                break;
+
+            default: throw new IllegalMoveException(move);
+        }
+
         return coordToSan(start, end, promoteTo, showCheck);
     }
     
@@ -1535,9 +1578,12 @@ public class Board implements Comparable<Board>
     /**
      * 
      * @param that
-     * @return true if all pieces are in the same places
+     * @return true if all pieces are in the same places and same side to move
      */
-    public final boolean looseEquals(Board that) { return Arrays.equals(position, that.position); }
+    public final boolean looseEquals(Board that)
+    {
+        return (ply & 1) == (that.ply & 1) && Arrays.equals(position, that.position);
+    }
     
     /**
      * 
@@ -1607,24 +1653,11 @@ public class Board implements Comparable<Board>
     @Override
     public int compareTo(Board that)
     {
-        if (that == null) return 1;
-
-        for (int i = 0; i < position.length; i++)
-        {
-            if (position[i] == null)
-            {
-                if (that.position[i] != null) return -1;
-                else continue;
-            }
-
-            if (that.position[i] == null) return 1;
-
-            if (position[i].toByte() > that.position[i].toByte()) return 1;
-            if (position[i].toByte() < that.position[i].toByte()) return -1;
-        }
-
         if (ply > that.ply) return 1;
         if (ply < that.ply) return -1;
+
+        int posComp = Arrays.compare(position, that.position);
+        if (posComp != 0) return posComp;
 
         if (epCandidate > that.epCandidate) return 1;
         if (epCandidate < that.epCandidate) return -1;
@@ -1651,8 +1684,8 @@ public class Board implements Comparable<Board>
         {
             Board that = (Board)other;
             
-            return Arrays.equals(position, that.position) &&
-                ply == that.ply &&
+            return ply == that.ply &&
+                Arrays.equals(position, that.position) &&
                 epCandidate == that.epCandidate &&
                 whiteCanCastleK == that.whiteCanCastleK &&
                 whiteCanCastleQ == that.whiteCanCastleQ &&
@@ -1661,10 +1694,7 @@ public class Board implements Comparable<Board>
                 halfMoveClock == that.halfMoveClock;
         }
         
-        catch (ClassCastException | NullPointerException e)
-        {
-            return false;
-        }
+        catch (ClassCastException | NullPointerException e) { return false; }
     }
     
     @Override

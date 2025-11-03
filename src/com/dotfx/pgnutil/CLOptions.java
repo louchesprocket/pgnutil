@@ -584,7 +584,7 @@ public class CLOptions
         try
         {
             PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(
-                    Collections.singleton(new LooseBoard(true).goTo(PgnGame.parseMoveString(moveSt)))));
+                    Collections.singleton(new LooseBoard(true).looseGoTo(PgnGame.parseMoveString(moveSt)))));
         }
 
         catch (IllegalMoveException e)
@@ -609,7 +609,7 @@ public class CLOptions
 
         for (String moveSt : readLinesSet(posFile))
         {
-            try { positionSet.add(new LooseBoard(true).goTo(PgnGame.parseMoveString(moveSt))); }
+            try { positionSet.add(new LooseBoard(true).looseGoTo(PgnGame.parseMoveString(moveSt))); }
 
             catch (IllegalMoveException e)
             {

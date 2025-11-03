@@ -804,12 +804,12 @@ public final class PgnGame
     public boolean containsPosition(final Set<LooseBoard> positionSet, int minWhitePieces, int minBlackPieces)
             throws IllegalMoveException
     {
-        LooseBoard looseBoard = new LooseBoard(new Board(true));
-        Board board = looseBoard.getBoard();
+        LooseBoard looseBoard = new LooseBoard(true);
 
         for (PgnGame.Move move : getMoveList())
         {
-            if (board.getWhitePieceCount() < minWhitePieces || board.getBlackPieceCount() < minBlackPieces) break;
+            if (looseBoard.getWhitePieceCount() < minWhitePieces || looseBoard.getBlackPieceCount() < minBlackPieces)
+                break;
 
             if (positionSet.contains(looseBoard))
             {
@@ -817,7 +817,7 @@ public final class PgnGame
                 return true;
             }
 
-            board.move(move);
+            looseBoard.move(move);
         }
 
         return false;

@@ -24,73 +24,34 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This class is for loose sorting and comparison of positions (piece positions and side to move only).
+ * This class is for loose sorting and comparison of positions (piece positions and side-to-move only).
  */
-public class LooseBoard implements Comparable<LooseBoard>
+public class LooseBoard extends Board<LooseBoard>
 {
-    private final Board board;
+    public LooseBoard(boolean initialPosition) { super(initialPosition); }
+    public LooseBoard(Board board) { super(board); }
 
-    public LooseBoard(boolean initialPosition) { this.board = new Board(initialPosition); }
-    public LooseBoard(Board board) { this.board = board; }
-
-    public Board getBoard() { return board; }
-    public Board.Piece[] getPosition() { return board.getPosition(); }
-    public int getPly() { return board.getPly(); }
-    public int getWhitePieceCount() { return board.getWhitePieceCount(); }
-    public int getBlackPieceCount() { return board.getBlackPieceCount(); }
-
-    public LooseBoard goTo(List<String> moveList)
-            throws IllegalMoveException
+    public final LooseBoard looseGoTo(List<String> moveList) throws IllegalMoveException
     {
-        board.goTo(moveList);
+        for (String moveSt : moveList) move(moveSt);
         return this;
     }
 
+    @Override
     public int compareTo(LooseBoard that)
     {
-        if (that == null) return 1;
-
-        int plyDiff = (board.getPly() & 1) - (that.getPly() & 1); // parity check
+        int plyDiff = (getPly() & 1) - (that.getPly() & 1);
         if (plyDiff != 0) return plyDiff;
 
-        Board.Piece[] position = board.position;
-        Board.Piece[] thatPosition = that.board.position;
-
-        for (int i = 0; i < position.length; i++)
-        {
-            if (position[i] == null)
-            {
-                if (thatPosition[i] != null) return -1;
-                else continue;
-            }
-
-            if (thatPosition[i] == null) return 1;
-
-            if (position[i].toByte() > thatPosition[i].toByte()) return 1;
-            if (position[i].toByte() < thatPosition[i].toByte()) return -1;
-        }
-
-        return 0;
+        return Arrays.compare(position, that.position);
     }
 
     @Override
-    public final boolean equals(Object other)
-    {
-        try
-        {
-            Board that = ((LooseBoard)other).board;
-
-            return (board.ply & 1) == (that.ply & 1) && /*(board.whitePieceCount == that.whitePieceCount) &&
-                    (board.blackPieceCount == that.blackPieceCount) &&*/ Arrays.equals(board.position, that.position);
-        }
-
-        catch (ClassCastException e) { return false; }
-    }
+    public final boolean equals(Object other) { return looseEquals((LooseBoard)other); }
 
     @Override
     public final int hashCode()
     {
-        return LooseBoard.class.hashCode() ^ Arrays.hashCode(board.position) ^
-                Integer.hashCode(board.ply & 1);
+        return LooseBoard.class.hashCode() ^ Arrays.hashCode(getPosition()) ^ Integer.hashCode(getPly() & 1);
     }
 }
