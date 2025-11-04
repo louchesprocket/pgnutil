@@ -101,7 +101,8 @@ public class DefaultGameParser implements PgnGame.Parser
 
             String value = new String(buf, 0, i);
             next = PgnGame.Parser.eatWhiteSpace(reader);
-            if (next != ']') throw new PGNException("missing ']'");
+
+            if (next != ']') throw new PGNException("unterminated tag '[" + tag + " " + value + "'");
 
             tagpairs.put(tag, value);
         }

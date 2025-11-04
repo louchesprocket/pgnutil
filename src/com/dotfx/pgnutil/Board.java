@@ -376,7 +376,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         blackPieceCount = blackCount;
     }
     
-    public Board(Board other)
+    public Board(Board<?> other)
     {
         position = new Piece[64];
         System.arraycopy(other.position, 0, position, 0, 64);
@@ -395,7 +395,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
     }
 
     public final int getPly() { return ply; }
-    public final Board copy() { return new Board(this); }
+    public final Board<?> copy() { return new Board<>(this); }
     public final Square getEpSquare() { return Square.get(epCandidate); }
     public final Piece[] getPosition() { return position; }
     
@@ -694,7 +694,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
      * @param promoteTo
      * @return 
      */
-    public final Board move(int start, int end, PieceType promoteTo) throws IllegalMoveException
+    public final Board<?> move(int start, int end, PieceType promoteTo) throws IllegalMoveException
     {
         ply++;
         
@@ -824,29 +824,29 @@ public class Board<T extends Board<T>> implements Comparable<T>
         return this;
     }
     
-    public final Board copyAndMove(int start, int end, PieceType promoteTo) throws IllegalMoveException
+    public final Board<?> copyAndMove(int start, int end, PieceType promoteTo) throws IllegalMoveException
     {
         return copy().move(start, end, promoteTo);
     }
     
-    public final Board move(PgnGame.Move move) throws IllegalMoveException
+    public final Board<?> move(PgnGame.Move move) throws IllegalMoveException
     {
         return move(move.getMoveOnly());
     }
     
-    public final Board move(List<TreeNode> moveList) throws IllegalMoveException
+    public final Board<?> move(List<TreeNode> moveList) throws IllegalMoveException
     {
         for (TreeNode node : moveList) move(node.getMoveText());
         return this;
     }
     
-    public final Board goTo(List<String> moveList) throws IllegalMoveException
+    public final Board<?> goTo(List<String> moveList) throws IllegalMoveException
     {
         for (String moveSt : moveList) move(moveSt);
         return this;
     }
 
-    public final Board goToMove(List<PgnGame.Move> moveList) throws IllegalMoveException
+    public final Board<?> goToMove(List<PgnGame.Move> moveList) throws IllegalMoveException
     {
         for (PgnGame.Move move : moveList) move(move);
         return this;
@@ -859,7 +859,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
      * @return
      * @throws IllegalMoveException 
      */
-    public final Board move(String san) throws IllegalMoveException
+    public final Board<?> move(String san) throws IllegalMoveException
     {
         Color color = (ply ^ 1) > ply ? Color.WHITE : Color.BLACK;
         PieceType promoteTo = null;
@@ -1287,9 +1287,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
             case 'h':
                 start = Square.get(move.substring(0, 2)).getLocation();
                 end = Square.get(move.substring(3, 5)).getLocation();
-
-                int promoteIdx = move.indexOf('=');
-                if (promoteIdx > -1) promoteTo = PieceType.get(move.substring(promoteIdx + 1, promoteIdx + 2));
+                if (move.length() > 5) promoteTo = PieceType.get(move.substring(5));
                 break;
 
             default: throw new IllegalMoveException(move);
@@ -1418,7 +1416,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         return "";
     }
 
-    public static Board fromFen(String fenSt) throws InvalidFenException
+    public static Board<?> fromFen(String fenSt) throws InvalidFenException
     {
         String[] fen = fenSt.trim().split(" ");
         Piece[] position = new Piece[64];
@@ -1682,7 +1680,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
     {
         try
         {
-            Board that = (Board)other;
+            Board<T> that = (Board<T>)other;
             
             return ply == that.ply &&
                 Arrays.equals(position, that.position) &&

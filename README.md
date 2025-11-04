@@ -288,7 +288,7 @@ which matches the "out-of-book" marker for both Aquarium and Banksia. This regul
 
 will search for games matching any of the openings from myopeningsfile, using "my book marker" as the demarcation between "book" moves and engine moves.
 
-If pgnutil fails to find the out-of-book marker for a game, it assumes that the first commented move is the first non-book move. This corresponds to Arena's behavior. Therefore, pgnutil's default behavior (without the "-bm" option) will correctly identify the out-of-book condition for Aquarium, Banksia, and Arena.
+If pgnutil fails to find the out-of-book marker for a game, it assumes that the first commented move is the first non-book move. This corresponds to the behavior of Arena and Winboard/Xboard. Therefore, pgnutil's default behavior (without the "-bm" option) will correctly identify the out-of-book condition for Aquarium, Banksia, Arena, and Winboard/Xboard.
 
 ### Time
 
@@ -317,6 +317,6 @@ If we further wish to know the lowest clock value for each player in these games
 
 Pgnutil is victim to the PGN specification's greatest infirmity: lack of standardized move notation.  PGN files are allowed to list moves in any way at all.  This means, for example, that "Bb2," "c1-b2," and "B-QN2" are all valid notation.  Pgnutil makes no effort to normalize moves (as this would entail a large performance penalty), so all move comparisons, such as the "-mo" and "-ro" options, as well as duplicate finding and opening statistics, assume that notation throughout the input file is consistent.  The various ECO-code and position-finding options require that the input file be in Standard Algebraic Notation.
 
-PGN files often violate the PGN specification. Where it can, pgnutil refrains from complaining about such errors (for example, it does not demand a correct Seven Tag Roster).  Certain problems, however, will cause an error to be reported.  Kingbase, for instance, uses the backslash ("\\") character in some event names.  Since the PGN specification defines this as an escape character, it may cause certain tag-value pairs to be unterminated, resulting in an exception.
+PGN files often violate the PGN specification. Where it can, pgnutil refrains from complaining about such errors (for example, it does not demand a correct Seven Tag Roster).  Certain problems, however, will cause an error to be reported.  Kingbase, for instance, uses the backslash ("\\") character in some event names. Since the PGN specification defines this as an escape character, it may cause certain tag-value pairs to be unterminated, resulting in an exception. Similarly, Fritz uses the double-quote character to signify "seconds" in representations of time controls. This will also cause exceptions.
 
 Also, the PGN spec permits "%"-style comments.  I have never seen these used, so they are unsupported.

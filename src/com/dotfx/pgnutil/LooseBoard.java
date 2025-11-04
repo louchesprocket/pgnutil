@@ -29,7 +29,7 @@ import java.util.List;
 public class LooseBoard extends Board<LooseBoard>
 {
     public LooseBoard(boolean initialPosition) { super(initialPosition); }
-    public LooseBoard(Board board) { super(board); }
+    public LooseBoard(Board<?> board) { super(board); }
 
     public final LooseBoard looseGoTo(List<String> moveList) throws IllegalMoveException
     {
