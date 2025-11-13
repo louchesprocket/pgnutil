@@ -208,7 +208,7 @@ public class PGNUtil
         }
         @Override public boolean processGame()
         {
-            return matchOpeningSet.contains(game.openingId());
+            return matchOpeningSet.contains(game.getOpeningId());
         }
     }
     
@@ -220,7 +220,7 @@ public class PGNUtil
         {
             notMatchOpeningSet = openings;
         }
-        @Override public boolean processGame() { return !notMatchOpeningSet.contains(game.openingId()); }
+        @Override public boolean processGame() { return !notMatchOpeningSet.contains(game.getOpeningId()); }
     }
     
     static final class MatchWinProcessor implements GameProcessor
@@ -599,7 +599,7 @@ public class PGNUtil
         
         @Override public boolean processGame()
         {
-            return replaceOpeningSet.contains(game.openingId());
+            return replaceOpeningSet.contains(game.getOpeningId());
         }
     }
     

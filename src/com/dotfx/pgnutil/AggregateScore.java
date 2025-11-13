@@ -28,7 +28,7 @@ package com.dotfx.pgnutil;
  *
  * @author Mark Chen <chen@dotfx.com>
  */
-public class OpeningScore
+public class AggregateScore
 {
     private int whiteWins;
     private int blackWins;
@@ -37,7 +37,7 @@ public class OpeningScore
     private long totalOobPlies;
     private long totalDisagree;
 
-    OpeningScore() {}
+    AggregateScore() {}
 
     public void incWhiteWin() { whiteWins++; }
     public void incBlackWin() { blackWins++; }

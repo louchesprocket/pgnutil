@@ -41,7 +41,7 @@ public class OpeningProcessors
          * @return true if we should continue processing this opening, false if
          *         we should skip it
          */
-        public boolean processOpening(OpeningScore score);
+        public boolean processOpening(AggregateScore score);
     }
 
     static class MinGamesProcessor implements Processor
@@ -50,7 +50,7 @@ public class OpeningProcessors
         
         public MinGamesProcessor(int minGames) { this.minGames = minGames; }
         
-        @Override public boolean processOpening(OpeningScore opening)
+        @Override public boolean processOpening(AggregateScore opening)
         {
             return opening.getGameCount() >= minGames;
         }
@@ -62,7 +62,7 @@ public class OpeningProcessors
         
         public MaxWinDiffProcessor(double maxDiff) { this.maxDiff = maxDiff; }
         
-        @Override public boolean processOpening(OpeningScore opening)
+        @Override public boolean processOpening(AggregateScore opening)
         {
             return opening.getWhiteWinPct() - opening.getBlackWinPct() <= maxDiff;
         }
@@ -74,7 +74,7 @@ public class OpeningProcessors
         
         public MinWinDiffProcessor(double minDiff) { this.minDiff = minDiff; }
         
-        @Override public boolean processOpening(OpeningScore opening)
+        @Override public boolean processOpening(AggregateScore opening)
         {
             return opening.getWhiteWinPct() - opening.getBlackWinPct() >= minDiff;
         }
@@ -86,7 +86,7 @@ public class OpeningProcessors
         
         public MinDrawProcessor(double minDraw) { this.minDraw = minDraw; }
         
-        @Override public boolean processOpening(OpeningScore opening)
+        @Override public boolean processOpening(AggregateScore opening)
         {
             return opening.getDrawPct() >= minDraw;
         }
@@ -98,7 +98,7 @@ public class OpeningProcessors
         
         public MaxDrawProcessor(double maxDraw) { this.maxDraw = maxDraw; }
         
-        @Override public boolean processOpening(OpeningScore opening)
+        @Override public boolean processOpening(AggregateScore opening)
         {
             return opening.getDrawPct() <= maxDraw;
         }

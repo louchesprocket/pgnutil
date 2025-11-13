@@ -28,6 +28,7 @@ import com.dotfx.pgnutil.eco.EcoTree;
 import com.dotfx.pgnutil.eco.TreeNodeSet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -64,7 +65,7 @@ public class EcoStatsTallier implements Tallier
         {
             StringBuilder ret = new StringBuilder();
             TreeNodeSet opening = iterator.next();
-            OpeningScore score = openingsMap.get(opening);
+            AggregateScore score = openingsMap.get(opening);
             
             if (selectors == null)
                 ret.append(opening.toString()).append(CLOptions.outputDelim).
@@ -88,21 +89,23 @@ public class EcoStatsTallier implements Tallier
 
     private static EcoStatsOutputSelector selectors[];
     private static EcoStatsTallier instance;
-    
-    private final TreeMap<TreeNodeSet,OpeningScore> openingsMap;
+
+    private final boolean tallyPosition;
+    private final TreeMap<TreeNodeSet,AggregateScore> openingsMap;
     private final EcoTree ecoTree;
     private final boolean transpose;
 
-    private EcoStatsTallier(EcoTree.FileType type, boolean transpose)
+    private EcoStatsTallier(EcoTree.FileType type, boolean transpose, boolean tallyPosition)
     {
         openingsMap = new TreeMap<>();
         ecoTree = type.getEcoTree();
         this.transpose = transpose;
+        this.tallyPosition = tallyPosition;
     }
 
-    public static EcoStatsTallier getInstance(EcoTree.FileType type, boolean transpose)
+    public static EcoStatsTallier getInstance(EcoTree.FileType type, boolean transpose, boolean tallyPosition)
     {
-        if (instance == null) instance = new EcoStatsTallier(type, transpose);
+        if (instance == null) instance = new EcoStatsTallier(type, transpose, tallyPosition);
         return instance;
     }
     
@@ -112,30 +115,35 @@ public class EcoStatsTallier implements Tallier
         if (selectors != null && selectors.length > 0)
         {
             EcoStatsTallier.selectors = new EcoStatsOutputSelector[selectors.length];
-            for (int i = 0; i < selectors.length; i++) EcoStatsTallier.selectors[i] = new EcoStatsOutputSelector(selectors[i]);
+
+            for (int i = 0; i < selectors.length; i++)
+                EcoStatsTallier.selectors[i] = new EcoStatsOutputSelector(selectors[i]);
         }
     }
 
     @Override
     public void tally(PgnGame game) throws IllegalMoveException
     {
-        TreeNodeSet treeNodeSet = transpose ? ecoTree.getDeepestTranspositionSet(game.getOpeningMoveList()) :
-                new TreeNodeSet(ecoTree.getDeepestDefined(game.getOpeningMoveList()));
+        tallyPosition(game, tallyPosition ? game.getMoveList().subList(0, game.getPosMatchAtPly()) :
+                game.getOpeningMoveList());
+    }
 
-        OpeningScore os = openingsMap.computeIfAbsent(treeNodeSet, k -> new OpeningScore());
+    private void tallyPosition(PgnGame game, List<PgnGame.Move> moveList) throws IllegalMoveException
+    {
+        TreeNodeSet treeNodeSet = transpose ? ecoTree.getDeepestTranspositionSet(moveList) :
+                new TreeNodeSet(ecoTree.getDeepestDefined(moveList));
+
+        AggregateScore score = openingsMap.computeIfAbsent(treeNodeSet, k -> new AggregateScore());
 
         switch (game.getResult())
         {
-            case WHITEWIN: os.incWhiteWin(); break;
-            case BLACKWIN: os.incBlackWin(); break;
-            case DRAW: os.incDraw(); break;
-            default: os.incNoResult();
+            case WHITEWIN: score.incWhiteWin(); break;
+            case BLACKWIN: score.incBlackWin(); break;
+            case DRAW: score.incDraw(); break;
+            default: score.incNoResult();
         }
     }
 
     @Override
-    public java.util.Iterator<String> getOutputIterator()
-    {
-        return new Iterator();
-    }
+    public java.util.Iterator<String> getOutputIterator() { return new Iterator(); }
 }

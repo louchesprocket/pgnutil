@@ -27,6 +27,7 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CLOptionResolver
 {
@@ -34,7 +35,7 @@ public class CLOptionResolver
     {
         default void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects) {}
         default void handleIfAny(Map<OptId,Integer> setOpts, Set<OptId> ifAnyIntersects) {}
-        default void handleIfNone(Map<OptId,Integer> setOpts) {}
+        default void handleIfNone(Map<OptId,Integer> setOpts, Set<OptId> checkIntersects) {}
     }
 
     public static class PrintPositionHandler implements OptHandler
@@ -48,7 +49,7 @@ public class CLOptionResolver
         {
             try
             {
-                System.out.println(new Board(true).goTo(PgnGame.parseMoveString(moveSt)));
+                System.out.println(new Board<>(true).goTo(PgnGame.parseMoveString(moveSt)));
                 System.exit(0);
             }
 
@@ -204,11 +205,66 @@ public class CLOptionResolver
     private static class OpeningsHandler implements OptHandler
     {
         @Override
-        public void handleIfNone(Map<OptId,Integer> setOpts)
+        public void handleIfNone(Map<OptId,Integer> setOpts, Set<OptId> checkIntersects) // no ECO options set
         {
-            Tallier os = OpeningStatsTallier.getInstance();
+            Tallier tallier = OpeningStatsTallier.getInstance(false);
+            PGNUtil.setHandler(new PGNUtil.TallyHandler(tallier));
+            PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(tallier));
+        }
+    }
+
+    public static class GroupPositionsHandler implements OptHandler
+    {
+        private static Set<LooseBoard> positionSet;
+
+        public static void setPositions(Set<LooseBoard> positionSet)
+        {
+            GroupPositionsHandler.positionSet = positionSet;
+        }
+
+        @Override
+        public void handleIfNone(Map<OptId,Integer> setOpts, Set<OptId> checkIntersects) // no ECO options set
+        {
+            Tallier os = OpeningStatsTallier.getInstance(true);
             PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
             PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+        }
+    }
+
+    public static class GroupPositionsErrorHandler implements OptHandler
+    {
+        @Override
+        public void handleIfAny(Map<OptId,Integer> setOpts, Set<OptId> ifAnyIntersects) // -s
+        {
+            if (Arrays.stream(PGNUtil.outputSelectors).anyMatch(s ->
+                    s.getValue() == OutputSelector.Value.OID))
+            {
+                System.err.println("Output selector '" + OutputSelector.Value.OID + "' is invalid with with option '" +
+                        CLOptions.GP + ".'");
+
+                System.exit(-1);
+            }
+        }
+
+        @Override
+        public void handleIfNone(Map<OptId,Integer> setOpts, Set<OptId> checkIntersects)
+        {
+            System.err.println("Option '" + CLOptions.GP + "' requires a position-matching option: '" +
+                CLOptions.MPOS + ",' '" + CLOptions.POSF + ",' '" + CLOptions.MFEN + ",' or '" + CLOptions.FF + ".'");
+
+            System.exit(-1);
+        }
+    }
+
+    public static class OpeningsErrorHandler implements OptHandler
+    {
+        @Override
+        public void handleIfNone(Map<OptId,Integer> setOpts, Set<OptId> checkIntersects)
+        {
+            System.err.println("Option '" + checkIntersects.stream().findFirst().orElseThrow() +
+                    "' requires a grouping option: '" + CLOptions.O + "' or '" + CLOptions.GP + ".'");
+
+            System.exit(-1);
         }
     }
 
@@ -284,16 +340,29 @@ public class CLOptionResolver
         }
     }
 
-    public static class StdEcoHandler implements OptHandler
+    public static class EcoHandler implements OptHandler
     {
         private final boolean transpose;
+        private final EcoTree.FileType type;
 
-        public StdEcoHandler(boolean transpose) { this.transpose = transpose; }
+        public EcoHandler(EcoTree.FileType type, boolean transpose)
+        {
+            this.type = type;
+            this.transpose = transpose;
+        }
 
         @Override
-        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
+        public void handleIfAny(Map<OptId,Integer> setOpts, Set<OptId> ifAnyIntersects) // "-gp" set
         {
-            Tallier os = EcoStatsTallier.getInstance(EcoTree.FileType.STD, transpose);
+            Tallier os = EcoStatsTallier.getInstance(type, transpose, true);
+            PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
+            PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+        }
+
+        @Override
+        public void handleIfNone(Map<OptId,Integer> setOpts, Set<OptId> checkIntersects) // "-gp" not set
+        {
+            Tallier os = EcoStatsTallier.getInstance(type, transpose, false);
             PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
             PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
         }
@@ -322,7 +391,7 @@ public class CLOptionResolver
     private static class DefaultSelectorsHandler implements OptHandler
     {
         @Override
-        public void handleIfNone(Map<OptId,Integer> setOpts)
+        public void handleIfNone(Map<OptId,Integer> setOpts, Set<OptId> checkIntersects)
         {
             PGNUtil.setHandler(new PGNUtil.SelectGameHandler(PGNUtil.outputSelectors));
         }
@@ -335,7 +404,7 @@ public class CLOptionResolver
         private final Set<OptId> ifNoneOf;
         private final OptHandler handler;
 
-        private ConditionSet(OptId checkOpts[], OptId ifAnyOf[], OptId ifNoneOf[], OptHandler handler)
+        private ConditionSet(OptId[] checkOpts, OptId[] ifAnyOf, OptId[] ifNoneOf, OptHandler handler)
         {
             this.checkOpts = new HashSet<>(Arrays.asList(checkOpts));
             this.ifAnyOf = ifAnyOf == null ? new HashSet<>() : new HashSet<>(Arrays.asList(ifAnyOf));
@@ -345,14 +414,16 @@ public class CLOptionResolver
 
         private void handle(final Map<OptId,Integer> setOpts)
         {
-            Set<OptId> intersects = setOpts.keySet().stream().filter(checkOpts::contains).collect(Collectors.toSet());
-            if (intersects.isEmpty()) return;
-            handler.handleOpts(setOpts, intersects);
+            Set<OptId> checkIntersects =
+                    setOpts.keySet().stream().filter(checkOpts::contains).collect(Collectors.toSet());
+
+            if (checkIntersects.isEmpty()) return;
+            handler.handleOpts(setOpts, checkIntersects);
 
             Set<OptId> anyIntersects = setOpts.keySet().stream().filter(ifAnyOf::contains).collect(Collectors.toSet());
             if (!anyIntersects.isEmpty()) handler.handleIfAny(setOpts, anyIntersects);
 
-            if (setOpts.keySet().stream().noneMatch(ifNoneOf::contains)) handler.handleIfNone(setOpts);
+            if (setOpts.keySet().stream().noneMatch(ifNoneOf::contains)) handler.handleIfNone(setOpts, checkIntersects);
         }
 
         @Override
@@ -373,28 +444,33 @@ public class CLOptionResolver
 
     private static final Set<ConditionSet> condSetSet = new HashSet<>();
 
-    public static void addCondition(OptId checkOpts[], OptId ifAnyOf[], OptId ifNoneOf[], OptHandler handler)
+    public static void addCondition(OptId[] checkOpts, OptId[] ifAnyOf, OptId[] ifNoneOf, OptHandler handler)
     {
         condSetSet.add(new ConditionSet(checkOpts, ifAnyOf, ifNoneOf, handler));
     }
 
     public static void resolveOpts(final Map<OptId,Integer> setOpts)
     {
-        final OptId topLevelOpts[] = new OptId[] {OptId.get(CLOptions.D), OptId.get(CLOptions.DM),
+        final OptId[] topLevelOpts = new OptId[] {OptId.get(CLOptions.D), OptId.get(CLOptions.DM),
                 OptId.get(CLOptions.DO), OptId.get(CLOptions.DOOB), OptId.get(CLOptions.DOOBM), OptId.get(CLOptions.O),
-                OptId.get(CLOptions.E), OptId.get(CLOptions.P), OptId.get(CLOptions.CSR)};
+                OptId.get(CLOptions.E), OptId.get(CLOptions.P), OptId.get(CLOptions.CSR), OptId.get(CLOptions.GP)};
 
         // sub-options under "-o"
-        final OptId ecoOpts[] = new OptId[] {OptId.get(CLOptions.ECO), OptId.get(CLOptions.SECO),
+        final OptId[] ecoOpts = new OptId[] {OptId.get(CLOptions.ECO), OptId.get(CLOptions.SECO),
                 OptId.get(CLOptions.XECO), OptId.get(CLOptions.XSECO)};
 
-        final OptId matchOpeningOpts[] = new OptId[] {OptId.get(CLOptions.MO), OptId.get(CLOptions.NMO),
+        final OptId[] groupSubOpts = Stream.concat(Arrays.stream(ecoOpts),
+                Arrays.stream(new OptId[] {OptId.get(CLOptions.CMIN), OptId.get(CLOptions.HWD),
+                OptId.get(CLOptions.LWD), OptId.get(CLOptions.HDRAW), OptId.get(CLOptions.LDRAW)})).
+                toArray(OptId[]::new);
+
+        final OptId[] matchOpeningOpts = new OptId[] {OptId.get(CLOptions.MO), OptId.get(CLOptions.NMO),
                 OptId.get(CLOptions.OF), OptId.get(CLOptions.NOF)};
 
-        final OptId matchPositionOpts[] = new OptId[] {OptId.get(CLOptions.MPOS), OptId.get(CLOptions.POSF),
+        final OptId[] matchPositionOpts = new OptId[] {OptId.get(CLOptions.MPOS), OptId.get(CLOptions.POSF),
                 OptId.get(CLOptions.MFEN), OptId.get(CLOptions.FF)};
 
-        final OptId singletonOpts[] = new OptId[] {OptId.get(CLOptions.MPOS), OptId.get(CLOptions.POSF),
+        final OptId[] singletonOpts = new OptId[] {OptId.get(CLOptions.MPOS), OptId.get(CLOptions.POSF),
                 OptId.get(CLOptions.MFEN), OptId.get(CLOptions.FF), OptId.get(CLOptions.PP),
                 OptId.get(CLOptions.GN), OptId.get(CLOptions.GNF), OptId.get(CLOptions.MW), OptId.get(CLOptions.ML),
                 OptId.get(CLOptions.TF), OptId.get(CLOptions.LELO), OptId.get(CLOptions.HELO), OptId.get(CLOptions.LED),
@@ -408,12 +484,12 @@ public class CLOptionResolver
                 OptId.get(CLOptions.R), OptId.get(CLOptions.RW), OptId.get(CLOptions.RL), OptId.get(CLOptions.RO),
                 OptId.get(CLOptions.D), OptId.get(CLOptions.DM), OptId.get(CLOptions.DO), OptId.get(CLOptions.DOOB),
                 OptId.get(CLOptions.DOOBM), OptId.get(CLOptions.E), OptId.get(CLOptions.CSR), OptId.get(CLOptions.O),
-                OptId.get(CLOptions.ECO), OptId.get(CLOptions.SECO), OptId.get(CLOptions.XECO),
+                OptId.get(CLOptions.GP), OptId.get(CLOptions.ECO), OptId.get(CLOptions.SECO), OptId.get(CLOptions.XECO),
                 OptId.get(CLOptions.XSECO), OptId.get(CLOptions.CMIN), OptId.get(CLOptions.LWD),
                 OptId.get(CLOptions.HWD), OptId.get(CLOptions.HDRAW), OptId.get(CLOptions.LDRAW),
                 OptId.get(CLOptions.P), OptId.get(CLOptions.S)};
 
-        final OptId utilOpts[] = new OptId[] {OptId.get(CLOptions.MKDB), OptId.get(CLOptions.MKDBS),
+        final OptId[] utilOpts = new OptId[] {OptId.get(CLOptions.MKDB), OptId.get(CLOptions.MKDBS),
                 OptId.get(CLOptions.DDB), OptId.get(CLOptions.DDBS), OptId.get(CLOptions.PP)};
 
         new ConditionSet(topLevelOpts, null, null, new MutexHandler()).handle(setOpts);
@@ -423,10 +499,19 @@ public class CLOptionResolver
         new ConditionSet(singletonOpts, null, null, new SingletonHandler()).handle(setOpts);
         new ConditionSet(utilOpts, null, null, new UtilHandler()).handle(setOpts);
 
-        new ConditionSet(new OptId[] {OptId.get(CLOptions.O)}, null, ecoOpts,
+        new ConditionSet(groupSubOpts,null, new OptId[] {OptId.get(CLOptions.O), OptId.get(CLOptions.GP)},
+                new OpeningsErrorHandler()).handle(setOpts);
+
+        new ConditionSet(new OptId[] {OptId.get(CLOptions.O)},null, ecoOpts,
                 new OpeningsHandler()).handle(setOpts);
 
-        new ConditionSet(new OptId[] {OptId.get(CLOptions.S)}, null, topLevelOpts,
+        new ConditionSet(new OptId[] {OptId.get(CLOptions.GP)}, new OptId[] {OptId.get(CLOptions.S)}, matchPositionOpts,
+                new GroupPositionsErrorHandler()).handle(setOpts);
+
+        new ConditionSet(new OptId[] {OptId.get(CLOptions.GP)},null, ecoOpts,
+                new GroupPositionsHandler()).handle(setOpts);
+
+        new ConditionSet(new OptId[] {OptId.get(CLOptions.S)},null, topLevelOpts,
                 new DefaultSelectorsHandler()).handle(setOpts);
 
         // anything else requiring delayed initialization

@@ -78,7 +78,7 @@ public final class OutputSelector
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            sb.append(game.getMoveStringToPly(Integer.MAX_VALUE));
+            sb.append(game.getFullMoveStringToPly(Integer.MAX_VALUE));
         }
     }
 
@@ -107,7 +107,7 @@ public final class OutputSelector
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            sb.append(game.getMoveStringToPly(game.getPosMatchAtPly() + 1));
+            sb.append(game.getFullMoveStringToPly(game.getPosMatchAtPly() + 1));
         }
     }
 
@@ -398,7 +398,7 @@ public final class OutputSelector
         @Override
         public void appendOutput(PgnGame game, StringBuilder sb)
         {
-            sb.append(game.openingId());
+            sb.append(game.getOpeningId());
         }
     }
 

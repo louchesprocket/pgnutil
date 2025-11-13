@@ -831,7 +831,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
     
     public final Board<?> move(PgnGame.Move move) throws IllegalMoveException
     {
-        return move(move.getMoveOnly());
+        return move(move.getBareMove());
     }
     
     public final Board<?> move(List<TreeNode> moveList) throws IllegalMoveException
@@ -1171,9 +1171,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
             }
             
             move(start, end, null);
-            
-            return ret.append("K").append(captureSt).
-                append(Square.get(end)).toString();
+            return ret.append("K").append(captureSt).append(Square.get(end)).toString();
         }
         
         boolean disambigRank = false;
@@ -1301,7 +1299,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
      * @param color
      * @return 
      */
-    private final String getCheckSymbol(Color color)
+    private String getCheckSymbol(Color color)
     {
         if (isInCheck(color, new int[] {color == Color.WHITE ? whiteKingLoc : blackKingLoc}))
         {
@@ -1345,10 +1343,9 @@ public class Board<T extends Board<T>> implements Comparable<T>
                             break;
                             
                         case KNIGHT:
-                            for (int j = 0; j < NMOVES.length; j++)
+                            for (int nmove : NMOVES)
                             {
-                                int dest = i + NMOVES[j];
-                                
+                                int dest = i + nmove;
                                 if (dest >= 0 && dest < 64 && moveTest(i, dest)) return "+";
                             }
                             
@@ -1464,7 +1461,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         {
             short currentPly = (short)((Short.parseShort(fen[5]) - 1) * 2 + (fen[1].equals("w") ? 0 : 1));
 
-            return new Board(
+            return new Board<>(
                     position,
                     currentPly,
                     fen[3].equals("-") ? null : Square.get(fen[3]), // e.p. square
@@ -1578,7 +1575,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
      * @param that
      * @return true if all pieces are in the same places and same side to move
      */
-    public final boolean looseEquals(Board that)
+    public final boolean looseEquals(Board<?> that)
     {
         return (ply & 1) == (that.ply & 1) && Arrays.equals(position, that.position);
     }
@@ -1588,7 +1585,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
      * @param that
      * @return true if all pieces are in the same places and same side to move
      */
-    public final boolean positionEquals(Board that)
+    public final boolean positionEquals(Board<?> that)
     {
 //        if (whitePieceCount != that.whitePieceCount ||
 //            blackPieceCount != that.blackPieceCount)
@@ -1680,7 +1677,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
     {
         try
         {
-            Board<T> that = (Board<T>)other;
+            Board<?> that = (Board<?>)other;
             
             return ply == that.ply &&
                 Arrays.equals(position, that.position) &&

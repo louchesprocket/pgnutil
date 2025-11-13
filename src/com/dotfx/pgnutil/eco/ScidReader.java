@@ -32,7 +32,7 @@ class ScidReader extends TreeReader
                 if (line.startsWith("#") || line.trim().isEmpty()) continue;
                 sb.append(line);
 
-                Board board = new Board(true);
+                Board<?> board = new Board<>(true);
 
                 while (!line.contains("*")) // entry continued to next line
                 {

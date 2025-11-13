@@ -59,6 +59,7 @@ public class CLOptions
     public static final String FF = "-ff";
     public static final String GN = "-gn";
     public static final String GNF = "-gnf";
+    public static final String GP = "-gp";
     public static final String H = "-h";
     public static final String HDRAW = "-hdraw";
     public static final String HED = "-hed";
@@ -139,6 +140,7 @@ public class CLOptions
         FENFILE(FF),
         GAMENUM(GN),
         GAMENUMFILE(GNF),
+        GROUPPOSITIONS(GP),
         HIELO(HELO),
         HIELODIFF(HED),
         HIOOBCOUNT(HOOB),
@@ -583,8 +585,11 @@ public class CLOptions
 
         try
         {
-            PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(
-                    Collections.singleton(new LooseBoard(true).looseGoTo(PgnGame.parseMoveString(moveSt)))));
+            Set<LooseBoard> positionSet =
+                    Collections.singleton(new LooseBoard(true).looseGoTo(PgnGame.parseMoveString(moveSt)));
+
+            CLOptionResolver.GroupPositionsHandler.setPositions(positionSet);
+            PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(positionSet));
         }
 
         catch (IllegalMoveException e)
@@ -624,6 +629,7 @@ public class CLOptions
             }
         }
 
+        CLOptionResolver.GroupPositionsHandler.setPositions(positionSet);
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(positionSet));
     }
 
@@ -635,8 +641,9 @@ public class CLOptions
 
         try
         {
-            PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(
-                    Collections.singleton(new LooseBoard(Board.fromFen(fen)))));
+            Set<LooseBoard> positionSet = Collections.singleton(new LooseBoard(Board.fromFen(fen)));
+            CLOptionResolver.GroupPositionsHandler.setPositions(positionSet);
+            PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(positionSet));
         }
 
         catch (InvalidFenException e)
@@ -656,6 +663,7 @@ public class CLOptions
         try
         {
             for (String fen : readLinesSet(fenFile)) positionSet.add(new LooseBoard(Board.fromFen(fen)));
+            CLOptionResolver.GroupPositionsHandler.setPositions(positionSet);
             PGNUtil.addMatchProcessor(new PGNUtil.MatchPositionSetProcessor(positionSet));
         }
 
@@ -1105,7 +1113,20 @@ public class CLOptions
         PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(events));
     }
 
-    // opening stats
+    // grouped positions
+
+    @Option(name = GP, aliases = "-group_positions",
+            usage = "print win/loss/draw statistics for each position specified by '" + MPOS + ",' '" + MFEN +
+            ",' '" + POSF + ",' or '" + FF + ".' Valid output selectors ('" + S + "') include: 'eco,' 'oid,' " +
+            "'count,' 'wwins,' 'bwins,' 'draws,' 'wwinpct,' 'bwinpct,' 'diff,' 'diffpct,' 'drawpct'")
+    private void groupPositions(boolean b)
+    {
+        countOption(OptId.get(GP));
+        // The rest is handled in CLOptionResolver.
+    }
+
+
+    // opening stats or grouped positions
 
     @Option(name = O, aliases = "-opening_stats",
             usage = "print win/loss/draw statistics for each opening.  Valid output selectors ('" + S + "') include: " +
@@ -1118,51 +1139,53 @@ public class CLOptions
 
     // ECO stats
 
-    @Option(name = ECO, depends = {O}, aliases = "-eco_stats",
-            usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each ECO code")
+    @Option(name = ECO, aliases = "-eco_stats",
+            usage = "combined with the '" + O + "' or '" + GP + "' option, print win/loss/draw statistics for each " +
+                    "ECO code")
     private void ecoOpenings(boolean o)
     {
         countOption(OptId.get(ECO));
 
-        // delay tree initialization in case "-ef" is set
-        CLOptionResolver.addCondition(new OptId[] {OptId.get(ECO)}, null, null,
-                new CLOptionResolver.StdEcoHandler(false));
+        // must delay tree initialization in case "-ef" is set
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(ECO)}, new OptId[] {OptId.get(GP)},
+                new OptId[] {OptId.get(GP)}, new CLOptionResolver.EcoHandler(EcoTree.FileType.STD, false));
     }
 
-    @Option(name = SECO, depends = {O}, aliases = "-scid_eco_stats",
-            usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each Scid ECO code")
+    @Option(name = SECO, aliases = "-scid_eco_stats",
+            usage = "combined with the '" + O + "' or '" + GP + "' option, print win/loss/draw statistics for " +
+                    "each Scid ECO code")
     private void ScidEcoOpenings(boolean o)
     {
         countOption(OptId.get(SECO));
-        Tallier os = EcoStatsTallier.getInstance(EcoTree.FileType.SCIDDB, false);
-        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
-        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(SECO)}, new OptId[] {OptId.get(GP)},
+                new OptId[] {OptId.get(GP)}, new CLOptionResolver.EcoHandler(EcoTree.FileType.SCIDDB, false));
     }
 
-    @Option(name = XECO, depends = {O}, aliases = "-trans_eco_stats",
-            usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each ECO code, " +
-                    "matching openings transpositionally")
+    @Option(name = XECO, aliases = "-trans_eco_stats",
+            usage = "combined with the '" + O + "' or '" + GP + "' option, print win/loss/draw statistics for each " +
+                    "ECO code, matching openings transpositionally")
     private void XEcoOpenings(boolean o)
     {
         countOption(OptId.get(XECO));
 
-        // delay tree initialization in case "-ef" is set
-        CLOptionResolver.addCondition(new OptId[] {OptId.get(XECO)}, null, null,
-                new CLOptionResolver.StdEcoHandler(true));
+        // must delay tree initialization in case "-ef" is set
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(XECO)}, new OptId[] {OptId.get(GP)},
+                new OptId[] {OptId.get(GP)}, new CLOptionResolver.EcoHandler(EcoTree.FileType.STD,true));
     }
 
-    @Option(name = XSECO, depends = {O}, aliases = "-trans_scid_eco_stats",
-            usage = "combined with the '" + O + "' option, print win/loss/draw statistics for each Scid ECO code, " +
-                    "matching openings transpositionally")
+    @Option(name = XSECO, aliases = "-trans_scid_eco_stats",
+            usage = "combined with the '" + O + "' or '" + GP + "' option, print win/loss/draw statistics for each " +
+                    "Scid ECO code, matching openings transpositionally")
     private void XScidEcoOpenings(boolean o)
     {
         countOption(OptId.get(XSECO));
-        Tallier os = EcoStatsTallier.getInstance(EcoTree.FileType.SCIDDB, true);
-        PGNUtil.setHandler(new PGNUtil.TallyHandler(os));
-        PGNUtil.setExitProcessor(new PGNUtil.TallyExitProcessor(os));
+
+        CLOptionResolver.addCondition(new OptId[] {OptId.get(XSECO)}, new OptId[] {OptId.get(GP)},
+                new OptId[] {OptId.get(GP)}, new CLOptionResolver.EcoHandler(EcoTree.FileType.SCIDDB, true));
     }
 
-    @Option(name = CMIN, depends = {O}, aliases = "-count_min", metaVar = "<min>",
+    @Option(name = CMIN, aliases = "-count_min", metaVar = "<min>",
         usage = "in combination with '" + O + "' option, print only openings that appear in at least <min> games")
     private void minOpeningCount(int cmin)
     {
@@ -1170,7 +1193,7 @@ public class CLOptions
         OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MinGamesProcessor(cmin));
     }
 
-    @Option(name = HWD, depends = {O}, aliases = "-hi_win_diff", metaVar = "<max>",
+    @Option(name = HWD, aliases = "-hi_win_diff", metaVar = "<max>",
         usage = "in combination with '" + O + "' option, print only openings for which the percentage win difference " +
                 "between white and black is at most <max> percent")
     private void hiWinDiff(double max)
@@ -1179,7 +1202,7 @@ public class CLOptions
         OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MaxWinDiffProcessor(max));
     }
 
-    @Option(name = LWD, depends = {O}, aliases = "-lo_win_diff", metaVar = "<min>",
+    @Option(name = LWD, aliases = "-lo_win_diff", metaVar = "<min>",
         usage = "in combination with '" + O + "' option, print only openings for which the percentage win difference " +
                 "between white and black is at least <min> percent")
     private void loWinDiff(double min)
@@ -1188,7 +1211,7 @@ public class CLOptions
         OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MinWinDiffProcessor(min));
     }
 
-    @Option(name = HDRAW, depends = {O}, aliases = "-hi_draw_pct", metaVar = "<max>",
+    @Option(name = HDRAW, aliases = "-hi_draw_pct", metaVar = "<max>",
         usage = "in combination with '" + O + "' option, print only openings for which the percentage of draws is " +
                 "at most <max> percent")
     private void maxDraw(double max)
@@ -1197,7 +1220,7 @@ public class CLOptions
         OpeningProcessors.addOpeningProcessor(new OpeningProcessors.MaxDrawProcessor(max));
     }
 
-    @Option(name = LDRAW, depends = {O}, aliases = "-lo_draw_pct", metaVar = "<min>",
+    @Option(name = LDRAW, aliases = "-lo_draw_pct", metaVar = "<min>",
         usage = "in combination with '" + O + "' option, print only openings for which the percentage of draws is " +
                 "at least <min> percent")
     private void minDraw(double min)

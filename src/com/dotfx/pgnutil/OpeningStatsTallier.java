@@ -22,7 +22,6 @@ package com.dotfx.pgnutil;
 
 import com.dotfx.pgnutil.eco.EcoTree;
 import com.dotfx.pgnutil.eco.TreeNode;
-import com.dotfx.pgnutil.eco.TreeNodeSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,65 +36,18 @@ import java.util.Map;
  */
 public class OpeningStatsTallier implements Tallier
 {
-    public static class Opening extends OpeningScore
-    {
-        private final String openingSt;
-        private final MoveListId oid;
-        private final TreeNode eco;
-        private final TreeNode scidEco;
-        private final TreeNodeSet xEcoSet;
-        private final TreeNodeSet xScidEcoSet;
-        
-        Opening(String openingSt, MoveListId oid, TreeNode eco, TreeNode scidEco, TreeNodeSet xEcoSet,
-                TreeNodeSet xScidEcoSet)
-        {
-            super();
-            this.openingSt = openingSt;
-            this.oid = oid;
-            this.eco = eco;
-            this.scidEco = scidEco;
-            this.xEcoSet = xEcoSet;
-            this.xScidEcoSet = xScidEcoSet;
-        }
-
-        public String getOpeningSt() { return openingSt; }
-
-        public MoveListId getId() { return oid; }
-
-        public TreeNode getEco(EcoTree.FileType type)
-        {
-            if (type == EcoTree.FileType.STD) return eco;
-            if (type == EcoTree.FileType.SCIDDB) return scidEco;
-            return null;
-        }
-
-        public TreeNodeSet getXEcoSet(EcoTree.FileType type)
-        {
-            if (type == EcoTree.FileType.STD) return xEcoSet;
-            if (type == EcoTree.FileType.SCIDDB) return xScidEcoSet;
-            return null;
-        }
-
-        @Override
-        public String toString()
-        {
-            return "ECO: " + eco.getCode() + CLOptions.outputDelim + "opening: " + oid + CLOptions.outputDelim +
-                    super.toString();
-        }
-    }
-    
     private class Iterator implements java.util.Iterator<String>
     {
-        private final java.util.Iterator<Opening> iterator;
+        private final java.util.Iterator<OpeningStats> iterator;
         
         private Iterator()
         {
-            List<Opening> selectedOpenings = new ArrayList<>();
+            List<OpeningStats> selectedOpenings = new ArrayList<>();
             
             nextOpening:
             for (MoveListId oid : openingsMap.keySet())
             {
-                Opening opening = openingsMap.get(oid);
+                OpeningStats opening = openingsMap.get(oid);
                 
                 for (OpeningProcessors.Processor processor : OpeningProcessors.getOpeningProcessors())
                     if (!processor.processOpening(opening)) continue nextOpening;
@@ -111,16 +63,19 @@ public class OpeningStatsTallier implements Tallier
         @Override public String next()
         {
             StringBuilder ret = new StringBuilder();
-            Opening opening = iterator.next();
+            OpeningStats stats = iterator.next();
             
-            if (selectors == null) ret.append(opening.toString());
+            if (selectors == null) ret.append("ECO: ").
+                    append(stats.getEco(EcoTree.FileType.STD).getCode()).append(CLOptions.outputDelim).
+                    append(tallyPosition ? "position: " + stats.getOpeningSt() : "opening: " + stats.getId()).
+                    append(CLOptions.outputDelim).append(stats);
 
             else
             {
                 for (OpeningStatsOutputSelector selector : selectors)
                 {
                     ret.append(CLOptions.outputDelim);
-                    selector.appendOutput(opening, ret);
+                    selector.appendOutput(stats, ret);
                 }
 
                 ret.delete(0, CLOptions.outputDelim.length());
@@ -130,24 +85,30 @@ public class OpeningStatsTallier implements Tallier
         }
     }
 
+    private static OpeningStatsTallier instance;
     private static boolean saveOpeningMoves = false;
     private static boolean trackPlies = false;
     private static boolean trackDisagree = false;
-    private static OpeningStatsOutputSelector selectors[];
-    private static OpeningStatsTallier instance;
-    
-    private final Map<MoveListId,Opening> openingsMap;
+    private static OpeningStatsOutputSelector[] selectors;
+
+    private final boolean tallyPosition;
+    private final Map<MoveListId, OpeningStats> openingsMap;
 
     private EcoTree ecoTree;
     private EcoTree scidEcoTree;
     private boolean useXStdEco;
     private boolean useXScidEco;
 
-    private OpeningStatsTallier() { openingsMap = new HashMap<>(10000); }
-
-    public static OpeningStatsTallier getInstance()
+    private OpeningStatsTallier(boolean tallyPosition)
     {
-        if (instance == null) instance = new OpeningStatsTallier();
+        openingsMap = new HashMap<>(10000);
+        this.tallyPosition = tallyPosition;
+        if (tallyPosition) setSaveOpeningMoves(true);
+    }
+
+    public static OpeningStatsTallier getInstance(boolean tallyPosition)
+    {
+        if (instance == null) instance = new OpeningStatsTallier(tallyPosition);
         return instance;
     }
 
@@ -157,7 +118,7 @@ public class OpeningStatsTallier implements Tallier
      * @throws SelectorException
      */
     @Override
-    public void init(OutputSelector selectors[]) throws SelectorException
+    public void init(OutputSelector[] selectors) throws SelectorException
     {
         if (selectors == null || selectors.length == 0) ecoTree = EcoTree.FileType.STD.getEcoTree();
 
@@ -198,21 +159,57 @@ public class OpeningStatsTallier implements Tallier
     @Override
     public void tally(PgnGame game) throws IllegalMoveException
     {
-        MoveListId openingId = game.openingId();
-        Opening opening = openingsMap.get(openingId);
+        if (tallyPosition) tallyPosition(game);
+        else tallyOpening(game);
+    }
+
+    private void tallyPosition(PgnGame game) throws IllegalMoveException
+    {
+        MoveListId openingId = game.getOpeningId(game.getPosMatchAtPly()); // "opening" = moves up to matched position
+        OpeningStats opening = openingsMap.get(openingId);
+
+        if (opening == null)
+        {
+            List<PgnGame.Move> openingMoveList = game.getMoveList().subList(0, game.getPosMatchAtPly());
+            if (openingMoveList.isEmpty()) return; // no matched moves
+
+            TreeNode ecoNode = ecoTree != null ? ecoTree.getDeepestDefined(openingMoveList) : null;
+            TreeNode scidNode = scidEcoTree != null ? scidEcoTree.getDeepestDefined(openingMoveList) : null;
+
+            opening = new OpeningStats(game.getFullMoveStringToPly(game.getPosMatchAtPly()),
+                    openingId, ecoNode, scidNode,
+                    useXStdEco ? ecoTree.getDeepestTranspositionSet(openingMoveList) : null,
+                    useXScidEco ? scidEcoTree.getDeepestTranspositionSet(openingMoveList) : null);
+
+            openingsMap.put(openingId, opening);
+        }
+
+        switch (game.getResult())
+        {
+            case WHITEWIN: opening.incWhiteWin(); break;
+            case BLACKWIN: opening.incBlackWin(); break;
+            case DRAW: opening.incDraw(); break;
+            default: opening.incNoResult();
+        }
+
+        if (trackDisagree) opening.addDisagree(game.getDisagreeCount());
+        if (trackPlies) opening.addOobPlies(game.getPostOpeningPlyCount());
+    }
+
+    private void tallyOpening(PgnGame game) throws IllegalMoveException
+    {
+        MoveListId openingId = game.getOpeningId();
+        OpeningStats opening = openingsMap.get(openingId);
 
         if (opening == null)
         {
             List<PgnGame.Move> openingMoveList = game.getOpeningMoveList();
             if (openingMoveList.isEmpty()) return; // no book moves
 
-            TreeNode ecoNode =
-                    ecoTree != null ? ecoTree.getDeepestDefined(openingMoveList) : null;
+            TreeNode ecoNode = ecoTree != null ? ecoTree.getDeepestDefined(openingMoveList) : null;
+            TreeNode scidNode = scidEcoTree != null ? scidEcoTree.getDeepestDefined(openingMoveList) : null;
 
-            TreeNode scidNode =
-                    scidEcoTree != null ? scidEcoTree.getDeepestDefined(openingMoveList) : null;
-
-            opening = new Opening(saveOpeningMoves ? game.getFullOpeningString() : null, openingId, ecoNode, scidNode,
+            opening = new OpeningStats(saveOpeningMoves ? game.getFullOpeningString() : null, openingId, ecoNode, scidNode,
                 useXStdEco ? ecoTree.getDeepestTranspositionSet(openingMoveList) : null,
                 useXScidEco ? scidEcoTree.getDeepestTranspositionSet(openingMoveList) : null);
 

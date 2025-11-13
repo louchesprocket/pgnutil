@@ -97,14 +97,14 @@ public final class PgnGame
         public List<String> getComments() { return comments; }
         public AquariumVars getAquariumVars() { return new AquariumVars(this); }
         
-        public static String getMoveOnly(String san) // strips extraneous chars
+        public static String getBareMove(String san) // strips extraneous chars
         {
             int end = san.length();
             while (end > 0 && !Character.isLetterOrDigit(san.charAt(end - 1))) end--;
             return san.substring(0, end);
         }
         
-        public String getMoveOnly() // strips extraneous chars
+        public String getBareMove() // strips extraneous chars
         {
             int end = move.length();
             while (end > 0 && !Character.isLetterOrDigit(move.charAt(end - 1))) end--;
@@ -201,7 +201,7 @@ public final class PgnGame
                 throws IOException
         {
             int i, next;
-            char buf[] = new char[COMMENT_BUFSIZE];
+            char[] buf = new char[COMMENT_BUFSIZE];
 
             for (i = 0;; i++) // one character per loop iteration
             {
@@ -288,6 +288,32 @@ public final class PgnGame
         }
 
         return moveList;
+    }
+
+    public static String formatFullMoveString(List<Move> moveList)
+    {
+        StringBuilder sb = new StringBuilder(1024);
+
+        for (Move move : moveList)
+        {
+            if (move.isWhite()) sb.append(move.getNumber()).append(".");
+            sb.append(move.getMove()).append(" "); // append annotated move
+        }
+
+        return sb.toString().trim();
+    }
+
+    public static String formatBareMoveString(List<Move> moveList)
+    {
+        StringBuilder sb = new StringBuilder(1024);
+
+        for (Move move : moveList)
+        {
+            if (move.isWhite()) sb.append(move.getNumber()).append(".");
+            sb.append(move.getBareMove()).append(" ");
+        }
+
+        return sb.toString().trim();
     }
 
     /**
@@ -460,19 +486,7 @@ public final class PgnGame
      */
     public String getPostOpeningString(int plies)
     {
-        StringBuilder sb = new StringBuilder(1024).append(getOpeningString());
-        Move move = getFirstOobMove();
-        int postOpeningPly = 0;
-        
-        while (move != null)
-        {
-            if (move.isWhite()) sb.append(move.getNumber()).append(".");
-            sb.append(move.getMove()).append(" ");
-            if (++postOpeningPly == plies) break;
-            move = getNextMove(move);
-        }
-        
-        return sb.toString().trim();
+        return formatFullMoveString(getMoveList().subList(0, getLastBookMove().getPly() + plies));
     }
 
     public int getPostOpeningPlyCount()
@@ -480,15 +494,15 @@ public final class PgnGame
         return getMoveList().size() - getOpeningMoveList().size();
     }
 
-    public Board getOpeningPosition() throws IllegalMoveException
+    public Board<?> getOpeningPosition() throws IllegalMoveException
     {
         return getOpeningPosition(bookMarker);
     }
     
-    public Board getOpeningPosition(Pattern oobMarker) throws IllegalMoveException
+    public Board<?> getOpeningPosition(Pattern oobMarker) throws IllegalMoveException
     {
-        Board board = new Board(true);
-        for (Move move : getOpeningMoveList(oobMarker)) board.move(move.getMoveOnly());
+        Board<?> board = new Board<>(true);
+        for (Move move : getOpeningMoveList(oobMarker)) board.move(move.getBareMove());
         return board;
     }
     
@@ -503,20 +517,24 @@ public final class PgnGame
     }
 
     /**
+     * Note that if the game contains no comments, then the entire game is regarded as opening.
+     *
+     * @return move-list string, stripped of extra characters ("+," "#," etc.)
+     */
+    private String getOpeningString()
+    {
+        if (openingString != null) return openingString;
+        return formatBareMoveString(getOpeningMoveList());
+    }
+
+    /**
      *
      * @return move-list string, including extra characters ("+," "#," etc.)
      */
     public String getFullOpeningString()
     {
-        StringBuilder sb = new StringBuilder(1024);
-        
-        for (Move move : getOpeningMoveList())
-        {
-            if (move.isWhite()) sb.append(move.getNumber()).append(".");
-            sb.append(move.getMove()).append(" ");
-        }
-
-        return sb.toString().trim();
+        if (openingString != null) return openingString;
+        return formatFullMoveString(getOpeningMoveList());
     }
 
     public List<Move> getOpeningMoveList()
@@ -562,55 +580,23 @@ public final class PgnGame
         return openingMoveList;
     }
 
-    /**
-     * Note that if the game contains no comments, then the entire game is regarded as opening.
-     *
-     * @return move-list string, stripped of extra characters ("+," "#," etc.)
-     */
-    private String getOpeningString()
-    {
-        if (openingString != null) return openingString;
-
-        StringBuilder sb = new StringBuilder(1024);
-        
-        for (Move move : getOpeningMoveList())
-        {
-            if (move.isWhite()) sb.append(move.getNumber()).append(".");
-            sb.append(move.getMoveOnly()).append(" ");
-        }
-
-        openingString = sb.toString().trim();
-        return openingString;
-    }
-
-    public MoveListId openingId(Pattern oobMarker) { return new MoveListId(getOpeningString()); }
-    public MoveListId openingId() { return openingId(bookMarker); }
+    public MoveListId getOpeningId(int lastPly) { return new MoveListId(getFullMoveStringToPly(lastPly)); }
+    public MoveListId getOpeningId(Pattern oobMarker) { return new MoveListId(getOpeningString()); }
+    public MoveListId getOpeningId() { return getOpeningId(bookMarker); }
 
     /**
      *
      * @param ply one-indexed
      * @return
      */
-    public String getMoveStringToPly(int ply)
+    public String getFullMoveStringToPly(int ply)
     {
-        StringBuilder sb = new StringBuilder();
-        List<PgnGame.Move> moves = getMoveList().subList(0, Math.min(ply, getMoveList().size()));
-
-        for (Move move : moves)
-        {
-            if (move.isWhite()) sb.append(move.getNumber()).append(".");
-            sb.append(move.getMove()).append(" ");
-        }
-
-        sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
+        return formatFullMoveString(getMoveList().subList(0, Math.min(ply, getMoveList().size())));
     }
     
     public UniqueId128 getPlayerOpeningHash()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getWhite()).append('\0').append(getBlack()).append('\0').append(getOpeningString());
-        return new UniqueId128(sb.toString().getBytes());
+        return new UniqueId128((getWhite() + '\0' + getBlack() + '\0' + getOpeningString()).getBytes());
     }
 
     public int getDisagreeCount()
@@ -702,7 +688,7 @@ public final class PgnGame
         boolean official = false;
         
         try { timeCtrlSt = get(OutputSelector.TIMECONTROL); }
-        catch (SelectorException e) {} // shouldn't happen
+        catch (SelectorException ignored) {} // shouldn't happen
         
         if (timeCtrlSt == null || timeCtrlSt.equals("?")) // try to infer
         {
@@ -767,7 +753,7 @@ public final class PgnGame
     public boolean containsPosition(PositionId pos)
         throws IllegalMoveException
     {
-        Board board = new Board(true);
+        Board<?> board = new Board<>(true);
 
         for (Move move : moves)
             if (board.move(move).positionId().equals(pos))
@@ -779,10 +765,10 @@ public final class PgnGame
         return false;
     }
     
-    public boolean containsPosition(Board pos)
+    public boolean containsPosition(Board<?> pos)
         throws IllegalMoveException
     {
-        Board board = new Board(true);
+        Board<?> board = new Board<>(true);
         int whitePieceCount = pos.getWhitePieceCount();
         int blackPieceCount = pos.getBlackPieceCount();
 
@@ -851,7 +837,7 @@ public final class PgnGame
         return get(new OutputSelector[] {selector});
     }
 
-    public String get(OutputSelector selectors[]) throws SelectorException
+    public String get(OutputSelector[] selectors) throws SelectorException
     {
         StringBuilder ret = new StringBuilder();
 

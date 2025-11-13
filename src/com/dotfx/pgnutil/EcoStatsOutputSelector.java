@@ -28,13 +28,13 @@ public class EcoStatsOutputSelector
 {
     interface OutputHandler
     {
-        void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb);
+        void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb);
     }
 
     private static final class BlackWinPctOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
+        public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
         {
             sb.append(Formats.PERCENT.format(os.getBlackWinPct()));
         }
@@ -43,7 +43,7 @@ public class EcoStatsOutputSelector
     private static final class BlackWinsOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
+        public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
         {
             sb.append(os.getBlackWins());
         }
@@ -52,7 +52,7 @@ public class EcoStatsOutputSelector
     private static final class CountOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
+        public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
         {
             sb.append(os.getGameCount());
         }
@@ -61,7 +61,7 @@ public class EcoStatsOutputSelector
     private static final class DiffOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
+        public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
         {
             sb.append(os.getWhiteWins() - os.getBlackWins());
         }
@@ -70,7 +70,7 @@ public class EcoStatsOutputSelector
     private static final class DiffPctOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
+        public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
         {
             sb.append(Formats.PERCENT.format(os.getWhiteWinPct() - os.getBlackWinPct()));
         }
@@ -79,7 +79,7 @@ public class EcoStatsOutputSelector
     private static final class DrawPctOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
+        public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
         {
             sb.append(Formats.PERCENT.format(os.getDrawPct()));
         }
@@ -88,7 +88,7 @@ public class EcoStatsOutputSelector
     private static final class DrawsOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
+        public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
         {
             sb.append(os.getDraws());
         }
@@ -97,7 +97,7 @@ public class EcoStatsOutputSelector
     private static final class WhiteWinPctOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
+        public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
         {
             sb.append(Formats.PERCENT.format(os.getWhiteWinPct()));
         }
@@ -106,7 +106,7 @@ public class EcoStatsOutputSelector
     private static final class WhiteWinsOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
+        public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
         {
             sb.append(os.getWhiteWins());
         }
@@ -115,7 +115,7 @@ public class EcoStatsOutputSelector
     private static final class EcoOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
+        public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
         {
             sb.append(opening.getCode());
         }
@@ -124,7 +124,7 @@ public class EcoStatsOutputSelector
     private static final class EcoDescOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
+        public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
         {
             sb.append(opening.getDesc());
         }
@@ -133,7 +133,7 @@ public class EcoStatsOutputSelector
     private static final class EcoMovesOutputHandler implements OutputHandler
     {
         @Override
-        public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
+        public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
         {
             sb.append(opening.getMoveString());
         }
@@ -193,7 +193,7 @@ public class EcoStatsOutputSelector
 
     public Value getValue() { return value; }
 
-    public void appendOutput(TreeNodeSet opening, OpeningScore os, StringBuilder sb)
+    public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
     {
         handler.appendOutput(opening, os, sb);
     }

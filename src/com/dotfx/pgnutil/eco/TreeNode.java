@@ -20,7 +20,6 @@
 
 package com.dotfx.pgnutil.eco;
 
-import com.dotfx.pgnutil.Board;
 import com.dotfx.pgnutil.IllegalMoveException;
 import com.dotfx.pgnutil.PgnGame;
 import com.dotfx.pgnutil.PositionId;
@@ -76,12 +75,12 @@ public final class TreeNode implements Comparable<TreeNode>
     public TreeNode getParent() {
         return parent;
     }
-    public String getMoveText() { return PgnGame.Move.getMoveOnly(moveSt); }
+    public String getMoveText() { return PgnGame.Move.getBareMove(moveSt); }
     public TreeNode branchTo(TreeNode node) {
         return branchTo(node.getMove());
     }
     public TreeNode branchTo(PgnGame.Move move) {
-        return branchTo(move.getMoveOnly());
+        return branchTo(move.getBareMove());
     }
 
     public List<TreeNode> getChildren()
@@ -124,7 +123,7 @@ public final class TreeNode implements Comparable<TreeNode>
 
         for (PgnGame.Move move : moveList)
         {
-            next = next.branchTo(move.getMoveOnly());
+            next = next.branchTo(move.getBareMove());
             if (next == null) break;
             ret = next;
         }
@@ -140,7 +139,7 @@ public final class TreeNode implements Comparable<TreeNode>
 
         for (int i = 0; i < moveList.size() && i < maxDepth; i++)
         {
-            next = next.branchTo(moveList.get(i).getMoveOnly());
+            next = next.branchTo(moveList.get(i).getBareMove());
             if (next == null) break;
             ret = next;
         }
@@ -167,7 +166,7 @@ public final class TreeNode implements Comparable<TreeNode>
 
         for (int i = 0; i < moveList.size(); i++)
         {
-            next = next.branchTo(moveList.get(i).getMoveOnly());
+            next = next.branchTo(moveList.get(i).getBareMove());
             if (next == null) break;
             ret = next;
         }
@@ -274,7 +273,7 @@ public final class TreeNode implements Comparable<TreeNode>
      */
     TreeNode addNode(String moveSt, String code, String desc) throws IllegalMoveException
     {
-        String moveOnly = PgnGame.Move.getMoveOnly(moveSt);
+        String moveOnly = PgnGame.Move.getBareMove(moveSt);
         TreeNode branch = branchTo(moveOnly);
 
         if (branch == null)

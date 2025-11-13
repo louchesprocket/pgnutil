@@ -179,7 +179,7 @@ Note that any of the transpositional selectors ("xstdeco," "xscideco," "xstdecod
 
 ### Special Output Options
 
-The "special" output options include "-d" (duplicates), "-dm" (duplicate moves), "-do" (duplicate [openings](#openings)), "-doob" (duplicate out-of-book), "-doobm" (duplicate out-of-book moves), "-e" (events), "-csr" (check sequential rounds), "-o" ([opening](#openings) statistics), and "-p" (player statistics). Any of these may be combined with any [matching](#matching) and [replacing](#replacing) options (see above).
+The "special" output options include "-d" (duplicates), "-dm" (duplicate moves), "-do" (duplicate [openings](#openings)), "-doob" (duplicate out-of-book), "-doobm" (duplicate out-of-book moves), "-e" (events), "-csr" (check sequential rounds), "-o" ([opening](#openings) statistics), "-gp" ([grouped positions](#grouped-positions)), and "-p" (player statistics). Any of these may be combined with any [matching](#matching) and [replacing](#replacing) options (see above).
 
 #### Duplicates
 
@@ -289,6 +289,10 @@ which matches the "out-of-book" marker for both Aquarium and Banksia. This regul
 will search for games matching any of the openings from myopeningsfile, using "my book marker" as the demarcation between "book" moves and engine moves.
 
 If pgnutil fails to find the out-of-book marker for a game, it assumes that the first commented move is the first non-book move. This corresponds to the behavior of Arena and Winboard/Xboard. Therefore, pgnutil's default behavior (without the "-bm" option) will correctly identify the out-of-book condition for Aquarium, Banksia, Arena, and Winboard/Xboard.
+
+#### Grouped Positions
+
+The "-gp" (group positions) option functions analogously to "-o" ([opening](#openings) statistics), but instead of grouping results by [opening](#openings), it groups by positions matched from any [position search](#position-search) option ("-mpos," "-posf," "-mfen," or "-ff"). All output selectors available to the "-o" option are also available with "-gp," except the "oid" selector, and will pertain to matched positions rather than openings.
 
 ### Time
 

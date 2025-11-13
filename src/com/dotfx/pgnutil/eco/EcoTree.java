@@ -155,7 +155,7 @@ public final class EcoTree
     public TreeNodeSet getDeepestTranspositionSet(List<PgnGame.Move> moveList) throws IllegalMoveException
     {
         Map<PositionId,Set<TreeNode>> posMap = reader.getPositionMap();
-        Board board = new Board(true);
+        Board<?> board = new Board<>(true);
         Set<TreeNode> deepest = null;
 
         for (int i = board.getPly(); i < moveList.size() && i <= reader.getDeepestPly(); i++)
@@ -241,7 +241,7 @@ public final class EcoTree
         
         while (!children.isEmpty())
         {
-            Board board = new Board(true);
+            Board<?> board = new Board<>(true);
             TreeNode oneChild = children.get(0);
             List<TreeNode> path = oneChild.getPath();
             
