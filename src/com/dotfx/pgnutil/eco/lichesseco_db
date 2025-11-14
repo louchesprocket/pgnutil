@@ -1389,6 +1389,7 @@ D80|Grünfeld Defense: Lutikov Variation|d4 Nf6 c4 g6 Nc3 d5 f3|d1eb3dff62c01270
 E70|King's Indian Defense: Normal Variation|d4 Nf6 c4 g6 Nc3 Bg7 e4|aafb7fa087174aa05e24ebc166a4fac3
 A46|Torre Attack: Wagner Gambit|d4 Nf6 Nf3 e6 Bg5 c5 e4|945a44065ec71207b8fd0e946632474e
 A46|Queen's Pawn Game: Veresov Attack, Classical Defense|d4 Nf6 Nf3 e6 Nc3 d5 Bg5|b1907fae510e7c97d7775ab255072a5a
+A48|London System|d4 Nf6 Nf3 g6 Bf4 Bg7 e3|fd631f82e454f0fb6015d5cf891f43c0
 A48|Queen's Pawn Game: Barry Attack|d4 Nf6 Nf3 g6 Nc3 d5 Bf4|1cc33571a2d9d573c6b8905abab89ac3
 A45|Indian Defense: Gibbins-Weidenhagen Gambit, Maltese Falcon|d4 Nf6 g4 Nxg4 f3 Nf6 e4|2a83431466fd0e9bfb7aa60eafa4d2da
 D01|Richter-Veresov Attack: Veresov Variation|d4 Nf6 Nc3 d5 Bg5 Bf5 Bxf6|e4eb603030f991fbe5817163c177696b
@@ -2036,6 +2037,7 @@ C45|Scotch Game: Classical Variation, Intermezzo Variation|e4 e5 Nf3 Nc6 d4 exd4
 C45|Scotch Game: Romanishin Variation|e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 Nb3 Bb4|39818eeb83f5e50c56fd1d950c4a0d88
 C45|Scotch Game: Modern Defense|e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Qh4 Nc3 Bb4|a5e0cd445f86e70335a2221459c5ae5d
 C53|Italian Game: Classical Variation, Center Holding Variation|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Qe7 d4 Bb6|e14142dd202dd2cc3380e7f4f26b9a63
+C54|Italian Game: Classical Variation, with d5|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d3 d5|2973cff8f039cb1b58d4e456d4f87828
 C54|Italian Game: Classical Variation, Giuoco Pianissimo|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d3 d6|cb4b792b5d63c5fd47e5f49227acf4a2
 C54|Italian Game: Classical Variation, Giuoco Pianissimo, with a6|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d3 a6|fa56c93943eb3142cb6e9fc18f09d5ad
 C51|Italian Game: Evans Gambit, McDonnell Defense|e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Bc5|d0a11c97a4039d65a197795528687492
@@ -2498,6 +2500,8 @@ C54|Italian Game: Classical Variation, Greco Gambit|e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc
 C56|Italian Game: Scotch Gambit, Max Lange Attack, Spielmann Defense|e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O Bc5 e5 Ng4|dff66cd1a28d0aa971e26c18ddea1715
 C45|Scotch Game: Classical Variation, Millennium Variation|e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 Be3 Qf6 c3 Qg6|877835273a602b114041a9ff2db80068
 C50|Italian Game: Hungarian Defense, Tartakower Variation|e4 e5 Nf3 Nc6 Bc4 Be7 d4 exd4 c3 Nf6 e5 Ne4|d9b671b278bd3febab732a9fd432a55a
+C54|Italian Game: Classical Variation, Giuoco Pianissimo|e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 O-O c3 d5|f82413c2e6c5cef52af123327767c98d
+C54|Italian Game: Classical Variation, Giuoco Pianissimo|e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 O-O c3 d6|dd32784185c53d725116a83855c7d91f
 C54|Italian Game: Classical Variation, Giuoco Pianissimo|e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 d6 c3 a6|ecc279ae503226c44670b6b73c5dc2df
 C54|Italian Game: Classical Variation, Giuoco Pianissimo, with h6|e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 d6 c3 h6|8dc132e22a8513aa5dab59b67fc54147
 C53|Italian Game: Classical Variation, La Bourdonnais Variation|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 d6 d4 exd4 cxd4 Bb6|58b47c8a5419ac42566bfb09a9d39f50
