@@ -89,6 +89,8 @@ public class EcoStatsTallier implements Tallier
 
     private static EcoStatsOutputSelector selectors[];
     private static EcoStatsTallier instance;
+    private static boolean trackPlies = false;
+    private static boolean trackDisagree = false;
 
     private final boolean tallyPosition;
     private final TreeMap<TreeNodeSet,AggregateScore> openingsMap;
@@ -117,9 +119,12 @@ public class EcoStatsTallier implements Tallier
             EcoStatsTallier.selectors = new EcoStatsOutputSelector[selectors.length];
 
             for (int i = 0; i < selectors.length; i++)
-                EcoStatsTallier.selectors[i] = new EcoStatsOutputSelector(selectors[i]);
+                EcoStatsTallier.selectors[i] = new EcoStatsOutputSelector(selectors[i], this);
         }
     }
+
+    public void setTrackDisagree(boolean trackDisagree) { EcoStatsTallier.trackDisagree = trackDisagree; }
+    public void setTrackPlies(boolean trackPlies) { EcoStatsTallier.trackPlies = trackPlies; }
 
     @Override
     public void tally(PgnGame game) throws IllegalMoveException
@@ -142,6 +147,9 @@ public class EcoStatsTallier implements Tallier
             case DRAW: score.incDraw(); break;
             default: score.incNoResult();
         }
+
+        if (trackDisagree) score.addDisagree(game.getDisagreeCount());
+        if (trackPlies) score.addOobPlies(game.getPostOpeningPlyCount());
     }
 
     @Override

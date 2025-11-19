@@ -26,8 +26,9 @@ import java.util.*;
 
 public class EcoStatsOutputSelector
 {
-    interface OutputHandler
+    public interface OutputHandler
     {
+        default void configTallier(EcoStatsTallier os) {}
         void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb);
     }
 
@@ -112,6 +113,34 @@ public class EcoStatsOutputSelector
         }
     }
 
+    private static final class DisagreeOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
+        {
+            sb.append(Formats.PERCENT.format(os.getDisagreePct()));
+        }
+
+        @Override
+        public void configTallier(EcoStatsTallier tallier)
+        {
+            tallier.setTrackDisagree(true);
+            tallier.setTrackPlies(true);
+        }
+    }
+
+    private static final class AvgPliesOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(TreeNodeSet opening, AggregateScore os, StringBuilder sb)
+        {
+            sb.append(Formats.DECIMAL.format(os.getAvgOobPlies()));
+        }
+
+        @Override
+        public void configTallier(EcoStatsTallier tallier) { tallier.setTrackPlies(true); }
+    }
+
     private static final class EcoOutputHandler implements OutputHandler
     {
         @Override
@@ -150,6 +179,8 @@ public class EcoStatsOutputSelector
         DRAWS(OutputSelector.Value.DRAWS, new DrawsOutputHandler()), // also applies to player results
         WWINPCT(OutputSelector.Value.WWINPCT, new WhiteWinPctOutputHandler()),
         WWINS(OutputSelector.Value.WWINS, new WhiteWinsOutputHandler()),
+        DISAGREEPCT(OutputSelector.Value.DISAGREEPCT, new DisagreeOutputHandler()),
+        AVGPLIES(OutputSelector.Value.AVGPLIES, new AvgPliesOutputHandler()),
 
         ECO(OutputSelector.Value.ECO, new EcoOutputHandler()),
         ECODESC(OutputSelector.Value.ECODESC, new EcoDescOutputHandler()),
@@ -175,19 +206,21 @@ public class EcoStatsOutputSelector
             return sigMap.get(signifier);
         }
 
+        public void configTallier(EcoStatsTallier os) { outputHandler.configTallier(os); }
         public OutputHandler getOutputHandler() { return outputHandler; }
     }
 
     private final Value value;
     private final OutputHandler handler;
 
-    public EcoStatsOutputSelector(OutputSelector selector) throws SelectorException
+    public EcoStatsOutputSelector(OutputSelector selector, EcoStatsTallier tallier) throws SelectorException
     {
         value = Value.get(selector.getValue());
 
         if (value == null)
             throw new SelectorException("output selector '" + selector + "' is invalid in this context");
 
+        value.configTallier(tallier);
         handler = value.getOutputHandler();
     }
 

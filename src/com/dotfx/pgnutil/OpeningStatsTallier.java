@@ -131,7 +131,7 @@ public class OpeningStatsTallier implements Tallier
         }
     }
 
-    public void setSaveOpeningMoves(boolean saveOpeningMoves) { OpeningStatsTallier.saveOpeningMoves = saveOpeningMoves;}
+    public void setSaveOpeningMoves(boolean saveOpeningMoves) { OpeningStatsTallier.saveOpeningMoves = saveOpeningMoves; }
     public void setTrackDisagree(boolean trackDisagree) { OpeningStatsTallier.trackDisagree = trackDisagree; }
     public void setTrackPlies(boolean trackPlies) { OpeningStatsTallier.trackPlies = trackPlies; }
 
@@ -156,6 +156,20 @@ public class OpeningStatsTallier implements Tallier
         }
     }
 
+    private void countGame(PgnGame game, OpeningStats stats)
+    {
+        switch (game.getResult())
+        {
+            case WHITEWIN: stats.incWhiteWin(); break;
+            case BLACKWIN: stats.incBlackWin(); break;
+            case DRAW: stats.incDraw(); break;
+            default: stats.incNoResult();
+        }
+
+        if (trackDisagree) stats.addDisagree(game.getDisagreeCount());
+        if (trackPlies) stats.addOobPlies(game.getPostOpeningPlyCount());
+    }
+
     @Override
     public void tally(PgnGame game) throws IllegalMoveException
     {
@@ -166,9 +180,9 @@ public class OpeningStatsTallier implements Tallier
     private void tallyPosition(PgnGame game) throws IllegalMoveException
     {
         MoveListId openingId = game.getOpeningId(game.getPosMatchAtPly()); // "opening" = moves up to matched position
-        OpeningStats opening = openingsMap.get(openingId);
+        OpeningStats stats = openingsMap.get(openingId);
 
-        if (opening == null)
+        if (stats == null)
         {
             List<PgnGame.Move> openingMoveList = game.getMoveList().subList(0, game.getPosMatchAtPly());
             if (openingMoveList.isEmpty()) return; // no matched moves
@@ -176,32 +190,23 @@ public class OpeningStatsTallier implements Tallier
             TreeNode ecoNode = ecoTree != null ? ecoTree.getDeepestDefined(openingMoveList) : null;
             TreeNode scidNode = scidEcoTree != null ? scidEcoTree.getDeepestDefined(openingMoveList) : null;
 
-            opening = new OpeningStats(game.getFullMoveStringToPly(game.getPosMatchAtPly()),
+            stats = new OpeningStats(game.getFullMoveStringToPly(game.getPosMatchAtPly()),
                     openingId, ecoNode, scidNode,
                     useXStdEco ? ecoTree.getDeepestTranspositionSet(openingMoveList) : null,
                     useXScidEco ? scidEcoTree.getDeepestTranspositionSet(openingMoveList) : null);
 
-            openingsMap.put(openingId, opening);
+            openingsMap.put(openingId, stats);
         }
 
-        switch (game.getResult())
-        {
-            case WHITEWIN: opening.incWhiteWin(); break;
-            case BLACKWIN: opening.incBlackWin(); break;
-            case DRAW: opening.incDraw(); break;
-            default: opening.incNoResult();
-        }
-
-        if (trackDisagree) opening.addDisagree(game.getDisagreeCount());
-        if (trackPlies) opening.addOobPlies(game.getPostOpeningPlyCount());
+        countGame(game, stats);
     }
 
     private void tallyOpening(PgnGame game) throws IllegalMoveException
     {
         MoveListId openingId = game.getOpeningId();
-        OpeningStats opening = openingsMap.get(openingId);
+        OpeningStats stats = openingsMap.get(openingId);
 
-        if (opening == null)
+        if (stats == null)
         {
             List<PgnGame.Move> openingMoveList = game.getOpeningMoveList();
             if (openingMoveList.isEmpty()) return; // no book moves
@@ -209,23 +214,15 @@ public class OpeningStatsTallier implements Tallier
             TreeNode ecoNode = ecoTree != null ? ecoTree.getDeepestDefined(openingMoveList) : null;
             TreeNode scidNode = scidEcoTree != null ? scidEcoTree.getDeepestDefined(openingMoveList) : null;
 
-            opening = new OpeningStats(saveOpeningMoves ? game.getFullOpeningString() : null, openingId, ecoNode, scidNode,
-                useXStdEco ? ecoTree.getDeepestTranspositionSet(openingMoveList) : null,
-                useXScidEco ? scidEcoTree.getDeepestTranspositionSet(openingMoveList) : null);
+            stats = new OpeningStats(saveOpeningMoves ? game.getFullOpeningString() : null,
+                    openingId, ecoNode, scidNode,
+                    useXStdEco ? ecoTree.getDeepestTranspositionSet(openingMoveList) : null,
+                    useXScidEco ? scidEcoTree.getDeepestTranspositionSet(openingMoveList) : null);
 
-            openingsMap.put(openingId, opening);
+            openingsMap.put(openingId, stats);
         }
 
-        switch (game.getResult())
-        {
-            case WHITEWIN: opening.incWhiteWin(); break;
-            case BLACKWIN: opening.incBlackWin(); break;
-            case DRAW: opening.incDraw(); break;
-            default: opening.incNoResult();
-        }
-
-        if (trackDisagree) opening.addDisagree(game.getDisagreeCount());
-        if (trackPlies) opening.addOobPlies(game.getPostOpeningPlyCount());
+        countGame(game, stats);
     }
 
     @Override

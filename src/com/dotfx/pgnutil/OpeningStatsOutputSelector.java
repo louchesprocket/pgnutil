@@ -313,7 +313,6 @@ public class OpeningStatsOutputSelector
         }
 
         public void configTallier(OpeningStatsTallier os) { outputHandler.configTallier(os); }
-
         public void appendOutput(OpeningStats opening, StringBuilder sb)
         {
             outputHandler.appendOutput(opening, sb);
@@ -333,7 +332,6 @@ public class OpeningStatsOutputSelector
     }
 
     public Value getValue() { return value; }
-
     public void appendOutput(OpeningStats opening, StringBuilder sb)
     {
         value.appendOutput(opening, sb);
