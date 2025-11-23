@@ -239,7 +239,7 @@ public class CLOptionResolver
             if (Arrays.stream(PGNUtil.outputSelectors).anyMatch(s ->
                     s.getValue() == OutputSelector.Value.OID))
             {
-                System.err.println("Output selector '" + OutputSelector.Value.OID + "' is invalid with with option '" +
+                System.err.println("Output selector '" + OutputSelector.Value.OID + "' is invalid with option '" +
                         CLOptions.GP + ".'");
 
                 System.exit(-1);
