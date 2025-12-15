@@ -1856,6 +1856,7 @@ B01|Scandinavian Defense: Anderssen Counterattack, Goteborg System|e4 d5 exd5 Qx
 B01|Scandinavian Defense: Portuguese Gambit, Lusophobe Variation|e4 d5 exd5 Nf6 d4 Bg4 Bb5 Nbd7 Be2|e34aaa209de174dc40697c8a94743982
 B01|Scandinavian Defense: Portuguese Gambit, Banker Variation|e4 d5 exd5 Nf6 d4 Bg4 f3 Bf5 c4|ccc41895d1c65f0027d0282f353f271b
 B01|Scandinavian Defense: Portuguese Gambit, Correspondence Refutation|e4 d5 exd5 Nf6 d4 Bg4 f3 Bf5 g4|a54f759e125d2ebacbff717f98ac3cbc
+C02|French Defense: Advance Variation, Kupreichik Variation|e4 e6 d4 d5 e5 c5 c3 Nc6 Be3|a2f930f36abb51bac4aa1efa5df26528
 C02|French Defense: Advance Variation, Paulsen Attack|e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3|f5aba1556e113e5afc979ad4d4e342bd
 C02|French Defense: Advance Variation, Ruisdonk Gambit|e4 e6 d4 d5 e5 c5 Nf3 cxd4 Bd3|20c2a0c24461a4d5b5b59d111d729bcc
 C02|French Defense: Advance Variation, Nimzowitsch Gambit|e4 e6 d4 d5 e5 c5 Qg4 cxd4 Nf3|06c95b2da419ff57f0854641c150f2bf
@@ -2559,6 +2560,7 @@ C07|French Defense: Tarrasch Variation, Eliskases Variation|e4 e6 d4 d5 Nd2 c5 e
 C05|French Defense: Tarrasch Variation, Closed Variation|e4 e6 d4 d5 Nd2 Nf6 e5 Nfd7 Bd3 c5 c3 Nc6|42c179ffa56f8c48eb4ed6744feccbff
 C05|French Defense: Tarrasch Variation, Botvinnik Variation|e4 e6 d4 d5 Nd2 Nf6 e5 Nfd7 Bd3 c5 c3 b6|b66f30480657e73357b73b51cc953d99
 C17|French Defense: Winawer Variation, Retreat Variation, Armenian Line|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Ba5 b4 cxd4|5c59d99c1a62cce850c3ec1c2db4c233
+C18|French Defense: Winawer Variation, Advance Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7|bf492a695265401c85c91eb3dfa28127
 C18|French Defense: Winawer Variation, Classical Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Qc7|85421924376671d6a65a83b58e0d2dd4
 C18|French Defense: Winawer Variation, Portisch-Hook Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Qa5|bed5b4be0b6f74b2a51a633b6782bf0e
 C17|French Defense: Winawer Variation, Maróczy-Wallis Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 cxd4 axb4 dxc3|ea5e4e892f414422f09d40258764968e
@@ -2759,7 +2761,9 @@ B01|Scandinavian Defense: Grünfeld Variation|e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3
 C02|French Defense: Advance Variation, Milner-Barry Gambit, Hector Variation|e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 Bd3 cxd4 O-O|9c71891ad9d5d44c958e8518593e0c1b
 C10|French Defense: Rubinstein Variation, Kasparov Attack|e4 e6 d4 d5 Nd2 dxe4 Nxe4 Nd7 Nf3 Ngf6 Nxf6 Nxf6 c3|d32a70cb775fefc2fc8325897bcc932a
 C19|French Defense: Winawer Variation, Advance Variation, Smyslov Variation|e4 e6 d4 d5 Nc3 Bb4 e5 Ne7 a3 Bxc3 bxc3 c5 a4|a20f09619f63e9b435c77d358f8c90b0
+C18|French Defense: Winawer Variation, Advance Variation, with Bd3|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Bd3|e432f97a5f91464b0efc44a0537da788
 C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Nf3|9fb304e051bef8b36e03a267a43ec770
+C18|French Defense: Winawer Variation, Advance Variation, with h4|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 h4|f09cea6d52c81c0dd9948b66e12ed595
 C17|French Defense: Winawer Variation, Advance Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 cxd4 axb4 dxc3 Nf3|02c1e990d8d0ea1af40c36c0c2403088
 C15|French Defense: Winawer Variation, Fingerslip Variation, Main Line|e4 e6 d4 d5 Nc3 Bb4 Bd2 dxe4 Qg4 Nf6 Qxg7 Rg8 Qh6|c127b55148fcbb7b8109538443eb6895
 C10|French Defense: Rubinstein Variation, Capablanca Line|e4 e6 d4 d5 Nc3 dxe4 Nxe4 Nd7 Nf3 Ngf6 Nxf6 Nxf6 Ne5|7a0fe070bbad1a377216ea224c501791
@@ -2929,8 +2933,11 @@ C49|Four Knights Game: Spanish Variation, Gunsberg Counterattack|e4 e5 Nf3 Nf6 N
 C49|Four Knights Game: Spanish Variation, Symmetrical Variation, Tarrasch Variation|e4 e5 Nf3 Nf6 Nc3 Nc6 Bb5 Bb4 O-O O-O d3 d6 Bg5 Be6|610c1cee9750d7e5536513a4a9263588
 C40|Latvian Gambit: Behting Variation|e4 e5 Nf3 f5 Bc4 fxe4 Nxe5 Qg5 Nf7 Qxg2 Rf1 d5 Nxh8 Nf6|c3d87f04a47ffb1d0ae4a74b19ab554e
 B01|Scandinavian Defense: Schiller-Pytel Variation, Modern Variation|e4 d5 exd5 Qxd5 Nc3 Qd6 d4 Nf6 Bc4 c6 Nge2 Bf5 Bf4 Qb4|ac28479365bc2c25256f4615df271fd7
+C19|French Defense: Winawer Variation, Advance Variation, Smyslov Variation|e4 e6 d4 d5 Nc3 Bb4 e5 Ne7 a3 Bxc3 bxc3 c5 a4 Qc7|bdf8354783d7e7133431adbdad96403a
 C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Nc6 Nf3 Nge7|86cd7013c773c74d299d82f3995d3917
+C18|French Defense: Winawer Variation, Advance Variation, with Bd3|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Bd3 Qc7|2b68dbb3465eb809328733200b59b744
 C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Nf3 Qc7|126ca3e777563f2d3c732d4bc17a59de
+C18|French Defense: Winawer Variation, Advance Variation, with h4|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 h4 Qc7|3b4a8621d163cfdf0d4ed04370ef2476
 C18|French Defense: Winawer Variation, Warsaw Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Qg4 O-O|5bbc5e2d1ec5fbeb4fad0f0c2b2a7019
 C18|French Defense: Winawer Variation, Poisoned Pawn Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Qg4 Qc7|3e5eb5ada34c1235247a6fe1bc337e8d
 C18|French Defense: Winawer Variation, Eingorn Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Qg4 Kf8|e918dc06d92fc20ddbc7b879949667db
@@ -3084,7 +3091,8 @@ C29|Vienna Game: Vienna Gambit, Wurzburger Trap|e4 e5 Nc3 Nf6 f4 d5 fxe5 Nxe4 d3
 C02|French Defense: Advance Variation, Milner-Barry Gambit, Hector Variation|e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 Bd3 cxd4 O-O Bd7 Re1|bf550618891d4bd59bc897c5e64c3bb6
 C02|French Defense: Advance Variation, Milner-Barry Gambit, Main Line|e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 Bd3 cxd4 cxd4 Bd7 O-O|6fa7f5a07a1673da08284a53669025df
 C06|French Defense: Tarrasch Variation, Closed Variation, Main Line|e4 e6 d4 d5 Nd2 Nf6 e5 Nfd7 Bd3 c5 c3 Nc6 Ne2 cxd4 cxd4|e8a448ee62d827cc85ffe7f3d39e26ca
-C19|French Defense: Winawer Variation, Advance Variation, Smyslov Variation|e4 e6 d4 d5 Nc3 Bb4 e5 Ne7 a3 Bxc3 bxc3 c5 a4 Nbc6 Nf3|bb9eff32c63642dc53d6e8b0a4faedfa
+C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Bd3 Nbc6 Nf3|f255ab8bfc3863060843292928adbc96
+C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 a4 Nbc6 Nf3|bb9eff32c63642dc53d6e8b0a4faedfa
 C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Nf3 Qc7 h4|6c9b4723e067cf66e41b6eac28e7b84f
 C18|French Defense: Winawer Variation, Poisoned Pawn Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Qg4 cxd4 Qxg7|791fa152fb4ff8c3eddc878cdfeebc77
 A08|King's Indian Attack: Sicilian Variation|e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5 g3 Nc6 Bg2 Be7 O-O O-O Re1|2ff11074e1c715853f665e2100ddc6c3
@@ -3126,6 +3134,7 @@ D00|Blackmar-Diemer Gambit Accepted: Teichmann Defense, Seidel-Hall Attack|d4 d5
 D00|Blackmar-Diemer Gambit Accepted: Bogoljubow Defense, Kloss Attack|d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 g6 Bc4 Bg7 O-O O-O Kh1|6157be82c2f7adbf54b9eb01cf25b9b7
 D00|Blackmar-Diemer Gambit Accepted: Bogoljubow Defense, Studier Attack|d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 g6 Bc4 Bg7 O-O O-O Qe1|96d3f11033bd82db6550f7aada90b531
 E09|Catalan Opening: Closed, Main Line|d4 Nf6 c4 e6 Nf3 d5 g3 Be7 Bg2 O-O O-O Nbd7 Qc2 c6 Nbd2|6c4382c2af25261fcf3aa44e798f7653
+D41|Queen's Gambit Declined: Semi-Tarrasch Defense, Endgame Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 c5 cxd5 cxd4 Qxd4 exd5 e4 dxe4 Qxd8|3e601e4e8f7c9f92c3984edc22c40ae7
 D62|Queen's Gambit Declined: Orthodox Defense, Rubinstein Variation, Flohr Line|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Qc2 c5 cxd5|6f4272eb8ba85bd1bdb076a825276e98
 D64|Queen's Gambit Declined: Orthodox Defense, Rubinstein Attack|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1 c6 Qc2|30c13c93663d6da372821bd41a087c19
 D63|Queen's Gambit Declined: Orthodox Defense, Swiss, Carlsbad Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1 a6 cxd5|b1d5dab42d7a51ecd1e6b648cca1aa8a
@@ -3283,6 +3292,8 @@ C42|Petrov's Defense: Classical Attack, Chigorin Variation, Browne Attack|e4 e5 
 C42|Petrov's Defense: Classical Attack, Chigorin Variation, Main Line|e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4 d5 Bd3 Nc6 O-O Be7 c4 Nb4 Be2|93aefbc2d743f699d3b2a990e2a81004
 C25|Vienna Game: Pierce Gambit, Rushmere Attack|e4 e5 Nc3 Nc6 f4 exf4 Nf3 g5 d4 g4 Bc4 gxf3 O-O d5 exd5 Bg4 dxc6|e50aa23c097e00469a117420f15b4d36
 C02|French Defense: Advance Variation, Milner-Barry Gambit, Sørensen Variation|e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 Bd3 cxd4 cxd4 Bd7 O-O Nxd4 Ng5|dc8d3bcfba0f09cd410867015a739fe0
+C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 a4 Nbc6 Nf3 Qa5 Bd2|3b4db621e2a1bef7ce23ac184d635a24
+C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 a4 Nbc6 Nf3 Qa5 Qd2|975e64a775f411915e854975226f8e8c
 C12|French Defense: McCutcheon Variation, Grigoriev Variation|e4 e6 d4 d5 Nc3 Nf6 Bg5 Bb4 e5 h6 exf6 hxg5 fxg7 Rg8 h4 gxh4 Qg4|5a679acd6bdf51e976436c832a78ea8b
 C12|French Defense: McCutcheon Variation, Duras Variation|e4 e6 Nc3 d5 d4 Nf6 Bg5 Bb4 e5 h6 Bd2 Bxc3 bxc3 Ne4 Qg4 Kf8 Bc1|f064eef2b8798711820fb72af8e875f6
 B33|Sicilian Defense: Lasker-Pelikan Variation, Sveshnikov Variation, Chelyabinsk Variation|e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 e5 Ndb5 d6 Bg5 a6 Na3 b5 Nd5|3b7cc02111028ee8c74eaf7ee6befd15
@@ -3364,6 +3375,9 @@ C67|Ruy Lopez: Berlin Defense, Berlin Wall|e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Nd6
 C48|Four Knights Game: Spanish Variation, Bardeleben Variation|e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 Bc5 O-O O-O Nxe5 Nxe5 d4 Bd6 f4 Nc6 e5 Bb4|c1c1a0af4cfb90e5d42dfb43677c643d
 C48|Four Knights Game: Spanish Variation, Rubinstein Variation, Maróczy Variation|e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 Nd4 Be2 Nxf3 Bxf3 Bc5 O-O O-O d3 d6 Na4 Bb6|e544b8574428cc5102cbe922a38043e9
 C42|Petrov's Defense: Classical Attack, Marshall Variation, Chinese Gambit|e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4 d5 Bd3 Bd6 O-O O-O c4 c6 Re1 Bg4|145073201b2c43c741fbd6874d5c3c0e
+C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 a4 Nbc6 Nf3 Qa5 Bd2 c4|56a65d584f863f33a750d0318f0a4167
+C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 a4 Nbc6 Nf3 Qa5 Bd2 Bd7|0c182ab866ccca64b6c64059b305bb40
+C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 a4 Nbc6 Nf3 Qa5 Qd2 Bd7|3bece2973e530beccfb368e52987715b
 C18|French Defense: Winawer Variation, Poisoned Pawn Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Qg4 cxd4 Qxg7 Rg8 Qxh7 Nbc6|bb1bad983fc7c918ed2543cb9b589809
 C11|French Defense: Steinitz Variation, Brodsky-Jones Variation|e4 e6 d4 d5 Nc3 Nf6 e5 Nfd7 f4 c5 dxc5 Nc6 a3 Bxc5 Qg4 O-O Nf3 f6|a35974021e933564cb1e0d41642c1248
 B21|Sicilian Defense: Smith-Morra Gambit Accepted, Chicago Defense|e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Bc4 e6 Nf3 d6 O-O a6 Qe2 b5 Bb3 Ra7|4ff7278bc0ee7af2023d30ab1192dfc4
