@@ -1205,6 +1205,7 @@ C64|Ruy Lopez: Classical Variation, Central Variation|e4 e5 Nf3 Nc6 Bb5 Bc5 c3|b
 C64|Ruy Lopez: Classical Variation, Spanish Wing Gambit|e4 e5 Nf3 Nc6 Bb5 Bc5 b4|2a38c59c97f174e3ecb45b0cba3af0ef
 C68|Ruy Lopez: Exchange Variation|e4 e5 Nf3 Nc6 Bb5 a6 Bxc6|4c6fe44e25d8af3dde0a0919cf7a9ef9
 C65|Ruy Lopez: Berlin Defense|e4 e5 Nf3 Nc6 Bb5 Nf6 O-O|090f0a588dabc3963287c44ccf7ff430
+C65|Ruy Lopez: Berlin Defense, Anti-Berlin Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 d3|00a2c82cc894c0f89d927c3be781616a
 C65|Ruy Lopez: Halloween Attack|e4 e5 Nf3 Nc6 Bb5 Nf6 Nxe5|85e98b84dc488d4ac72af41d11b92bbe
 C44|King's Pawn Game: Tayler Opening|e4 e5 Nf3 Nc6 Be2 Nf6 d4|778854d6243470abf2407a8d158af517
 C44|King's Pawn Game: Schulze-Müller Gambit|e4 e5 Nf3 Nc6 Nxe5 Nxe5 d4|609fdcfe31cf4062d2fa0819eabce80c
@@ -1515,7 +1516,7 @@ C66|Ruy Lopez: Berlin Defense, Improved Steinitz Defense|e4 e5 Nf3 Nc6 Bb5 Nf6 O
 C65|Ruy Lopez: Berlin Defense, Beverwijk Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Bc5|ef775806084380fbd7cfa053fd298ed4
 C65|Ruy Lopez: Berlin Defense, Fishing Pole Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Ng4|c055a6cc54a7a284e3dc030515420c34
 C67|Ruy Lopez: Berlin Defense, Rio Gambit Accepted|e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4|f187330929de545efdc989debdc4400e
-C65|Ruy Lopez: Berlin Defense, Mortimer Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 d3 Ne7|7f0e0d801cd749a919cb2e2445787d7d
+C65|Ruy Lopez: Berlin Defense, Anti-Berlin Variation, Mortimer Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 d3 Ne7|7f0e0d801cd749a919cb2e2445787d7d
 C46|Three Knights Opening: Schlechter Variation|e4 e5 Nf3 Nc6 Nc3 Bb4 Nd5 Nf6|b06e92f81afbf12161d6a17ae6a2f702
 C47|Four Knights Game: Scotch Variation Accepted|e4 e5 Nf3 Nc6 Nc3 Nf6 d4 exd4|19d74b378f255899584245889de10cdc
 C48|Four Knights Game: Spanish Variation, Classical Variation|e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 Bc5|349381ea5bcadee3f3c6947c8177f29f
@@ -1811,9 +1812,9 @@ C69|Ruy Lopez: Exchange Variation, Normal Variation|e4 e5 Nf3 Nc6 Bb5 a6 Bxc6 dx
 C68|Ruy Lopez: Exchange Variation, Keres Variation|e4 e5 Nf3 Nc6 Bb5 a6 Bxc6 dxc6 Nc3|a7ac79c3e9b29b4d32fd734614bfccb4
 C65|Ruy Lopez: Classical Variation, Zukertort Gambit|e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Bc5 c3|7265fe65f48cee4a47116dbe11bfa09f
 C65|Ruy Lopez: Berlin Defense, Nyholm Attack|e4 e5 Nf3 Nc6 Bb5 Nf6 d4 exd4 O-O|934f868d8e524bdd7f28b748e86ef8ad
-C65|Ruy Lopez: Berlin Defense, Duras Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 d3 d6 c4|d9df3a3a30d48b8873ab313f9d7939c5
-C65|Ruy Lopez: Berlin Defense, Anderssen Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 d3 d6 Bxc6|e2128799f5df4c30d0269d320a512a5f
-C65|Ruy Lopez: Berlin Defense, Kaufmann Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 d3 Bc5 Be3|1eec02b61c299a6813bff8e8a22191ee
+C65|Ruy Lopez: Berlin Defense, Anti-Berlin Variation, Duras Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 d3 d6 c4|d9df3a3a30d48b8873ab313f9d7939c5
+C65|Ruy Lopez: Berlin Defense, Anti-Berlin Variation, Anderssen Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 d3 d6 Bxc6|e2128799f5df4c30d0269d320a512a5f
+C65|Ruy Lopez: Berlin Defense, Anti-Berlin Variation, Kaufmann Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 d3 Bc5 Be3|1eec02b61c299a6813bff8e8a22191ee
 C44|King's Pawn Game: Tayler Opening, Basman Gambit|e4 e5 Nf3 Nc6 Be2 Nf6 d4 exd4 e5|69e9d62829ca4a257d6295a1604cb516
 C44|King's Pawn Game: Tayler Opening, Inverted Hanham|e4 e5 Nf3 Nc6 Be2 Nf6 d3 d5 Nbd2|3c4d31b81f37c9e7b00762c19a57697e
 C46|Three Knights Opening: Steinitz-Rosenthal Variation|e4 e5 Nf3 Nc6 Nc3 g6 d4 exd4 Nd5|85a179dfadeb13401347e8d22b6502db
@@ -2083,7 +2084,7 @@ C66|Ruy Lopez: Closed Berlin Defense, Chigorin Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 O
 C67|Ruy Lopez: Berlin Defense, l'Hermet Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Nd6|bd0075975f6bc5b8ff00f5b651889d03
 C67|Ruy Lopez: Berlin Defense, Rio de Janeiro Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Be7|e7402eab6a9f7be879dec1af8d1fa39b
 C67|Ruy Lopez: Berlin Defense, Rosenthal Variation|e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 a6|bd5025c5c53974d806032b56c6d35f31
-C65|Ruy Lopez: Berlin Defense, Mortimer Trap|e4 e5 Nf3 Nc6 Bb5 Nf6 d3 Ne7 Nxe5 c6|84bcf5c6c10626279b82ff767868f5d2
+C65|Ruy Lopez: Berlin Defense, Anti-Berlin Variation, Mortimer Trap|e4 e5 Nf3 Nc6 Bb5 Nf6 d3 Ne7 Nxe5 c6|84bcf5c6c10626279b82ff767868f5d2
 C47|Four Knights Game: Scotch Variation, Oxford Gambit|e4 e5 Nf3 Nc6 Nc3 Nf6 d4 Bb4 d5 Nd4|cbde245a91cea057ecb701ebc63ce02b
 C47|Four Knights Game: Scotch Variation, Krause Gambit, Leonhardt Defense|e4 e5 Nf3 Nc6 Nc3 Nf6 d4 Bb4 Nxe5 Qe7|c276ff9f784d7ee0f74d12e1289f407f
 C47|Four Knights Game: Scotch Variation, Schmid Defense|e4 e5 Nf3 Nc6 Nc3 Nf6 d4 exd4 Nxd4 Nxe4|c3efc523a263d84c71bf0c14a5d8d90a
@@ -2293,6 +2294,7 @@ C54|Italian Game: Classical Variation, Giuoco Pianissimo|e4 e5 Nf3 Nc6 Bc4 Bc5 O
 C53|Italian Game: Classical Variation, Mestel Variation|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Qe7 d4 Bb6 Bg5|3207bab1d89a948be56ae8b7d362e562
 C54|Italian Game: Classical Variation, Greco Gambit, Modern Line|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 e5|bc5fa7d3de76dc641b2f647ea775e970
 C56|Italian Game: Scotch Gambit, Walbrodt-Baird Gambit|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 O-O|38884811091c2593e8f1983764c54225
+C54|Italian Game: Classical Variation, Greco Gambit, Dubov Italian|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 b4|9f7be219972d56d42d6d29db8ebe6f8a
 C54|Italian Game: Classical Variation, Greco Gambit, Traditional Line|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 cxd4|76d4e1968b1629ab06b6d5b9a94fe1e5
 C54|Italian Game: Classical Variation, Giuoco Pianissimo, Albin Variation|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d3 d6 b4|85bb520dabc0adc7204ebb88591c42e3
 C52|Italian Game: Evans Gambit, Slow Variation|e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Ba5 O-O|7b82005845c4bf782c58b8b60e7c652e
@@ -3094,6 +3096,7 @@ C06|French Defense: Tarrasch Variation, Closed Variation, Main Line|e4 e6 d4 d5 
 C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Bd3 Nbc6 Nf3|f255ab8bfc3863060843292928adbc96
 C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 a4 Nbc6 Nf3|bb9eff32c63642dc53d6e8b0a4faedfa
 C19|French Defense: Winawer Variation, Positional Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Nf3 Qc7 h4|6c9b4723e067cf66e41b6eac28e7b84f
+C18|French Defense: Winawer Variation, Poisoned Pawn Variation Declined|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Qg4 Qc7 Bd3|85f7dd92097e4b8b169f9530f59fa9e5
 C18|French Defense: Winawer Variation, Poisoned Pawn Variation|e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3 bxc3 Ne7 Qg4 cxd4 Qxg7|791fa152fb4ff8c3eddc878cdfeebc77
 A08|King's Indian Attack: Sicilian Variation|e4 e6 d3 d5 Nd2 Nf6 Ngf3 c5 g3 Nc6 Bg2 Be7 O-O O-O Re1|2ff11074e1c715853f665e2100ddc6c3
 B22|Sicilian Defense: Alapin Variation, Barmen Defense, Milner-Barry Attack|e4 c5 c3 d5 exd5 Qxd5 d4 Nc6 Nf3 cxd4 cxd4 e5 Nc3 Bb4 Be2|88c2601eec9a5e1244833578affdefa6
