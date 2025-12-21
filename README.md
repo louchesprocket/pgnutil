@@ -120,7 +120,7 @@ means, "Output the value of the 'Event' tag for every game containing 'Blitz' or
 
 ### Output Selectors
 
-By default, pgnutil will output the full text of the game in response to any search operation.  The "-s" option may be used to restrict the output to a list of selected fields. Selected fields may include any PGN tag and should be separated on the command line by commas.
+By default, pgnutil will output full game texts after performing any specified matching and replacing operations.  The "-s" option may be used to restrict the output to a list of selected fields. Selected fields may include any PGN tag and should be separated on the command line by commas.
 
 By default, fields selected by the "-s" option appear on the output separated by the pipe ("|") character.  If a different output delimiter is desired, this may be set with the "-od" (output-delimiter) option.
 

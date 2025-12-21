@@ -691,10 +691,10 @@ public class CLOptions
 
         // delayed initialization, in case "-ef" is set
         CLOptionResolver.addCondition(new OptId[] {OptId.get(ME)}, null, null,
-                new CLOptionResolver.OptHandler()
+                new SetLogic.Handler<OptId>()
                 {
                     @Override
-                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
+                    public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
                                 EcoTree.FileType.STD));
@@ -710,10 +710,10 @@ public class CLOptions
 
         // delayed initialization, in case "-ef" is set
         CLOptionResolver.addCondition(new OptId[] {OptId.get(MED)}, null, null,
-                new CLOptionResolver.OptHandler()
+                new SetLogic.Handler<OptId>()
                 {
                     @Override
-                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
+                    public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco,
                                 Pattern.DOTALL), EcoTree.FileType.STD));
@@ -729,10 +729,10 @@ public class CLOptions
 
         // delayed initialization, in case "-ef" is set
         CLOptionResolver.addCondition(new OptId[] {OptId.get(MSE)}, null, null,
-                new CLOptionResolver.OptHandler()
+                new SetLogic.Handler<OptId>()
                 {
                     @Override
-                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
+                    public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
                                 EcoTree.FileType.SCIDDB));
@@ -748,10 +748,10 @@ public class CLOptions
 
         // delayed initialization, in case "-ef" is set
         CLOptionResolver.addCondition(new OptId[] {OptId.get(MSED)}, null, null,
-                new CLOptionResolver.OptHandler()
+                new SetLogic.Handler<OptId>()
                 {
                     @Override
-                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
+                    public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchEcoDescProcessor(Pattern.compile(eco,
                                 Pattern.DOTALL), EcoTree.FileType.SCIDDB));
@@ -767,10 +767,10 @@ public class CLOptions
 
         // delayed initialization, in case "-ef" is set
         CLOptionResolver.addCondition(new OptId[] {OptId.get(MXE)}, null, null,
-                new CLOptionResolver.OptHandler()
+                new SetLogic.Handler<OptId>()
                 {
                     @Override
-                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
+                    public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
                                 EcoTree.FileType.STD));
@@ -786,10 +786,10 @@ public class CLOptions
 
         // delayed initialization, in case "-ef" is set
         CLOptionResolver.addCondition(new OptId[] {OptId.get(MXED)}, null, null,
-                new CLOptionResolver.OptHandler()
+                new SetLogic.Handler<OptId>()
                 {
                     @Override
-                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
+                    public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco,
                                 Pattern.DOTALL), EcoTree.FileType.STD));
@@ -805,10 +805,10 @@ public class CLOptions
 
         // delayed initialization, in case "-ef" is set
         CLOptionResolver.addCondition(new OptId[] {OptId.get(MXSE)}, null, null,
-                new CLOptionResolver.OptHandler()
+                new SetLogic.Handler<OptId>()
                 {
                     @Override
-                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
+                    public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoProcessor(Pattern.compile(eco, Pattern.DOTALL),
                                 EcoTree.FileType.SCIDDB));
@@ -824,10 +824,10 @@ public class CLOptions
 
         // delayed initialization, in case "-ef" is set
         CLOptionResolver.addCondition(new OptId[] {OptId.get(MXSED)}, null, null,
-                new CLOptionResolver.OptHandler()
+                new SetLogic.Handler<OptId>()
                 {
                     @Override
-                    public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> intersects)
+                    public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> intersects)
                     {
                         PGNUtil.addMatchProcessor(new PGNUtil.MatchXEcoDescProcessor(Pattern.compile(eco,
                                 Pattern.DOTALL), EcoTree.FileType.SCIDDB));

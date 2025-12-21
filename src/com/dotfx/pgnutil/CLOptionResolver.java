@@ -31,21 +31,14 @@ import java.util.stream.Stream;
 
 public class CLOptionResolver
 {
-    public interface OptHandler
-    {
-        default void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects) {}
-        default void handleIfAny(Map<OptId,Integer> setOpts, Set<OptId> ifAnyIntersects) {}
-        default void handleIfNone(Map<OptId,Integer> setOpts, Set<OptId> checkIntersects) {}
-    }
-
-    public static class PrintPositionHandler implements OptHandler
+    public static class PrintPositionHandler implements SetLogic.Handler<OptId>
     {
         private final String moveSt;
 
         public PrintPositionHandler(String moveSt) { this.moveSt = moveSt; }
 
         @Override
-        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
+        public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
         {
             try
             {
@@ -61,7 +54,7 @@ public class CLOptionResolver
         }
     }
 
-    public static class MakeDbHandler implements OptHandler
+    public static class MakeDbHandler implements SetLogic.Handler<OptId>
     {
         private final EcoTree.FileType type;
         private final File inFile;
@@ -73,7 +66,7 @@ public class CLOptionResolver
         }
 
         @Override
-        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
+        public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
         {
             try
             {
@@ -95,7 +88,7 @@ public class CLOptionResolver
         }
     }
 
-    public static class DbDiffHandler implements OptHandler
+    public static class DbDiffHandler implements SetLogic.Handler<OptId>
     {
         private final EcoTree.FileType type;
         private final File inFile;
@@ -107,7 +100,7 @@ public class CLOptionResolver
         }
 
         @Override
-        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
+        public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
         {
             try
             {
@@ -134,10 +127,10 @@ public class CLOptionResolver
     /**
      * For options that are disallowed from appearing with specific other options.
      */
-    private static class MutexHandler implements OptHandler
+    private static class MutexHandler implements SetLogic.Handler<OptId>
     {
         @Override
-        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
+        public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
         {
             if (setIntersects.size() > 1)
             {
@@ -152,10 +145,10 @@ public class CLOptionResolver
     /**
      * For options that can only appear once, but may appear with other options.
      */
-    private static class SingletonHandler implements OptHandler
+    private static class SingletonHandler implements SetLogic.Handler<OptId>
     {
         @Override
-        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
+        public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
         {
             for (OptId opt : setIntersects)
             {
@@ -171,10 +164,10 @@ public class CLOptionResolver
     /**
      * For options that must stand alone.
      */
-    private static class UtilHandler implements OptHandler
+    private static class UtilHandler implements SetLogic.Handler<OptId>
     {
         @Override
-        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
+        public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
         {
             if (setOpts.size() > 1)
             {
@@ -184,7 +177,7 @@ public class CLOptionResolver
         }
     }
 
-    public static class ReplaceHandler implements OptHandler
+    public static class ReplaceHandler implements SetLogic.Handler<OptId>
     {
         private final Pattern searchPattern;
         private final String replacement;
@@ -196,13 +189,13 @@ public class CLOptionResolver
         }
 
         @Override
-        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
+        public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
         {
             PGNUtil.addReplaceProcessor(new PGNUtil.ReplaceProcessor(searchPattern, replacement));
         }
     }
 
-    private static class OpeningsHandler implements OptHandler
+    private static class OpeningsHandler implements SetLogic.Handler<OptId>
     {
         @Override
         public void handleIfNone(Map<OptId,Integer> setOpts, Set<OptId> checkIntersects) // no ECO options set
@@ -213,7 +206,7 @@ public class CLOptionResolver
         }
     }
 
-    public static class GroupPositionsHandler implements OptHandler
+    public static class GroupPositionsHandler implements SetLogic.Handler<OptId>
     {
         private static Set<LooseBoard> positionSet;
 
@@ -231,7 +224,7 @@ public class CLOptionResolver
         }
     }
 
-    public static class GroupPositionsErrorHandler implements OptHandler
+    public static class GroupPositionsErrorHandler implements SetLogic.Handler<OptId>
     {
         @Override
         public void handleIfAny(Map<OptId,Integer> setOpts, Set<OptId> ifAnyIntersects) // -s
@@ -256,7 +249,7 @@ public class CLOptionResolver
         }
     }
 
-    public static class OpeningsErrorHandler implements OptHandler
+    public static class OpeningsErrorHandler implements SetLogic.Handler<OptId>
     {
         @Override
         public void handleIfNone(Map<OptId,Integer> setOpts, Set<OptId> checkIntersects)
@@ -268,7 +261,7 @@ public class CLOptionResolver
         }
     }
 
-    public static class GameNumHandler implements OptHandler
+    public static class GameNumHandler implements SetLogic.Handler<OptId>
     {
         public void handleIfAny(Map<OptId,Integer> setOpts, Set<OptId> ifAnyIntersects)
         {
@@ -283,14 +276,14 @@ public class CLOptionResolver
         }
     }
 
-    public static class PlayerHandler implements OptHandler
+    public static class PlayerHandler implements SetLogic.Handler<OptId>
     {
         private final Pattern playerPattern;
 
         public PlayerHandler(Pattern playerPattern) { this.playerPattern = playerPattern; }
 
         @Override
-        public void handleOpts(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
+        public void handleChecked(Map<OptId,Integer> setOpts, Set<OptId> setIntersects)
         {
             if (CLOptions.getCount(OptId.MATCHPLAYER) > 2)
             {
@@ -340,7 +333,7 @@ public class CLOptionResolver
         }
     }
 
-    public static class EcoHandler implements OptHandler
+    public static class EcoHandler implements SetLogic.Handler<OptId>
     {
         private final boolean transpose;
         private final EcoTree.FileType type;
@@ -368,7 +361,7 @@ public class CLOptionResolver
         }
     }
 
-    public static class ClockBelowHandler implements OptHandler
+    public static class ClockBelowHandler implements SetLogic.Handler<OptId>
     {
         private final Clock clock;
 
@@ -388,7 +381,7 @@ public class CLOptionResolver
         }
     }
 
-    private static class DefaultSelectorsHandler implements OptHandler
+    private static class DefaultSelectorsHandler implements SetLogic.Handler<OptId>
     {
         @Override
         public void handleIfNone(Map<OptId,Integer> setOpts, Set<OptId> checkIntersects)
@@ -397,56 +390,12 @@ public class CLOptionResolver
         }
     }
 
-    private static class ConditionSet
+    private static final Set<SetLogic<OptId>> condSetSet = new HashSet<>();
+
+    public static void addCondition(OptId[] checkOpts, OptId[] ifAnyOf, OptId[] ifNoneOf,
+                                    SetLogic.Handler<OptId> handler)
     {
-        private final Set<OptId> checkOpts;
-        private final Set<OptId> ifAnyOf;
-        private final Set<OptId> ifNoneOf;
-        private final OptHandler handler;
-
-        private ConditionSet(OptId[] checkOpts, OptId[] ifAnyOf, OptId[] ifNoneOf, OptHandler handler)
-        {
-            this.checkOpts = new HashSet<>(Arrays.asList(checkOpts));
-            this.ifAnyOf = ifAnyOf == null ? new HashSet<>() : new HashSet<>(Arrays.asList(ifAnyOf));
-            this.ifNoneOf = ifNoneOf == null ? new HashSet<>() : new HashSet<>(Arrays.asList(ifNoneOf));
-            this.handler = handler;
-        }
-
-        private void handle(final Map<OptId,Integer> setOpts)
-        {
-            Set<OptId> checkIntersects =
-                    setOpts.keySet().stream().filter(checkOpts::contains).collect(Collectors.toSet());
-
-            if (checkIntersects.isEmpty()) return;
-            handler.handleOpts(setOpts, checkIntersects);
-
-            Set<OptId> anyIntersects = setOpts.keySet().stream().filter(ifAnyOf::contains).collect(Collectors.toSet());
-            if (!anyIntersects.isEmpty()) handler.handleIfAny(setOpts, anyIntersects);
-
-            if (setOpts.keySet().stream().noneMatch(ifNoneOf::contains)) handler.handleIfNone(setOpts, checkIntersects);
-        }
-
-        @Override
-        public final boolean equals(Object other)
-        {
-            ConditionSet that = (ConditionSet)other;
-
-            return that != null && checkOpts.equals(that.checkOpts) && ifAnyOf.equals(that.ifAnyOf) &&
-                    ifNoneOf.equals(that.ifNoneOf);
-        }
-
-        @Override
-        public final int hashCode()
-        {
-            return ConditionSet.class.hashCode() ^ checkOpts.hashCode() ^ ifAnyOf.hashCode() ^ ifNoneOf.hashCode();
-        }
-    }
-
-    private static final Set<ConditionSet> condSetSet = new HashSet<>();
-
-    public static void addCondition(OptId[] checkOpts, OptId[] ifAnyOf, OptId[] ifNoneOf, OptHandler handler)
-    {
-        condSetSet.add(new ConditionSet(checkOpts, ifAnyOf, ifNoneOf, handler));
+        condSetSet.add(new SetLogic<>(checkOpts, ifAnyOf, ifNoneOf, handler));
     }
 
     public static void resolveOpts(final Map<OptId,Integer> setOpts)
@@ -492,29 +441,29 @@ public class CLOptionResolver
         final OptId[] utilOpts = new OptId[] {OptId.get(CLOptions.MKDB), OptId.get(CLOptions.MKDBS),
                 OptId.get(CLOptions.DDB), OptId.get(CLOptions.DDBS), OptId.get(CLOptions.PP)};
 
-        new ConditionSet(topLevelOpts, null, null, new MutexHandler()).handle(setOpts);
-        new ConditionSet(ecoOpts, null, null, new MutexHandler()).handle(setOpts);
-        new ConditionSet(matchOpeningOpts, null, null, new MutexHandler()).handle(setOpts);
-        new ConditionSet(matchPositionOpts, null, null, new MutexHandler()).handle(setOpts);
-        new ConditionSet(singletonOpts, null, null, new SingletonHandler()).handle(setOpts);
-        new ConditionSet(utilOpts, null, null, new UtilHandler()).handle(setOpts);
+        new SetLogic<OptId>(topLevelOpts, null, null, new MutexHandler()).handle(setOpts);
+        new SetLogic<OptId>(ecoOpts, null, null, new MutexHandler()).handle(setOpts);
+        new SetLogic<OptId>(matchOpeningOpts, null, null, new MutexHandler()).handle(setOpts);
+        new SetLogic<OptId>(matchPositionOpts, null, null, new MutexHandler()).handle(setOpts);
+        new SetLogic<OptId>(singletonOpts, null, null, new SingletonHandler()).handle(setOpts);
+        new SetLogic<OptId>(utilOpts, null, null, new UtilHandler()).handle(setOpts);
 
-        new ConditionSet(groupSubOpts,null, new OptId[] {OptId.get(CLOptions.O), OptId.get(CLOptions.GP)},
+        new SetLogic<OptId>(groupSubOpts,null, new OptId[] {OptId.get(CLOptions.O), OptId.get(CLOptions.GP)},
                 new OpeningsErrorHandler()).handle(setOpts);
 
-        new ConditionSet(new OptId[] {OptId.get(CLOptions.O)},null, ecoOpts,
+        new SetLogic<OptId>(new OptId[] {OptId.get(CLOptions.O)},null, ecoOpts,
                 new OpeningsHandler()).handle(setOpts);
 
-        new ConditionSet(new OptId[] {OptId.get(CLOptions.GP)}, new OptId[] {OptId.get(CLOptions.S)}, matchPositionOpts,
+        new SetLogic<OptId>(new OptId[] {OptId.get(CLOptions.GP)}, new OptId[] {OptId.get(CLOptions.S)}, matchPositionOpts,
                 new GroupPositionsErrorHandler()).handle(setOpts);
 
-        new ConditionSet(new OptId[] {OptId.get(CLOptions.GP)},null, ecoOpts,
+        new SetLogic<OptId>(new OptId[] {OptId.get(CLOptions.GP)},null, ecoOpts,
                 new GroupPositionsHandler()).handle(setOpts);
 
-        new ConditionSet(new OptId[] {OptId.get(CLOptions.S)},null, topLevelOpts,
+        new SetLogic<OptId>(new OptId[] {OptId.get(CLOptions.S)},null, topLevelOpts,
                 new DefaultSelectorsHandler()).handle(setOpts);
 
         // anything else requiring delayed initialization
-        for (ConditionSet cs : condSetSet) cs.handle(setOpts);
+        for (SetLogic<OptId> sl : condSetSet) sl.handle(setOpts);
     }
 }
