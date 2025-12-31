@@ -441,26 +441,26 @@ public class CLOptionResolver
         final OptId[] utilOpts = new OptId[] {OptId.get(CLOptions.MKDB), OptId.get(CLOptions.MKDBS),
                 OptId.get(CLOptions.DDB), OptId.get(CLOptions.DDBS), OptId.get(CLOptions.PP)};
 
-        new SetLogic<OptId>(topLevelOpts, null, null, new MutexHandler()).handle(setOpts);
-        new SetLogic<OptId>(ecoOpts, null, null, new MutexHandler()).handle(setOpts);
-        new SetLogic<OptId>(matchOpeningOpts, null, null, new MutexHandler()).handle(setOpts);
-        new SetLogic<OptId>(matchPositionOpts, null, null, new MutexHandler()).handle(setOpts);
-        new SetLogic<OptId>(singletonOpts, null, null, new SingletonHandler()).handle(setOpts);
-        new SetLogic<OptId>(utilOpts, null, null, new UtilHandler()).handle(setOpts);
+        new SetLogic<>(topLevelOpts, null, null, new MutexHandler()).handle(setOpts);
+        new SetLogic<>(ecoOpts, null, null, new MutexHandler()).handle(setOpts);
+        new SetLogic<>(matchOpeningOpts, null, null, new MutexHandler()).handle(setOpts);
+        new SetLogic<>(matchPositionOpts, null, null, new MutexHandler()).handle(setOpts);
+        new SetLogic<>(singletonOpts, null, null, new SingletonHandler()).handle(setOpts);
+        new SetLogic<>(utilOpts, null, null, new UtilHandler()).handle(setOpts);
 
-        new SetLogic<OptId>(groupSubOpts,null, new OptId[] {OptId.get(CLOptions.O), OptId.get(CLOptions.GP)},
+        new SetLogic<>(groupSubOpts,null, new OptId[] {OptId.get(CLOptions.O), OptId.get(CLOptions.GP)},
                 new OpeningsErrorHandler()).handle(setOpts);
 
-        new SetLogic<OptId>(new OptId[] {OptId.get(CLOptions.O)},null, ecoOpts,
+        new SetLogic<>(new OptId[] {OptId.get(CLOptions.O)},null, ecoOpts,
                 new OpeningsHandler()).handle(setOpts);
 
-        new SetLogic<OptId>(new OptId[] {OptId.get(CLOptions.GP)}, new OptId[] {OptId.get(CLOptions.S)}, matchPositionOpts,
+        new SetLogic<>(new OptId[] {OptId.get(CLOptions.GP)}, new OptId[] {OptId.get(CLOptions.S)}, matchPositionOpts,
                 new GroupPositionsErrorHandler()).handle(setOpts);
 
-        new SetLogic<OptId>(new OptId[] {OptId.get(CLOptions.GP)},null, ecoOpts,
+        new SetLogic<>(new OptId[] {OptId.get(CLOptions.GP)},null, ecoOpts,
                 new GroupPositionsHandler()).handle(setOpts);
 
-        new SetLogic<OptId>(new OptId[] {OptId.get(CLOptions.S)},null, topLevelOpts,
+        new SetLogic<>(new OptId[] {OptId.get(CLOptions.S)},null, topLevelOpts,
                 new DefaultSelectorsHandler()).handle(setOpts);
 
         // anything else requiring delayed initialization
