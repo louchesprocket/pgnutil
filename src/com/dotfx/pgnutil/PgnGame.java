@@ -246,6 +246,7 @@ public final class PgnGame
     private transient List<Move> openingMoveList;
     private transient String openingString;
     private transient int posMatchAtPly;
+    private transient int materialMatchAtPly;
 
     private transient Clock lowClockWhite, lowClockBlack;
     private transient final Map<EcoTree.FileType,TreeNodeSet> xEcoCacheMap; // transposed ECO TreeNodeSets
@@ -382,6 +383,7 @@ public final class PgnGame
     public int getPlyCount() { return moves.size(); }
     public String getOrigText() { return origText; }
     public int getPosMatchAtPly() { return posMatchAtPly; }
+    public int getMatMatchAtPly() { return materialMatchAtPly; }
     public boolean contains(CharSequence s) { return origText.contains(s); }
     
     // PGN seven-tag roster
@@ -792,7 +794,7 @@ public final class PgnGame
     {
         LooseBoard looseBoard = new LooseBoard(true);
 
-        for (PgnGame.Move move : getMoveList())
+        for (Move move : getMoveList())
         {
             if (looseBoard.getWhitePieceCount() < minWhitePieces || looseBoard.getBlackPieceCount() < minBlackPieces)
                 break;
@@ -804,6 +806,31 @@ public final class PgnGame
             }
 
             looseBoard.move(move);
+        }
+
+        return false;
+    }
+
+    public boolean containsMaterial(Material material)
+            throws IllegalMoveException
+    {
+        int whitePieceCount = material.getWhitePieceCount();
+        int blackPieceCount = material.getBlackPieceCount();
+
+        Board<?> board = new Board<>(true);
+
+        for (Move move : getMoveList())
+        {
+            if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount)
+                break;
+
+            if (material.equalsBoard(board))
+            {
+                materialMatchAtPly = move.getPly() - 1;
+                return true;
+            }
+
+            board.move(move);
         }
 
         return false;

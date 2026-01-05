@@ -81,6 +81,7 @@ public class CLOptions
     public static final String MKDB = "-mkdb"; // util make ECO d.b.
     public static final String MKDBS = "-mkdbs"; // util make SCID ECO d.b.
     public static final String ML = "-ml";
+    public static final String MM = "-mm";
     public static final String MO = "-mo";
     public static final String MP = "-mp";
     public static final String MPOS = "-mpos";
@@ -159,6 +160,7 @@ public class CLOptions
         MATCHECODESC(MED),
         MATCHFEN(MFEN),
         MATCHLOSER(ML),
+        MATCHMATERIAL(MM),
         MATCHOPENING(MO),
         MATCHPLAYER(MP),
         MATCHPOSITION(MPOS),
@@ -601,6 +603,21 @@ public class CLOptions
         catch (NullPointerException e)
         {
             System.err.println("illegal move in parameter '" + moveSt + "'");
+            System.exit(-1);
+        }
+    }
+
+    @Option(name = MM, aliases = "-match_material", metaVar = "<spec>",
+            usage = "output games wherein the material specified in <spec> appeared on the board")
+    private void setMaterial(String spec)
+    {
+        countOption(OptId.get(MM));
+
+        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchMaterialProcessor(new Material(spec))); }
+
+        catch (Material.CountException e)
+        {
+            System.err.println(e.getLocalizedMessage());
             System.exit(-1);
         }
     }

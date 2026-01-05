@@ -68,7 +68,7 @@ public class NumberUtils
 
     public static String longToHex(long input, boolean trimLeadingZeroes)
     {
-        long v = input & 0xFFFFFFFFFFFFFFFFL;
+        long v = input;
         byte[] result = new byte[16];
 
         for (int i = 0; i < result.length; i++)

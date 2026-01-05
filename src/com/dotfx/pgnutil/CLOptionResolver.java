@@ -420,7 +420,7 @@ public class CLOptionResolver
                 OptId.get(CLOptions.MFEN), OptId.get(CLOptions.FF)};
 
         final OptId[] singletonOpts = new OptId[] {OptId.get(CLOptions.MPOS), OptId.get(CLOptions.POSF),
-                OptId.get(CLOptions.MFEN), OptId.get(CLOptions.FF), OptId.get(CLOptions.PP),
+                OptId.get(CLOptions.MFEN), OptId.get(CLOptions.FF), OptId.get(CLOptions.PP), OptId.get(CLOptions.MM),
                 OptId.get(CLOptions.GN), OptId.get(CLOptions.GNF), OptId.get(CLOptions.MW), OptId.get(CLOptions.ML),
                 OptId.get(CLOptions.TF), OptId.get(CLOptions.LELO), OptId.get(CLOptions.HELO), OptId.get(CLOptions.LED),
                 OptId.get(CLOptions.HED), OptId.get(CLOptions.CB), OptId.get(CLOptions.CNB), OptId.get(CLOptions.ELO),

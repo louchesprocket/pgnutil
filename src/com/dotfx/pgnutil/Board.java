@@ -107,120 +107,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         @Override
         public String toString() { return name().toLowerCase(); }
     }
-    
-    public enum PieceType
-    {
-        PAWN("p"),
-        ROOK("R"),
-        KNIGHT("N"),
-        BISHOP("B"),
-        QUEEN("Q"),
-        KING("K");
-        
-        private static final Map<String,PieceType> sigMap = new HashMap<>();
-        private final String signifier;
-        
-        static
-        {
-            for (PieceType r : PieceType.values()) sigMap.put(r.toString(), r);
-        }
-        
-        PieceType(String signifier) { this.signifier = signifier; }
-        @Override public String toString() { return signifier; }
-        
-        public static PieceType get(String signifier)
-        {
-            return sigMap.get(signifier);
-        }
-        public static PieceType get(char signifier) { return sigMap.get(String.valueOf(signifier)); }
-    }
-    
-    public enum Piece
-    {
-        WHITE_PAWN(Color.WHITE, PieceType.PAWN, 0),
-        WHITE_ROOK(Color.WHITE, PieceType.ROOK, 1),
-        WHITE_KNIGHT(Color.WHITE, PieceType.KNIGHT, 2),
-        WHITE_BISHOP(Color.WHITE, PieceType.BISHOP, 3),
-        WHITE_QUEEN(Color.WHITE, PieceType.QUEEN, 4),
-        WHITE_KING(Color.WHITE, PieceType.KING, 5),
 
-        BLACK_PAWN(Color.BLACK, PieceType.PAWN, 6),
-        BLACK_ROOK(Color.BLACK, PieceType.ROOK, 7),
-        BLACK_KNIGHT(Color.BLACK, PieceType.KNIGHT, 8),
-        BLACK_BISHOP(Color.BLACK, PieceType.BISHOP, 9),
-        BLACK_QUEEN(Color.BLACK, PieceType.QUEEN, 10),
-        BLACK_KING(Color.BLACK, PieceType.KING, 11);
-
-        private final PieceType pieceType;
-        private final Color color;
-        private final int code;
-        
-        Piece(Color color, PieceType pieceType, int code)
-        {
-            this.pieceType = pieceType;
-            this.color = color;
-            this.code = code;
-        }
-
-        public static Piece get(Color color, PieceType type)
-        {
-            if (color == Color.WHITE)
-                switch (type)
-                {
-                    case PAWN: return WHITE_PAWN;
-                    case ROOK: return WHITE_ROOK;
-                    case KNIGHT: return WHITE_KNIGHT;
-                    case BISHOP: return WHITE_BISHOP;
-                    case QUEEN: return WHITE_QUEEN;
-                    case KING: return WHITE_KING;
-                    default: return null;
-                }
-
-            else
-                switch (type)
-                {
-                    case PAWN: return BLACK_PAWN;
-                    case ROOK: return BLACK_ROOK;
-                    case KNIGHT: return BLACK_KNIGHT;
-                    case BISHOP: return BLACK_BISHOP;
-                    case QUEEN: return BLACK_QUEEN;
-                    case KING: return BLACK_KING;
-                    default: return null;
-                }
-        }
-
-        public static Piece get(Character p)
-        {
-            switch (p)
-            {
-                case 'P': return WHITE_PAWN;
-                case 'p': return BLACK_PAWN;
-                case 'R': return WHITE_ROOK;
-                case 'r': return BLACK_ROOK;
-                case 'N': return WHITE_KNIGHT;
-                case 'n': return BLACK_KNIGHT;
-                case 'B': return WHITE_BISHOP;
-                case 'b': return BLACK_BISHOP;
-                case 'Q': return WHITE_QUEEN;
-                case 'q': return BLACK_QUEEN;
-                case 'K': return WHITE_KING;
-                case 'k': return BLACK_KING;
-                default: return null;
-            }
-        }
-        
-        public final PieceType getType() { return pieceType; }
-        public final Color getColor() { return color; }
-        public final byte toByte() { return (byte)code; }
-        
-        @Override
-        public String toString()
-        {
-            return color == Color.WHITE ? getType().toString().toUpperCase() :
-                getType().toString().toLowerCase();
-        }
-    }
-    
     private static final int whiteKCastleSquares[] = new int[] {4, 5, 6};
     private static final int whiteQCastleSquares[] = new int[] {2, 3, 4};
     private static final int blackKCastleSquares[] = new int[] {60, 61, 62};
@@ -590,7 +477,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         int span = end > start ? end - start : start - end;
         
         // en passant capture
-        if (end == epCandidate && movingPiece.getType() == PieceType.PAWN)
+        if (end == epCandidate && movingPiece.getType() == Material.Type.PAWN)
         {
             int savedCaptureLoc = color == Color.WHITE ? epCandidate - 8 : epCandidate + 8;
             Piece savedCapture = position[savedCaptureLoc];
@@ -619,7 +506,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         
             try
             {
-                if (movingPiece.getType() == PieceType.KING)
+                if (movingPiece.getType() == Material.Type.KING)
                 {
                     if (span == 2) // castle
                     {
@@ -694,7 +581,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
      * @param promoteTo
      * @return 
      */
-    public final Board<?> move(int start, int end, PieceType promoteTo) throws IllegalMoveException
+    public final Board<?> move(int start, int end, Material.Type promoteTo) throws IllegalMoveException
     {
         ply++;
         
@@ -824,7 +711,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         return this;
     }
     
-    public final Board<?> copyAndMove(int start, int end, PieceType promoteTo) throws IllegalMoveException
+    public final Board<?> copyAndMove(int start, int end, Material.Type promoteTo) throws IllegalMoveException
     {
         return copy().move(start, end, promoteTo);
     }
@@ -862,7 +749,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
     public final Board<?> move(String san) throws IllegalMoveException
     {
         Color color = (ply ^ 1) > ply ? Color.WHITE : Color.BLACK;
-        PieceType promoteTo = null;
+        Material.Type promoteTo = null;
         int len = san.length();
         int chopLen = len;
         
@@ -900,7 +787,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         
         if (Character.isUpperCase(lastChar)) // promotion
         {
-            promoteTo = PieceType.get(lastChar);
+            promoteTo = Material.Type.get(lastChar);
             while (!Character.isDigit(san.charAt(san.length() - 1))) san = san.substring(0, --len);
         }
         
@@ -916,7 +803,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
             {
                 Piece piece = position[i];
                 
-                if (piece != null && piece.getType() == PieceType.PAWN &&
+                if (piece != null && piece.getType() == Material.Type.PAWN &&
                     piece.getColor() == color && canMove(i, endSquare) &&
                     !isMovingIntoCheck(i, endSquare))
                     return move(i, endSquare, promoteTo);
@@ -932,7 +819,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         if (sanStartLast == 'x' || !Character.isLetterOrDigit(sanStartLast))
             sanStart = sanStart.substring(0, sanStartLen - 1); // chop capture symbol
         
-        PieceType pieceType = PieceType.get(sanStart.charAt(0));
+        Material.Type type = Material.Type.get(sanStart.charAt(0));
         String disambig = sanStart.length() > 1 ? sanStart.substring(1) : null;
         
         if (disambig != null)
@@ -948,7 +835,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
                 {
                     Piece piece = position[i];
 
-                    if (piece != null && piece.getType() == pieceType &&
+                    if (piece != null && piece.getType() == type &&
                         piece.getColor() == color && canMove(i, endSquare) &&
                         !isMovingIntoCheck(i, endSquare))
                         return move(i, endSquare, promoteTo);
@@ -963,7 +850,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
                 {
                     Piece piece = position[i];
 
-                    if (piece != null && piece.getType() == pieceType &&
+                    if (piece != null && piece.getType() == type &&
                         piece.getColor() == color && canMove(i, endSquare) &&
                         !isMovingIntoCheck(i, endSquare))
                         return move(i, endSquare, promoteTo);
@@ -977,7 +864,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         {
             Piece piece = position[i];
             
-            if (piece != null && piece.getType() == pieceType &&
+            if (piece != null && piece.getType() == type &&
                 piece.getColor() == color && i != endSquare &&
                 canMove(i, endSquare) && !isMovingIntoCheck(i, endSquare))
                 return move(i, endSquare, promoteTo);
@@ -995,7 +882,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
     public final String normalize(String san, boolean showCheck) throws IllegalMoveException
     {
         Color color = (ply ^ 1) > ply ? Color.WHITE : Color.BLACK;
-        PieceType promoteTo = null;
+        Material.Type promoteTo = null;
         int len = san.length();
         int chopLen = len;
         
@@ -1023,7 +910,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         
         if (Character.isUpperCase(lastChar)) // promotion
         {
-            promoteTo = PieceType.get(lastChar);
+            promoteTo = Material.Type.get(lastChar);
             while (!Character.isDigit(san.charAt(san.length() - 1))) san = san.substring(0, --len);
         }
         
@@ -1039,7 +926,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
             {
                 Piece piece = position[i];
                 
-                if (piece != null && piece.getType() == PieceType.PAWN &&
+                if (piece != null && piece.getType() == Material.Type.PAWN &&
                     piece.getColor() == color && moveTest(i, endSquare))
                     return coordToSan(i, endSquare, promoteTo, showCheck);
             }
@@ -1054,7 +941,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         if (sanStartLast == 'x' || !Character.isLetterOrDigit(sanStartLast))
             sanStart = sanStart.substring(0, sanStartLen - 1); // chop capture symbol
         
-        PieceType pieceType = PieceType.get(sanStart.charAt(0));
+        Material.Type type = Material.Type.get(sanStart.charAt(0));
         String disambig = sanStart.length() > 1 ? sanStart.substring(1) : null;
         
         if (disambig != null)
@@ -1075,7 +962,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
                 {
                     Piece piece = position[i];
 
-                    if (piece != null && piece.getType() == pieceType && piece.getColor() == color &&
+                    if (piece != null && piece.getType() == type && piece.getColor() == color &&
                             moveTest(i, endSquare))
                         return coordToSan(i, endSquare, promoteTo, showCheck);
                 }
@@ -1089,7 +976,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
                 {
                     Piece piece = position[i];
 
-                    if (piece != null && piece.getType() == pieceType &&
+                    if (piece != null && piece.getType() == type &&
                         piece.getColor() == color && moveTest(i, endSquare))
                         return coordToSan(i, endSquare, promoteTo, showCheck);
                 }
@@ -1102,7 +989,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         {
             Piece piece = position[i];
             
-            if (piece != null && piece.getType() == pieceType &&
+            if (piece != null && piece.getType() == type &&
                 piece.getColor() == color && moveTest(i, endSquare))
                 return coordToSan(i, endSquare, promoteTo, showCheck);
         }
@@ -1110,23 +997,23 @@ public class Board<T extends Board<T>> implements Comparable<T>
         throw new IllegalMoveException(getMoveErrorMsg(san, ply));
     }
     
-    public final String coordToSan(int start, int end, PieceType promoteTo, boolean showCheck)
+    public final String coordToSan(int start, int end, Material.Type promoteTo, boolean showCheck)
         throws IllegalMoveException
     {
         Color moveColor = (ply ^ 1) > ply ? Color.WHITE : Color.BLACK;
         Color otherColor = (ply ^ 1) > ply ? Color.BLACK : Color.WHITE;
-        PieceType pieceType;
+        Material.Type type;
         String captureSt = position[end] == null ? "" : "x";
         StringBuilder ret = new StringBuilder();
         
-        try { pieceType = position[start].getType(); }
+        try { type = position[start].getType(); }
         
         catch (NullPointerException e)
         {
             throw new IllegalMoveException("illegal move at ply " + (ply + 1));
         }
         
-        if (pieceType == PieceType.PAWN)
+        if (type == Material.Type.PAWN)
         {
             int span = end - start > 0 ? end - start : start - end;
             
@@ -1156,7 +1043,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
             return ret.toString();
         }
         
-        if (pieceType == PieceType.KING)
+        if (type == Material.Type.KING)
         {
             if ((start == 4 && end == 6) || (start == 60 && end == 62))
             {
@@ -1182,7 +1069,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         for (int i = 0; i < 64; i++)
         {
             if (position[i] != null && position[i].getColor() == moveColor &&
-                position[i].getType() == pieceType && moveTest(i, end))
+                position[i].getType() == type && moveTest(i, end))
                 candidates[candidateCount++] = i;
         }
         
@@ -1202,7 +1089,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
             }
         }
         
-        ret.append(pieceType);
+        ret.append(type);
         
         if (disambigFile)
         {
@@ -1250,7 +1137,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         int start = Square.get(move.substring(0, 2)).getLocation();
         int end = Square.get(move.substring(2, 4)).getLocation();
         
-        PieceType promoteTo = move.length() > 4 ? PieceType.get(move.substring(4, 5)) : null;
+        Material.Type promoteTo = move.length() > 4 ? Material.Type.get(move.substring(4, 5)) : null;
         return coordToSan(start, end, promoteTo, showCheck);
     }
 
@@ -1262,7 +1149,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
     public final String longToSan(String move, boolean showCheck) throws IllegalMoveException
     {
         int start, end;
-        PieceType promoteTo = null;
+        Material.Type promoteTo = null;
 
         switch (move.charAt(0))
         {
@@ -1285,7 +1172,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
             case 'h':
                 start = Square.get(move.substring(0, 2)).getLocation();
                 end = Square.get(move.substring(3, 5)).getLocation();
-                if (move.length() > 5) promoteTo = PieceType.get(move.substring(5));
+                if (move.length() > 5) promoteTo = Material.Type.get(move.substring(5));
                 break;
 
             default: throw new IllegalMoveException(move);
@@ -1587,10 +1474,6 @@ public class Board<T extends Board<T>> implements Comparable<T>
      */
     public final boolean positionEquals(Board<?> that)
     {
-//        if (whitePieceCount != that.whitePieceCount ||
-//            blackPieceCount != that.blackPieceCount)
-//            return false;
-        
         return (ply & 1) == (that.ply & 1) && (whitePieceCount == that.whitePieceCount) &&
                 (blackPieceCount == that.blackPieceCount) && Arrays.equals(position, that.position);
     }

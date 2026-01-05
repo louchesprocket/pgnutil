@@ -401,6 +401,24 @@ public class PGNUtil
         }
     }
 
+    static final class MatchMaterialProcessor implements GameProcessor
+    {
+        private final Material material;
+
+        public MatchMaterialProcessor(Material material) { this.material = material; }
+
+        @Override public boolean processGame()
+        {
+            try { return game.containsMaterial(material); }
+
+            catch (IllegalMoveException e)
+            {
+                System.err.println("PGN error in game #" + game.getNumber() + ": " + e.getMessage());
+                return false;
+            }
+        }
+    }
+
     static final class MatchPositionSetProcessor implements GameProcessor
     {
         private final Set<LooseBoard> positionSet;
