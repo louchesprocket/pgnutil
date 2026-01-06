@@ -14,7 +14,7 @@ Pgnutil requires Java 1.11 or higher.  It theoretically runs on any platform wit
 ## Building
 
 To build, open the project in IntelliJ Idea and select
-"Build->Build Artifacts->pgnutil:jar->Rebuild" from the menu bar. Then run script/mkdist.sh. This will create the pgnutil integrated executable in the dist directory.
+"<nobr>Build-></nobr><nobr>Build Artifacts-></nobr><nobr>pgnutil:jar-></nobr>Rebuild" from the menu bar. Then run script/mkdist.sh. This will create the pgnutil integrated executable in the dist directory.
 
 
 ## Usage
@@ -35,7 +35,7 @@ By default, pgnutil outputs the entire text of each matched game. So in the prev
 
 If we only want to get a list of players that have forfeited in a game involving some version of Stockfish, we can combine the "-mp" option, which matches any player name (either black or white):
 
-``pgnutil -mp 'Stockfish' -m 'forfeit' -s loser -i mygames.pgn | sort -u``
+``pgnutil <nobr>-mp</nobr> 'Stockfish' <nobr>-m</nobr> 'forfeit' <nobr>-s</nobr> loser <nobr>-i</nobr> mygames.pgn | sort <nobr>-u</nobr>``
 
 If we don't want to see Stockfish itself in this list (which would happen if Stockfish forfeited any games), we can use the "-mw" (match winner) option to omit cases where Stockfish lost.  We can also list the event and round number for every such game:
 
@@ -66,7 +66,7 @@ uses the "-posf" (position-file) option to search for a list of positions contai
 
 The "-mfen" (match FEN) option may be used to search for positions from a FEN string:
 
-``pgnutil -mfen 'rnb1kb1r/ppq2ppp/3p4/2pPp3/8/2B2Q2/PPP2PPP/2KR1BNR w kq e6 0 9' -i mygames.pgn``
+``pgnutil -mfen 'rnb1kb1r/ppq2ppp/3p4/2pPp3/8/2B2Q2/PPP2PPP/2KR1BNR w kq e6 0 9' <nobr>-i</nobr> mygames.pgn``
 
 And its corresponding multi-position search option is "-ff" (FEN-file):
 
@@ -90,6 +90,14 @@ will return every game in which the ECO openings A42 or A43 were played, ignorin
 
 For all ECO-related operations, the standard (non-Scid) ECO database may be specified on the command line with the "-ef" (ECO file) option. This file should use the same format as Lichess (see https://github.com/lichess-org/chess-openings). If this option is not set, pgnutil will use its own internal database.
 
+#### Material Search
+
+Material searches may be performed with the <nobr>"-mm"</nobr> (match material) option. This option takes a single parameter indicating the material to be searched for, with black pieces represented by the characters "p", "n," "b," "r," "q," and "k" (the last being optional), and white pieces represented by the same characters in upper case. An optional integer preceding a piece indicates multiples. For example,
+
+``pgnutil <nobr>-mm</nobr> 3PQqn <nobr>-i</nobr> mygames.pgn``
+
+searches mygames.pgn for any game wherein three white pawns, one white queen, one black queen, and one black knight (plus kings) appears on the board without other pieces.
+
 ### Replacing
 
 The "-r" option performs replacements on the game text.  For example, to strip comments (or, to be precise, all text between curly braces) from mygames.pgn:
@@ -110,11 +118,11 @@ means, "For every game containing 'Nunn 1' or 'Noomen 2012,' replace every occur
 
 The selectivity of the replacement can be further refined with other options.  For example, the command:
 
-``pgnutil -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -rl 'Glaurung 2.0.1' -i mygames.pgn``
+``pgnutil -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' <nobr>-rl</nobr> 'Glaurung 2.0.1' <nobr>-i</nobr> mygames.pgn``
 
 uses the "-rl" (replace loser) option to mean, "For every game containing 'Nunn 1' or 'Noomen 2012' that was lost by 'Glaurung 2.0.1,' replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'" And, of course, any of these may be combined with any of the various [matching](#matching) and [output-selection](#output-selectors) options:
 
-``pgnutil -m '[Bb]litz' -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -rl 'Glaurung 2.0.1' -s Event -i mygames.pgn``
+``pgnutil -m '[Bb]litz' -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' <nobr>-rl</nobr> 'Glaurung 2.0.1' <nobr>-s</nobr> Event <nobr>-i</nobr> mygames.pgn``
 
 means, "Output the value of the 'Event' tag for every game containing 'Blitz' or 'blitz,' but of these games, for every game containing 'Nunn 1' or 'Noomen 2012' that was lost by 'Glaurung 2.0.1,' replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'"
 
@@ -144,7 +152,7 @@ There are several "special" selectors recognized by the "-s" option.  For exampl
 * 	gameno: causes pgnutil to output the game's ordinal position within the PGN file
 * 	plies: causes pgnutil to output the number of half-moves present in the game
 * 	cbplayers: for engine games containing clock annotations, and in conjunction with the "-cb" option (see [Time](#time), below), causes pgnutil to output the names of players whose clocks fell below the indicated time threshold
-*   cbclocks: for engine games containing clock annotations, and in conjunction with the "-cb" option (see [Time](#time), below), causes pgnutil to output the lowest clock value for each player that fell below the indicated time threshold
+*   cbclocks: for engine games containing clock annotations, and in conjunction with the <nobr>"-cb"</nobr> option (see [Time](#time), below), causes pgnutil to output the lowest clock value for each player that fell below the indicated time threshold
 * 	lowclockwhite: for engine games containing clock annotations, causes pgnutil to output the lowest clock value for the white player (see [Time](#time), below)
 * 	lowclockblack: for engine games containing clock annotations, causes pgnutil to output the lowest clock value for the black player (see [Time](#time), below)
 *   disagreepct: for engine games wherein the u.i. annotates expected responses, output the percentage of moves that disagree with an opponent's expectation
