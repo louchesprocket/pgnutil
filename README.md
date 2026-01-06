@@ -35,7 +35,7 @@ By default, pgnutil outputs the entire text of each matched game. So in the prev
 
 If we only want to get a list of players that have forfeited in a game involving some version of Stockfish, we can combine the "-mp" option, which matches any player name (either black or white):
 
-``pgnutil <nobr>-mp</nobr> 'Stockfish' <nobr>-m</nobr> 'forfeit' <nobr>-s</nobr> loser <nobr>-i</nobr> mygames.pgn | sort <nobr>-u</nobr>``
+``pgnutil -mp 'Stockfish' -m 'forfeit' -s loser -i mygames.pgn | sort -u``
 
 If we don't want to see Stockfish itself in this list (which would happen if Stockfish forfeited any games), we can use the "-mw" (match winner) option to omit cases where Stockfish lost.  We can also list the event and round number for every such game:
 
@@ -66,7 +66,7 @@ uses the "-posf" (position-file) option to search for a list of positions contai
 
 The "-mfen" (match FEN) option may be used to search for positions from a FEN string:
 
-``pgnutil -mfen 'rnb1kb1r/ppq2ppp/3p4/2pPp3/8/2B2Q2/PPP2PPP/2KR1BNR w kq e6 0 9' <nobr>-i</nobr> mygames.pgn``
+``pgnutil -mfen 'rnb1kb1r/ppq2ppp/3p4/2pPp3/8/2B2Q2/PPP2PPP/2KR1BNR w kq e6 0 9' -i mygames.pgn``
 
 And its corresponding multi-position search option is "-ff" (FEN-file):
 
@@ -94,7 +94,7 @@ For all ECO-related operations, the standard (non-Scid) ECO database may be spec
 
 Material searches may be performed with the <nobr>"-mm"</nobr> (match material) option. This option takes a single parameter indicating the material to be searched for, with black pieces represented by the characters "p", "n," "b," "r," "q," and "k" (the last being optional), and white pieces represented by the same characters in upper case. An optional integer preceding a piece indicates multiples. For example,
 
-``pgnutil <nobr>-mm</nobr> 3PQqn <nobr>-i</nobr> mygames.pgn``
+``pgnutil -mm 3PQqn -i mygames.pgn``
 
 searches mygames.pgn for any game wherein three white pawns, one white queen, one black queen, and one black knight (plus kings) appears on the board without other pieces.
 
@@ -118,11 +118,11 @@ means, "For every game containing 'Nunn 1' or 'Noomen 2012,' replace every occur
 
 The selectivity of the replacement can be further refined with other options.  For example, the command:
 
-``pgnutil -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' <nobr>-rl</nobr> 'Glaurung 2.0.1' <nobr>-i</nobr> mygames.pgn``
+``pgnutil -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -rl 'Glaurung 2.0.1' -i mygames.pgn``
 
 uses the "-rl" (replace loser) option to mean, "For every game containing 'Nunn 1' or 'Noomen 2012' that was lost by 'Glaurung 2.0.1,' replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'" And, of course, any of these may be combined with any of the various [matching](#matching) and [output-selection](#output-selectors) options:
 
-``pgnutil -m '[Bb]litz' -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' <nobr>-rl</nobr> 'Glaurung 2.0.1' <nobr>-s</nobr> Event <nobr>-i</nobr> mygames.pgn``
+``pgnutil -m '[Bb]litz' -r '(Nunn 1)|(Noomen 2012)/Quazar/Quazar 0.4 x64' -rl 'Glaurung 2.0.1' -s Event -i mygames.pgn``
 
 means, "Output the value of the 'Event' tag for every game containing 'Blitz' or 'blitz,' but of these games, for every game containing 'Nunn 1' or 'Noomen 2012' that was lost by 'Glaurung 2.0.1,' replace every occurrence of 'Quazar' with 'Quazar 0.4 x64.'"
 
