@@ -2185,8 +2185,10 @@ D51|Queen's Gambit Declined: Modern Variation, Knight Defense|d4 d5 c4 e6 Nc3 Nf
 D51|Queen's Gambit Declined: Manhattan Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 Nbd7 e3 Bb4|7740d26abf29f94e537f749eaf4c20ee
 D06|Queen's Gambit Declined: Austrian Defense, Haberditz Variation|d4 d5 c4 c5 cxd5 Nf6 e4 Nxe4 dxc5 Qa5|d25001d40b2281c720f760101d1c368d
 D11|Slav Defense: Modern Line|d4 d5 c4 c6 Nf3 Nf6 g3 dxc4 Bg2 g6|c408e51cafced31251b5bc4c0beeffe2
+D12|Slav Defense: Quiet Variation, Schallopp Defense|d4 d5 c4 c6 Nf3 Nf6 e3 Bf5 Nc3 e6|2d0cc2e0cb403da7884cd005ff781bb4
 D30|Semi-Slav Defense: Quiet Variation|d4 d5 c4 c6 Nf3 Nf6 e3 e6 Nbd2 Nbd7|d81edabf029b06eb62344e49c0cb2967
 D44|Semi-Slav Defense Accepted|d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 dxc4|a7333b95c5ad981c6cbf94002399f9ce
+D15|Slav Defense: Chebanenko Variation|d4 d5 c4 c6 Nf3 Nf6 Nc3 a6 e3 Bf5|1fe1cc98a453e6250953828601531aa7
 D17|Slav Defense: Czech Variation|d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4 Bf5|da843d2f2366caa7768585bae0771d44
 D16|Slav Defense: Soultanbeieff Variation|d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4 e6|69ff4c8867604dc4f45c5d2fcdb4cbb4
 D16|Slav Defense: Smyslov Variation|d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4 Na6|1b3c4d18261f9f3ec8d30480be78b1ae
