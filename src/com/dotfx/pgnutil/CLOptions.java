@@ -82,6 +82,7 @@ public class CLOptions
     public static final String MKDBS = "-mkdbs"; // util make SCID ECO d.b.
     public static final String ML = "-ml";
     public static final String MM = "-mm";
+    public static final String MMD = "-mmd";
     public static final String MO = "-mo";
     public static final String MP = "-mp";
     public static final String MPOS = "-mpos";
@@ -161,6 +162,7 @@ public class CLOptions
         MATCHFEN(MFEN),
         MATCHLOSER(ML),
         MATCHMATERIAL(MM),
+        MATCHMATERIALDIFF(MMD),
         MATCHOPENING(MO),
         MATCHPLAYER(MP),
         MATCHPOSITION(MPOS),
@@ -613,7 +615,22 @@ public class CLOptions
     {
         countOption(OptId.get(MM));
 
-        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchMaterialProcessor(new Material(spec))); }
+        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchMaterialProcessor(new Material(spec), false)); }
+
+        catch (Material.CountException e)
+        {
+            System.err.println(e.getLocalizedMessage());
+            System.exit(-1);
+        }
+    }
+
+    @Option(name = MMD, aliases = "-match_material_diff", metaVar = "<spec>",
+            usage = "output games wherein the material difference specified in <spec> appeared on the board")
+    private void setMaterialDiff(String spec)
+    {
+        countOption(OptId.get(MMD));
+
+        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchMaterialProcessor(new Material(spec), true)); }
 
         catch (Material.CountException e)
         {

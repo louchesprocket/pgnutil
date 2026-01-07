@@ -404,12 +404,17 @@ public class PGNUtil
     static final class MatchMaterialProcessor implements GameProcessor
     {
         private final Material material;
+        private final boolean diff;
 
-        public MatchMaterialProcessor(Material material) { this.material = material; }
+        public MatchMaterialProcessor(Material material, boolean diff)
+        {
+            this.material = material;
+            this.diff = diff;
+        }
 
         @Override public boolean processGame()
         {
-            try { return game.containsMaterial(material); }
+            try { return diff ? game.containsMaterialDiff(material) : game.containsMaterial(material); }
 
             catch (IllegalMoveException e)
             {

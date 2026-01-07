@@ -86,13 +86,6 @@ public class Material
     private int whiteMatHash = Type.MATERIAL_HASH_SEED;
     private int blackMatHash = Type.MATERIAL_HASH_SEED;
 
-    /**
-     *
-     * @param spec example: "3P2N2p2b" for "3 white pawns and two white knights vs. 2 black pawns and two black
-     *             bishops"; kings are optional, but, if present,  may only appear with qty. 1
-     *
-     * @throws NumberFormatException, NullPointerException
-     */
     public Material(String spec) throws CountException
     {
         if (!spec.contains("k")) spec += "k";
@@ -103,6 +96,13 @@ public class Material
         verifyMaterial(blackMatHash);
     }
 
+    /**
+     *
+     * @param spec example: "3P2N2p2b" for "3 white pawns and two white knights vs. 2 black pawns and two black
+     *             bishops"; kings are optional, but, if present,  may only appear with qty. 1
+     *
+     * @throws CountException
+     */
     private void parseMaterial(String spec) throws CountException
     {
         int stLen = spec.length();
@@ -165,15 +165,15 @@ public class Material
             switch (type)
             {
                 case PAWN:
-                    if (count > 8) throw new CountException("piece count " + count + " is invalid for type PAWN");
+                    if (count > 8) throw new CountException("piece count " + count + " is invalid for type " + type);
                     break;
 
                 case QUEEN:
-                    if (count > 9) throw new CountException("piece count " + count + " is invalid for type QUEEN");
+                    if (count > 9) throw new CountException("piece count " + count + " is invalid for type " + type);
                     break;
 
                 case KING:
-                    if (count != 1) throw new CountException("piece count " + count + " is invalid for type KING");
+                    if (count != 1) throw new CountException("piece count " + count + " is invalid for type " + type);
                     break;
 
                 default:
@@ -188,39 +188,45 @@ public class Material
     public int getWhiteMatHash() { return whiteMatHash; }
     public int getBlackPieceCount() { return blackPieceCount; }
     public int getBlackMatHash() { return blackMatHash; }
-    public int getMaterialBalance() { return whiteMatHash - blackMatHash; }
 
-    public boolean equalsBoard(Board<?> board)
+    public boolean equalsBoardMaterial(Board<?> board)
     {
         if (whitePieceCount != board.getWhitePieceCount() ||
                 blackPieceCount != board.getBlackPieceCount()) return false;
 
-        int runningWhiteHash = Material.Type.MATERIAL_HASH_SEED;
-        int runningBlackHash = Material.Type.MATERIAL_HASH_SEED;
+        int boardWhiteMat = Material.Type.MATERIAL_HASH_SEED;
+        int boardBlackMat = Material.Type.MATERIAL_HASH_SEED;
 
         for (Piece piece : board.getPosition())
         {
             if (piece != null)
             {
                 if (piece.getColor() == Color.WHITE)
-                    runningWhiteHash = piece.getType().updateMaterialHash(runningWhiteHash);
+                    boardWhiteMat = piece.getType().updateMaterialHash(boardWhiteMat);
 
-                else runningBlackHash = piece.getType().updateMaterialHash(runningBlackHash);
+                else boardBlackMat = piece.getType().updateMaterialHash(boardBlackMat);
             }
         }
 
-        return runningWhiteHash == whiteMatHash && runningBlackHash == blackMatHash;
+        return boardWhiteMat == whiteMatHash && boardBlackMat == blackMatHash;
     }
 
-    /**
-     *
-     * @param mat instance containing the material difference to be tested
-     *
-     * @return true if the material difference contained in this instance equals the material difference contained
-     *         in the parameter; false otherwise
-     */
-    public boolean materialDiffEquals(Material mat)
+    public boolean equalsBoardMaterialDiff(Board<?> board)
     {
-        return getMaterialBalance() == mat.getMaterialBalance();
+        int boardWhiteMat = Material.Type.MATERIAL_HASH_SEED;
+        int boardBlackMat = Material.Type.MATERIAL_HASH_SEED;
+
+        for (Piece piece : board.getPosition())
+        {
+            if (piece != null)
+            {
+                if (piece.getColor() == Color.WHITE)
+                    boardWhiteMat = piece.getType().updateMaterialHash(boardWhiteMat);
+
+                else boardBlackMat = piece.getType().updateMaterialHash(boardBlackMat);
+            }
+        }
+
+        return boardWhiteMat - boardBlackMat == whiteMatHash - blackMatHash;
     }
 }

@@ -419,6 +419,8 @@ public class CLOptionResolver
         final OptId[] matchPositionOpts = new OptId[] {OptId.get(CLOptions.MPOS), OptId.get(CLOptions.POSF),
                 OptId.get(CLOptions.MFEN), OptId.get(CLOptions.FF)};
 
+        final OptId[] matchMaterialOpts = new OptId[] {OptId.get(CLOptions.MM), OptId.get(CLOptions.MMD)};
+
         final OptId[] singletonOpts = new OptId[] {OptId.get(CLOptions.MPOS), OptId.get(CLOptions.POSF),
                 OptId.get(CLOptions.MFEN), OptId.get(CLOptions.FF), OptId.get(CLOptions.PP), OptId.get(CLOptions.MM),
                 OptId.get(CLOptions.GN), OptId.get(CLOptions.GNF), OptId.get(CLOptions.MW), OptId.get(CLOptions.ML),
@@ -445,6 +447,7 @@ public class CLOptionResolver
         new SetLogic<>(ecoOpts, null, null, new MutexHandler()).handle(setOpts);
         new SetLogic<>(matchOpeningOpts, null, null, new MutexHandler()).handle(setOpts);
         new SetLogic<>(matchPositionOpts, null, null, new MutexHandler()).handle(setOpts);
+        new SetLogic<>(matchMaterialOpts, null, null, new MutexHandler()).handle(setOpts);
         new SetLogic<>(singletonOpts, null, null, new SingletonHandler()).handle(setOpts);
         new SetLogic<>(utilOpts, null, null, new UtilHandler()).handle(setOpts);
 

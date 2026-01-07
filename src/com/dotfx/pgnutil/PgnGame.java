@@ -824,7 +824,32 @@ public final class PgnGame
             if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount)
                 break;
 
-            if (material.equalsBoard(board))
+            if (material.equalsBoardMaterial(board))
+            {
+                materialMatchAtPly = move.getPly() - 1;
+                return true;
+            }
+
+            board.move(move);
+        }
+
+        return false;
+    }
+
+    public boolean containsMaterialDiff(Material material)
+            throws IllegalMoveException
+    {
+        int whitePieceCount = material.getWhitePieceCount();
+        int blackPieceCount = material.getBlackPieceCount();
+
+        Board<?> board = new Board<>(true);
+
+        for (Move move : getMoveList())
+        {
+            if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount)
+                break;
+
+            if (material.equalsBoardMaterialDiff(board))
             {
                 materialMatchAtPly = move.getPly() - 1;
                 return true;
