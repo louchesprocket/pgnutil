@@ -419,10 +419,12 @@ public class CLOptionResolver
         final OptId[] matchPositionOpts = new OptId[] {OptId.get(CLOptions.MPOS), OptId.get(CLOptions.POSF),
                 OptId.get(CLOptions.MFEN), OptId.get(CLOptions.FF)};
 
-        final OptId[] matchMaterialOpts = new OptId[] {OptId.get(CLOptions.MM), OptId.get(CLOptions.MMD)};
+        final OptId[] matchMaterialOpts = new OptId[] {OptId.get(CLOptions.MM), OptId.get(CLOptions.MMI),
+                OptId.get(CLOptions.MMD), OptId.get(CLOptions.MMDI)};
 
         final OptId[] singletonOpts = new OptId[] {OptId.get(CLOptions.MPOS), OptId.get(CLOptions.POSF),
                 OptId.get(CLOptions.MFEN), OptId.get(CLOptions.FF), OptId.get(CLOptions.PP), OptId.get(CLOptions.MM),
+                OptId.get(CLOptions.MMI), OptId.get(CLOptions.MMD), OptId.get(CLOptions.MMDI),
                 OptId.get(CLOptions.GN), OptId.get(CLOptions.GNF), OptId.get(CLOptions.MW), OptId.get(CLOptions.ML),
                 OptId.get(CLOptions.TF), OptId.get(CLOptions.LELO), OptId.get(CLOptions.HELO), OptId.get(CLOptions.LED),
                 OptId.get(CLOptions.HED), OptId.get(CLOptions.CB), OptId.get(CLOptions.CNB), OptId.get(CLOptions.ELO),

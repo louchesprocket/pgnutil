@@ -405,16 +405,19 @@ public class PGNUtil
     {
         private final Material material;
         private final boolean diff;
+        private final boolean ignoreColors;
 
-        public MatchMaterialProcessor(Material material, boolean diff)
+        public MatchMaterialProcessor(Material material, boolean diff, boolean ignoreColors)
         {
             this.material = material;
             this.diff = diff;
+            this.ignoreColors = ignoreColors;
         }
 
         @Override public boolean processGame()
         {
-            try { return diff ? game.containsMaterialDiff(material) : game.containsMaterial(material); }
+            try { return diff ? game.containsMaterialDiff(material, ignoreColors) :
+                    game.containsMaterial(material, ignoreColors); }
 
             catch (IllegalMoveException e)
             {

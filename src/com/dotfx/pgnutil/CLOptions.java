@@ -83,6 +83,8 @@ public class CLOptions
     public static final String ML = "-ml";
     public static final String MM = "-mm";
     public static final String MMD = "-mmd";
+    public static final String MMI = "-mmi";
+    public static final String MMDI = "-mmdi";
     public static final String MO = "-mo";
     public static final String MP = "-mp";
     public static final String MPOS = "-mpos";
@@ -163,6 +165,8 @@ public class CLOptions
         MATCHLOSER(ML),
         MATCHMATERIAL(MM),
         MATCHMATERIALDIFF(MMD),
+        MATCHMATERIALIGNORE(MMI),
+        MATCHMATERIALDIFFIGNORE(MMDI),
         MATCHOPENING(MO),
         MATCHPLAYER(MP),
         MATCHPOSITION(MPOS),
@@ -615,7 +619,30 @@ public class CLOptions
     {
         countOption(OptId.get(MM));
 
-        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchMaterialProcessor(new Material(spec), false)); }
+        try
+        {
+            PGNUtil.addMatchProcessor(new PGNUtil.MatchMaterialProcessor(new Material(spec), false,
+                    false));
+        }
+
+        catch (Material.CountException e)
+        {
+            System.err.println(e.getLocalizedMessage());
+            System.exit(-1);
+        }
+    }
+
+    @Option(name = MMI, aliases = "-match_material_ignore", metaVar = "<spec>",
+            usage = "output games wherein the material specified in <spec> appeared on the board, ignoring colors")
+    private void setMaterialIgnore(String spec)
+    {
+        countOption(OptId.get(MMI));
+
+        try
+        {
+            PGNUtil.addMatchProcessor(new PGNUtil.MatchMaterialProcessor(new Material(spec), false,
+                    true));
+        }
 
         catch (Material.CountException e)
         {
@@ -630,7 +657,31 @@ public class CLOptions
     {
         countOption(OptId.get(MMD));
 
-        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchMaterialProcessor(new Material(spec), true)); }
+        try
+        {
+            PGNUtil.addMatchProcessor(new PGNUtil.MatchMaterialProcessor(new Material(spec), true,
+                    false));
+        }
+
+        catch (Material.CountException e)
+        {
+            System.err.println(e.getLocalizedMessage());
+            System.exit(-1);
+        }
+    }
+
+    @Option(name = MMDI, aliases = "-match_material_diff_ignore", metaVar = "<spec>",
+            usage = "output games wherein the material difference specified in <spec> appeared on the board, " +
+                    "ignoring colors")
+    private void setMaterialDiffIgnore(String spec)
+    {
+        countOption(OptId.get(MMDI));
+
+        try
+        {
+            PGNUtil.addMatchProcessor(new PGNUtil.MatchMaterialProcessor(new Material(spec), true,
+                    true));
+        }
 
         catch (Material.CountException e)
         {

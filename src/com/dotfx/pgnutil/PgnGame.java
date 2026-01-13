@@ -811,51 +811,87 @@ public final class PgnGame
         return false;
     }
 
-    public boolean containsMaterial(Material material)
+    public boolean containsMaterial(Material material, boolean ignoreSides)
             throws IllegalMoveException
     {
         int whitePieceCount = material.getWhitePieceCount();
         int blackPieceCount = material.getBlackPieceCount();
-
         Board<?> board = new Board<>(true);
 
-        for (Move move : getMoveList())
+        if (ignoreSides)
         {
-            if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount)
-                break;
-
-            if (material.equalsBoardMaterial(board))
+            for (Move move : getMoveList())
             {
-                materialMatchAtPly = move.getPly() - 1;
-                return true;
-            }
+                if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount) break;
 
-            board.move(move);
+                if (material.equalsBoardMatIgnoreColors(board))
+                {
+                    materialMatchAtPly = move.getPly() - 1;
+                    return true;
+                }
+
+                board.move(move);
+            }
+        }
+
+        else
+        {
+            for (Move move : getMoveList())
+            {
+                if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount) break;
+
+                if (material.equalsBoardMaterial(board))
+                {
+                    materialMatchAtPly = move.getPly() - 1;
+                    return true;
+                }
+
+                board.move(move);
+            }
         }
 
         return false;
     }
 
-    public boolean containsMaterialDiff(Material material)
+    public boolean containsMaterialDiff(Material material, boolean ignoreSides)
             throws IllegalMoveException
     {
         int whitePieceCount = material.getWhitePieceCount();
         int blackPieceCount = material.getBlackPieceCount();
-
         Board<?> board = new Board<>(true);
 
-        for (Move move : getMoveList())
+        if (ignoreSides)
         {
-            if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount)
-                break;
+            int pieceCountThreshold = whitePieceCount + blackPieceCount;
 
-            if (material.equalsBoardMaterialDiff(board))
+            for (Move move : getMoveList())
             {
-                materialMatchAtPly = move.getPly() - 1;
-                return true;
-            }
+                if (board.getWhitePieceCount() + board.getBlackPieceCount() < pieceCountThreshold) break;
 
-            board.move(move);
+                if (material.equalsBoardMatDiffIgnoreColors(board))
+                {
+                    materialMatchAtPly = move.getPly() - 1;
+                    return true;
+                }
+
+                board.move(move);
+            }
+        }
+
+        else
+        {
+            for (Move move : getMoveList())
+            {
+                if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount) break;
+
+                if (material.equalsBoardMaterialDiff(board))
+                {
+                    materialMatchAtPly = move.getPly() - 1;
+                    return true;
+                }
+
+                board.move(move);
+            }
         }
 
         return false;

@@ -211,6 +211,29 @@ public class Material
         return boardWhiteMat == whiteMatHash && boardBlackMat == blackMatHash;
     }
 
+    public boolean equalsBoardMatIgnoreColors(Board<?> board)
+    {
+        if (whitePieceCount != board.getWhitePieceCount() ||
+                blackPieceCount != board.getBlackPieceCount()) return false;
+
+        int boardWhiteMat = Material.Type.MATERIAL_HASH_SEED;
+        int boardBlackMat = Material.Type.MATERIAL_HASH_SEED;
+
+        for (Piece piece : board.getPosition())
+        {
+            if (piece != null)
+            {
+                if (piece.getColor() == Color.WHITE)
+                    boardWhiteMat = piece.getType().updateMaterialHash(boardWhiteMat);
+
+                else boardBlackMat = piece.getType().updateMaterialHash(boardBlackMat);
+            }
+        }
+
+        return (boardWhiteMat == whiteMatHash && boardBlackMat == blackMatHash) ||
+                (boardWhiteMat == blackMatHash && boardBlackMat == whiteMatHash);
+    }
+
     public boolean equalsBoardMaterialDiff(Board<?> board)
     {
         int boardWhiteMat = Material.Type.MATERIAL_HASH_SEED;
@@ -228,5 +251,25 @@ public class Material
         }
 
         return boardWhiteMat - boardBlackMat == whiteMatHash - blackMatHash;
+    }
+
+    public boolean equalsBoardMatDiffIgnoreColors(Board<?> board)
+    {
+        int boardWhiteMat = Material.Type.MATERIAL_HASH_SEED;
+        int boardBlackMat = Material.Type.MATERIAL_HASH_SEED;
+
+        for (Piece piece : board.getPosition())
+        {
+            if (piece != null)
+            {
+                if (piece.getColor() == Color.WHITE)
+                    boardWhiteMat = piece.getType().updateMaterialHash(boardWhiteMat);
+
+                else boardBlackMat = piece.getType().updateMaterialHash(boardBlackMat);
+            }
+        }
+
+        return (boardWhiteMat - boardBlackMat == whiteMatHash - blackMatHash) ||
+                (boardWhiteMat - boardBlackMat == blackMatHash - whiteMatHash);
     }
 }

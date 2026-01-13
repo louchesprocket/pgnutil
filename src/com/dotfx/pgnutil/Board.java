@@ -470,7 +470,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
      * @param end
      * @return true if the mover is moving into check or (in case of castling) out of or through check
      */
-    private final boolean isMovingIntoCheck(int start, int end)
+    private boolean isMovingIntoCheck(int start, int end)
     {
         Piece movingPiece = position[start];
         Color color = movingPiece.getColor();
@@ -546,7 +546,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         }
     }
     
-    private final boolean isInCheck(Color color, int squares[])
+    private boolean isInCheck(Color color, int squares[])
     {
         int savedKingLoc = color == Color.WHITE ? whiteKingLoc : blackKingLoc;
         
@@ -555,8 +555,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
             Piece saved = position[square]; // save contents of test square
             position[square] = position[savedKingLoc]; // move king to test square
             
-            if (savedKingLoc != square)
-                position[savedKingLoc] = null; // empty king's previous square
+            if (savedKingLoc != square) position[savedKingLoc] = null; // empty king's previous square
             
             for (int i = 0; i < 64; i++)
                 if (position[i] != null && position[i].getColor() != color && canMove(i, square)) return true;
@@ -574,7 +573,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
     }
     
     /**
-     * Does not do any kind of correctness checking.
+     * Does not do any correctness checking.
      * 
      * @param start
      * @param end
