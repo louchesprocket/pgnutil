@@ -213,8 +213,9 @@ public class Material
 
     public boolean equalsBoardMatIgnoreColors(Board<?> board)
     {
-        if (whitePieceCount != board.getWhitePieceCount() ||
-                blackPieceCount != board.getBlackPieceCount()) return false;
+        if ((whitePieceCount != board.getWhitePieceCount() && whitePieceCount != board.getBlackPieceCount()) ||
+            (blackPieceCount != board.getBlackPieceCount() && blackPieceCount != board.getWhitePieceCount()))
+            return false;
 
         int boardWhiteMat = Material.Type.MATERIAL_HASH_SEED;
         int boardBlackMat = Material.Type.MATERIAL_HASH_SEED;
