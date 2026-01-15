@@ -814,39 +814,51 @@ public final class PgnGame
     public boolean containsMaterial(Material material, boolean ignoreSides)
             throws IllegalMoveException
     {
-        int whitePieceCount = material.getWhitePieceCount();
-        int blackPieceCount = material.getBlackPieceCount();
+        final int whitePieceCount = material.getWhitePieceCount();
+        final int blackPieceCount = material.getBlackPieceCount();
         Board<?> board = new Board<>(true);
 
         if (ignoreSides)
         {
+            final int pieceCountThreshold = whitePieceCount + blackPieceCount;
+
+            if (material.equalsBoardMatIgnoreColors(board))
+            {
+                materialMatchAtPly = 0;
+                return true;
+            }
+
             for (Move move : getMoveList())
             {
-                if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount) break;
+                board.move(move);
+                if (board.getWhitePieceCount() + board.getBlackPieceCount() < pieceCountThreshold) break;
 
                 if (material.equalsBoardMatIgnoreColors(board))
                 {
-                    materialMatchAtPly = move.getPly() - 1;
+                    materialMatchAtPly = move.getPly();
                     return true;
                 }
-
-                board.move(move);
             }
         }
 
         else
         {
+            if (material.equalsBoardMaterial(board))
+            {
+                materialMatchAtPly = 0;
+                return true;
+            }
+
             for (Move move : getMoveList())
             {
+                board.move(move);
                 if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount) break;
 
                 if (material.equalsBoardMaterial(board))
                 {
-                    materialMatchAtPly = move.getPly() - 1;
+                    materialMatchAtPly = move.getPly();
                     return true;
                 }
-
-                board.move(move);
             }
         }
 
@@ -856,25 +868,24 @@ public final class PgnGame
     public boolean containsMaterialDiff(Material material, boolean ignoreSides)
             throws IllegalMoveException
     {
-        int whitePieceCount = material.getWhitePieceCount();
-        int blackPieceCount = material.getBlackPieceCount();
+        final int whitePieceCount = material.getWhitePieceCount();
+        final int blackPieceCount = material.getBlackPieceCount();
         Board<?> board = new Board<>(true);
 
         if (ignoreSides)
         {
-            int pieceCountThreshold = whitePieceCount + blackPieceCount;
+            final int pieceCountThreshold = whitePieceCount + blackPieceCount;
 
             for (Move move : getMoveList())
             {
+                board.move(move);
                 if (board.getWhitePieceCount() + board.getBlackPieceCount() < pieceCountThreshold) break;
 
                 if (material.equalsBoardMatDiffIgnoreColors(board))
                 {
-                    materialMatchAtPly = move.getPly() - 1;
+                    materialMatchAtPly = move.getPly();
                     return true;
                 }
-
-                board.move(move);
             }
         }
 
@@ -882,15 +893,14 @@ public final class PgnGame
         {
             for (Move move : getMoveList())
             {
+                board.move(move);
                 if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount) break;
 
                 if (material.equalsBoardMaterialDiff(board))
                 {
-                    materialMatchAtPly = move.getPly() - 1;
+                    materialMatchAtPly = move.getPly();
                     return true;
                 }
-
-                board.move(move);
             }
         }
 
