@@ -1725,6 +1725,7 @@ A04|Modern Defense: Semi-Averbakh Variation, Polish Variation|Nf3 c5 c4 g6 d4 Bg
 A04|Modern Defense: Semi-Averbakh Variation, Pterodactyl Variation|Nf3 c5 c4 g6 d4 Bg7 e4 Qa5|fe2889b4701813457742f1a3caaeda85
 A04|Colle System: Rhamphorhynchus Variation|Nf3 c5 e3 g6 d4 Bg7 dxc5 Qa5|c3217def9499c262aef00d3d674bfce5
 A12|Réti Opening: Anglo-Slav Variation, New York System|Nf3 Nf6 c4 c6 b3 d5 Bb2 Bf5|be9664967d007dfe5cb39ab45ab91d98
+A07|King's Indian Attack, with e6|Nf3 Nf6 g3 d5 Bg2 e6 O-O Be7|685ca40c6de4ad68808ca56d5560c4f9
 A07|King's Indian Attack, with Bf5|Nf3 Nf6 g3 d5 Bg2 c6 O-O Bf5|fe6e01b9a8d25953f8cc414c87e6bfb3
 A07|King's Indian Attack: Yugoslav Variation|Nf3 Nf6 g3 d5 Bg2 c6 O-O Bg4|e6bb8acd0f20822c5abd5f4026e36dd6
 A00|Sodium Attack: Celadon Variation|Na3 e5 d3 Bxa3 bxa3 d5 e3 c5 Rb1|53d354e2e3109d2caec317372271ade2
@@ -2266,6 +2267,7 @@ A34|English Opening: Symmetrical Variation, Rubinstein Variation|c4 Nf6 Nc3 c5 g
 A04|Modern Defense: Semi-Averbakh Variation, Pterodactyl Variation Accepted|Nf3 g6 d4 Bg7 e4 d6 c4 c5 dxc5 Qa5|a94d6f58c720f33daaaed88e7b8faf44
 A07|King's Indian Attack: Pachman System|Nf3 d5 g3 g6 Bg2 Bg7 O-O e5 d3 Ne7|626987c3af71384c17a9ee5d7f4de3a8
 A42|Pterodactyl Defense|Nf3 c5 c4 g6 d4 Bg7 e4 Qa5 Nc3 d6|7381d1ee9057df2376d71fa41a49185c
+A07|King's Indian Attack, with Bf5|Nf3 Nf6 g3 d5 Bg2 c6 O-O Bf5 d3 h6|ba37366fb659aa0403c7136e9b8d7e5f
 A05|King's Indian Attack: Wahls Defense|Nf3 Nf6 g3 g6 Bg2 Bg7 O-O O-O d3 d5|26fce7394e90e868e95214b7264dd0e8
 B00|Nimzowitsch Defense: El Columpio Defense, El Columpio Gambit|e4 Nc6 Nf3 Nf6 e5 Ng4 d4 d6 h3 Nh6 e6|e4c8bbcbc51e3419cb0a9764cc7ee033
 B00|Nimzowitsch Defense: El Columpio Defense, Pin Variation|e4 Nc6 Nf3 Nf6 e5 Ng4 d4 d6 h3 Nh6 Bb5|85bdde96f442a0f16593823a4fb3571f
@@ -2491,6 +2493,7 @@ A00|Polish Opening: Rooks Swap Line|b4 e6 Bb2 Nf6 b5 a6 a4 axb5 axb5 Rxa1 Bxa1|7
 A00|Polish Opening: King's Indian Variation, Sokolsky Attack|b4 Nf6 Bb2 g6 c4 Bg7 e3 d6 Nf3 O-O d4|d96c19bcb95d5a9ff6bd022144b05b83
 A00|Amar Opening: Paris Gambit, Gent Gambit|Nh3 d5 g3 e5 f4 Bxh3 Bxh3 exf4 O-O fxg3 hxg3|f7ec9ab8be0aca78a00a840b810495d9
 A14|Réti Opening: Anglo-Slav Variation|Nf3 d5 c4 c6 g3 Nf6 Bg2 e6 b3 Be7 Bb2|1cf400b50f8ecb4561cb939926ec4ace
+A07|King's Indian Attack, with Bf5|Nf3 Nf6 g3 d5 Bg2 c6 O-O Bf5 d3 e6 Nbd2|f77c8cd8eca216d3c3843f7297699fbe
 A07|King's Indian Attack, with Bf5|Nf3 Nf6 g3 d5 Bg2 c6 O-O Bf5 d3 e6 Nh4|ee852673e2573abec5d1b1d970882752
 A05|Zukertort Opening: Double Fianchetto Attack|Nf3 Nf6 g3 g6 b3 Bg7 Bb2 O-O Bg2 d6 O-O|a0e5bb61f567e7d424dc273389a4d5e4
 A00|Van Geet Opening: Jendrossek Gambit|Nc3 d5 f4 d4 Ne4 f5 Nf2 Nf6 Nf3 c5 b4|55d35eef5a8413f4d5caf8bdc4c8a8d1
