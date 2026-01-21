@@ -411,6 +411,15 @@ public final class OutputSelector
         }
     }
 
+    private static final class MmPlyOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            sb.append(game.getMatMatchAtPly());
+        }
+    }
+
     private static final class WinnerOutputHandler implements OutputHandler
     {
         @Override
@@ -531,15 +540,16 @@ public final class OutputSelector
         LOSER("loser", new LoserOutputHandler()),
         MOVES("moves", new MoveListOutputHandler()),
         DECORATEDMOVES("decoratedmoves", new DecoratedMovesOutputHandler()),
-        OID("oid", new OidOutputHandler()), // opening move list identifier
         OPENINGMOVES("openingmoves", new OpeningMovesOutputHandler()),
         OPENINGFEN("openingfen", new OpeningFenOutputHandler()),
+        OID("oid", new OidOutputHandler()), // opening move-list identifier
         OPID("opid", new OpeningIdOutputHandler()), // opening position identifier
         OPPONENT("opponent", null), // handler set in CLOptionResolver.PlayerHandler
         OPPONENTELO("opponentelo", null), // handler set in CLOptionResolver.PlayerHandler
         PLAYERELO("playerelo", null),
         HIEVALDIFF("hievaldiff", new HiEvalDiffHandler()),
         PLIES("plies", new PliesOutputHandler()),
+        MMPLY("mmply", new MmPlyOutputHandler()),
         STDECO("stdeco", new EcoOutputHandler(EcoTree.FileType.STD)),
         STDECODESC("stdecodesc", new EcoDescOutputHandler(EcoTree.FileType.STD)),
         STDECOMOVES("stdecomoves", new EcoMovesOutputHandler(EcoTree.FileType.STD)),

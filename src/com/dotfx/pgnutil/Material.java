@@ -99,7 +99,7 @@ public class Material
     /**
      *
      * @param spec example: "3P2N2p2b" for "3 white pawns and two white knights vs. 2 black pawns and two black
-     *             bishops"; kings are optional, but, if present,  may only appear with qty. 1
+     *             bishops"; kings are optional, but, if present, may only appear with qty. 1
      *
      * @throws CountException
      */
