@@ -96,7 +96,19 @@ Material searches may be performed with the <nobr>"-mm"</nobr> (match material) 
 
 ``pgnutil -mm 3PQqn -i mygames.pgn``
 
-searches mygames.pgn for any game wherein three white pawns, one white queen, one black queen, and one black knight (plus kings) appears on the board without other pieces.
+searches mygames.pgn for any game wherein three white pawns, one white queen, one black queen, and one black knight (plus kings) appear on the board without other pieces.
+
+The <nobr>"-mmi"</nobr> (match material ignore colors) option performs the same search as <nobr>-mm</nobr>, but will also match the same material with reversed colors.
+
+The <nobr>"-mmd"</nobr> (match material difference) option is similar to <nobr>-mm</nobr>, but the parameter is interpreted as a material <i>difference</i>, rather than a complete list of material on the board. Thus,
+
+``pgnutil -mmd 2P -i mygames.pgn``
+
+will match a position containing two white pawns plus kings; two white pawns, one white knight, and one black knight plus kings; etc.
+
+The <nobr>"-mmdi"</nobr> (match material difference ignore colors) option is similar to <nobr>-mmd</nobr>, but also matches reversed colors.
+
+For all material-search options described in this section, the "mmply" [output selector](#output-selectors) may be used to output the half-move at which the match was found.
 
 ### Replacing
 
@@ -151,7 +163,8 @@ There are several "special" selectors recognized by the "-s" option.  For exampl
 * 	opponentelo: when the "-mp" (match player) option is used, output the value of the "Elo" header for the opposing player
 * 	gameno: causes pgnutil to output the game's ordinal position within the PGN file
 * 	plies: causes pgnutil to output the number of half-moves present in the game
-* 	cbplayers: for engine games containing clock annotations, and in conjunction with the "-cb" option (see [Time](#time), below), causes pgnutil to output the names of players whose clocks fell below the indicated time threshold
+*   mmply: in conjunction with a [material-matching](#material-search) option, causes pgnutil to output the half-move at which a match was found
+* 	cbplayers: for engine games containing clock annotations, and in conjunction with the <nobr>"-cb"</nobr> option (see [Time](#time), below), causes pgnutil to output the names of players whose clocks fell below the indicated time threshold
 *   cbclocks: for engine games containing clock annotations, and in conjunction with the <nobr>"-cb"</nobr> option (see [Time](#time), below), causes pgnutil to output the lowest clock value for each player that fell below the indicated time threshold
 * 	lowclockwhite: for engine games containing clock annotations, causes pgnutil to output the lowest clock value for the white player (see [Time](#time), below)
 * 	lowclockblack: for engine games containing clock annotations, causes pgnutil to output the lowest clock value for the black player (see [Time](#time), below)
