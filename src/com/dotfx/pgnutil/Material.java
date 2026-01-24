@@ -40,6 +40,7 @@ public class Material
 
         private final String signifier;
         private final int hashShift;
+        private final int unitIncrement;
 
         static { for (Type r : Type.values()) sigMap.put(r.toString(), r);}
 
@@ -47,6 +48,7 @@ public class Material
         {
             this.signifier = signifier;
             this.hashShift = hashShift;
+            unitIncrement = 0x1 << hashShift;
         }
 
         @Override
@@ -59,7 +61,7 @@ public class Material
          * @param checksum the running commutative checksum
          * @return updated commutative checksum of this PieceType
          */
-        public int updateMaterialHash(int checksum) { return checksum + (1 << hashShift); }
+        public int updateMaterialHash(int checksum) { return checksum + unitIncrement; }
 
         /**
          *
