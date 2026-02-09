@@ -112,16 +112,15 @@ public class Board<T extends Board<T>> implements Comparable<T>
     private static final int whiteQCastleSquares[] = new int[] {2, 3, 4};
     private static final int blackKCastleSquares[] = new int[] {60, 61, 62};
     private static final int blackQCastleSquares[] = new int[] {58, 59, 60};
-    private static final Color[] COLORS = new Color[] {Color.WHITE, Color.BLACK};
     private static final int[] NMOVES = new int[] {6, 15, 17, 10, -6, -15, -17, -10};
 
     private boolean whiteCanCastleQ;
     private boolean whiteCanCastleK;
     private boolean blackCanCastleQ;
     private boolean blackCanCastleK;
-    private byte whiteKingLoc;
-    private byte blackKingLoc;
-    private byte epCandidate; // location of the capture square; -1 if none
+    private int whiteKingLoc;
+    private int blackKingLoc;
+    private int epCandidate; // location of the capture square; -1 if none
     private short halfMoveClock; // ply of last capture or pawn move
     short ply; // zero at initial position
     byte whitePieceCount = 16;
@@ -141,7 +140,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         whiteCanCastleK = true;
         blackCanCastleQ = true;
         blackCanCastleK = true;
-        
+
         for (int i = 8; i < 16; i++)
         {
             position[i] = Piece.WHITE_PAWN;
@@ -227,7 +226,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         this.blackCanCastleK = blackCanCastleK;
         this.halfMoveClock = halfMoveClock;
 
-        this.epCandidate = epCandidate == null ? -1 : (byte)epCandidate.getLocation();
+        this.epCandidate = epCandidate == null ? -1 : epCandidate.getLocation();
 
         for (int i = 0; i < 64; i++)
         {
@@ -240,7 +239,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
                     if (position[i] == Piece.WHITE_KING)
                     {
                         if (whiteKingLoc != -1) throw new InvalidPositionException("too many kings");
-                        whiteKingLoc = (byte)i;
+                        whiteKingLoc = i;
                     }
                 }
 
@@ -251,7 +250,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
                     if (position[i] == Piece.BLACK_KING)
                     {
                         if (blackKingLoc != -1) throw new InvalidPositionException("too many kings");
-                        blackKingLoc = (byte)i;
+                        blackKingLoc = i;
                     }
                 }
             }
@@ -312,8 +311,6 @@ public class Board<T extends Board<T>> implements Comparable<T>
         
         Piece destPiece = position[end];
         Color moveColor = piece.getColor();
-        
-//        if (colors[ply % 2] != moveColor) return false;
         
         Color destColor = destPiece == null ? null : destPiece.getColor();
         boolean destSameColor = moveColor == destColor;
@@ -498,8 +495,8 @@ public class Board<T extends Board<T>> implements Comparable<T>
         else
         {
             Piece savedCapture = position[end];
-            byte savedWKingLoc = whiteKingLoc;
-            byte savedBKingLoc = blackKingLoc;
+            int savedWKingLoc = whiteKingLoc;
+            int savedBKingLoc = blackKingLoc;
             
             position[end] = position[start];
             position[start] = null;
@@ -529,8 +526,8 @@ public class Board<T extends Board<T>> implements Comparable<T>
                         }
                     }
 
-                    else if (color == Color.WHITE) whiteKingLoc = (byte)end;
-                    else blackKingLoc = (byte)end;
+                    else if (color == Color.WHITE) whiteKingLoc = end;
+                    else blackKingLoc = end;
                 }
 
                 return isInCheck(color, new int[] {color == Color.WHITE ? whiteKingLoc : blackKingLoc});
@@ -606,7 +603,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
 
                     if (piece.getColor() == Color.WHITE)
                     {
-                        whiteKingLoc = (byte) end;
+                        whiteKingLoc = end;
                         whiteCanCastleK = false;
                         whiteCanCastleQ = false;
 
@@ -625,7 +622,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
 
                     else
                     {
-                        blackKingLoc = (byte) end;
+                        blackKingLoc = end;
                         blackCanCastleK = false;
                         blackCanCastleQ = false;
 
@@ -668,8 +665,8 @@ public class Board<T extends Board<T>> implements Comparable<T>
 
                     if (span == 16)
                     {
-                        if (piece.getColor() == Color.WHITE) epCandidate = (byte)(start + 8);
-                        else epCandidate = (byte)(start - 8);
+                        if (piece.getColor() == Color.WHITE) epCandidate = start + 8;
+                        else epCandidate = start - 8;
                     }
 
                     else if (end == epCandidate && (span == 7 || span == 9))
@@ -747,7 +744,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
      */
     public final Board<?> move(String san) throws IllegalMoveException
     {
-        Color color = (ply ^ 1) > ply ? Color.WHITE : Color.BLACK;
+        Color color = (ply & 1) == 0 ? Color.WHITE : Color.BLACK;
         Material.Type promoteTo = null;
         int len = san.length();
         int chopLen = len;
@@ -880,7 +877,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
      */
     public final String normalize(String san, boolean showCheck) throws IllegalMoveException
     {
-        Color color = (ply ^ 1) > ply ? Color.WHITE : Color.BLACK;
+        Color color = (ply & 1) == 0 ? Color.WHITE : Color.BLACK;
         Material.Type promoteTo = null;
         int len = san.length();
         int chopLen = len;
@@ -999,8 +996,8 @@ public class Board<T extends Board<T>> implements Comparable<T>
     public final String coordToSan(int start, int end, Material.Type promoteTo, boolean showCheck)
         throws IllegalMoveException
     {
-        Color moveColor = (ply ^ 1) > ply ? Color.WHITE : Color.BLACK;
-        Color otherColor = (ply ^ 1) > ply ? Color.BLACK : Color.WHITE;
+        Color moveColor = (ply & 1) == 0 ? Color.WHITE : Color.BLACK;
+        Color otherColor = (ply & 1) == 0 ? Color.BLACK : Color.WHITE;
         Material.Type type;
         String captureSt = position[end] == null ? "" : "x";
         StringBuilder ret = new StringBuilder();
@@ -1394,7 +1391,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
             if (i > 0) ret.append("/");
         }
         
-        ret.append(" ").append((ply ^ 1) > ply ? Color.WHITE : Color.BLACK).append(" ");
+        ret.append(" ").append((ply & 1) == 0 ? Color.WHITE : Color.BLACK).append(" ");
         if (!whiteCanCastleK && !whiteCanCastleQ && !blackCanCastleK && !blackCanCastleQ) ret.append("- ");
         
         else
@@ -1442,7 +1439,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
             if (i > 0) ret.append("/");
         }
         
-        ret.append(" ").append((ply ^ 1) > ply ? Color.WHITE : Color.BLACK).append(" ");
+        ret.append(" ").append((ply & 1) == 0 ? Color.WHITE : Color.BLACK).append(" ");
         if (!whiteCanCastleK && !whiteCanCastleQ && !blackCanCastleK && !blackCanCastleQ) ret.append("-");
         
         else
@@ -1578,7 +1575,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
     public int hashCode()
     {
         return Board.class.hashCode() ^ Arrays.hashCode(position) ^
-            Short.hashCode(ply) ^ Byte.hashCode(epCandidate) ^
+            Short.hashCode(ply) ^ Integer.hashCode(epCandidate) ^
             Boolean.hashCode(whiteCanCastleK) ^
             Boolean.hashCode(whiteCanCastleQ) ^
             Boolean.hashCode(blackCanCastleK) ^

@@ -193,8 +193,8 @@ public class Material
 
     public boolean equalsBoardMaterial(Board<?> board)
     {
-        if (whitePieceCount != board.getWhitePieceCount() ||
-                blackPieceCount != board.getBlackPieceCount()) return false;
+        if (whitePieceCount != board.getWhitePieceCount() || blackPieceCount != board.getBlackPieceCount())
+            return false;
 
         int boardWhiteMat = Material.Type.MATERIAL_HASH_SEED;
         int boardBlackMat = Material.Type.MATERIAL_HASH_SEED;
