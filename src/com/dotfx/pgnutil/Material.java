@@ -158,6 +158,11 @@ public class Material
         }
     }
 
+    /**
+     *
+     * @param hash for one color
+     * @throws CountException
+     */
     private void verifyMaterial(int hash) throws CountException
     {
         for (Type type : Type.values())

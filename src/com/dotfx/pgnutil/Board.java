@@ -313,21 +313,21 @@ public class Board<T extends Board<T>> implements Comparable<T>
         Color moveColor = piece.getColor();
         
         Color destColor = destPiece == null ? null : destPiece.getColor();
-        boolean destSameColor = moveColor == destColor;
+        boolean destDiffColor = moveColor != destColor;
         
         switch (piece.getType())
         {
             case PAWN:
                 int diff = end - start;
-                int endRank = end / 8;
+                int endRank = end >> 3;
                 
                 if (moveColor == Color.WHITE)
                 {
                     if (diff == 8) return destPiece == null;
                     if (diff == 16 && endRank == 3) return destPiece == null && position[start + 8] == null;
                     
-                    if ((diff == 7 || diff == 9) && hi/8 - low/8 == 1)
-                        return (destPiece != null || end == epCandidate) && !destSameColor;
+                    if ((diff == 7 || diff == 9) && (hi >> 3) - (low >> 3) == 1)
+                        return (destPiece != null || end == epCandidate) && destDiffColor;
                 }
                 
                 else
@@ -335,103 +335,105 @@ public class Board<T extends Board<T>> implements Comparable<T>
                     if (diff == -8) return destPiece == null;
                     if (diff == -16 && endRank == 4) return destPiece == null && position[start - 8] == null;
                     
-                    if ((diff == -7 || diff == -9) && hi/8 - low/8 == 1)
-                        return (destPiece != null || end == epCandidate) && !destSameColor;
+                    if ((diff == -7 || diff == -9) && (hi >> 3) - (low >> 3) == 1)
+                        return (destPiece != null || end == epCandidate) && destDiffColor;
                 }
 
                 return false;
 
             case ROOK:
-                if (low / 8 == hi / 8) // same rank
+                if ((span & 0x7) == 0) // same file
+                {
+                    for (i = low + 8; i < hi; i += 8)
+                        if (position[i] != null) return false;
+                }
+
+                else if ((low >> 3) == (hi >> 3)) // same rank
                 {
                     for (i = low + 1; i < hi; i++)
                         if (position[i] != null) return false;
                 }
                 
-                else if (span % 8 == 0) // same file
-                {
-                    for (i = low + 8; i < hi; i += 8)
-                        if (position[i] != null) return false;
-                }
-                
                 else return false;
                 
-                return !destSameColor;
+                return destDiffColor;
                 
             case KNIGHT:
                 switch (span)
                 {
                     case 6:
                     case 10:
-                        return !destSameColor && low/8 == hi/8 - 1;
+                        return destDiffColor && (low >> 3) == (hi >> 3) - 1;
                         
                     case 15:
                     case 17:
-                        return !destSameColor && low/8 == hi/8 - 2;
+                        return destDiffColor && (low >> 3) == (hi >> 3) - 2;
                         
                     default: return false;
                 }
                 
             case BISHOP:
-                if (span % 7 == 0 && span != 63)
-                {
-                    for (i = low + 7; i < hi; i += 7)
-                        if (i/8 - (i - 7)/8 != 1 || position[i] != null) return false;
-                    
-                    return !destSameColor && i/8 - (i - 7)/8 == 1;
-                }
-                
-                else if (span % 9 == 0)
+                if (span % 9 == 0)
                 {
                     for (i = low + 9; i < hi; i += 9)
-                        if (i/8 - (i - 9)/8 != 1 || position[i] != null) return false;
-                    
-                    return !destSameColor && i/8 - (i - 9)/8 == 1;
+                        if ((i >> 3) - ((i - 9) >> 3) != 1 || position[i] != null) return false;
+
+                    return destDiffColor && (i >> 3) - ((i - 9) >> 3) == 1;
                 }
-                
+
+                else if (span % 7 == 0)
+                {
+                    for (i = low + 7; i < hi; i += 7)
+                        if ((i >> 3) - ((i - 7) >> 3) != 1 || position[i] != null) return false;
+                    
+                    return destDiffColor && (i >> 3) - ((i - 7) >> 3) == 1;
+                }
+
                 else return false;
                 
             case QUEEN:
-                if (low / 8 == hi / 8) // same rank
-                {
-                    for (i = low + 1; i < hi; i++)
-                        if (position[i] != null) return false;
-                }
-                
-                else if (span % 8 == 0) // same file
+                if ((span & 0x7) == 0) // same file
                 {
                     for (i = low + 8; i < hi; i += 8)
                         if (position[i] != null) return false;
                 }
-                
-                else if (span % 7 == 0 && span != 63) // same diagonal
+
+                else if ((low >> 3) == (hi >> 3)) // same rank
                 {
-                    for (i = low + 7; i < hi; i += 7)
-                        if (i/8 - (i - 7)/8 != 1 || position[i] != null) return false;
-                    
-                    return !destSameColor && i/8 - (i - 7)/8 == 1;
+                    for (i = low + 1; i < hi; i++)
+                        if (position[i] != null) return false;
                 }
-                
+
                 else if (span % 9 == 0) // same diagonal
                 {
                     for (i = low + 9; i < hi; i += 9)
-                        if (i/8 - (i - 9)/8 != 1 || position[i] != null) return false;
+                        if ((i >> 3) - ((i - 9) >> 3) != 1 || position[i] != null) return false;
+
+                    return destDiffColor && (i >> 3) - ((i - 9) >> 3) == 1;
+                }
+
+                else if (span % 7 == 0) // same diagonal
+                {
+                    for (i = low + 7; i < hi; i += 7)
+                        if ((i >> 3) - ((i - 7) >> 3) != 1 || position[i] != null) return false;
                     
-                    return !destSameColor && i/8 - (i - 9)/8 == 1;
+                    return destDiffColor && (i >> 3) - ((i - 7) >> 3) == 1;
                 }
                 
                 else return false;
                 
-                return !destSameColor;
+                return destDiffColor;
                 
             case KING:
                 switch (span)
                 {
-                    case 1: return hi/8 == low/8 && !destSameColor;
+                    case 1:
+                        return (hi >> 3) == (low >> 3) && destDiffColor;
+
                     case 7:
                     case 8:
                     case 9:
-                        return hi/8 - low/8 == 1 && !destSameColor;
+                        return (hi >> 3) - (low >> 3) == 1 && destDiffColor;
                         
                     case 2: // castle
                         if (moveColor == Color.WHITE)
@@ -660,7 +662,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
 
                 case PAWN:
                     halfMoveClock = ply;
-                    int endRank = end / 8;
+                    int endRank = end >> 3;
                     int span = end > start ? end - start : start - end;
 
                     if (span == 16)
@@ -772,11 +774,11 @@ public class Board<T extends Board<T>> implements Comparable<T>
         
         if (san.equalsIgnoreCase("O-O-O"))
         {
-            if (color == Color.WHITE && canMove(4, 2) &&
-                !isMovingIntoCheck(4, 2)) return move(4, 2, promoteTo);
+            if (color == Color.WHITE && canMove(4, 2) && !isMovingIntoCheck(4, 2))
+                return move(4, 2, promoteTo);
             
-            else if (color == Color.BLACK && canMove(60, 58) &&
-                !isMovingIntoCheck(60, 58)) return move(60, 58, promoteTo);
+            else if (color == Color.BLACK && canMove(60, 58) && !isMovingIntoCheck(60, 58))
+                return move(60, 58, promoteTo);
         
             throw new IllegalMoveException(getMoveErrorMsg(san, ply));
         }
@@ -945,8 +947,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
             int disambigLen = disambig.length();
             
             if (disambigLen == 2)
-                return coordToSan(Square.get(disambig).getLocation(), endSquare,
-                    promoteTo, showCheck);
+                return coordToSan(Square.get(disambig).getLocation(), endSquare, promoteTo, showCheck);
             
             char disambigChar = disambig.charAt(0);
             
@@ -972,8 +973,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
                 {
                     Piece piece = position[i];
 
-                    if (piece != null && piece.getType() == type &&
-                        piece.getColor() == color && moveTest(i, endSquare))
+                    if (piece != null && piece.getType() == type && piece.getColor() == color && moveTest(i, endSquare))
                         return coordToSan(i, endSquare, promoteTo, showCheck);
                 }
             }
@@ -985,8 +985,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         {
             Piece piece = position[i];
             
-            if (piece != null && piece.getType() == type &&
-                piece.getColor() == color && moveTest(i, endSquare))
+            if (piece != null && piece.getType() == type && piece.getColor() == color && moveTest(i, endSquare))
                 return coordToSan(i, endSquare, promoteTo, showCheck);
         }
         
@@ -1003,11 +1002,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         StringBuilder ret = new StringBuilder();
         
         try { type = position[start].getType(); }
-        
-        catch (NullPointerException e)
-        {
-            throw new IllegalMoveException("illegal move at ply " + (ply + 1));
-        }
+        catch (NullPointerException e) { throw new IllegalMoveException("illegal move at ply " + (ply + 1)); }
         
         if (type == Material.Type.PAWN)
         {
@@ -1031,7 +1026,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
             move(start, end, promoteTo);
             
             ret.append(Square.get(end));
-            int endRank = end/8;
+            int endRank = end >> 3;
             
             if (endRank == 0 || endRank == 7)
                 ret.append("=").append(promoteTo).append(showCheck ? getCheckSymbol(otherColor) : "");
@@ -1077,11 +1072,11 @@ public class Board<T extends Board<T>> implements Comparable<T>
             {
                 int candidate2 = candidates[i];
                 
-                if (disambigFile == false)
-                    if ((candidate2 - candidate1) % 8 != 0) disambigFile = true;
+                if (!disambigFile)
+                    if (((candidate2 - candidate1) & 0x7) != 0) disambigFile = true;
                 
-                else if (disambigRank == false)
-                    if ((candidate2 - candidate1) % 8 == 0) disambigRank = true;
+                else if (!disambigRank)
+                    if (((candidate2 - candidate1) & 0x7) == 0) disambigRank = true;
             }
         }
         
@@ -1323,7 +1318,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
                 case 'k':
                     Piece piece = Piece.get(currentChar);
                     if (file > 7 || piece == null) throw new InvalidFenException("invalid FEN: '" + fenSt + "'");
-                    position[rank * 8 + file] = piece;
+                    position[(rank << 3) + file] = piece;
                     file++;
                     break;
 
@@ -1406,7 +1401,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         if (epCandidate == -1) ret.append("- ");
         else ret.append(Square.get(epCandidate).toString().toLowerCase()).append(" ");
         
-        ret.append((ply - halfMoveClock)).append(" ").append(((ply + 2)/2));
+        ret.append((ply - halfMoveClock)).append(" ").append(((ply + 2) >> 1));
         
         return ret.toString();
     }
