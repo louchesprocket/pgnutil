@@ -76,6 +76,7 @@ public class AquariumVars
     {
         otherVars = new HashMap<>();
 
+        nextComment:
         for (String comment : move.getComments())
         {
             int varNameStartIdx, pos = 0, varNameEndIdx;
@@ -112,8 +113,13 @@ public class AquariumVars
 
                     for (i = varValStartIdx + 1; i < commentLen; i++)
                     {
-                        if (comment.charAt(i) == '\"') do i++; while (comment.charAt(i) != '\"');
-                        if (comment.charAt(i) == ']') break;
+                        try
+                        {
+                            if (comment.charAt(i) == '\"') do i++; while (comment.charAt(i) != '\"');
+                            if (comment.charAt(i) == ']') break;
+                        }
+
+                        catch (StringIndexOutOfBoundsException e) { continue nextComment; }
                     }
 
                     varValEndIdx = i;
