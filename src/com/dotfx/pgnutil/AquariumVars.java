@@ -152,7 +152,7 @@ public class AquariumVars
                             default:
                                 otherVars.put(oneVarName, comment.substring(varValStartIdx, varValEndIdx));
                         }
-                    } catch (InvalidClockException e) {} // best effort
+                    } catch (InvalidClockException ignored) {} // best effort
                 }
 
                 else // "("
@@ -176,7 +176,10 @@ public class AquariumVars
     {
         if (meval == null) return null;
         int tbVarStart = meval.indexOf("|TB:");
-        if (tbVarStart > -1) return meval.substring(tbVarStart + 4);
+
+        try { if (tbVarStart > -1) return meval.substring(tbVarStart + 4); }
+        catch (StringIndexOutOfBoundsException ignored) {}
+
         return null;
     }
 }
