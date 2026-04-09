@@ -766,38 +766,15 @@ public final class PgnGame
         
         return false;
     }
-    
-    public boolean containsPosition(Board<?> pos)
-        throws IllegalMoveException
-    {
-        Board<?> board = new Board<>(true);
-        int whitePieceCount = pos.getWhitePieceCount();
-        int blackPieceCount = pos.getBlackPieceCount();
 
-        for (Move move : moves)
-        {
-            if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount)
-                return false;
-
-            if (board.move(move).positionEquals(pos))
-            {
-                posMatchAtPly = move.getPly();
-                return true;
-            }
-        }
-        
-        return false;
-    }
-
-    public boolean containsPosition(final Set<LooseBoard> positionSet, int minWhitePieces, int minBlackPieces)
+    public boolean containsPosition(final Set<LooseBoard> positionSet, int minPieces)
             throws IllegalMoveException
     {
         LooseBoard looseBoard = new LooseBoard(true);
 
         for (Move move : getMoveList())
         {
-            if (looseBoard.getWhitePieceCount() < minWhitePieces || looseBoard.getBlackPieceCount() < minBlackPieces)
-                break;
+            if (looseBoard.getPieceCount() < minPieces) break;
 
             if (positionSet.contains(looseBoard))
             {
@@ -814,14 +791,11 @@ public final class PgnGame
     public boolean containsMaterial(Material material, boolean ignoreSides)
             throws IllegalMoveException
     {
-        final int whitePieceCount = material.getWhitePieceCount();
-        final int blackPieceCount = material.getBlackPieceCount();
+        final int pieceCountThreshold = material.getPieceCount();
         Board<?> board = new Board<>(true);
 
         if (ignoreSides)
         {
-            final int pieceCountThreshold = whitePieceCount + blackPieceCount;
-
             if (material.equalsBoardMatIgnoreColors(board))
             {
                 materialMatchAtPly = 0;
@@ -831,7 +805,7 @@ public final class PgnGame
             for (Move move : getMoveList())
             {
                 board.move(move);
-                if (board.getWhitePieceCount() + board.getBlackPieceCount() < pieceCountThreshold) break;
+                if (board.getPieceCount() < pieceCountThreshold) break;
 
                 if (material.equalsBoardMatIgnoreColors(board))
                 {
@@ -852,7 +826,7 @@ public final class PgnGame
             for (Move move : getMoveList())
             {
                 board.move(move);
-                if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount) break;
+                if (board.getPieceCount() < pieceCountThreshold) break;
 
                 if (material.equalsBoardMaterial(board))
                 {
@@ -868,18 +842,15 @@ public final class PgnGame
     public boolean containsMaterialDiff(Material material, boolean ignoreSides)
             throws IllegalMoveException
     {
-        final int whitePieceCount = material.getWhitePieceCount();
-        final int blackPieceCount = material.getBlackPieceCount();
+        final int pieceCountThreshold = material.getPieceCount();
         Board<?> board = new Board<>(true);
 
         if (ignoreSides)
         {
-            final int pieceCountThreshold = whitePieceCount + blackPieceCount;
-
             for (Move move : getMoveList())
             {
                 board.move(move);
-                if (board.getWhitePieceCount() + board.getBlackPieceCount() < pieceCountThreshold) break;
+                if (board.getPieceCount() < pieceCountThreshold) break;
 
                 if (material.equalsBoardMatDiffIgnoreColors(board))
                 {
@@ -894,7 +865,7 @@ public final class PgnGame
             for (Move move : getMoveList())
             {
                 board.move(move);
-                if (board.getWhitePieceCount() < whitePieceCount || board.getBlackPieceCount() < blackPieceCount) break;
+                if (board.getPieceCount() < pieceCountThreshold) break;
 
                 if (material.equalsBoardMaterialDiff(board))
                 {

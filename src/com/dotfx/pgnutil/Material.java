@@ -84,7 +84,7 @@ public class Material
         public CountException(String msg) { super(msg); }
     }
 
-    private int whitePieceCount, blackPieceCount;
+    private int pieceCount;
     private int whiteMatHash = Type.MATERIAL_HASH_SEED;
     private int blackMatHash = Type.MATERIAL_HASH_SEED;
 
@@ -132,18 +132,12 @@ public class Material
                     try
                     {
                         piece = Piece.get(c);
+                        pieceCount += qty;
 
                         if (piece.getColor() == Color.WHITE)
-                        {
-                            whitePieceCount += qty;
                             whiteMatHash = piece.getType().updateMaterialHash(qty, whiteMatHash);
-                        }
 
-                        else
-                        {
-                            blackPieceCount += qty;
-                            blackMatHash = piece.getType().updateMaterialHash(qty, blackMatHash);
-                        }
+                        else blackMatHash = piece.getType().updateMaterialHash(qty, blackMatHash);
                     }
 
                     catch (NullPointerException e) { throw new CountException("invalid piece '" + c + "'"); }
@@ -191,15 +185,13 @@ public class Material
         }
     }
 
-    public int getWhitePieceCount() { return whitePieceCount; }
+    public int getPieceCount() { return pieceCount; }
     public int getWhiteMatHash() { return whiteMatHash; }
-    public int getBlackPieceCount() { return blackPieceCount; }
     public int getBlackMatHash() { return blackMatHash; }
 
     public boolean equalsBoardMaterial(Board<?> board)
     {
-        if (whitePieceCount != board.getWhitePieceCount() || blackPieceCount != board.getBlackPieceCount())
-            return false;
+        if (pieceCount != board.getPieceCount()) return false;
 
         int boardWhiteMat = Material.Type.MATERIAL_HASH_SEED;
         int boardBlackMat = Material.Type.MATERIAL_HASH_SEED;
@@ -220,9 +212,7 @@ public class Material
 
     public boolean equalsBoardMatIgnoreColors(Board<?> board)
     {
-        if ((whitePieceCount != board.getWhitePieceCount() && whitePieceCount != board.getBlackPieceCount()) ||
-            (blackPieceCount != board.getBlackPieceCount() && blackPieceCount != board.getWhitePieceCount()))
-            return false;
+        if (pieceCount != board.getPieceCount()) return false;
 
         int boardWhiteMat = Material.Type.MATERIAL_HASH_SEED;
         int boardBlackMat = Material.Type.MATERIAL_HASH_SEED;

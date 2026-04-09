@@ -430,18 +430,17 @@ public class PGNUtil
     static final class MatchPositionSetProcessor implements GameProcessor
     {
         private final Set<LooseBoard> positionSet;
-        private final int minWhitePieces, minBlackPieces;
+        private final int minPieces;
 
         public MatchPositionSetProcessor(Set<LooseBoard> positionSet)
         {
             this.positionSet = positionSet;
-            minWhitePieces = positionSet.stream().mapToInt(LooseBoard::getWhitePieceCount).min().orElse(0);
-            minBlackPieces = positionSet.stream().mapToInt(LooseBoard::getBlackPieceCount).min().orElse(0);
+            minPieces = positionSet.stream().mapToInt(LooseBoard::getPieceCount).min().orElse(0);
         }
 
         @Override public boolean processGame()
         {
-            try { return game.containsPosition(positionSet, minWhitePieces, minBlackPieces); }
+            try { return game.containsPosition(positionSet, minPieces); }
 
             catch (IllegalMoveException | StringIndexOutOfBoundsException | NullPointerException e)
             {

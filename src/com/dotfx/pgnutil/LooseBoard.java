@@ -47,7 +47,7 @@ public class LooseBoard extends Board<LooseBoard>
     }
 
     @Override
-    public final boolean equals(Object other) { return looseEquals((LooseBoard)other); }
+    public final boolean equals(Object other) { return positionEquals((LooseBoard)other); }
 
     @Override
     public final int hashCode()
