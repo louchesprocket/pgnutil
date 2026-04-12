@@ -54,24 +54,18 @@ public class Board<T extends Board<T>> implements Comparable<T>
         
         private static final Square[] squares = new Square[64];
         private static final Map<String,Square> nameMap = new HashMap<>();
-
-        private int location;
         
         static
         {
-            Square[] values = Square.values();
-
-            for (int i = 0; i < values.length; i++) values[i].location = i;
-            
             for (Square s : Square.values())
             {
-                squares[s.location] = s;
+                squares[s.location()] = s;
                 nameMap.put(s.name().toLowerCase(), s);
             }
 
         }
         
-        public final int getLocation() { return location; }
+        public final int location() { return ordinal(); }
         public static Square get(int square) { return squares[square]; }
 
         public static Square get(String s) throws IllegalMoveException
@@ -110,8 +104,8 @@ public class Board<T extends Board<T>> implements Comparable<T>
             }
         }
 
-        public long getSetMask() { return SET_MASK[location]; }
-        public long getClearMask() { return CLEAR_MASK[location]; }
+        public long getSetMask() { return SET_MASK[location()]; }
+        public long getClearMask() { return CLEAR_MASK[location()]; }
         
         @Override
         public String toString() { return name().toLowerCase(); }
@@ -128,16 +122,16 @@ public class Board<T extends Board<T>> implements Comparable<T>
 
     // for "in check" checks
     private static final int[] whiteKCastleSquares =
-            new int[] {Square.E1.location, Square.F1.location, Square.G1.location};
+            new int[] {Square.E1.location(), Square.F1.location(), Square.G1.location()};
 
     private static final int[] whiteQCastleSquares =
-            new int[] {Square.C1.location, Square.D1.location, Square.E1.location};
+            new int[] {Square.C1.location(), Square.D1.location(), Square.E1.location()};
 
     private static final int[] blackKCastleSquares =
-            new int[] {Square.E8.location, Square.F8.location, Square.G8.location};
+            new int[] {Square.E8.location(), Square.F8.location(), Square.G8.location()};
 
     private static final int[] blackQCastleSquares =
-            new int[] {Square.C8.location, Square.D8.location, Square.E8.location};
+            new int[] {Square.C8.location(), Square.D8.location(), Square.E8.location()};
 
     static
     {
@@ -179,8 +173,8 @@ public class Board<T extends Board<T>> implements Comparable<T>
     {
         position = new Piece[64];
         Arrays.fill(position, null);
-        whiteKingLoc = Square.E1.location;
-        blackKingLoc = Square.E8.location;
+        whiteKingLoc = Square.E1.location();
+        blackKingLoc = Square.E8.location();
         epCandidate = -1;
         if (!initialPosition) return;
         
@@ -190,23 +184,23 @@ public class Board<T extends Board<T>> implements Comparable<T>
         blackCanCastleK = true;
         bitBoard = 0xFFFF00000000FFFFL;
 
-        for (int i = Square.A2.location; i <= Square.H2.location; i++)
+        for (int i = Square.A2.location(); i <= Square.H2.location(); i++)
         {
             position[i] = Piece.WHITE_PAWN;
             position[i + 40] = Piece.BLACK_PAWN;
         }
         
-        position[Square.A1.location] = position[Square.H1.location] = Piece.WHITE_ROOK;
-        position[Square.B1.location] = position[Square.G1.location] = Piece.WHITE_KNIGHT;
-        position[Square.C1.location] = position[Square.F1.location] = Piece.WHITE_BISHOP;
-        position[Square.D1.location] = Piece.WHITE_QUEEN;
-        position[Square.E1.location] = Piece.WHITE_KING;
+        position[Square.A1.location()] = position[Square.H1.location()] = Piece.WHITE_ROOK;
+        position[Square.B1.location()] = position[Square.G1.location()] = Piece.WHITE_KNIGHT;
+        position[Square.C1.location()] = position[Square.F1.location()] = Piece.WHITE_BISHOP;
+        position[Square.D1.location()] = Piece.WHITE_QUEEN;
+        position[Square.E1.location()] = Piece.WHITE_KING;
 
-        position[Square.A8.location] = position[Square.H8.location] = Piece.BLACK_ROOK;
-        position[Square.B8.location] = position[Square.G8.location] = Piece.BLACK_KNIGHT;
-        position[Square.C8.location] = position[Square.F8.location] = Piece.BLACK_BISHOP;
-        position[Square.D8.location] = Piece.BLACK_QUEEN;
-        position[Square.E8.location] = Piece.BLACK_KING;
+        position[Square.A8.location()] = position[Square.H8.location()] = Piece.BLACK_ROOK;
+        position[Square.B8.location()] = position[Square.G8.location()] = Piece.BLACK_KNIGHT;
+        position[Square.C8.location()] = position[Square.F8.location()] = Piece.BLACK_BISHOP;
+        position[Square.D8.location()] = Piece.BLACK_QUEEN;
+        position[Square.E8.location()] = Piece.BLACK_KING;
     }
     
     public Board(Piece[] position, short ply, byte epCandidate, boolean whiteCanCastleQ, boolean whiteCanCastleK,
@@ -254,7 +248,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         this.blackCanCastleK = blackCanCastleK;
         this.halfMoveClock = halfMoveClock;
 
-        this.epCandidate = epCandidate == null ? -1 : epCandidate.getLocation();
+        this.epCandidate = epCandidate == null ? -1 : epCandidate.location();
 
         for (int i = 0; i < 64; i++)
         {
@@ -566,7 +560,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
         }
     }
     
-    private boolean isInCheck(Color color, int squares[])
+    private boolean isInCheck(Color color, int[] squares)
     {
         int savedKingLoc = color == Color.WHITE ? whiteKingLoc : blackKingLoc;
         
@@ -626,15 +620,15 @@ public class Board<T extends Board<T>> implements Comparable<T>
 
                         if (diff == -2)
                         {
-                            position[3] = position[0];
-                            position[0] = null;
+                            position[Square.D1.location()] = Piece.WHITE_ROOK;
+                            position[Square.A1.location()] = null;
                             bitBoard ^= wqCastleMask;
                         }
 
                         else if (diff == 2)
                         {
-                            position[5] = position[7];
-                            position[7] = null;
+                            position[Square.F1.location()] = Piece.WHITE_ROOK;
+                            position[Square.H1.location()] = null;
                             bitBoard ^= wkCastleMask;
                         }
 
@@ -649,15 +643,15 @@ public class Board<T extends Board<T>> implements Comparable<T>
 
                         if (diff == -2)
                         {
-                            position[59] = position[56];
-                            position[56] = null;
+                            position[Square.D8.location()] = Piece.BLACK_ROOK;
+                            position[Square.A8.location()] = null;
                             bitBoard ^= bqCastleMask;
                         }
 
                         else if (diff == 2)
                         {
-                            position[61] = position[63];
-                            position[63] = null;
+                            position[Square.F8.location()] = Piece.BLACK_ROOK;
+                            position[Square.H8.location()] = null;
                             bitBoard ^= bkCastleMask;
                         }
 
@@ -671,14 +665,14 @@ public class Board<T extends Board<T>> implements Comparable<T>
 
                     if (piece.getColor() == Color.WHITE)
                     {
-                        if (start == 7) whiteCanCastleK = false;
-                        else if (start == 0) whiteCanCastleQ = false;
+                        if (start == Square.H1.location()) whiteCanCastleK = false;
+                        else if (start == Square.A1.location()) whiteCanCastleQ = false;
                     }
 
                     else
                     {
-                        if (start == 63) blackCanCastleK = false;
-                        else if (start == 56) blackCanCastleQ = false;
+                        if (start == Square.H8.location()) blackCanCastleK = false;
+                        else if (start == Square.A8.location()) blackCanCastleQ = false;
                     }
 
                     bitBoard = bitBoard & CLEAR_MASK[start] | SET_MASK[end];
@@ -784,22 +778,26 @@ public class Board<T extends Board<T>> implements Comparable<T>
         
         if (san.equalsIgnoreCase("O-O"))
         {
-            if (color == Color.WHITE && canMove(4, 6) && !isMovingIntoCheck(4, 6))
-                return move(4, 6, promoteTo);
+            if (color == Color.WHITE && canMove(Square.E1.location(), Square.G1.location()) &&
+                    !isMovingIntoCheck(Square.E1.location(), Square.G1.location()))
+                return move(Square.E1.location(), Square.G1.location(), promoteTo);
             
-            else if (color == Color.BLACK && canMove(60, 62) && !isMovingIntoCheck(60, 62))
-                return move(60, 62, null);
+            else if (color == Color.BLACK && canMove(Square.E8.location(), Square.G8.location()) &&
+                    !isMovingIntoCheck(Square.E8.location(), Square.G8.location()))
+                return move(Square.E8.location(), Square.G8.location(), null);
 
             throw new IllegalMoveException(getMoveErrorMsg(san, ply));
         }
         
         if (san.equalsIgnoreCase("O-O-O"))
         {
-            if (color == Color.WHITE && canMove(4, 2) && !isMovingIntoCheck(4, 2))
-                return move(4, 2, promoteTo);
+            if (color == Color.WHITE && canMove(Square.E1.location(), Square.C1.location()) &&
+                    !isMovingIntoCheck(Square.E1.location(), Square.C1.location()))
+                return move(Square.E1.location(), Square.C1.location(), promoteTo);
             
-            else if (color == Color.BLACK && canMove(60, 58) && !isMovingIntoCheck(60, 58))
-                return move(60, 58, promoteTo);
+            else if (color == Color.BLACK && canMove(Square.E8.location(), Square.C8.location()) &&
+                    !isMovingIntoCheck(Square.E8.location(), Square.C8.location()))
+                return move(Square.E8.location(), Square.C8.location(), promoteTo);
         
             throw new IllegalMoveException(getMoveErrorMsg(san, ply));
         }
@@ -811,12 +809,12 @@ public class Board<T extends Board<T>> implements Comparable<T>
         }
         
         int firstSquare;
-        int endSquare = Square.get(san.substring(len - 2)).getLocation();
+        int endSquare = Square.get(san.substring(len - 2)).location();
         char sanFirstChar = san.charAt(0);
         
         if (Character.isLowerCase(sanFirstChar)) // pawn move
         {
-            firstSquare = Square.get(sanFirstChar, '2').getLocation();
+            firstSquare = Square.get(sanFirstChar, '2').location();
             
             for (int i = firstSquare; i < 56; i += 8)
             {
@@ -843,12 +841,12 @@ public class Board<T extends Board<T>> implements Comparable<T>
         
         if (disambig != null)
         {
-            if (disambig.length() == 2) return move(Square.get(disambig).getLocation(), endSquare, promoteTo);
+            if (disambig.length() == 2) return move(Square.get(disambig).location(), endSquare, promoteTo);
             char disambigChar = disambig.charAt(0);
             
             if (Character.isLetter(disambigChar)) // file
             {
-                firstSquare = Square.get(disambigChar, '1').getLocation();
+                firstSquare = Square.get(disambigChar, '1').location();
             
                 for (int i = firstSquare; i < 64; i += 8)
                 {
@@ -863,7 +861,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
             
             else // rank
             {
-                firstSquare = Square.get('a', disambigChar).getLocation();
+                firstSquare = Square.get('a', disambigChar).location();
                 
                 for (int i = firstSquare; i < firstSquare + 8; i++)
                 {
@@ -917,14 +915,18 @@ public class Board<T extends Board<T>> implements Comparable<T>
         
         if (san.equalsIgnoreCase("O-O"))
         {
-            if (color == Color.WHITE) return coordToSan(4, 6, promoteTo, showCheck);
-            else return coordToSan(60, 62, null, showCheck);
+            if (color == Color.WHITE)
+                return coordToSan(Square.E1.location(), Square.G1.location(), promoteTo, showCheck);
+
+            else return coordToSan(Square.E8.location(), Square.G8.location(), null, showCheck);
         }
         
         if (san.equalsIgnoreCase("O-O-O"))
         {
-            if (color == Color.WHITE) return coordToSan(4, 2, promoteTo, showCheck);
-            else return coordToSan(60, 58, promoteTo, showCheck);
+            if (color == Color.WHITE)
+                return coordToSan(Square.E1.location(), Square.C1.location(), promoteTo, showCheck);
+
+            else return coordToSan(Square.E8.location(), Square.C8.location(), promoteTo, showCheck);
         }
         
         if (Character.isUpperCase(lastChar)) // promotion
@@ -934,12 +936,12 @@ public class Board<T extends Board<T>> implements Comparable<T>
         }
         
         int firstSquare;
-        int endSquare = Square.get(san.substring(len - 2)).getLocation();
+        int endSquare = Square.get(san.substring(len - 2)).location();
         char sanFirstChar = san.charAt(0);
         
         if (Character.isLowerCase(sanFirstChar)) // pawn move
         {
-            firstSquare = Square.get(sanFirstChar, '2').getLocation();
+            firstSquare = Square.get(sanFirstChar, '2').location();
             
             for (int i = firstSquare; i < 56; i += 8)
             {
@@ -968,13 +970,13 @@ public class Board<T extends Board<T>> implements Comparable<T>
             int disambigLen = disambig.length();
             
             if (disambigLen == 2)
-                return coordToSan(Square.get(disambig).getLocation(), endSquare, promoteTo, showCheck);
+                return coordToSan(Square.get(disambig).location(), endSquare, promoteTo, showCheck);
             
             char disambigChar = disambig.charAt(0);
             
             if (Character.isLetter(disambigChar)) // file
             {
-                firstSquare = Square.get(disambigChar, '1').getLocation();
+                firstSquare = Square.get(disambigChar, '1').location();
             
                 for (int i = firstSquare; i < 64; i += 8)
                 {
@@ -988,7 +990,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
             
             else // rank
             {
-                firstSquare = Square.get('a', disambigChar).getLocation();
+                firstSquare = Square.get('a', disambigChar).location();
                 
                 for (int i = firstSquare; i < firstSquare + 8; i++)
                 {
@@ -1057,13 +1059,15 @@ public class Board<T extends Board<T>> implements Comparable<T>
         
         if (type == Material.Type.KING)
         {
-            if ((start == 4 && end == 6) || (start == 60 && end == 62))
+            if ((start == Square.E1.location() && end == Square.G1.location()) ||
+                (start == Square.E8.location() && end == Square.G8.location()))
             {
                 move(start, end, null);
                 return "O-O" + (showCheck ? getCheckSymbol(otherColor) : "");
             }
             
-            if ((start == 4 && end == 2) || (start == 60 && end == 58))
+            if ((start == Square.E1.location() && end == Square.C1.location()) ||
+                (start == Square.E8.location() && end == Square.C8.location()))
             {
                 move(start, end, null);
                 return "O-O-O" + (showCheck ? getCheckSymbol(otherColor) : "");
@@ -1146,8 +1150,8 @@ public class Board<T extends Board<T>> implements Comparable<T>
      */
     public final String coordToSan(String move, boolean showCheck) throws IllegalMoveException
     {
-        int start = Square.get(move.substring(0, 2)).getLocation();
-        int end = Square.get(move.substring(2, 4)).getLocation();
+        int start = Square.get(move.substring(0, 2)).location();
+        int end = Square.get(move.substring(2, 4)).location();
         
         Material.Type promoteTo = move.length() > 4 ? Material.Type.get(move.substring(4, 5)) : null;
         return coordToSan(start, end, promoteTo, showCheck);
@@ -1170,8 +1174,8 @@ public class Board<T extends Board<T>> implements Comparable<T>
             case 'B':
             case 'Q':
             case 'K':
-                start = Square.get(move.substring(1, 3)).getLocation();
-                end = Square.get(move.substring(4, 6)).getLocation();
+                start = Square.get(move.substring(1, 3)).location();
+                end = Square.get(move.substring(4, 6)).location();
                 break;
 
             case 'a':
@@ -1182,8 +1186,8 @@ public class Board<T extends Board<T>> implements Comparable<T>
             case 'f':
             case 'g':
             case 'h':
-                start = Square.get(move.substring(0, 2)).getLocation();
-                end = Square.get(move.substring(3, 5)).getLocation();
+                start = Square.get(move.substring(0, 2)).location();
+                end = Square.get(move.substring(3, 5)).location();
                 if (move.length() > 5) promoteTo = Material.Type.get(move.substring(5));
                 break;
 
@@ -1506,7 +1510,7 @@ public class Board<T extends Board<T>> implements Comparable<T>
     /**
      *
      * @param san the offending move
-     * @param ply internal (zero-based) ply number
+     * @param ply internal ply number (zero at initial position)
      * @return
      */
     private static String getMoveErrorMsg(String san, int ply)
@@ -1540,14 +1544,16 @@ public class Board<T extends Board<T>> implements Comparable<T>
     @Override
     public int compareTo(Board that)
     {
-        if (ply > that.ply) return 1;
-        if (ply < that.ply) return -1;
+        long bbDiff = bitBoard - that.bitBoard;
+        if (bbDiff > 0L) return 1;
+        if (bbDiff < 0L) return -1;
+
+        if (ply != that.ply) return ply - that.ply;
 
         int posComp = Arrays.compare(position, that.position);
         if (posComp != 0) return posComp;
 
-        if (epCandidate > that.epCandidate) return 1;
-        if (epCandidate < that.epCandidate) return -1;
+        if (epCandidate != that.epCandidate) return epCandidate - that.epCandidate;
 
         if (whiteCanCastleK && !that.whiteCanCastleK) return 1;
         if (!whiteCanCastleK && that.whiteCanCastleK) return -1;
