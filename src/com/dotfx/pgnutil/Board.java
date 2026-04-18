@@ -120,6 +120,12 @@ public class Board<T extends Board<T>> implements Comparable<T>
     private static final long bqCastleMask;
     private static final long bkCastleMask;
 
+    // castling squares required to be empty for "can move" checks
+    private static final long wqCastlePath;
+    private static final long wkCastlePath;
+    private static final long bqCastlePath;
+    private static final long bkCastlePath;
+
     // for "in check" checks
     private static final int[] whiteKCastleSquares =
             new int[] {Square.E1.location(), Square.F1.location(), Square.G1.location()};
@@ -155,6 +161,11 @@ public class Board<T extends Board<T>> implements Comparable<T>
 
         bkCastleMask =
                 Square.E8.getSetMask() | Square.F8.getSetMask() | Square.G8.getSetMask() | Square.H8.getSetMask();
+
+        wqCastlePath = Square.B1.getSetMask() | Square.C1.getSetMask() | Square.D1.getSetMask();
+        wkCastlePath = Square.F1.getSetMask() | Square.G1.getSetMask();
+        bqCastlePath = Square.B8.getSetMask() | Square.C8.getSetMask() | Square.D8.getSetMask();
+        bkCastlePath = Square.F8.getSetMask() | Square.G8.getSetMask();
     }
 
     private boolean whiteCanCastleQ;
@@ -453,22 +464,14 @@ public class Board<T extends Board<T>> implements Comparable<T>
                     case 2: // castle
                         if (moveColor == Color.WHITE)
                         {
-                            if (end - start == 2) // king side
-                                return position[5] == null && position[6] == null && whiteCanCastleK;
-                            
-                            else // queen side
-                                return position[1] == null && position[2] == null &&
-                                    position[3] == null && whiteCanCastleQ;
+                            if (end - start == 2) return (bitBoard & wkCastlePath) == 0 && whiteCanCastleK; // king side
+                            else return (bitBoard & wqCastlePath) == 0 && whiteCanCastleQ; // queen side
                         }
                         
                         else
                         {
-                            if (end - start == 2) // king side
-                                return position[61] == null && position[62] == null && blackCanCastleK;
-                            
-                            else // queen side
-                                return position[57] == null && position[58] == null &&
-                                    position[59] == null && blackCanCastleQ;
+                            if (end - start == 2) return (bitBoard & bkCastlePath) == 0 && blackCanCastleK; // king side
+                            else return (bitBoard & bqCastlePath) == 0 && blackCanCastleQ; // queen side
                         }
                         
                     default: return false;
@@ -916,17 +919,29 @@ public class Board<T extends Board<T>> implements Comparable<T>
         if (san.equalsIgnoreCase("O-O"))
         {
             if (color == Color.WHITE)
-                return coordToSan(Square.E1.location(), Square.G1.location(), promoteTo, showCheck);
+            {
+                if (moveTest(Square.E1.location(), Square.G1.location()))
+                    return coordToSan(Square.E1.location(), Square.G1.location(), null, showCheck);
+            }
 
-            else return coordToSan(Square.E8.location(), Square.G8.location(), null, showCheck);
+            else if (moveTest(Square.E8.location(), Square.G8.location()))
+                return coordToSan(Square.E8.location(), Square.G8.location(), null, showCheck);
+
+            throw new IllegalMoveException(getMoveErrorMsg(san, ply));
         }
         
         if (san.equalsIgnoreCase("O-O-O"))
         {
             if (color == Color.WHITE)
-                return coordToSan(Square.E1.location(), Square.C1.location(), promoteTo, showCheck);
+            {
+                if (moveTest(Square.E1.location(), Square.C1.location()))
+                    return coordToSan(Square.E1.location(), Square.C1.location(), null, showCheck);
+            }
 
-            else return coordToSan(Square.E8.location(), Square.C8.location(), promoteTo, showCheck);
+            else if (moveTest(Square.E8.location(), Square.C8.location()))
+                return coordToSan(Square.E8.location(), Square.C8.location(), null, showCheck);
+
+            throw new IllegalMoveException(getMoveErrorMsg(san, ply));
         }
         
         if (Character.isUpperCase(lastChar)) // promotion
