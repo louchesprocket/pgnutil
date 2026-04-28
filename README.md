@@ -14,7 +14,7 @@ Pgnutil requires Java 1.11 or higher.  It theoretically runs on any platform wit
 ## Building
 
 To build, open the project in IntelliJ Idea and select
-"<nobr>Build‑></nobr><nobr>Build Artifacts‑></nobr><nobr>pgnutil:jar‑></nobr>Rebuild" from the menu bar. Then run script/mkdist.sh. This will create the pgnutil integrated executable in the dist directory.
+"Build‑>Build Artifacts‑>pgnutil:jar‑>Rebuild" from the menu bar. Then run script/mkdist.sh. This will create the pgnutil integrated executable in the dist directory.
 
 
 ## Usage
