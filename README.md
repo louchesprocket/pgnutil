@@ -163,8 +163,8 @@ There are several "special" selectors recognized by the "-s" option.  For exampl
 * 	gameno: causes pgnutil to output the game's ordinal position within the PGN file
 * 	plies: causes pgnutil to output the number of half-moves present in the game
 *   mmply: in conjunction with a [material-matching](#material-search) option, causes pgnutil to output the half-move at which a match was found
-* 	cbplayers: for engine games containing clock annotations, and in conjunction with the <nobr>"-cb"</nobr> option (see [Time](#time), below), causes pgnutil to output the names of players whose clocks fell below the indicated time threshold
-*   cbclocks: for engine games containing clock annotations, and in conjunction with the <nobr>"-cb"</nobr> option (see [Time](#time), below), causes pgnutil to output the lowest clock value for each player that fell below the indicated time threshold
+* 	cbplayers: for engine games containing clock annotations, and in conjunction with the "<nobr>-cb</nobr>" option (see [Time](#time), below), causes pgnutil to output the names of players whose clocks fell below the indicated time threshold
+*   cbclocks: for engine games containing clock annotations, and in conjunction with the "<nobr>-cb</nobr>" option (see [Time](#time), below), causes pgnutil to output the lowest clock value for each player that fell below the indicated time threshold
 * 	lowclockwhite: for engine games containing clock annotations, causes pgnutil to output the lowest clock value for the white player (see [Time](#time), below)
 * 	lowclockblack: for engine games containing clock annotations, causes pgnutil to output the lowest clock value for the black player (see [Time](#time), below)
 *   disagreepct: for engine games wherein the u.i. annotates expected responses, output the percentage of moves that disagree with an opponent's expectation
