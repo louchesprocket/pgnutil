@@ -702,7 +702,7 @@ public final class PgnGame
             {
                 if (color != null && !move.getColor().equals(color)) continue;
                 
-                Clock thisClko = new AquariumVars(move).getClko();
+                Clock thisClko = move.getAquariumVars().getClko();
                 if (thisClko == null) continue;
                 
                 if (startClko == null)
@@ -713,17 +713,7 @@ public final class PgnGame
                 
                 else if (thisClko.compareTo(lastClko) > 0 && move.getColor().equals(color))
                 {
-                    int moveNo = move.getNumber();
-                    
-                    // Correct for Aquarium weirdness.
-                    
-                    moveNo = moveNo % 10 >= 5 ? ((moveNo / 10) * 10) + 10 : (moveNo / 10) * 10;
-                    timeCtrlSt = moveNo + "/" + startClko.inSecs();
-                    
-//                    timeCtrlSt = (moveNo -
-//                        (color.equals(Color.WHITE) ? 1 : 0)) + "/" +
-//                        startClko.inSecs();
-                    
+                    timeCtrlSt = ((move.getNumber() / 10) * 10) + "/" + startClko.inSecs();
                     break;
                 }
                 
@@ -735,6 +725,41 @@ public final class PgnGame
         
         try { return new TimeCtrl(timeCtrlSt, official); }
         catch (InvalidTimeCtrlException e) { return null; }
+    }
+
+    /**
+     *
+     * @return first ply at which an expected clock annotation was missing, or 0 if none
+     */
+    public List<ClockError> getClockErrors()
+    {
+        List<ClockError> ret = new ArrayList<>();
+        Move firstOobMove = getFirstOobMove();
+        AquariumVars firstOobVars = firstOobMove.getAquariumVars();
+        boolean hasClk = firstOobVars.getClk() != null;
+        boolean hasClko = firstOobVars.getClko() != null;
+
+        for (int i = firstOobMove.getPly() - 1; i < getMoveList().size(); i++)
+        {
+            Move move = getMoveList().get(i);
+            AquariumVars moveVars = move.getAquariumVars();
+
+            if (hasClk && moveVars.getClk() == null)
+            {
+                String annotatingPlayer = move.getColor() == Color.WHITE ? getWhite() : getBlack();
+                ret.add(new ClockError(i + 1, annotatingPlayer, annotatingPlayer));
+            }
+
+            if (hasClko && moveVars.getClko() == null)
+            {
+                String annotatingPlayer = move.getColor() == Color.WHITE ? getWhite() : getBlack();
+
+                ret.add(new ClockError(i + 1, annotatingPlayer,
+                        move.getColor() == Color.WHITE ? getBlack() : getWhite()));
+            }
+        }
+
+        return ret;
     }
     
     /**

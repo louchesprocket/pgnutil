@@ -277,6 +277,12 @@ public class PGNUtil
         @Override public boolean processGame() { return game.getLowClock().compareTo(c) >= 0; }
     }
 
+    static final class ClockErrorProcessor implements GameProcessor
+    {
+        public ClockErrorProcessor() {}
+        @Override public boolean processGame() { return !game.getClockErrors().isEmpty(); }
+    }
+
     static final class MinEloProcessor implements GameProcessor
     {
         private final Integer minElo;

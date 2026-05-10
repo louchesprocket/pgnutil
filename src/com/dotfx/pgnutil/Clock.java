@@ -34,7 +34,7 @@ public class Clock implements Comparable<Clock>
     
     public Clock(String clockSt) throws InvalidClockException
     {
-        String clockParts[] = clockSt.split(":");
+        String[] clockParts = clockSt.split(":");
         int partCount = clockParts.length;
         if (partCount > 3) throw new InvalidClockException(clockSt);
 
@@ -44,14 +44,14 @@ public class Clock implements Comparable<Clock>
             {
                 clockParts[0] = clockParts[0].substring(1);
 
-                seconds = -(Integer.valueOf(clockParts[partCount - 1]) +
-                            (partCount >= 2 ? Integer.valueOf(clockParts[partCount - 2]) * 60 : 0) +
-                            (partCount == 3 ? Integer.valueOf(clockParts[0]) * 3600 : 0));
+                seconds = -(Integer.parseInt(clockParts[partCount - 1]) +
+                            (partCount >= 2 ? Integer.parseInt(clockParts[partCount - 2]) * 60 : 0) +
+                            (partCount == 3 ? Integer.parseInt(clockParts[0]) * 3600 : 0));
             }
 
-            else seconds = Integer.valueOf(clockParts[partCount - 1]) +
-                            (partCount >= 2 ? Integer.valueOf(clockParts[partCount - 2]) * 60 : 0) +
-                            (partCount == 3 ? Integer.valueOf(clockParts[0]) * 3600 : 0);
+            else seconds = Integer.parseInt(clockParts[partCount - 1]) +
+                            (partCount >= 2 ? Integer.parseInt(clockParts[partCount - 2]) * 60 : 0) +
+                            (partCount == 3 ? Integer.parseInt(clockParts[0]) * 3600 : 0);
         }
 
         catch (NumberFormatException e)

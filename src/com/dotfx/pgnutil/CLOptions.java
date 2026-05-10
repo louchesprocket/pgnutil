@@ -42,6 +42,7 @@ public class CLOptions
     public static final String AQ = "-aq";
     public static final String BM = "-bm";
     public static final String CB = "-cb";
+    public static final String CE = "-ce"; // timekeeping error in annotation
     public static final String CNB = "-cnb";
     public static final String CMIN = "-cmin";
     public static final String CSR = "-csr";
@@ -130,6 +131,7 @@ public class CLOptions
         BOOKMARKER(BM),
         CHECKSEQUENTIALROUNDS(CSR),
         CLOCKBELOW(CB),
+        CLOCKERROR(CE),
         CLOCKNOTBELOW(CNB),
         DIFFDB(DDB),
         DIFFDBS(DDBS),
@@ -281,7 +283,7 @@ public class CLOptions
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file)))
         {
-            char buf[] = new char[1024];
+            char[] buf = new char[1024];
             int read;
 
             while ((read = reader.read(buf, 0, buf.length)) >= 0) writer.write(buf, 0, read);
@@ -467,8 +469,16 @@ public class CLOptions
         PGNUtil.addMatchProcessor(new PGNUtil.MatchPlayerProcessor(playerPattern));
     }
 
+    @Option(name = CE, aliases = "-clock_error",
+            usage = "output games containing a timekeeping error (requires u.i. time annotations)")
+    private void setTimeError(boolean ce)
+    {
+        countOption(OptId.get(CE));
+        PGNUtil.addMatchProcessor(new PGNUtil.ClockErrorProcessor());
+    }
+
     @Option(name = TF, aliases = "-time_fault", forbids = {CB},
-            usage = "output games where at least one player's clock went negative (Aquarium only)")
+            usage = "output games where at least one player's clock went negative (requires u.i. time annotations)")
     private void setTimeFault(boolean tf)
     {
         countOption(OptId.get(TF));
@@ -1002,7 +1012,7 @@ public class CLOptions
     {
         countOption(OptId.get(TC));
         
-        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchTimeCtrlProcessor(timectrl));}
+        try { PGNUtil.addMatchProcessor(new PGNUtil.MatchTimeCtrlProcessor(timectrl)); }
         
         catch (InvalidTimeCtrlException e)
         {
@@ -1064,7 +1074,7 @@ public class CLOptions
         // ("/") with a backslash. See https://stackoverflow.com/questions/
         // 18677762/handling-delimiter-with-escape-characters-in-java-string-split-method
         // First, however, we must escape any escaped backslashes.
-        String replaceTokens[] =
+        String[] replaceTokens =
                 replaceStr.replace("\\\\", "\0").split("(?<!\\\\)/", -1);
 
         if (replaceTokens.length != 3)
@@ -1342,7 +1352,7 @@ public class CLOptions
     {
         countOption(OptId.get(S));
 
-        String tokens[] = spec.split(",\\W*");
+        String[] tokens = spec.split(",\\W*");
         PGNUtil.outputSelectors = new OutputSelector[tokens.length];
         for (int i = 0; i < tokens.length; i++) PGNUtil.outputSelectors[i] = new OutputSelector(tokens[i]);
         // The rest is handled in CLOptionResolver.

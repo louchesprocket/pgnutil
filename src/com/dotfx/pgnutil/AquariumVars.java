@@ -182,4 +182,11 @@ public class AquariumVars
 
         return null;
     }
+
+    public Clock suspiciousClock()
+    {
+        if (clk == null && clko != null) return clko;
+        if (clk != null && clko == null) return clk;
+        return null;
+    }
 }

@@ -456,6 +456,69 @@ public final class OutputSelector
         }
     }
 
+    private static final class ClockErrorOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            List<ClockError> errList = game.getClockErrors();
+            if (errList.isEmpty()) return;
+
+            StringJoiner retsj = new StringJoiner(CLOptions.valueDelim);
+
+            for (ClockError clockError : errList)
+            {
+                StringJoiner sj = new StringJoiner(CLOptions.valueDelim, "{", "}");
+
+                sj.add(String.valueOf(clockError.getPly())).
+                        add(clockError.getAnnotatingPlayer()).add(clockError.getMissingClockOwner());
+
+                retsj.add(sj.toString());
+            }
+
+            sb.append(retsj);
+        }
+    }
+
+    private static final class CePlyOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            StringJoiner sj = new StringJoiner(CLOptions.valueDelim);
+
+            for (ClockError clockError : game.getClockErrors())
+            {
+                if (clockError.getMissingClockOwner().equals(clockError.getAnnotatingPlayer()))
+                    sj.add(String.valueOf(clockError.getPly()));
+            }
+
+            if (sj.length() > 0) sb.append(sj);
+        }
+    }
+
+    private static final class CePlayerOutputHandler implements OutputHandler
+    {
+        @Override
+        public void appendOutput(PgnGame game, StringBuilder sb)
+        {
+            HashSet<String> playerSet = new HashSet<>();
+
+            for (ClockError clockError : game.getClockErrors())
+            {
+                if (clockError.getMissingClockOwner().equals(clockError.getAnnotatingPlayer()))
+                    playerSet.add(clockError.getMissingClockOwner());
+            }
+
+            if (!playerSet.isEmpty())
+            {
+                StringJoiner sj = new StringJoiner(CLOptions.valueDelim);
+                for (String player: playerSet) sj.add(player);
+                sb.append(sj);
+            }
+        }
+    }
+
     private static final class DisagreePctOutputHandler implements OutputHandler
     {
         @Override
@@ -509,7 +572,7 @@ public final class OutputSelector
         // Aquarium
         BLACKELO("blackelo", null),
         CLASSES("classes", null),
-        TIMECONTROL("timecontrol", null),
+        TIMECONTROL("timecontrol", null), // value of the tag, if present
         WHITEELO("whiteelo", null),
         
         // Arena extras
@@ -524,18 +587,21 @@ public final class OutputSelector
         ORIGTEXT("text", new OrigTextOutputHandler()),
         BRANCH("branch", new BranchOutputHandler()),
         AVGPLIES("avgplies", null),
-        CBPLAYERS("cbplayers", null), // Aquarium only. Handler set in CLOptionResolver.ClockBelowHandler
-        CBCLOCKS("cbclocks", null), // Aquarium only. Handler set in CLOptionResolver.ClockBelowHandler
+        CBPLAYERS("cbplayers", null), // Handler set in CLOptionResolver.ClockBelowHandler
+        CBCLOCKS("cbclocks", null), // Handler set in CLOptionResolver.ClockBelowHandler
+        CEPLIES("ceplies", new CePlyOutputHandler()), // requires time annotations
+        CEPLAYERS("ceplayers", new CePlayerOutputHandler()), // requires time annotations
+        CLOCKERRORS("clockerrors", new ClockErrorOutputHandler()), // requires time annotations
         DISAGREEPCT("disagreepct", new DisagreePctOutputHandler()),
         FILENAME("filename", new FileNameOutputHandler()),
         GAMENO("gameno", new GameNumOutputHandler()),
-        LOWCLOCK("lowclock", new LowClockOutputHandler()), // Aquarium only
-        LOWCLOCKBLACK("lowclockblack", new LowClockBlackOutputHandler()), // Aquarium only
-        LOWCLOCKPLAYERS("lowclockplayers", new LowClockPlayersOutputHandler()), // Aquarium only
-        LOWCLOCKWHITE("lowclockwhite", new LowClockWhiteOutputHandler()), // Aquarium only
+        LOWCLOCK("lowclock", new LowClockOutputHandler()), // requires time annotations
+        LOWCLOCKBLACK("lowclockblack", new LowClockBlackOutputHandler()), // requires time annotations
+        LOWCLOCKPLAYERS("lowclockplayers", new LowClockPlayersOutputHandler()), // requires time annotations
+        LOWCLOCKWHITE("lowclockwhite", new LowClockWhiteOutputHandler()), // requires time annotations
         TAGS("tags", new TagsOutputHandler()),
         TEXTSIZE("textsize", new TextSizeOutputHandler()),
-        TIMECTRL("timectrl", new TimeCtrlOutputHandler()), // Aquarium only. Infers time control, if tag not present
+        TIMECTRL("timectrl", new TimeCtrlOutputHandler()), // infers time control, if tag not present
         WINNER("winner", new WinnerOutputHandler()),
         LOSER("loser", new LoserOutputHandler()),
         MOVES("moves", new MoveListOutputHandler()),
