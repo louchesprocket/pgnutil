@@ -729,7 +729,7 @@ public final class PgnGame
 
     /**
      *
-     * @return first ply at which an expected clock annotation was missing, or 0 if none
+     * @return
      */
     public List<ClockError> getClockErrors()
     {

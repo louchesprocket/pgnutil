@@ -3,7 +3,7 @@
 Pgnutil is a command-line tool for querying and filtering Portable Game Notation (PGN) files.  I wrote the tool because I like to run computer-chess tournaments for my own amusement, and found that calculating results was a nightmare due to a lack of very basic capabilities for handling PGN files.  Common problems such as finding duplicate games, identifying time forfeitures, and even just figuring out if I had already played a particular pair of engines against a particular set of test positions were nearly insoluble.  After failing to find any applicable tool on the
 Internet, I wrote pgnutil.
 
-Pgnutil works as a Unix-style command-line filter that performs [matching/selecting](#matching) and [replacing](#replacing) functions on PGN files in conjunction with various [output options](#output-selectors). By default, pgnutil simply outputs selected games after performing any stipulated replacement operations, but it can instead output user-selected lists of fields.  In addition, pgnutil has various ["special" output options](#special-output-options): [duplicate finding](#duplicates), [event listing](#events-players-and-rounds), [opening statistics](#openings), and [player statistics](#events-players-and-rounds).  Pgnutil is particularly designed to be used in conjunction with tools such as bayeselo or elostat.
+Pgnutil works as a Unix-style command-line filter that performs [matching/selecting](#matching) and [replacing](#replacing) functions on PGN files in conjunction with various [output options](#output-selectors). By default, pgnutil simply outputs selected games after performing any stipulated replacement operations, but it can instead output user-selected lists of fields.  In addition, pgnutil has various ["special" output options](#special-output-options): [duplicate finding](#duplicates), [event listing](#events-players-and-rounds), [player statistics](#events-players-and-rounds), and [opening statistics](#openings).  Pgnutil is particularly designed to be used in conjunction with tools such as bayeselo or elostat.
 
 
 ## Requirements
@@ -199,7 +199,7 @@ Note that any of the transpositional selectors ("xstdeco," "xscideco," "xstdecod
 
 ### Special Output Options
 
-The "special" output options include "‑d" (duplicates), "‑dm" (duplicate moves), "‑do" (duplicate [openings](#openings)), "‑doob" (duplicate out-of-book), "‑doobm" (duplicate out-of-book moves), "‑e" (events), "‑csr" (check sequential rounds), "‑o" ([opening](#openings) statistics), "‑gp" ([grouped positions](#grouped-positions)), and "‑p" (player statistics). Any of these may be combined with any [matching](#matching) and [replacing](#replacing) options (see above).
+The "special" output options include "‑d" ([duplicates](#duplicates)), "‑dm" ([duplicate moves](#duplicates)), "‑do" ([duplicate openings](#duplicates)), "‑doob" ([duplicate out-of-book](#duplicates)), "‑doobm" ([duplicate out-of-book moves](#duplicates)), "‑e" ([events](#events-players-and-rounds)), "‑csr" ([check sequential rounds](#events-players-and-rounds)), "‑p" ([player statistics](#events-players-and-rounds)), "‑o" ([opening statistics](#openings)), and "‑gp" ([grouped positions](#grouped-positions)). Any of these may be combined with any [matching](#matching) and [replacing](#replacing) options (see above).
 
 #### Duplicates
 
