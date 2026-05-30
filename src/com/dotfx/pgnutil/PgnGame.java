@@ -829,8 +829,7 @@ public final class PgnGame
 
             for (Move move : getMoveList())
             {
-                board.move(move);
-                if (board.getPieceCount() < pieceCountThreshold) break;
+                if (board.move(move).getPieceCount() < pieceCountThreshold) break;
 
                 if (material.equalsBoardMatIgnoreColors(board))
                 {
@@ -850,8 +849,7 @@ public final class PgnGame
 
             for (Move move : getMoveList())
             {
-                board.move(move);
-                if (board.getPieceCount() < pieceCountThreshold) break;
+                if (board.move(move).getPieceCount() < pieceCountThreshold) break;
 
                 if (material.equalsBoardMaterial(board))
                 {
@@ -874,8 +872,7 @@ public final class PgnGame
         {
             for (Move move : getMoveList())
             {
-                board.move(move);
-                if (board.getPieceCount() < pieceCountThreshold) break;
+                if (board.move(move).getPieceCount() < pieceCountThreshold) break;
 
                 if (material.equalsBoardMatDiffIgnoreColors(board))
                 {
@@ -889,8 +886,7 @@ public final class PgnGame
         {
             for (Move move : getMoveList())
             {
-                board.move(move);
-                if (board.getPieceCount() < pieceCountThreshold) break;
+                if (board.move(move).getPieceCount() < pieceCountThreshold) break;
 
                 if (material.equalsBoardMaterialDiff(board))
                 {
@@ -948,15 +944,12 @@ public final class PgnGame
     /**
      * Test for same players and same moves.
      * 
-     * @param other
+     * @param otherGame
      * @return true if the parameter Game has the same players, same moves, and
      *         same result as this Game, false otherwise
      */
-    public boolean isDuplicateOf(Object other)
+    public boolean isDuplicateOf(PgnGame otherGame)
     {
-        if (!(other instanceof PgnGame)) return false;
-        
-        PgnGame otherGame = (PgnGame)other;
         String thisWhite = getWhite();
         String thisBlack = getBlack();
         String otherWhite = otherGame.getWhite();
