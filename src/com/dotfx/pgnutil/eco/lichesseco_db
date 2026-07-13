@@ -2926,6 +2926,7 @@ D33|Tarrasch Defense: Swedish Variation, Central Break|d4 d5 c4 e6 Nc3 c5 cxd5 e
 D51|Queen's Gambit Declined: Rochlin Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 Nbd7 Nf3 c6 Rc1 Qa5 Bd2|112c083351a9e0b19ef2c071727614e6
 D52|Queen's Gambit Declined: Cambridge Springs Defense, Capablanca Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 Nbd7 e3 c6 Nf3 Qa5 Bxf6|d72d185b964d8d032e5af1bea1fefe1f
 D53|Queen's Gambit Declined|d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 Nf3 c6 e3 dxc4 Bxc4|876e293ca36dbedc906ade5000297335
+D61|Queen's Gambit Declined: Orthodox Defense, Rubinstein Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7 Qc2|245562f9c3d5a0da839c65e604903b7c
 D52|Queen's Gambit Declined: Cambridge Springs Defense|d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 Nbd7 e3 Qa5 cxd5|b94927b2dcb3fdc9453b6ba360b8f9e8
 D43|Semi-Slav Defense: Hastings Variation|d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 h6 Bxf6 Qxf6 Qb3|0fa4137f61bff7e841aaf3f177aff2fd
 D45|Semi-Slav Defense: Stoltz Variation, Shabalov Attack|d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e3 Nbd7 Qc2 Bd6 g4|f45f0ebe7f26615405994bcb57128438
@@ -2950,7 +2951,6 @@ D41|Queen's Gambit Declined: Semi-Tarrasch Defense|d4 Nf6 c4 e6 Nf3 d5 Nc3 c5 cx
 D42|Queen's Gambit Declined: Semi-Tarrasch Defense, Main Line|d4 Nf6 c4 e6 Nf3 d5 Nc3 c5 cxd5 Nxd5 e3 Nc6 Bd3|f578536f3692f259b520cf5d55190e6c
 D41|Queen's Gambit Declined: Semi-Tarrasch Defense, Exchange Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 c5 cxd5 Nxd5 e4 Nxc3 bxc3|69fa8b78378e921d099b5b44f147b89a
 D60|Queen's Gambit Declined: Orthodox Defense, Botvinnik Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Bd3|94813662485e45e57579047e973373bc
-D61|Queen's Gambit Declined: Orthodox Defense, Rubinstein Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Qc2|245562f9c3d5a0da839c65e604903b7c
 D63|Queen's Gambit Declined: Orthodox Defense, Main Line|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1|7dd54bc61a5fb00ce35df9087d9ae805
 D55|Queen's Gambit Declined: Anti-Tartakower Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 h6 Bxf6|dd261fdc63cc887ae7e62740ad91d2e2
 D55|Queen's Gambit Declined: Neo-Orthodox Variation, Main Line|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 h6 Bh4 O-O e3|98c1d4d1b851228d9285a3ab4355aa15
@@ -3114,6 +3114,8 @@ D31|Queen's Gambit Declined: Semi-Slav, Abrahams Variation|d4 d5 c4 e6 Nc3 c6 Nf
 D31|Queen's Gambit Declined: Semi-Slav, Koomen Variation|d4 d5 c4 e6 Nc3 c6 Nf3 dxc4 e3 b5 a4 Bb4 Bd2 Qe7|dd4d39da4b7e41d87863b16ac5012702
 D53|Queen's Gambit Declined: Uhlmann Variation|d4 d5 c4 e6 Nc3 Be7 Nf3 Nf6 Bg5 h6 Bh4 O-O Rc1 dxc4|90081d1740c258fe5b0976f041105ebb
 D56|Queen's Gambit Declined: Lasker Defense|d4 d5 c4 e6 Nc3 Be7 Nf3 Nf6 Bg5 h6 Bh4 O-O e3 Ne4|029781b7904bce4491f138ac4a613501
+D61|Queen's Gambit Declined: Orthodox Defense, Rubinstein Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7 Qc2 c5|5ca0368e1ed5b1cf25a41361466bcab7
+D61|Queen's Gambit Declined: Orthodox Defense, Rubinstein Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7 Qc2 c6|86519dd30c28b4dfc0ae018d160f31cc
 D40|Queen's Gambit Declined: Semi-Tarrasch Defense, Symmetrical Variation|d4 d5 c4 e6 Nc3 Nf6 Nf3 c5 e3 Nc6 Bd3 Bd6 O-O O-O|fb0ab8c595130025f28878ca2a1d7d25
 D40|Queen's Gambit Declined: Semi-Tarrasch Defense|d4 d5 c4 e6 Nc3 Nf6 Nf3 c5 e3 Nc6 a3 cxd4 exd4 Bd6|e8a7ff8570dbd671e3b753b35797a1db
 D35|Queen's Gambit Declined: Exchange Variation|d4 d5 c4 e6 Nc3 Nf6 e3 Be7 cxd5 exd5 Bd3 O-O Nf3 c6|5d581ce08702e2ad048cb6ad1ace77a7
@@ -3131,6 +3133,7 @@ D00|Blackmar-Diemer Gambit Accepted: Gunderam Defense, Stader Variation|d4 d5 e4
 D32|Queen's Gambit Declined: Tarrasch Defense|d4 Nf6 c4 e6 Nf3 d5 e3 c5 cxd5 exd5 Nc3 a6 Be2 Nc6|c16641962677b6afceec9c5289e03fb9
 E14|Queen's Indian Defense, with e3|d4 Nf6 c4 e6 Nf3 d5 e3 b6 Nc3 Bd6 Bd3 O-O O-O Bb7|9c00ebfbecbcc120c2744861a28353db
 D37|Queen's Gambit Declined: Harrwitz Attack, Main Line|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bf4 O-O e3 c5 dxc5 Bxc5|1b0fdabf031efd6f8b64e923285603bc
+D60|Queen's Gambit Declined: Orthodox Defense, Botvinnik Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Bd3 c6|bd01576141c0299652b5323e51d0468c
 D63|Queen's Gambit Declined: Orthodox Defense, Main Line|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1 c6|263d09b3e11657378b99d4c390f19667
 D63|Queen's Gambit Declined: Orthodox Defense, Henneberger Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1 a6|1e506ee92c42c871f4b93fe403af0f24
 D58|Queen's Gambit Declined: Tartakower Defense|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 h6 Bh4 O-O e3 b6|7af66828f4d683e624b0604cc517b908
@@ -3258,6 +3261,7 @@ D07|Queen's Gambit Declined: Chigorin Defense, Exchange Variation, Costa's Line|
 D56|Queen's Gambit Declined|d4 d5 c4 e6 Nf3 Nf6 Nc3 Nc6 Bg5 Be7 e3 O-O Rc1 h6 Bh4|1c7acbd1ae5fb3d109d453b20d635ca1
 D45|Semi-Slav Defense: Normal Variation|d4 d5 c4 e6 Nc3 c6 Nf3 Nf6 e3 Nbd7 b3 Bd6 Bb2 O-O Be2|025e33c4a68ad6cd10d056ce468e0bba
 D50|Queen's Gambit Declined: Semi-Tarrasch Defense, Krause Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 c5 Nf3 cxd4 Nxd4 e5 Ndb5 a6 Qa4|bae384ca067a62d34595a23ec7d2c82b
+D61|Queen's Gambit Declined: Orthodox Defense, Rubinstein Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7 Qc2 c6 a3|02330eeecdf83fcaeb5b22a70dcd1ec0
 D66|Queen's Gambit Declined: Orthodox Defense, Bd3 Line|d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7 Rc1 c6 Bd3|1080608cff5160162d2e097d1dc21138
 D12|Slav Defense: Quiet Variation, Landau Variation|d4 d5 c4 c6 Nf3 Nf6 e3 Bf5 cxd5 cxd5 Qb3 Qc8 Bd2 e6 Na3|68c8ad16f4f05a91615db7ba421209e0
 D52|Queen's Gambit Declined: Cambridge Springs Defense, Bogoljubow Variation|d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 Nbd7 e3 Qa5 Nd2 Bb4 Qc2|3c49943fecb72aaea4b9ca1913d2472c
@@ -3278,6 +3282,7 @@ E14|Queen's Indian Defense, with e3|d4 Nf6 c4 e6 Nf3 d5 e3 Be7 b3 O-O Bb2 b6 Nbd
 D41|Queen's Gambit Declined: Semi-Tarrasch Defense, Endgame Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 c5 cxd5 cxd4 Qxd4 exd5 e4 dxe4 Qxd8|3e601e4e8f7c9f92c3984edc22c40ae7
 D62|Queen's Gambit Declined: Orthodox Defense, Rubinstein Variation, Flohr Line|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Qc2 c5 cxd5|6f4272eb8ba85bd1bdb076a825276e98
 D64|Queen's Gambit Declined: Orthodox Defense, Rubinstein Attack|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1 c6 Qc2|30c13c93663d6da372821bd41a087c19
+D63|Queen's Gambit Declined: Orthodox Defense, Henneberger Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1 a6 c5|cdb794c88e15a94d2addaff2058b8f00
 D63|Queen's Gambit Declined: Orthodox Defense, Swiss, Carlsbad Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1 a6 cxd5|b1d5dab42d7a51ecd1e6b648cca1aa8a
 A71|Benoni Defense: Classical Variation, Averbakh-Grivas Attack|d4 Nf6 c4 e6 Nf3 c5 d5 exd5 cxd5 d6 Nc3 g6 e4 Bg7 Bg5|6622e1930fb6c09a45689a48aba3b99d
 A70|Benoni Defense: Classical Variation, New York Variation|d4 Nf6 c4 e6 Nf3 c5 d5 exd5 cxd5 d6 Nc3 g6 e4 Bg7 h3|5ffbfab1b4afe1e4a8446612e73ccb47
@@ -3370,6 +3375,8 @@ D33|Tarrasch Defense: Dubov Tarrasch|d4 d5 c4 e6 Nc3 c5 cxd5 exd5 Nf3 Nc6 g3 Nf6
 D31|Semi-Slav Defense: Noteboom Variation, Abrahams Variation|d4 d5 c4 e6 Nc3 c6 Nf3 dxc4 a4 Bb4 e3 Bxc3 bxc3 b5 axb5 cxb5|3f533961edd5756d4c9c6c41bca4703c
 D58|Queen's Gambit Declined: Tartakower Defense, Exchange Variation|d4 d5 c4 e6 Nc3 Be7 Nf3 Nf6 Bg5 h6 Bh4 O-O e3 b6 cxd5 exd5|72da0c1247744cda17ea3cf4091adfd0
 D59|Queen's Gambit Declined: Tartakower Defense, Makogonov Exchange Variation|d4 d5 c4 e6 Nc3 Be7 Nf3 Nf6 Bg5 h6 Bh4 O-O e3 b6 cxd5 Nxd5|46338d5ae42359f697258c04682fd0e3
+D61|Queen's Gambit Declined: Orthodox Defense, Rubinstein Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7 Qc2 c6 Rd1 a6|1d2b4861c4c0eeecdc8f5507f1734686
+D63|Queen's Gambit Declined: Orthodox Defense, Main Line|d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 Nbd7 Nf3 O-O Rc1 h6 Bh4 c5|d14c695f0304df26ec8950b9bff72299
 E09|Catalan Opening: Closed Variation, Rabinovich Variation|d4 d5 c4 c6 Nf3 Nf6 Qc2 e6 Nbd2 Be7 g3 Nbd7 Bg2 O-O O-O b5|fea354d33c6cc4e7313d7799a1d5cd0a
 D14|Slav Defense: Exchange Variation, Trifunovic Variation|d4 d5 c4 c6 Nf3 Nf6 cxd5 cxd5 Nc3 Nc6 Bf4 Bf5 e3 e6 Qb3 Bb4|09e1f2182773450eb09373a17c618079
 D47|Semi-Slav Defense: Meran Variation, Lundin Variation|d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 e3 Nbd7 Bd3 dxc4 Bxc4 b5 Bd3 b4|6bd4f7858702cb020e63c8bab046cb4b
@@ -3381,6 +3388,7 @@ D29|Queen's Gambit Accepted: Classical Defense, Alekhine System, Main Line|d4 d5
 E09|Catalan Opening: Closed Variation, Traditional Variation|d4 Nf6 c4 e6 Nf3 d5 g3 Be7 Bg2 O-O O-O Nbd7 Qc2 c6 Nbd2 b6|21d7e57547ebfdd2ac51e5cfdeee3593
 E06|Catalan Opening: Closed|d4 Nf6 c4 e6 Nf3 d5 g3 Bb4 Bd2 Be7 Bg2 O-O O-O c6 Bf4 b6|aac42dc0edc2884ba7afd22f66720169
 D64|Queen's Gambit Declined: Orthodox Defense, Rubinstein Attack|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1 c6 Qc2 a6|4e3568426e18aeb56ad514dea31f0bb7
+D63|Queen's Gambit Declined: Orthodox Defense, Henneberger Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1 a6 c5 c6|0d21ccffd7f28539c3b136eb9f7be35b
 E08|Catalan Opening: Closed|d4 Nf6 c4 e6 g3 d5 Bg2 Be7 Nf3 O-O O-O Nbd7 Qc2 c6 b3 b6|a0673a7880497dc5aa924f7f155a4c5a
 A62|Benoni Defense: Fianchetto Variation|d4 Nf6 c4 e6 g3 c5 d5 exd5 cxd5 d6 Nc3 g6 Bg2 Bg7 Nf3 O-O|3769159fd8fef62cdc5ec32879143ea9
 E11|Bogo-Indian Defense: Retreat Variation|d4 Nf6 c4 e6 g3 Bb4 Bd2 Be7 Bg2 d5 Nf3 Nbd7 O-O O-O Qc2 c6|58805afe19d3566e870f19a904222755
@@ -3466,6 +3474,7 @@ A95|Dutch Defense: Stonewall Variation, Chekhover Variation|d4 f5 c4 Nf6 g3 e6 B
 E08|Catalan Opening: Closed, Zagoryansky Variation|d4 e6 c4 Nf6 Nf3 d5 g3 Be7 Bg2 O-O O-O Nbd7 Qc2 c6 Rd1 b6 a4|71d0daae6a7a7bb48939a9509f6e5128
 D34|Tarrasch Defense: Classical Variation, Carlsbad Variation|d4 d5 c4 e6 Nc3 c5 cxd5 exd5 Nf3 Nc6 g3 Nf6 Bg2 Be7 O-O O-O Bg5|2c9c2e0d19d6266a4101a6c6cec4d167
 D52|Queen's Gambit Declined: Cambridge Springs Defense, Argentine Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 Nbd7 e3 c6 Nf3 Qa5 Nd2 Bb4 Qc2 O-O Bh4|3c99a563c72d0a10d912c5ae4c03608b
+D66|Queen's Gambit Declined: Orthodox Defense, Bd3 Line|d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7 Rc1 c6 Bd3 h6 Bh4|6d411285330c8670482e0acf940234a3
 D44|Semi-Slav Defense: Botvinnik Variation|d4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5 dxc4 e4 b5 e5 h6 Bh4 g5 Nxg5|47d742f0320aa2bbfcf5fc087d1b8736
 D19|Slav Defense: Czech Variation, Classical System, Main Line|d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4 Bf5 e3 e6 Bxc4 Bb4 O-O O-O Qe2|fd762da384d3c76e39bef1afdaac6cbe
 D46|Semi-Slav Defense: Chigorin Defense|d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7 Qc2 Bd6 b3 O-O Bb2 Qe7 Bd3|8169d2be2334a120c58da52a6d6ac15c
@@ -3473,6 +3482,7 @@ D46|Semi-Slav Defense: Chigorin Defense|d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7 Qc2 B
 D29|Queen's Gambit Accepted: Classical Defense, Alekhine System, Main Line|d4 d5 c4 dxc4 Nf3 Nf6 e3 e6 Bxc4 c5 O-O a6 Qe2 b5 Bb3 Bb7 Nc3|a5a1d5d6bd842a2fe4fcebfd557a3446
 D65|Queen's Gambit Declined: Orthodox Defense, Rubinstein Attack|d4 d5 Nf3 Nf6 c4 e6 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1 c6 Qc2 a6 cxd5|8dc357caf8032956da13ec3871d185ae
 D00|Blackmar-Diemer Gambit Accepted: Euwe Defense, Zilbermints Gambit|d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 e6 Bg5 Be7 Bd3 Nc6 O-O Nxd4 Kh1|ba673af06c62f18c32a42c500f973939
+D63|Queen's Gambit Declined: Orthodox Defense, Henneberger Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1 a6 c5 c6 Bd3|1a1e0ee3a44f99c0bc57f619b8d91f78
 D56|Queen's Gambit Declined: Lasker Defense, Teichmann Variation|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 h6 Bh4 O-O e3 Ne4 Bxe7 Qxe7 Qc2|d629ce99f2fb82cb55a123f87a3521e9
 E19|Queen's Indian Defense: Classical Variation, Traditional Variation, Main Line|d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O O-O Nc3 Ne4 Qc2 Nxc3 Qxc3|c0665bd54fb3d065c775fd27b531b603
 E14|Queen's Indian Defense: Averbakh Variation|d4 Nf6 c4 e6 Nf3 b6 e3 Bb7 Bd3 c5 O-O Be7 b3 O-O Bb2 cxd4 Nxd4|8d09bb6b4104fe7f90b3d20c07da2358
@@ -3487,6 +3497,7 @@ D64|Queen's Gambit Declined: Orthodox Defense, Rubinstein Attack|d4 Nf6 c4 e6 Nc
 E23|Nimzo-Indian Defense: Spielmann Variation, Stahlberg Variation|d4 Nf6 c4 e6 Nc3 Bb4 Qb3 c5 dxc5 Nc6 Nf3 Ne4 Bd2 Nxc5 Qc2 f5 g3|5aa34675527e4bcf02040484005c2ae4
 E43|Nimzo-Indian Defense: St. Petersburg Variation|d4 Nf6 c4 e6 Nc3 Bb4 Nf3 b6 e3 Ne4 Qc2 Bb7 Bd3 Bxc3 bxc3 f5 O-O|03b8b6fc0af6edb6c594b5c6b15da1d6
 E58|Nimzo-Indian Defense: Normal Variation, Bernstein Defense, Exchange Line|d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Bd3 d5 Nf3 c5 O-O Nc6 a3 Bxc3 bxc3|dd8795c90393a26cbdeadf066a710a6b
+E54|Nimzo-Indian Defense: Normal Variation, Gligoric System, Exchange Variation|d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Bd3 d5 Nf3 c5 O-O dxc4 Bxc4 cxd4 exd4|ba650c3296055892cc7ab80f18f0ad83
 A73|Benoni Defense: Classical Variation, Main Line|d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 Nf3 Bg7 Be2 O-O O-O|17cb7ca2b80d833e28e4eb84b84063e1
 A58|Benko Gambit Accepted: Fianchetto Variation|d4 Nf6 c4 c5 d5 b5 cxb5 a6 bxa6 g6 Nc3 Bxa6 g3 d6 Bg2 Bg7 Nf3|ceff603c7cc81702302c2e2bdc917d65
 A59|Benko Gambit Accepted: Yugoslav|d4 Nf6 c4 c5 d5 b5 cxb5 a6 bxa6 g6 Nc3 Bxa6 e4 Bxf1 Kxf1 d6 Nge2|703cac42c17fe9c5448fdac2fc1a7f70
@@ -3558,6 +3569,7 @@ D34|Tarrasch Defense: Classical Variation, Classical Tarrasch Gambit|d4 d5 c4 e6
 D48|Semi-Slav Defense: Meran Variation, Pirc Variation|d4 d5 c4 e6 Nc3 c6 e3 Nf6 Nf3 Nbd7 Bd3 dxc4 Bxc4 b5 Bd3 a6 e4 b4|cf47c6802737cd748725e3c6228b6fb4
 D31|Semi-Slav Defense: Marshall Gambit, Tolush Variation|d4 d5 c4 e6 Nc3 c6 e4 dxe4 Nxe4 Bb4 Bd2 Qxd4 Bxb4 Qxe4 Be2 c5 Bxc5 Qxg2|3c6d0b8e82c0eaae4cc7bda4ca1aaada
 D66|Queen's Gambit Declined: Orthodox Defense, Fianchetto Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 c6 Nf3 Be7 e3 Nbd7 Rc1 O-O Bd3 dxc4 Bxc4 b5|989e03fb58bab138a62286bae2c67a9f
+D61|Queen's Gambit Declined: Orthodox Defense, Rubinstein Variation|d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7 Qc2 a6 cxd5 exd5 Bd3 Re8|6ffd0d29bfd71de54b36dedbfc0f99f6
 D67|Queen's Gambit Declined: Orthodox Defense, Capablanca System|d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7 Rc1 c6 Bd3 dxc4 Bxc4 Nd5|6fe0f5fcfc049cab76d5a719ad4d827b
 D41|Queen's Gambit Declined: Semi-Tarrasch Defense, San Sebastian Variation|d4 d5 c4 e6 Nc3 Nf6 cxd5 Nxd5 e4 Nxc3 bxc3 c5 Nf3 cxd4 cxd4 Bb4 Bd2 Qa5|2dcea74f611d47581e2d09ce93f62599
 D48|Semi-Slav Defense: Meran Variation|d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7 Bd3 dxc4 Bxc4 b5 Bd3 a6 e4 c5|be41e0f658c15725766f85d3da5a0fe2
@@ -3623,6 +3635,7 @@ D48|Semi-Slav Defense: Meran Variation, Old Variation|d4 d5 c4 c6 Nc3 Nf6 e3 e6 
 D46|Semi-Slav Defense: Main Line|d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7 Qc2 b6 b3 Bb7 Bd3 Be7 O-O O-O Bb2|87fa56e03d68c4c9265240d808af1a68
 D26|Queen's Gambit Accepted: Classical, Furman Variation|d4 d5 c4 dxc4 Nf3 Nf6 e3 e6 Bxc4 c5 Qe2 a6 dxc5 Bxc5 O-O Nc6 e4 b5 e5|211072d8d4e5ecfb534254aa68123fd6
 D67|Queen's Gambit Declined: Orthodox Defense, Janowski Variation|d4 d5 Nf3 Nf6 c4 e6 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1 c6 Bd3 dxc4 Bxc4 Nd5 h4|6925f00fbc21a5df734ea6223c8b2c28
+D65|Queen's Gambit Declined: Orthodox Defense, Rubinstein Attack|d4 d5 Nf3 Nf6 c4 e6 Nc3 Be7 Bg5 O-O e3 Nbd7 Rc1 c6 Qc2 a6 cxd5 exd5 Bd3|25fed8cb46218321d436096217ca1a11
 E11|Bogo-Indian Defense: Retreat Variation|d4 Nf6 c4 e6 Nf3 d5 g3 Bb4 Bd2 Be7 Bg2 O-O O-O c6 Qc2 Nbd7 Bf4 b6 Nbd2|5ed6aa88cc6d54bcf56f11f589a9ab3c
 D37|Queen's Gambit Declined: Harrwitz Attack|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bf4 O-O e3 c5 dxc5 Bxc5 Qc2 Nc6 a3 Qa5 O-O-O|25a52c8113e7722f86f37f5c24cd02c2
 D37|Queen's Gambit Declined: Harrwitz Attack|d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bf4 O-O e3 c5 dxc5 Bxc5 Qc2 Nc6 Rd1 Qa5 a3|77f6cd1b0175ff80ed68a9c75227b67e
