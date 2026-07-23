@@ -2357,6 +2357,7 @@ C45|Scotch Game|e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Qh4 Nb5 Bb4 Bd2|20a2c8c943f666ca3c829
 C45|Scotch Game: Mieses Variation|e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nxc6 bxc6 e5|3399a38f1d78484eba6bfe33034bef0c
 C45|Scotch Game: Tartakower Variation|e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nxc6 bxc6 Nd2|dcfba331a9e23f0f79a60b47275bfdc1
 C45|Scotch Game: Ghulam-Kassim Variation|e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nxd4 Qxd4 d6 Bd3|ec8124489ab78d738be53840b9408109
+C54|Italian Game: Classical Variation, Giuoco Pianissimo|e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 d6 c3|8bdc83d7cbe49e0dadf4764fcabb7c4d
 C54|Italian Game: Classical Variation, Giuoco Pianissimo, with a5|e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 a5 c3|cee078df268d88c8f6b33bf03e613bca
 C54|Italian Game: Classical Variation, Giuoco Pianissimo|e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 h6 c3|2e0b1f467af5fe3715f41db0e06c90da
 C53|Italian Game: Classical Variation, Mestel Variation|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Qe7 d4 Bb6 Bg5|3207bab1d89a948be56ae8b7d362e562
@@ -2606,8 +2607,10 @@ C56|Italian Game: Scotch Gambit, Max Lange Attack, Spielmann Defense|e4 e5 Nf3 N
 C45|Scotch Game: Classical Variation, Millennium Variation|e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 Be3 Qf6 c3 Qg6|877835273a602b114041a9ff2db80068
 C50|Italian Game: Hungarian Defense, Tartakower Variation|e4 e5 Nf3 Nc6 Bc4 Be7 d4 exd4 c3 Nf6 e5 Ne4|d9b671b278bd3febab732a9fd432a55a
 C54|Italian Game: Classical Variation, Giuoco Pianissimo|e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 O-O c3 d5|f82413c2e6c5cef52af123327767c98d
-C54|Italian Game: Classical Variation, Giuoco Pianissimo|e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 O-O c3 d6|dd32784185c53d725116a83855c7d91f
+C54|Italian Game: Classical Variation, Giuoco Pianissimo|e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 d6 c3 O-O|dd32784185c53d725116a83855c7d91f
+C54|Italian Game: Classical Variation, Giuoco Pianissimo|e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 d6 c3 a5|4f15d9c0cb6aa14de0c5e79b51a13d64
 C54|Italian Game: Classical Variation, Giuoco Pianissimo|e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 d6 c3 a6|ecc279ae503226c44670b6b73c5dc2df
+C54|Italian Game: Classical Variation, Giuoco Pianissimo|e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 d6 c3 Bb6|8c7589baf3a649003fa82992b2524e79
 C54|Italian Game: Classical Variation, Giuoco Pianissimo, with h6|e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 d6 c3 h6|8dc132e22a8513aa5dab59b67fc54147
 C53|Italian Game: Classical Variation, La Bourdonnais Variation|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 d6 d4 exd4 cxd4 Bb6|58b47c8a5419ac42566bfb09a9d39f50
 C54|Italian Game: Classical Variation, Greco Gambit, Modern Line|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 e5 d5|ee6a32a2f95016568c123e3c6777e022
@@ -3655,6 +3658,7 @@ C54|Italian Game: Giuoco Piano, Bernstein Variation|e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6
 C51|Italian Game: Evans Gambit, Paulsen Variation|e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Bc5 d4 exd4 O-O d6 cxd4 Bb6 d5 Na5 Bb2 Ne7|7121d08176550f264655d61cd58cbd9f
 C59|Italian Game: Two Knights Defense, Polerio Defense, Göring Variation|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5 c6 dxc6 bxc6 Be2 h6 Nf3 e4 Ne5 Qc7|bea969dbe2185aa02bd81d4f5fdfc68e
 C78|Ruy Lopez: Rabinovich Variation|e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O b5 Bb3 d6 Ng5 d5 exd5 Nd4 Re1 Bc5 Rxe5 Kf8|7520c2a20c4c8464e6d6124b5ea3f13f
+C89|Ruy Lopez: Marshall Attack|e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d5 exd5 Nxd5 a4 Bb7|e002dd6e7b7660ce52aebfdd34805225
 C96|Ruy Lopez: Closed, Chigorin Defense, Gajewski Gambit|e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Na5 Bc2 d5|185b034dd25012d7ea8974e863e83122
 C96|Ruy Lopez: Closed, Chigorin Defense|e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Na5 Bc2 c5|d01ce2c8fe82547194b4744f63f34774
 C95|Ruy Lopez: Closed, Breyer Defense, Zaitsev Hybrid|e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Nb8 d4 Nbd7|5a8020a3cc7b4cf3f8422d8806792997
