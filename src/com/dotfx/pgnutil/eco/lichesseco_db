@@ -1588,6 +1588,7 @@ C11|French Defense: Classical Variation, Burn Variation|e4 e6 d4 d5 Nc3 Nf6 Bg5 
 C00|French Defense: St. George Defense, St. George Gambit|e4 e6 d4 a6 c4 b5 cxb5 axb5|d26fed448a78d1efe725c87d570ebb42
 B07|Lion Defense: Anti-Philidor, Lion's Cave|e4 d6 d4 Nf6 Nc3 Nbd7 f4 e5|2748f2c13c747644b1895e1629c418b8
 B08|Pirc Defense: Classical Variation|e4 d6 d4 Nf6 Nc3 g6 Nf3 Bg7|f5c724407cdbadaa210b0b8186862db3
+B21|Sicilian Defense: Smith-Morra Gambit Accepted, Fianchetto Defense|e4 c5 d4 cxd4 c3 dxc3 Nxc3 g6|d45245a99cfff928c91a1bd621d15abb
 B22|Sicilian Defense: Alapin Variation, Smith-Morra Declined|e4 c5 c3 Nf6 e5 Nd5 d4 cxd4|6787884571e96055b98dc9cbb99d5c44
 B20|Sicilian Defense: Gloria Variation|e4 c5 c4 d6 Nc3 Nc6 g3 h5|62e5836b1dabeed4ef28e1b22efc6bc6
 B32|Sicilian Defense: Löwenthal Variation|e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 e5|687d8b2c5cde4813072af1f7a20a85ce
@@ -2178,6 +2179,7 @@ B09|Pirc Defense: Austrian Attack|e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 O-O|7dc119c8fd0
 B09|Pirc Defense: Austrian Attack, Dragon Formation|e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 c5|f2877629b81fe7f9eb10ff7216140cf4
 B21|Sicilian Defense: Smith-Morra Gambit Accepted, Fianchetto Defense|e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 g6|58d908e1d8f1f01f4c256ffb7133f3f6
 B21|Sicilian Defense: Smith-Morra Gambit Accepted, Kan Formation|e4 c5 d4 cxd4 c3 dxc3 Nxc3 e6 Nf3 a6|83c2ddd7fe8032dfcc4ea99f2dcf4ce9
+B21|Sicilian Defense: Smith-Morra Gambit Accepted, Fianchetto Defense|e4 c5 d4 cxd4 c3 dxc3 Nxc3 d6 Nf3 g6|9e1f9e46e178319d7f347a7f924f5a9c
 B22|Sicilian Defense: Alapin Variation, Barmen Defense, Modern Line|e4 c5 c3 d5 exd5 Qxd5 d4 Nf6 Nf3 Bg4|6a1c2b31c83a6b3cf0162e49161b95f9
 B32|Sicilian Defense: Kalashnikov Variation|e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 e5 Nb5 d6|e043e81c04f70bd06ef5ce29548d7131
 B32|Sicilian Defense: O'Kelly Variation, Maróczy Bind, Geller Line|e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 a6 c4 e5|63495ed9cbafd9f3e586f4cbc99a5e04
@@ -2684,6 +2686,7 @@ B21|Sicilian Defense: Smith-Morra Gambit Accepted, Morphy Defense|e4 c5 d4 cxd4 
 B21|Sicilian Defense: Smith-Morra Gambit Accepted, Paulsen Formation|e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 e6 Bc4 a6|b62ab21f960e60d5ef1760d91d52d7b1
 B21|Sicilian Defense: Smith-Morra Gambit Accepted, Pin Defense|e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 e6 Bc4 Bb4|6b0c80f08d2091b88880527f52e2d84e
 B21|Sicilian Defense: Smith-Morra Gambit Accepted, Scheveningen Formation|e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 d6 Bc4 e6|bdb748c56423daa6d8f08c9869458212
+B21|Sicilian Defense: Smith-Morra Gambit Accepted, Fianchetto Defense|e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 d6 Bc4 g6|9930841afaacb05056a8ac716ebaad49
 B21|Sicilian Defense: Smith-Morra Gambit Accepted, Taimanov Formation|e4 c5 d4 cxd4 c3 dxc3 Nxc3 e6 Bc4 a6 Nf3 Ne7|b0302963748f7aebd668166edc9b0f8e
 B22|Sicilian Defense: Alapin Variation, Barmen Defense, Central Exchange|e4 c5 c3 d5 exd5 Qxd5 d4 cxd4 cxd4 Nc6 Nf3 Bg4|65ce3d87aa1bb99ceaa6747f85b9b4f5
 B60|Sicilian Defense: Richter-Rauzer Variation, Dragon Variation|e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 d6 Bg5 g6|3a4ff29a847c3fc54c2f577bef11f7f6
